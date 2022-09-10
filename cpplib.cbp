@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="cpplib" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="c:/tmp/cpplib/bin/Debug/libcpplib" prefix_auto="1" extension_auto="1" />
+				<Option object_output="c:/tmp/cpplib/obj/Debug/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-g" />
+					<Add directory="src/include" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="c:/tmp/cpplib/bin/Release/libcpplib" prefix_auto="1" extension_auto="1" />
+				<Option object_output="c:/tmp/cpplib/obj/Release/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add directory="include" />
+					<Add directory="src/include" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+		</Compiler>
+		<Unit filename="main.cpp" />
+		<Unit filename="src/ConfigManager.h" />
+		<Unit filename="src/algorithm_stream.h" />
+		<Unit filename="src/algorithm_util.h" />
+		<Unit filename="src/algorithm_util.hpp" />
+		<Unit filename="src/constants.cpp" />
+		<Unit filename="src/constants.h" />
+		<Unit filename="src/creator.hpp" />
+		<Unit filename="src/distance.hpp" />
+		<Unit filename="src/error.hpp" />
+		<Unit filename="src/generator.hpp" />
+		<Unit filename="src/genetic/Chromossome.cpp" />
+		<Unit filename="src/genetic/Chromossome.hpp" />
+		<Unit filename="src/genetic/Environment.cpp" />
+		<Unit filename="src/genetic/Environment.hpp" />
+		<Unit filename="src/genetic/Evolution.cpp" />
+		<Unit filename="src/genetic/Evolution.hpp" />
+		<Unit filename="src/genetic/Gene.cpp" />
+		<Unit filename="src/genetic/Gene.hpp" />
+		<Unit filename="src/genetic/Population.cpp" />
+		<Unit filename="src/genetic/Population.hpp" />
+		<Unit filename="src/genetic/Specimen.cpp" />
+		<Unit filename="src/genetic/Specimen.hpp" />
+		<Unit filename="src/global_types.cpp" />
+		<Unit filename="src/global_types.h" />
+		<Unit filename="src/html_util.cpp" />
+		<Unit filename="src/html_util.h" />
+		<Unit filename="src/id.hpp" />
+		<Unit filename="src/include/ConfigManager.h" />
+		<Unit filename="src/include/algorithm_stream.h" />
+		<Unit filename="src/include/algorithm_util.h" />
+		<Unit filename="src/include/algorithm_util.hpp" />
+		<Unit filename="src/include/constants.h" />
+		<Unit filename="src/include/creator.hpp" />
+		<Unit filename="src/include/distance.hpp" />
+		<Unit filename="src/include/error.hpp" />
+		<Unit filename="src/include/generator.hpp" />
+		<Unit filename="src/include/global_types.h" />
+		<Unit filename="src/include/html_util.h" />
+		<Unit filename="src/include/id.hpp" />
+		<Unit filename="src/include/io_util.hpp" />
+		<Unit filename="src/include/iro_object.hpp" />
+		<Unit filename="src/include/language.hpp" />
+		<Unit filename="src/include/locale.hpp" />
+		<Unit filename="src/include/log.h" />
+		<Unit filename="src/include/log.hpp" />
+		<Unit filename="src/include/macros.hpp" />
+		<Unit filename="src/include/mg.h" />
+		<Unit filename="src/include/my_boost.hpp" />
+		<Unit filename="src/include/name.hpp" />
+		<Unit filename="src/include/object.hpp" />
+		<Unit filename="src/include/posix_util.h" />
+		<Unit filename="src/include/random_util.hpp" />
+		<Unit filename="src/include/serialization.hpp" />
+		<Unit filename="src/include/streamable.hpp" />
+		<Unit filename="src/include/string_def.hpp" />
+		<Unit filename="src/include/string_util.h" />
+		<Unit filename="src/include/string_util.hpp" />
+		<Unit filename="src/include/sys_user_info.h" />
+		<Unit filename="src/include/telefone.h" />
+		<Unit filename="src/include/time_util.h" />
+		<Unit filename="src/include/type_manipulation.hpp" />
+		<Unit filename="src/include/validation.h" />
+		<Unit filename="src/include/validation.hpp" />
+		<Unit filename="src/include/version.hpp" />
+		<Unit filename="src/include/wstring_stream_hack.hpp" />
+		<Unit filename="src/io_util.cpp" />
+		<Unit filename="src/io_util.hpp" />
+		<Unit filename="src/language.cpp" />
+		<Unit filename="src/language.hpp" />
+		<Unit filename="src/locale.cpp" />
+		<Unit filename="src/locale.hpp" />
+		<Unit filename="src/log.cpp" />
+		<Unit filename="src/log.h" />
+		<Unit filename="src/log.hpp" />
+		<Unit filename="src/macros.hpp" />
+		<Unit filename="src/main.cpp" />
+		<Unit filename="src/mg.h" />
+		<Unit filename="src/my_boost.hpp" />
+		<Unit filename="src/name.hpp" />
+		<Unit filename="src/odb/odb.hpp" />
+		<Unit filename="src/posix_util.cpp" />
+		<Unit filename="src/random_util.cpp" />
+		<Unit filename="src/random_util.hpp" />
+		<Unit filename="src/serialization.hpp" />
+		<Unit filename="src/streamable.hpp" />
+		<Unit filename="src/string_def.hpp" />
+		<Unit filename="src/string_util.cpp" />
+		<Unit filename="src/string_util.h" />
+		<Unit filename="src/string_util.hpp" />
+		<Unit filename="src/sys_user_info.cpp" />
+		<Unit filename="src/sys_user_info.h" />
+		<Unit filename="src/system.cpp" />
+		<Unit filename="src/telefone.cpp" />
+		<Unit filename="src/test/algorithm_util_test.cpp" />
+		<Unit filename="src/test/config_manager_test.cpp" />
+		<Unit filename="src/test/dir_util_test.cpp" />
+		<Unit filename="src/test/distance_test.cpp" />
+		<Unit filename="src/test/dummy.cpp" />
+		<Unit filename="src/test/dummy.h" />
+		<Unit filename="src/test/fixed_columns_parser_test.cpp" />
+		<Unit filename="src/test/generator_test.cpp" />
+		<Unit filename="src/test/genetic/chromossome_test.cpp" />
+		<Unit filename="src/test/genetic/gene_test.cpp" />
+		<Unit filename="src/test/genetic/population_test.cpp" />
+		<Unit filename="src/test/genetic/specimen_test.cpp" />
+		<Unit filename="src/test/html_util_test.cpp" />
+		<Unit filename="src/test/id_test.cpp" />
+		<Unit filename="src/test/id_test.hpp" />
+		<Unit filename="src/test/io_util_test.cpp" />
+		<Unit filename="src/test/log_test.cpp" />
+		<Unit filename="src/test/main.cpp" />
+		<Unit filename="src/test/name_test.cpp" />
+		<Unit filename="src/test/odb/ODBTest.cpp" />
+		<Unit filename="src/test/random_util_test.cpp" />
+		<Unit filename="src/test/serialization_test.cpp" />
+		<Unit filename="src/test/string_util_test.cpp" />
+		<Unit filename="src/test/time_util_test.cpp" />
+		<Unit filename="src/time_util.cpp" />
+		<Unit filename="src/time_util.h" />
+		<Unit filename="src/type_manipulation.hpp" />
+		<Unit filename="src/validation.cpp" />
+		<Unit filename="src/validation.hpp" />
+		<Unit filename="src/version.hpp" />
+		<Unit filename="src/wstring_stream_hack.hpp" />
+		<Extensions>
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
