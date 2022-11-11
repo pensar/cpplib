@@ -1,0 +1,175 @@
+# depslib dependency file v1.0
+1584205422 source:c:\mg\prj\cpplib\main.cpp
+
+1662671574 source:c:\mg\prj\cpplib\src\genetic\environment.cpp
+	"Environment.hpp"
+
+1662671573 c:\mg\prj\cpplib\src\genetic\environment.hpp
+
+1662671574 source:c:\mg\prj\cpplib\src\genetic\evolution.cpp
+	"Evolution.hpp"
+
+1662671573 c:\mg\prj\cpplib\src\genetic\evolution.hpp
+
+1662671567 source:c:\mg\prj\cpplib\src\constants.cpp
+	"stdafx.h"
+	"constants.h"
+
+1590829540 c:\mg\prj\cpplib\src\include\constants.h
+	<cstdint>
+
+1662671573 source:c:\mg\prj\cpplib\src\genetic\chromossome.cpp
+	"Chromossome.hpp"
+
+1662671573 c:\mg\prj\cpplib\src\genetic\chromossome.hpp
+	<vector>
+	<utility>
+	<functional>
+	<iterator>
+	"Gene.hpp"
+
+1662671574 c:\mg\prj\cpplib\src\genetic\gene.hpp
+	<random>
+	<iostream>
+	<functional>
+	"random_util.hpp"
+	"log.hpp"
+
+1385625892 c:\mg\prj\cpplib\src\include\random_util.hpp
+	<chrono>
+	<random>
+	<cstdlib>
+
+1424944064 c:\mg\prj\cpplib\src\include\log.hpp
+	"stdafx.h"
+	"macros.hpp"
+	<iostream>
+	<fstream>
+	<string>
+
+1424944064 c:\mg\prj\cpplib\src\include\macros.hpp
+
+1662671573 source:c:\mg\prj\cpplib\src\genetic\gene.cpp
+	"Gene.hpp"
+
+1662671573 source:c:\mg\prj\cpplib\src\genetic\population.cpp
+	"Population.hpp"
+
+1662671573 c:\mg\prj\cpplib\src\genetic\population.hpp
+	<random>
+	<algorithm>
+	<utility>
+	<deque>
+	"Specimen.hpp"
+	"Environment.hpp"
+
+1662671574 c:\mg\prj\cpplib\src\genetic\specimen.hpp
+	"Chromossome.hpp"
+	"Environment.hpp"
+
+1662671574 source:c:\mg\prj\cpplib\src\genetic\specimen.cpp
+	"Specimen.hpp"
+
+1662671568 source:c:\mg\prj\cpplib\src\global_types.cpp
+	"stdafx.h"
+	"global_types.h"
+
+1294588232 c:\mg\prj\cpplib\src\include\global_types.h
+	<stdint.h>
+	<iostream>
+	<fstream>
+	<ios>
+	<string>
+
+1662671568 source:c:\mg\prj\cpplib\src\html_util.cpp
+	"stdafx.h"
+	"html_util.h"
+	<string>
+
+1294588232 c:\mg\prj\cpplib\src\include\html_util.h
+	<vcl.h>
+	<string>
+
+1662724561 source:c:\mg\prj\cpplib\src\io_util.cpp
+	"stdafx.h"
+	"mg.h"
+	<windows.h>
+	"io_util.hpp"
+	<sstream>
+	<ctime>
+	<sys/stat.h>
+	<algorithm>
+	<iostream>
+	<fcntl.h>
+	<unistd.h>
+	<cstring>
+	<fstream>
+	<string>
+
+1662671567 c:\mg\prj\cpplib\src\mg.h
+
+1662724461 c:\mg\prj\cpplib\src\io_util.hpp
+	<string>
+	<io.h>
+
+1662671568 source:c:\mg\prj\cpplib\src\log.cpp
+	"log.hpp"
+
+1662671567 c:\mg\prj\cpplib\src\log.hpp
+	"stdafx.h"
+	"macros.hpp"
+	<iostream>
+	<fstream>
+	<string>
+
+1662671567 c:\mg\prj\cpplib\src\macros.hpp
+
+1662671567 source:c:\mg\prj\cpplib\src\random_util.cpp
+	"random_util.hpp"
+
+1662671568 c:\mg\prj\cpplib\src\random_util.hpp
+	<chrono>
+	<random>
+	<cstdlib>
+
+1662671567 source:c:\mg\prj\cpplib\src\string_util.cpp
+	"StdAfx.h"
+	"string_util.hpp"
+	<iostream>
+
+1662671567 c:\mg\prj\cpplib\src\string_util.hpp
+	<vcl.h>
+	<string>
+	<vector>
+	<algorithm>
+	<functional>
+	<locale>
+	<cmath>
+	<iomanip>
+	<cctype>
+	<cwctype>
+	<memory>
+	<sstream>
+	<cassert>
+	"log.hpp"
+
+1662671567 source:c:\mg\prj\cpplib\src\sys_user_info.cpp
+	"stdafx.h"
+	<windows.h>
+	"sys_user_info.h"
+
+1662671567 c:\mg\prj\cpplib\src\sys_user_info.h
+	<string>
+
+1662671568 source:c:\mg\prj\cpplib\src\system.cpp
+	<string>
+
+1662671568 source:c:\mg\prj\cpplib\src\telefone.cpp
+	"stdafx.h"
+	"telefone.h"
+
+1662671567 c:\mg\prj\cpplib\src\telefone.h
+	<string>
+	<vcl.h>
+	"constants.h"
+
