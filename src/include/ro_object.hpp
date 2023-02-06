@@ -10,7 +10,7 @@ namespace pensar_digital
         class RO_Object
         {
             public:
-                using IdType                        = unsigned int64_t;
+                using IdType                        = int64_t; // istream >> unsigned long was not compiling.
                 using HashType                      = int64_t;
                 using VersionType                   = int16_t;
                 const static VersionType VERSION           = 1;

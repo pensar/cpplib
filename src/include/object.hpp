@@ -20,9 +20,9 @@ namespace pensar_digital
                 /** Copy constructor
                  *  \param other Object to copy from
                  */
-                Object(const Object& o) {assign (o);}
+                Object(const RO_Object& o) {assign (o);}
 
-                virtual Object& assign (const Object& o) {id = o.get_id (); return *this;}
+                virtual Object& assign (const RO_Object& o) {id = o.get_id (); return *this;}
 
                 /** Assignment operator
                  *  \param o Object to assign from
@@ -38,6 +38,7 @@ namespace pensar_digital
            protected:
                 virtual std::istream& ReadFromStream (std::istream& is, const VersionType v)
                 {
+                    int i;
                     switch (v)
                     {
                         case 1:
