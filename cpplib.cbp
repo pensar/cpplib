@@ -7,28 +7,42 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="c:/tmp/cpplib/bin/Debug/libcpplib" prefix_auto="1" extension_auto="1" />
-				<Option object_output="c:/tmp/cpplib/obj/Debug/" />
-				<Option type="3" />
+				<Option output="#out/debug/bin/cpplib" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="#out/debug/bin" />
+				<Option object_output="#out/debug/obj" />
+				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option createDefFile="1" />
-				<Option createStaticLib="1" />
+				<Option parameters="--run_test=" />
+				<Option host_application="cpplib.exe" />
+				<Option run_host_application_in_terminal="0" />
 				<Compiler>
+					<Add option="-Wall" />
 					<Add option="-g" />
-					<Add directory="src/include" />
+					<Add option="-std=gnu++20" />
+					<Add directory="test" />
+					<Add directory="textdb" />
+					<Add directory="$(PROJECT_DIR)" />
+					<Add directory="$(PROJECT_DIR)/genetic" />
+					<Add directory="$(PROJECT_DIR)/odb" />
+					<Add directory="$(PROJECT_DIR)/test" />
+					<Add directory="../unit_test" />
+					<Add directory="C:/mingw64/include" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
-				<Option output="c:/tmp/cpplib/bin/Release/libcpplib" prefix_auto="1" extension_auto="1" />
-				<Option object_output="c:/tmp/cpplib/obj/Release/" />
-				<Option type="3" />
+				<Option output="#out/release/bin/cpplib" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="#out/release/obj" />
+				<Option type="2" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
-				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
-					<Add directory="include" />
-					<Add directory="src/include" />
+					<Add option="-Wall" />
+					<Add option="-std=c11" />
+					<Add option="-DWINDOWS" />
+					<Add option="-DWIN32" />
+					<Add directory="c:/projects/cpplib/" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -36,136 +50,76 @@
 			</Target>
 		</Build>
 		<Compiler>
-			<Add option="-Wall" />
-			<Add option="-fexceptions" />
+			<Add option="-std=c11" />
+			<Add option="-DTEST_DIR=#out/test" />
+			<Add directory="c:/projects/cpplib/" />
+			<Add directory="C:/projects/cpplib/odb" />
 		</Compiler>
-		<Unit filename="main.cpp" />
-		<Unit filename="src/ConfigManager.h" />
-		<Unit filename="src/algorithm_stream.h" />
-		<Unit filename="src/algorithm_util.h" />
-		<Unit filename="src/algorithm_util.hpp" />
-		<Unit filename="src/constants.cpp" />
-		<Unit filename="src/constants.h" />
-		<Unit filename="src/creator.hpp" />
-		<Unit filename="src/distance.hpp" />
-		<Unit filename="src/error.hpp" />
-		<Unit filename="src/generator.hpp" />
-		<Unit filename="src/genetic/Chromossome.cpp" />
-		<Unit filename="src/genetic/Chromossome.hpp" />
-		<Unit filename="src/genetic/Environment.cpp" />
-		<Unit filename="src/genetic/Environment.hpp" />
-		<Unit filename="src/genetic/Evolution.cpp" />
-		<Unit filename="src/genetic/Evolution.hpp" />
-		<Unit filename="src/genetic/Gene.cpp" />
-		<Unit filename="src/genetic/Gene.hpp" />
-		<Unit filename="src/genetic/Population.cpp" />
-		<Unit filename="src/genetic/Population.hpp" />
-		<Unit filename="src/genetic/Specimen.cpp" />
-		<Unit filename="src/genetic/Specimen.hpp" />
-		<Unit filename="src/global_types.cpp" />
-		<Unit filename="src/global_types.h" />
-		<Unit filename="src/html_util.cpp" />
-		<Unit filename="src/html_util.h" />
-		<Unit filename="src/id.hpp" />
-		<Unit filename="src/include/ConfigManager.h" />
-		<Unit filename="src/include/algorithm_stream.h" />
-		<Unit filename="src/include/algorithm_util.h" />
-		<Unit filename="src/include/algorithm_util.hpp" />
-		<Unit filename="src/include/constants.h" />
-		<Unit filename="src/include/creator.hpp" />
-		<Unit filename="src/include/distance.hpp" />
-		<Unit filename="src/include/error.hpp" />
-		<Unit filename="src/include/generator.hpp" />
-		<Unit filename="src/include/global_types.h" />
-		<Unit filename="src/include/html_util.h" />
-		<Unit filename="src/include/id.hpp" />
-		<Unit filename="src/include/io_util.hpp" />
-		<Unit filename="src/include/iro_object.hpp" />
-		<Unit filename="src/include/language.hpp" />
-		<Unit filename="src/include/locale.hpp" />
-		<Unit filename="src/include/log.h" />
-		<Unit filename="src/include/log.hpp" />
-		<Unit filename="src/include/macros.hpp" />
-		<Unit filename="src/include/mg.h" />
-		<Unit filename="src/include/my_boost.hpp" />
-		<Unit filename="src/include/name.hpp" />
-		<Unit filename="src/include/object.hpp" />
-		<Unit filename="src/include/posix_util.h" />
-		<Unit filename="src/include/random_util.hpp" />
-		<Unit filename="src/include/serialization.hpp" />
-		<Unit filename="src/include/streamable.hpp" />
-		<Unit filename="src/include/string_def.hpp" />
-		<Unit filename="src/include/string_util.h" />
-		<Unit filename="src/include/string_util.hpp" />
-		<Unit filename="src/include/sys_user_info.h" />
-		<Unit filename="src/include/telefone.h" />
-		<Unit filename="src/include/time_util.h" />
-		<Unit filename="src/include/type_manipulation.hpp" />
-		<Unit filename="src/include/validation.h" />
-		<Unit filename="src/include/validation.hpp" />
-		<Unit filename="src/include/version.hpp" />
-		<Unit filename="src/include/wstring_stream_hack.hpp" />
-		<Unit filename="src/io_util.cpp" />
-		<Unit filename="src/io_util.hpp" />
-		<Unit filename="src/language.cpp" />
-		<Unit filename="src/language.hpp" />
-		<Unit filename="src/locale.cpp" />
-		<Unit filename="src/locale.hpp" />
-		<Unit filename="src/log.cpp" />
-		<Unit filename="src/log.h" />
-		<Unit filename="src/log.hpp" />
-		<Unit filename="src/macros.hpp" />
-		<Unit filename="src/main.cpp" />
-		<Unit filename="src/mg.h" />
-		<Unit filename="src/my_boost.hpp" />
-		<Unit filename="src/name.hpp" />
-		<Unit filename="src/odb/odb.hpp" />
-		<Unit filename="src/posix_util.cpp" />
-		<Unit filename="src/random_util.cpp" />
-		<Unit filename="src/random_util.hpp" />
-		<Unit filename="src/serialization.hpp" />
-		<Unit filename="src/streamable.hpp" />
-		<Unit filename="src/string_def.hpp" />
-		<Unit filename="src/string_util.cpp" />
-		<Unit filename="src/string_util.h" />
-		<Unit filename="src/string_util.hpp" />
-		<Unit filename="src/sys_user_info.cpp" />
-		<Unit filename="src/sys_user_info.h" />
-		<Unit filename="src/system.cpp" />
-		<Unit filename="src/telefone.cpp" />
-		<Unit filename="src/test/algorithm_util_test.cpp" />
-		<Unit filename="src/test/config_manager_test.cpp" />
-		<Unit filename="src/test/dir_util_test.cpp" />
-		<Unit filename="src/test/distance_test.cpp" />
-		<Unit filename="src/test/dummy.cpp" />
-		<Unit filename="src/test/dummy.h" />
-		<Unit filename="src/test/fixed_columns_parser_test.cpp" />
-		<Unit filename="src/test/generator_test.cpp" />
-		<Unit filename="src/test/genetic/chromossome_test.cpp" />
-		<Unit filename="src/test/genetic/gene_test.cpp" />
-		<Unit filename="src/test/genetic/population_test.cpp" />
-		<Unit filename="src/test/genetic/specimen_test.cpp" />
-		<Unit filename="src/test/html_util_test.cpp" />
-		<Unit filename="src/test/id_test.cpp" />
-		<Unit filename="src/test/id_test.hpp" />
-		<Unit filename="src/test/io_util_test.cpp" />
-		<Unit filename="src/test/log_test.cpp" />
-		<Unit filename="src/test/main.cpp" />
-		<Unit filename="src/test/name_test.cpp" />
-		<Unit filename="src/test/odb/ODBTest.cpp" />
-		<Unit filename="src/test/random_util_test.cpp" />
-		<Unit filename="src/test/serialization_test.cpp" />
-		<Unit filename="src/test/string_util_test.cpp" />
-		<Unit filename="src/test/time_util_test.cpp" />
-		<Unit filename="src/time_util.cpp" />
-		<Unit filename="src/time_util.h" />
-		<Unit filename="src/type_manipulation.hpp" />
-		<Unit filename="src/validation.cpp" />
-		<Unit filename="src/validation.hpp" />
-		<Unit filename="src/version.hpp" />
-		<Unit filename="src/wstring_stream_hack.hpp" />
+		<Unit filename="../unit_test/test.cpp" />
+		<Unit filename="../unit_test/test.hpp" />
+		<Unit filename="algorithm_util.hpp" />
+		<Unit filename="constants.h" />
+		<Unit filename="distance.hpp" />
+		<Unit filename="error.hpp" />
+		<Unit filename="generator.hpp" />
+		<Unit filename="genetic/Chromossome.cpp" />
+		<Unit filename="genetic/Chromossome.hpp" />
+		<Unit filename="genetic/Environment.cpp" />
+		<Unit filename="genetic/Environment.hpp" />
+		<Unit filename="genetic/Evolution.cpp" />
+		<Unit filename="genetic/Evolution.hpp" />
+		<Unit filename="genetic/Gene.cpp" />
+		<Unit filename="genetic/Gene.hpp" />
+		<Unit filename="genetic/Population.cpp" />
+		<Unit filename="genetic/Population.hpp" />
+		<Unit filename="genetic/Specimen.cpp" />
+		<Unit filename="genetic/Specimen.hpp" />
+		<Unit filename="global_types.cpp" />
+		<Unit filename="global_types.h" />
+		<Unit filename="html_util.cpp" />
+		<Unit filename="html_util.h" />
+		<Unit filename="io_util.cpp" />
+		<Unit filename="io_util.hpp" />
+		<Unit filename="locale.hpp" />
+		<Unit filename="log.cpp" />
+		<Unit filename="log.hpp" />
+		<Unit filename="macros.hpp" />
+		<Unit filename="mg.hpp" />
+		<Unit filename="name.hpp" />
+		<Unit filename="object.hpp" />
+		<Unit filename="odb/odb.hpp" />
+		<Unit filename="posix_util.cpp" />
+		<Unit filename="posix_util.h" />
+		<Unit filename="random_util.cpp" />
+		<Unit filename="random_util.hpp" />
+		<Unit filename="streamable.hpp" />
+		<Unit filename="string_def.hpp" />
+		<Unit filename="string_util.cpp" />
+		<Unit filename="string_util.hpp" />
+		<Unit filename="sys_user_info.cpp" />
+		<Unit filename="sys_user_info.hpp" />
+		<Unit filename="system.cpp" />
+		<Unit filename="telefone.cpp" />
+		<Unit filename="telefone.h" />
+		<Unit filename="test/main.cpp">
+			<Option target="Debug" />
+		</Unit>
+		<Unit filename="time_util.cpp" />
+		<Unit filename="time_util.h" />
+		<Unit filename="validation.cpp" />
+		<Unit filename="validation.hpp" />
+		<Unit filename="version.hpp" />
+		<Unit filename="wstring_stream_hack.hpp" />
 		<Extensions>
-			<lib_finder disable_auto="1" />
+			<DoxyBlocks>
+				<comment_style block="2" line="2" />
+				<doxyfile_project />
+				<doxyfile_build />
+				<doxyfile_warnings />
+				<doxyfile_output />
+				<doxyfile_dot class_diagrams="1" />
+				<general />
+			</DoxyBlocks>
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>
