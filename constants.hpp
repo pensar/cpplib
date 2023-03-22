@@ -9,9 +9,10 @@ namespace pensar_digital
 {
     namespace cpplib
     {
-        extern const int ID_INEXISTENTE;
-
-        typedef int32_t VersionType;
+        using Id                        = int64_t; // istream >> unsigned long was not compiling.
+        using Hash                      = int64_t;
+        using Version                   = int16_t;
+        extern const Id NULL_ID;
     }   // namespace cpplib
 }       // namespace pensar_digital
 
