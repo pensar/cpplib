@@ -12,6 +12,7 @@ namespace pensar_digital
         using Id                        = int64_t; // istream >> unsigned long was not compiling.
         using Hash                      = int64_t;
         using Version                   = int16_t;
+        using FileSize                  = int64_t;
         extern const Id NULL_ID;
     }   // namespace cpplib
 }       // namespace pensar_digital
