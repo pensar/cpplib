@@ -1,4 +1,6 @@
-// $Id: string_util.cpp 70 2014-01-16 07:04:22Z mgpensar $
+// author : Mauricio Gomes
+// license: MIT (https://opensource.org/licenses/MIT)
+
 
 
 #ifdef CODE_GEAR

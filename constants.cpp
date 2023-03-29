@@ -1,3 +1,5 @@
+// author : Mauricio Gomes
+// license: MIT (https://opensource.org/licenses/MIT)
 
 #ifdef CODE_GEAR
 #pragma hdrstop

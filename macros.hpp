@@ -1,3 +1,6 @@
+// author : Mauricio Gomes
+// license: MIT (https://opensource.org/licenses/MIT)
+
 #ifndef MACROS_HPP_INCLUDED
 #define MACROS_HPP_INCLUDED
 

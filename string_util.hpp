@@ -1,4 +1,6 @@
-// $Id: string_util.hpp 70 2014-01-16 07:04:22Z mgpensar $
+// author : Mauricio Gomes
+// license: MIT (https://opensource.org/licenses/MIT)
+
 
 #ifndef string_utilH
 #define string_utilH

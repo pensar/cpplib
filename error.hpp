@@ -1,3 +1,6 @@
+// author : Mauricio Gomes
+// license: MIT (https://opensource.org/licenses/MIT)
+
 #ifndef ERROR_HPP_INCLUDED
 #define ERROR_HPP_INCLUDED
 

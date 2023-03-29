@@ -17,11 +17,15 @@
 #include <iostream>
 
 #include <fcntl.h>  // O_RDONLY
+// author : Mauricio Gomes
+// license: MIT (https://opensource.org/licenses/MIT)
 
 #ifndef VISUAL_STUDIO
 #include <unistd.h> // read
 #endif
 
+// author : Mauricio Gomes
+// license: MIT (https://opensource.org/licenses/MIT)
 
 #include <cstring>  // memchr
 #include <fstream>
