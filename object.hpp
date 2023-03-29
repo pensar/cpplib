@@ -92,7 +92,7 @@ namespace pensar_digital
                 /// \return true if they are equal, false otherwise.
                 /// \see equals
                 ///
-                virtual _equals (const Object& o) const { return id == o.id;}
+                virtual bool _equals (const Object& o) const { return (id == o.id);}
             private:
 
                 Id id; //!< Member variable "id"

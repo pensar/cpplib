@@ -1,41 +1,50 @@
 #ifndef LOCALE_HPP
 #define LOCALE_HPP
 
-#include <id.hpp>
+#include "object.hpp"
+#include "string_def.hpp"
+#include "language.hpp"
+#include "country.hpp"
 
-template <class String = string>
-class Locale : public Id
+namespace pensar_digital
 {
-  public:
-    /** Default constructor */
-    Locale (const typename Id::value_type aid = -1,);
-    /** Default destructor */
-    virtual ~locale();
-    /** Copy constructor
-     *  \param other Object to copy from
-     */
-    locale(const locale& other);
-    /** Assignment operator
-     *  \param other Object to assign from
-     *  \return A reference to this
-     */
-    locale& operator=(const locale& other);
-    /** Access name
-     * \return The current value of name
-     */
-    String Getname() { return name; }
-    /** Access language
-     * \return The current value of language
-     */
-    Language* Getlanguage() { return language; }
-    /** Access country
-     * \return The current value of country
-     */
-    Country* Getcountry() { return country; }
-  protected:
-  private:
-    Language* language; //!< Member variable "language"
-    Country* country; //!< Member variable "country"
-};
+    namespace cpplib
+    {
+        class Locale : public Object
+        {
+        public:
+            /** Default constructor */
+            Locale(const typename Id aid = NULL_ID) {}
+            /** Default destructor */
+            virtual ~Locale() {}
+            /** Copy constructor
+             *  \param other Object to copy from
+             */
+            Locale(const Locale& other) {}
+            /** Assignment operator
+             *  \param other Object to assign from
+             *  \return A reference to this
+             */
+            Locale& operator=(const Locale& other) {}
+            /** Access name
+             * \return The current value of name
+             */
+            String get_name() { return ""; }
+            /** Access language
+             * \return The current value of language
+             */
+            Language* get_language() { return language; }
 
+            /** Access country
+             * \return The current value of country
+             */
+            Country* get_country() { return country; }
+
+        protected:
+        private:
+            Language* language; //!< Member variable "language"
+            Country* country; //!< Member variable "country"
+        };
+    }
+}
 #endif // LOCALE_HPP

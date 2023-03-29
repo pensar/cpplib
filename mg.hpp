@@ -11,14 +11,14 @@
 //Windows Server 2003, Windows XP	0x0501
 //Windows 2000	0x0500
 
-#ifdef WINDOWS
-    #ifndef WINVER
-    #define WINVER 0x0502
-    #endif
-
-    #ifndef _WIN32_WINNT
-    #define _WIN32_WINNT 0x0502
-    #endif
-#endif
+//#ifdef WINDOWS
+//    #ifndef WINVER
+//    #define WINVER 0x0502
+//    #endif
+//
+//    #ifndef _WIN32_WINNT
+//    #define _WIN32_WINNT 0x0502
+//    #endif
+//#endif
 
 #endif

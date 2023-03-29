@@ -1,8 +1,5 @@
 // $Id: io_util.cpp 40 2010-07-16 22:04:49Z mgpensar $
 
-#ifdef VISUAL_STUDIO
-#include "stdafx.h"
-#endif
 #ifdef CODE_GEAR
 #pragma hdrstop
 #endif
@@ -20,7 +17,12 @@
 #include <iostream>
 
 #include <fcntl.h>  // O_RDONLY
+
+#ifndef VISUAL_STUDIO
 #include <unistd.h> // read
+#endif
+
+
 #include <cstring>  // memchr
 #include <fstream>
 #include <string>

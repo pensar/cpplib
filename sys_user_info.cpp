@@ -1,8 +1,5 @@
 // $Id: sys_user_info.cpp 70 2014-01-16 07:04:22Z mgpensar $
 
-#ifdef VISUAL_STUDIO
-#include "stdafx.h"
-#endif
 
 #ifdef CODE_GEAR
 #pragma hdrstop
@@ -37,11 +34,11 @@ namespace pensar_digital
 
         std::string get_user_home ()
         {
-            char*  s;
             std::string home;
 
             #ifdef WINDOWS
             // Get home dir from environment variables
+            char*  s;
             s = getenv("USERPROFILE");
             if (s)
             {

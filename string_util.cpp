@@ -1,8 +1,5 @@
 // $Id: string_util.cpp 70 2014-01-16 07:04:22Z mgpensar $
 
-#ifdef VISUAL_STUDIO
-#include "StdAfx.h"
-#endif
 
 #ifdef CODE_GEAR
 #pragma hdrstop

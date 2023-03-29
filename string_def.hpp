@@ -5,7 +5,7 @@
 
 namespace pensar_digital
 {
-  typedef std::string String;
+  using String = std::string;
 }
 
 #endif // STRING_DEF_HPP_INCLUDED

@@ -1,9 +1,8 @@
-#include "test.hpp"
+#include "..\unit-test\test.hpp"
 
-namespace pd = pensar_digital::unit_test;
-
-int main ()
+int main()
 {
-    pd::AllTests.run ();
+    namespace test = pensar_digital::unit_test;
+    test::all_tests ().run ();
     return 0;
 }

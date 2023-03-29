@@ -1,7 +1,8 @@
-// $Id: constantes.h 40 2010-07-16 22:04:49Z mgpensar $
+// author : Mauricio Gomes
+// license: MIT (https://opensource.org/licenses/MIT)
 
-#ifndef constantesH
-#define constantesH
+#ifndef constantesHPP
+#define constantesHPP
 //---------------------------------------------------------------------------
 #include <cstdint>
 

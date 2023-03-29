@@ -1,7 +1,8 @@
 #ifndef GENERATOR_HPP_INCLUDED
 #define GENERATOR_HPP_INCLUDED
 
-#include "version.hpp"
+#include "object.hpp"
+#include "error.hpp"
 
 namespace pensar_digital
 {
@@ -21,37 +22,35 @@ namespace pensar_digital
       ///
       ///  };
       /// \endcode
-      template <class T = int>
-      class Generator : public Version
+      template <class T>
+      class Generator : public Object
       {
         public:
         /// \brief Constructs a Generator.
         /// \param [in] initial_value Initial value for the generator, defaults to 0.
         /// \param [in] astep Step to be used when incrementing the generator, defaults to 1.
-        Generator(T initial_value = 0, T astep = 1): Version(0), value(initial_value), step(astep) {};
+            Generator(Id aid = NULL_ID, Id initial_value = 0, Id astep = 1) : Object(aid), value(initial_value), step(astep) {};
         virtual ~Generator(){};
 
         /// \brief Increments value and return the new value.
         /// \return The new value.
-        T get () { value += step; return value; }
+        Id get () { value += step; return value; }
 
         /// \brief Gets the next value without incrementing the current one.
         /// \return The next value.
-        T get_next () const { return (value + step); }
+        Id get_next () const { return (value + step); }
 
         /// \brief Gets the current value.
         /// \return The current value.
-        T get_current () const { return value; }
+        Id get_current () const { return value; }
 
         /// \brief Set value. Next call to get will get value + 1.
         /// \param val New value to set
-        void set_value(T val) { value = val; }
-        using Version::operator <<;
-        using Version::operator >>;
+        void set_value(Id val) { value = val; }
 
-        virtual std::istream& ReadFromStream (std::istream& is, const Version::V v)
+        virtual std::istream& ReadFromStream (std::istream& is, const Version v)
         {
-            Version::V version;
+            Version version;
             is >> version;
             switch (version)
             {
@@ -63,7 +62,7 @@ namespace pensar_digital
             return is;
         };
 
-        virtual std::ostream& WriteToStream (std::ostream& os, const Version::V v) const
+        virtual std::ostream& WriteToStream (std::ostream& os, const Version v) const
         {
             switch (v)
             {
@@ -77,8 +76,8 @@ namespace pensar_digital
 
         private:
 
-        T value; //!< Member variable "id"
-        T step;  //!< Step to increment value.
+        Id value; //!< Member variable "id"
+        Id step;  //!< Step to increment value.
       };
     }
 }

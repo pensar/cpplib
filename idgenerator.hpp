@@ -11,7 +11,7 @@ namespace pensar_digital
         class IdGenerator
         {
             public:
-                IdGenerator(): id(Object::NULL_ID) {}
+                IdGenerator(): id(NULL_ID) {}
                 virtual ~IdGenerator() {}
 
                 Id get_id () { return ++id;}

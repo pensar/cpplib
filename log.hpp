@@ -1,10 +1,6 @@
 #ifndef LOG_H_INCLUDED
 #define LOG_H_INCLUDED
 
-#ifdef VISUAL_STUDIO
-#include "stdafx.h"
-#endif
-
 #include "macros.hpp"
 #include <iostream>
 #include <fstream>

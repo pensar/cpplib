@@ -1,8 +1,4 @@
 
-#ifdef VISUAL_STUDIO
-  #include "stdafx.h"
-#endif
-
 #ifdef CODE_GEAR
 #pragma hdrstop
 #endif

@@ -75379,13 +75379,13 @@
 1679419424 source:c:\mg\prj\unit_test\test.cpp
 	"test.hpp"
 
-1679419368 c:\mg\prj\unit_test\test.hpp
-	"name.hpp"
-	"idgenerator.hpp"
-	"macros.hpp"
-	"string_def.hpp"
-	"string_util.hpp"
-	"error.hpp"
+1680036338 c:\mg\prj\unit_test\test.hpp
+	"../cpplib/name.hpp"
+	"../cpplib/generator.hpp"
+	"../cpplib/macros.hpp"
+	"../cpplib/string_def.hpp"
+	"../cpplib/string_util.hpp"
+	"../cpplib/error.hpp"
 	<string>
 	<stdexcept>
 	<sstream>
@@ -75441,8 +75441,7 @@
 	<cassert>
 	"log.hpp"
 
-1672739626 c:\mg\prj\cpplib\\log.hpp
-	"stdafx.h"
+1679926230 c:\mg\prj\cpplib\\log.hpp
 	"macros.hpp"
 	<iostream>
 	<fstream>
@@ -75521,8 +75520,7 @@
 	<vcl.h>
 	<string>
 
-1678381737 source:c:\mg\prj\cpplib\io_util.cpp
-	"stdafx.h"
+1679927340 source:c:\mg\prj\cpplib\io_util.cpp
 	<windows.h>
 	"io_util.hpp"
 	<sstream>
@@ -75537,16 +75535,17 @@
 
 1294606232 c:\mg\prj\cpplib\mg.h
 
-1679408509 c:\mg\prj\cpplib\io_util.hpp
+1679924142 c:\mg\prj\cpplib\io_util.hpp
 	"object.hpp"
 	<string>
 	<filesystem>
+	<experimental/filesystem>
+	<io.h>
 
 1672739626 source:c:\mg\prj\cpplib\log.cpp
 	"log.hpp"
 
-1672739626 c:\mg\prj\cpplib\log.hpp
-	"stdafx.h"
+1679926230 c:\mg\prj\cpplib\log.hpp
 	"macros.hpp"
 	<iostream>
 	<fstream>
@@ -75580,8 +75579,7 @@
 	<random>
 	<cstdlib>
 
-1672739626 source:c:\mg\prj\cpplib\string_util.cpp
-	"StdAfx.h"
+1679926098 source:c:\mg\prj\cpplib\string_util.cpp
 	"string_util.hpp"
 	<iostream>
 
@@ -75601,8 +75599,7 @@
 	<cassert>
 	"log.hpp"
 
-1678382805 source:c:\mg\prj\cpplib\sys_user_info.cpp
-	"stdafx.h"
+1679927390 source:c:\mg\prj\cpplib\sys_user_info.cpp
 	<windows.h>
 	"sys_user_info.hpp"
 
@@ -75899,10 +75896,11 @@
 	<sstream>
 	<vcl.h>
 
-1679484081 c:\mg\prj\cpplib\\object.hpp
+1679759819 c:\mg\prj\cpplib\\object.hpp
+	"constants.hpp"
 	<iostream>
 
-1678031910 c:\mg\prj\cpplib\\idgenerator.hpp
+1679693223 c:\mg\prj\cpplib\\idgenerator.hpp
 	"object.hpp"
 
 1678381758 source:c:\mg\prj\cpplib\time_util.cpp
@@ -75939,16 +75937,85 @@
 1678382939 c:\mg\prj\cpplib\sys_user_info.hpp
 	<string>
 
-1679483910 source:c:\mg\prj\cpplib\test\main.cpp
+1679694441 source:c:\mg\prj\cpplib\test\main.cpp
 	"../../unit_test/test.hpp"
 	"io_util.hpp"
+	"constants.hpp"
+	"memory.h"
 	<iostream>
 
-1679484081 c:\mg\prj\cpplib\object.hpp
+1679759819 c:\mg\prj\cpplib\object.hpp
+	"constants.hpp"
 	<iostream>
 
-1679408509 c:\mg\prj\cpplib\\io_util.hpp
+1679659695 c:\mg\prj\cpplib\\io_util.hpp
 	"object.hpp"
 	<string>
-	<filesystem>
+	<experimental/filesystem>
+	<io.h>
+
+1679922275 c:\mg\prj\cpplib\\constants.hpp
+	<cstdint>
+
+1679922275 c:\mg\prj\cpplib\constants.hpp
+	<cstdint>
+
+1679693828 source:c:\mg\prj\cpplib\memory.c
+	<windows.h>
+	<psapi.h>
+	<unistd.h>
+	<sys/resource.h>
+	<mach/mach.h>
+	<fcntl.h>
+	<procfs.h>
+	<stdio.h>
+
+1679928124 source:c:\mg\prj\cpplib\constants.cpp
+	"constants.hpp"
+
+1679693545 c:\mg\prj\cpplib\\memory.h
+
+1680059554 source:c:\mg\prj\cpplib\main.cpp
+	"..\unit-test\test.hpp"
+
+1680059617 c:\mg\prj\unit-test\test.hpp
+	"..\cpplib\constants.hpp"
+	"..\cpplib\name.hpp"
+	"..\cpplib\generator.hpp"
+	"..\cpplib\macros.hpp"
+	"..\cpplib\string_def.hpp"
+	"..\cpplib\string_util.hpp"
+	"..\cpplib\error.hpp"
+	<string>
+	<stdexcept>
+	<sstream>
+	<unordered_map>
+	<queue>
+	<iostream>
+
+1676918566 c:\mg\prj\cpplib\name.hpp
+	"object.hpp"
+	"string_def.hpp"
+
+1679949596 c:\mg\prj\cpplib\string_def.hpp
+	<string>
+
+1679926780 c:\mg\prj\cpplib\generator.hpp
+	"object.hpp"
+	"error.hpp"
+
+1679419266 c:\mg\prj\cpplib\error.hpp
+	"string_def.hpp"
+	"object.hpp"
+	<stdexcept>
+	<sstream>
+
+1680059282 source:c:\mg\prj\unit-test\test.cpp
+	"test.hpp"
+	"..\cpplib\constants.hpp"
+
+1680059822 source:c:\mg\prj\cpplib\test\name_test.cpp
+	"../../unit-test/test.hpp"
+	"../name.hpp"
+	"../string_def.hpp"
 

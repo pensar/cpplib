@@ -1,23 +1,19 @@
-#include "Language.hpp"
+#include "language.hpp"
 
-Language::Language()
+namespace pensar_digital
 {
-    //ctor
-}
+    namespace cpplib
+    {
+        Language::Language(const Language& other)
+        {
+            //copy ctor
+        }
 
-Language::~Language()
-{
-    //dtor
-}
-
-Language::Language(const Language& other)
-{
-    //copy ctor
-}
-
-Language& Language::operator=(const Language& rhs)
-{
-    if (this == &rhs) return *this; // handle self assignment
-    //assignment operator
-    return *this;
+        Language& Language::operator=(const Language& rhs)
+        {
+            if (this == &rhs) return *this; // handle self assignment
+            //assignment operator
+            return *this;
+        }
+    }
 }

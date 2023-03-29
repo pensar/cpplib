@@ -1,4 +1,4 @@
- // author : Mauricio Gomes
+// author : Mauricio Gomes
 // license: MIT (https://opensource.org/licenses/MIT)
 
 #ifndef io_utilH
@@ -6,7 +6,12 @@
 
 #include "object.hpp"
 #include <string>
+#ifdef VISUAL_STUDIO
+#include <filesystem>
+#else
 #include <experimental/filesystem>
+#endif
+
 
 #ifdef WINDOWS
     #include <io.h>
@@ -16,8 +21,11 @@ namespace pensar_digital
 {
     namespace cpplib
     {
-        namespace fs = std::experimental::filesystem;
-
+            #ifdef VISUAL_STUDIO
+                namespace fs = std::filesystem;
+            #else
+                namespace fs = std::experimental::filesystem;
+            #endif
         /// \brief File class.
         ///
         class File: Object
