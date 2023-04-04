@@ -7,59 +7,12 @@
 #include "constants.hpp"
 
 #include <iostream>
+#include <memory>
 
 namespace pensar_digital
 {
     namespace cpplib
     {
-        template <class T, typename... Args>
-        class InstantiationPolicy
-        {
-            public:
-            virtual T get (Args&& ... args) = 0;
-            virtual T get () = 0;
-        };
-
-        template <class T, typename... Args>
-        class NewInstantiationPolicy: public InstantiationPolicy <T, Args...>
-        {
-            T get(Args&& ... args){ return T(std::forward<Args>(args) ... ); }
-            T get () { return * new T(); }
-        };
-
-        template <class T, typename... Args>
-        class MockupInstantiationPolicy: public InstantiationPolicy <T, Args...>
-        {
-            public:
-                /// MockupInstantiationPolicy will take ownership over the amockup object.
-                MockupInstantiationPolicy (T* amockup) : mockup(amockup) { };
-                ~MockupInstantiationPolicy () { free (mockup); }
-
-                T get (Args&& ... args) { return *mockup; }
-                T get (               ) { return *mockup; }
-
-            private:
-                T* mockup;
-        };
-
-        template <class T, typename... Args>
-        class Factory
-        {
-            public:
-                const static Version VERSION           = 1;
-                const static Version INTERFACE_VERSION = 1;
-                Factory (InstantiationPolicy <T, Args...>* apolicy = new NewInstantiationPolicy<T, Args...>): policy (apolicy) {}
-                ~Factory () { free (policy); }
-                T get (Args&& ... args) { return policy->get (std::forward<Args>(args) ... ); }
-                T get () { return policy->get (); }
-
-                /// set_policy will take ownership over the passed policy pointer.
-                /// \param InstantiationPolicy pointer to be used by the factory.
-                void set_policy (InstantiationPolicy <T, Args...>* apolicy) { policy = apolicy; };
-            private:
-                InstantiationPolicy <T, Args...>* policy;
-        };
-
         class Object
         {
             public:

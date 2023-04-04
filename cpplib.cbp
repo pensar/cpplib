@@ -43,16 +43,22 @@
 		<Unit filename="constants.cpp" />
 		<Unit filename="constants.hpp" />
 		<Unit filename="error.hpp" />
+		<Unit filename="factory.hpp" />
 		<Unit filename="generator.hpp" />
 		<Unit filename="io_util.cpp" />
 		<Unit filename="io_util.hpp" />
 		<Unit filename="macros.hpp" />
 		<Unit filename="main.cpp" />
+		<Unit filename="memory.cpp" />
+		<Unit filename="memory.hpp" />
 		<Unit filename="name.hpp" />
 		<Unit filename="object.hpp" />
 		<Unit filename="string_def.hpp" />
 		<Unit filename="string_util.cpp" />
 		<Unit filename="string_util.hpp" />
+		<Unit filename="test/factory_test.cpp">
+			<Option target="debug" />
+		</Unit>
 		<Unit filename="test/name_test.cpp">
 			<Option target="debug" />
 		</Unit>

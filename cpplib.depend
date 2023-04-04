@@ -75520,7 +75520,7 @@
 	<vcl.h>
 	<string>
 
-1679927340 source:c:\mg\prj\cpplib\io_util.cpp
+1680120130 source:c:\mg\prj\cpplib\io_util.cpp
 	<windows.h>
 	"io_util.hpp"
 	<sstream>
@@ -75551,7 +75551,7 @@
 	<fstream>
 	<string>
 
-1672739626 c:\mg\prj\cpplib\macros.hpp
+1680120053 c:\mg\prj\cpplib\macros.hpp
 
 1678381737 source:c:\mg\prj\cpplib\posix_util.cpp
 	"stdafx.h"
@@ -75579,11 +75579,11 @@
 	<random>
 	<cstdlib>
 
-1679926098 source:c:\mg\prj\cpplib\string_util.cpp
+1680120053 source:c:\mg\prj\cpplib\string_util.cpp
 	"string_util.hpp"
 	<iostream>
 
-1672739626 c:\mg\prj\cpplib\string_util.hpp
+1680120054 c:\mg\prj\cpplib\string_util.hpp
 	<vcl.h>
 	<string>
 	<vector>
@@ -75944,9 +75944,10 @@
 	"memory.h"
 	<iostream>
 
-1679759819 c:\mg\prj\cpplib\object.hpp
+1680168776 c:\mg\prj\cpplib\object.hpp
 	"constants.hpp"
 	<iostream>
+	<memory>
 
 1679659695 c:\mg\prj\cpplib\\io_util.hpp
 	"object.hpp"
@@ -75970,12 +75971,12 @@
 	<procfs.h>
 	<stdio.h>
 
-1679928124 source:c:\mg\prj\cpplib\constants.cpp
+1680120053 source:c:\mg\prj\cpplib\constants.cpp
 	"constants.hpp"
 
 1679693545 c:\mg\prj\cpplib\\memory.h
 
-1680059554 source:c:\mg\prj\cpplib\main.cpp
+1680120053 source:c:\mg\prj\cpplib\main.cpp
 	"..\unit-test\test.hpp"
 
 1680059617 c:\mg\prj\unit-test\test.hpp
@@ -75993,24 +75994,24 @@
 	<queue>
 	<iostream>
 
-1676918566 c:\mg\prj\cpplib\name.hpp
+1680120054 c:\mg\prj\cpplib\name.hpp
 	"object.hpp"
 	"string_def.hpp"
 
-1679949596 c:\mg\prj\cpplib\string_def.hpp
+1680120054 c:\mg\prj\cpplib\string_def.hpp
 	<string>
 
-1679926780 c:\mg\prj\cpplib\generator.hpp
+1680120053 c:\mg\prj\cpplib\generator.hpp
 	"object.hpp"
 	"error.hpp"
 
-1679419266 c:\mg\prj\cpplib\error.hpp
+1680120053 c:\mg\prj\cpplib\error.hpp
 	"string_def.hpp"
 	"object.hpp"
 	<stdexcept>
 	<sstream>
 
-1680059282 source:c:\mg\prj\unit-test\test.cpp
+1680120053 source:c:\mg\prj\unit-test\test.cpp
 	"test.hpp"
 	"..\cpplib\constants.hpp"
 
@@ -76018,4 +76019,23 @@
 	"../../unit-test/test.hpp"
 	"../name.hpp"
 	"../string_def.hpp"
+
+1679693828 source:c:\mg\prj\cpplib\memory.cpp
+	<windows.h>
+	<psapi.h>
+	<unistd.h>
+	<sys/resource.h>
+	<mach/mach.h>
+	<fcntl.h>
+	<procfs.h>
+	<stdio.h>
+
+1680300096 source:c:\mg\prj\cpplib\test\factory_test.cpp
+	"../../unit-test/test.hpp"
+	"../factory.hpp"
+	"../string_def.hpp"
+	<memory>
+
+1680456397 c:\mg\prj\cpplib\factory.hpp
+	<memory>
 
