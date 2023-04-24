@@ -13,6 +13,13 @@ namespace pensar_digital
 {
     namespace cpplib
     {
+        template <class T, typename... Args>
+        class Initializer
+        {
+            public:
+              virtual bool initialize(T& obj, Args&& ... args) { return true; }
+        };
+
         class Object
         {
             public:
@@ -102,6 +109,14 @@ namespace pensar_digital
                 std::istream& operator >> (std::istream& is)       { return ReadFromStream (is, VERSION);};
                 std::ostream& operator << (std::ostream& os) const { return WriteToStream  (os, VERSION);};
          };
+
+        class ObjectInitializer : public Initializer<Object, Id>
+        {
+            public:
+                ObjectInitializer() {}
+                virtual ~ObjectInitializer() {}
+                virtual bool initialize(Object& obj, Id aid = NULL_ID) { obj.set_id(aid); return true; }
+        };
     }
 }
 #endif // OBJECT_HPP

@@ -5,6 +5,7 @@
 #include <set>
 #include <vector>
 #include <limits>
+#include <map>
 
 #include "error.hpp"
 #include "log.hpp"
