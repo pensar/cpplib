@@ -48,7 +48,7 @@ namespace pensar_digital
 
         TEST(PoolFactory)
         {
-			pd::PoolFactory<pd::Object, pd::Id> factory ((size_t)3, (size_t)10, pd::ObjectInitializer(), 1);
+			pd::PoolFactory<pd::Object, pd::ObjectInitializer, pd::Id> factory (3, 10, 1);
             CHECK(factory.get_available_count() == 3, "0. available_count should be 3 but is " + pd::to_string((int)factory.get_available_count ()));
 			std::shared_ptr<pd::Object> o  = factory.get (1);
             CHECK(o->get_id () == 1, "0. o->get_id () should be 1 but is " + pd::to_string((int)o->get_id ()))
@@ -62,7 +62,7 @@ namespace pensar_digital
             std::shared_ptr<pd::Object> o3 = factory.get (4);
             CHECK(factory.get_available_count() == 9, "4. available_count should be 9 but is " + pd::to_string((int)factory.get_available_count()));
             CHECK(o3->get_id() == 4, "0. o3->get_id () should be 2 but is " + pd::to_string((int)o->get_id()))
-            CHECK(*o == *o1, "0. o == o1 should be true.");
+            CHECK(*o != *o1, "0. *o != *o1 should be true.");
 			o.reset();
 			CHECK(o.get () == nullptr, "1. managed object should have been deleted and assigned to nullptr.");
 		}

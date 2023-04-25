@@ -8,7 +8,10 @@
 
 namespace pensar_digital
 {
-  using String = std::string;
+	namespace cpplib
+	{
+		using String = std::string;
+	}
 }
 
 #endif // STRING_DEF_HPP_INCLUDED

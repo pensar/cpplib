@@ -19,7 +19,7 @@ namespace pensar_digital
             public:
               virtual bool initialize(T& obj, Args&& ... args) { return true; }
         };
-
+        
         class Object
         {
             public:
