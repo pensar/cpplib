@@ -72,8 +72,8 @@ namespace pensar_digital
                 virtual Object& assign (const Object& o) {id = o.get_id (); return *this;}
 
                 template <typename T = Object>
-                T& clone (const T& o) {return T(o);}
-
+                T& clone(const T& o) { return (T)_clone (); }
+                Object clone (const Object& o) {return _clone (o); }
                 /** Assignment operator
                  *  \param o Object to assign from
                  *  \return A reference to this
@@ -86,6 +86,8 @@ namespace pensar_digital
                 void set_id (Id value) { id = value; }
 
            protected:
+                virtual Object _clone (const Object& o) {return Object (o);}
+
                 virtual std::istream& ReadFromStream (std::istream& is, const Version v)
                 {
                     switch (v)

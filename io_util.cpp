@@ -20,7 +20,7 @@
 // author : Mauricio Gomes
 // license: MIT (https://opensource.org/licenses/MIT)
 
-#ifndef VISUAL_STUDIO
+#ifndef _MSC_BUILD  
 #include <unistd.h> // read
 #endif
 

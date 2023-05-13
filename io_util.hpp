@@ -6,7 +6,7 @@
 
 #include "object.hpp"
 #include <string>
-#ifdef VISUAL_STUDIO
+#ifdef _MSC_VER
 #include <filesystem>
 #else
 #include <experimental/filesystem>
@@ -21,7 +21,7 @@ namespace pensar_digital
 {
     namespace cpplib
     {
-            #ifdef VISUAL_STUDIO
+            #ifdef _MSC_VER
                 namespace fs = std::filesystem;
             #else
                 namespace fs = std::experimental::filesystem;
