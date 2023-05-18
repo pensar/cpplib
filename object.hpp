@@ -5,7 +5,8 @@
 #define OBJECT_HPP
 
 #include "constants.hpp"
-
+#include "string_def.hpp"
+#include <sstream>
 #include <iostream>
 #include <memory>
 
@@ -60,6 +61,30 @@ namespace pensar_digital
                 /** Default constructor */
                 Object (): id (NULL_ID) {};
                 Object(Id aid): id (aid) {};
+                
+                /// Move constructor
+                Object(Object&& o) {assign (o);}
+
+                /// Move assignment operator
+                Object& operator=(Object&& o) {return assign (o);}  
+
+                /// Conversion to string.
+                /// \return A string with the object id.
+                virtual String to_string () const {return std::to_string (id);}
+
+                /// Implicit conversion to string.
+                /// \return A string with the object id.
+                operator String () const {return to_string ();}
+
+                /// Debug string.
+                /// \return A string with the object id.
+                virtual String debug_string() const 
+                { 
+                    std::stringstream ss;
+                    ss << "id = " << to_string(); 
+                    return ss.str ();
+
+                }
 
                 /** Default destructor */
                 virtual ~Object() {}
@@ -69,11 +94,11 @@ namespace pensar_digital
                  */
                 Object(const Object& o) {assign (o);}
 
+
                 virtual Object& assign (const Object& o) {id = o.get_id (); return *this;}
 
-                template <typename T = Object>
-                T& clone(const T& o) { return (T)_clone (); }
-                Object clone (const Object& o) {return _clone (o); }
+                virtual Object clone(const Object& o) { return Object(o); }
+
                 /** Assignment operator
                  *  \param o Object to assign from
                  *  \return A reference to this
@@ -86,8 +111,6 @@ namespace pensar_digital
                 void set_id (Id value) { id = value; }
 
            protected:
-                virtual Object _clone (const Object& o) {return Object (o);}
-
                 virtual std::istream& ReadFromStream (std::istream& is, const Version v)
                 {
                     switch (v)
