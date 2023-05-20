@@ -16,12 +16,12 @@ namespace pensar_digital
     {
         
 
-     // Concept for a class with a noexcept initialize method returning something convertible to bool.
+        // Concept for a class with a noexcept initialize method returning something convertible to bool.
         template <typename T, typename... Args>
         concept Initializable = requires (T t, Args&& ... args) 
         {
-            {T(std::forward<Args>(args) ...)};
-            {t.initialize (std::forward<Args>(args) ...)} -> std::convertible_to<bool>;
+            {T(std::forward<Args>(args) ...)} noexcept;
+            {t.initialize (std::forward<Args>(args) ...)} noexcept -> std::convertible_to<bool>;
         };
 
         class Object
@@ -62,8 +62,8 @@ namespace pensar_digital
                 Id id; //!< Member variable "id"
            public:
                 /** Default constructor */
-                Object (): id (NULL_ID) {};
-                Object(Id aid): id (aid) {};
+                Object () noexcept : id (NULL_ID) {};
+                Object(Id aid) noexcept : id (aid) {};
                 
                 /// Move constructor
                 Object(Object&& o) noexcept {assign (o);}
