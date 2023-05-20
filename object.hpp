@@ -20,6 +20,7 @@ namespace pensar_digital
         template <typename T, typename... Args>
         concept Initializable = requires (T t, Args&& ... args) 
         {
+            {T(std::forward<Args>(args) ...)};
             {t.initialize (std::forward<Args>(args) ...)} -> std::convertible_to<bool>;
         };
 
