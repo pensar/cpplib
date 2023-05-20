@@ -20,10 +20,9 @@ namespace pensar_digital
             public:
 				Dummy (const Id& id): Object (id) {}
 				Dummy (const Dummy& d): Object (d) {}
-				Dummy (Dummy&& d): Object (d) {}
-                virtual 
-				Dummy& operator = (const Dummy& d) {Object::operator = (d); return *this;}
-				Dummy& operator = (Dummy&& d) {Object::operator = (d); return *this;}
+				Dummy (Dummy&& d) noexcept : Object (d) {}
+				Dummy& operator = (const Dummy& d) noexcept {Object::operator = (d); return *this;}
+				Dummy& operator = (Dummy&& d) noexcept {Object::operator = (d); return *this;}
                 bool operator == (const Dummy& d) const {return Object::operator == (d);}
                 //std::ostream& operator << (std::ostream& os) const { Object::operator << (os); return os;  }
                 /// Makes Dummy Streamable.
@@ -31,8 +30,8 @@ namespace pensar_digital
                 using Object::operator !=;
 				virtual ~Dummy () {}
 
-            virtual Dummy assign (const Dummy& d) {return Dummy (d);}
-            virtual Dummy assign (Dummy&& d) {return Dummy (d);}
+            virtual Dummy assign (const Dummy& d) noexcept {return Dummy (d);}
+            virtual Dummy assign (Dummy&& d) noexcept {return Dummy (d);}
             virtual Dummy clone (const Dummy& d) {return Dummy (d);}
 
 			/// Implicity convertion to object.

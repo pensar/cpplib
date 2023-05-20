@@ -48,7 +48,7 @@ namespace pensar_digital
 
         TEST(PoolFactory)
         {
-			pd::PoolFactory<pd::Object, pd::ObjectInitializer, pd::Id> factory (3, 10, 1);
+			pd::PoolFactory<pd::Object, pd::Id> factory (3, 10, 1);
             CHECK(factory.get_available_count() == 3, "0. available_count should be 3 but is " + pd::to_string((int)factory.get_available_count ()));
 			std::shared_ptr<pd::Object> o  = factory.get (1);
             CHECK(o->get_id () == 1, "0. o->get_id () should be 1 but is " + pd::to_string((int)o->get_id ()))

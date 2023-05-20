@@ -14,13 +14,15 @@ namespace pensar_digital
 {
     namespace cpplib
     {
-        template <class T, typename... Args>
-        class Initializer
-        {
-            public:
-              virtual bool initialize(T& obj, Args&& ... args) { return true; }
-        };
         
+
+     // Concept for a class with a noexcept initialize method returning something convertible to bool.
+        template <typename T, typename... Args>
+        concept Initializable = requires (T t, Args&& ... args) 
+        {
+            {t.initialize (std::forward<Args>(args) ...)} -> std::convertible_to<bool>;
+        };
+
         class Object
         {
             public:
@@ -63,10 +65,10 @@ namespace pensar_digital
                 Object(Id aid): id (aid) {};
                 
                 /// Move constructor
-                Object(Object&& o) {assign (o);}
+                Object(Object&& o) noexcept {assign (o);}
 
                 /// Move assignment operator
-                Object& operator=(Object&& o) {return assign (o);}  
+                Object& operator=(Object&& o) noexcept {return assign (o);}
 
                 /// Conversion to string.
                 /// \return A string with the object id.
@@ -109,7 +111,7 @@ namespace pensar_digital
                  * \param val New value to set
                  */
                 void set_id (Id value) { id = value; }
-
+                virtual bool initialize(Id aid = NULL_ID) noexcept { id = aid; return true; }
            protected:
                 virtual std::istream& ReadFromStream (std::istream& is, const Version v)
                 {
@@ -135,13 +137,7 @@ namespace pensar_digital
                 std::ostream& operator << (std::ostream& os) const { return WriteToStream  (os, VERSION);};
          };
 
-        class ObjectInitializer : public Initializer<Object, Id>
-        {
-            public:
-                ObjectInitializer() {}
-                virtual ~ObjectInitializer() {}
-                virtual bool initialize(Object& obj, Id aid = NULL_ID) { obj.set_id(aid); return true; }
-        };
+        static_assert(Initializable<Object, Id>);
     }
 }
 #endif // OBJECT_HPP
