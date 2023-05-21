@@ -51,7 +51,7 @@ namespace pensar_digital
 
             Dummy d(42, "d");
             Dummy d1 = d.clone<Dummy>(d);
-            static_assert(Streamable<Dummy>);
+            static_assert(OutputStreamable<Dummy>);
             CHECK_EQ(Dummy, d, d1, "1. d == d1 should be true");
         }
         TEST_END(ObjectClone)

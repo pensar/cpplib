@@ -6,6 +6,8 @@
 
 #include "constants.hpp"
 #include "string_def.hpp"
+#include "cpplib_concepts.hpp"
+
 #include <sstream>
 #include <iostream>
 #include <memory>
@@ -15,16 +17,6 @@ namespace pensar_digital
 {
     namespace cpplib
     {
-        
-
-        // Concept for a class with a noexcept initialize method returning something convertible to bool.
-        template <typename T, typename... Args>
-        concept Initializable = requires (T t, Args&& ... args) 
-        {
-            {T(std::forward<Args>(args) ...)} noexcept;
-            {t.initialize (std::forward<Args>(args) ...)} noexcept -> std::convertible_to<bool>;
-        };
-
         class Object
         {
             public:
