@@ -9,6 +9,7 @@
 #include <sstream>
 #include <iostream>
 #include <memory>
+#include <concepts>
 
 namespace pensar_digital
 {
@@ -100,7 +101,8 @@ namespace pensar_digital
 
                 virtual Object& assign (const Object& o) {id = o.get_id (); return *this;}
 
-                virtual Object clone(const Object& o) { return Object(o); }
+                template<std::copy_constructible T = Object>
+                static T clone(const T& o) { return T(o); }
 
                 /** Assignment operator
                  *  \param o Object to assign from

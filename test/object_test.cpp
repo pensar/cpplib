@@ -18,28 +18,30 @@ namespace pensar_digital
         class Dummy: public Object 
         {
             public:
-				Dummy (const Id& id): Object (id) {}
-				Dummy (const Dummy& d): Object (d) {}
-				Dummy (Dummy&& d) noexcept : Object (d) {}
-				Dummy& operator = (const Dummy& d) noexcept {Object::operator = (d); return *this;}
-				Dummy& operator = (Dummy&& d) noexcept {Object::operator = (d); return *this;}
-                bool operator == (const Dummy& d) const {return Object::operator == (d);}
+				Dummy (const Id& id, const String& aname): Object (id), name(aname) {}
+                Dummy(const Dummy& d) : Object(d) { name = d.name; }
+                Dummy(Dummy&& d) noexcept : Object(d) { name = d.name; }
+				Dummy& operator = (const Dummy& d) noexcept {assign (d); return *this;}
+				Dummy& operator = (Dummy&& d) noexcept {assign(d); return *this;}
+                bool operator == (const Dummy& d) const {return (Object::operator == (d) && (name == d.name));}
                 //std::ostream& operator << (std::ostream& os) const { Object::operator << (os); return os;  }
                 /// Makes Dummy Streamable.
                 friend std::ostream& operator << (std::ostream& os, const Dummy& d) { return os << d.get_id (); }   
                 using Object::operator !=;
 				virtual ~Dummy () {}
-
-            virtual Dummy assign (const Dummy& d) noexcept {return Dummy (d);}
-            virtual Dummy assign (Dummy&& d) noexcept {return Dummy (d);}
-            virtual Dummy clone (const Dummy& d) {return Dummy (d);}
+                Dummy assign(const Dummy& d) noexcept { name = d.name; return *this; }
 
 			/// Implicity convertion to object.
             /// \return A copy of the object.
-            operator Object () const {return Object (get_id ());}
+            operator Object () const noexcept { return Object (get_id ()); }
             
+            String get_name () const noexcept { return name; }
+
 			protected:
 				virtual bool _equals (const Object& o) const {return Object::_equals (o);}
+            private:
+                
+                String name;
         };
         TEST(ObjectClone)
         {
@@ -47,8 +49,8 @@ namespace pensar_digital
             pd::Object o1 = o.clone(o);
             CHECK(o == o1, "0. o == o1 should be true");
 
-            Dummy d(42);
-            Dummy d1 = d.clone(d);
+            Dummy d(42, "d");
+            Dummy d1 = d.clone<Dummy>(d);
             static_assert(Streamable<Dummy>);
             CHECK_EQ(Dummy, d, d1, "1. d == d1 should be true");
         }
