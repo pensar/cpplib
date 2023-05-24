@@ -36,13 +36,33 @@ namespace pensar_digital
             operator Object () const noexcept { return Object (get_id ()); }
             
             String get_name () const noexcept { return name; }
-
+            friend void to_json(Json& j, const Dummy& d);
+            friend void from_json(const Json& j, Dummy& d);
 			protected:
 				virtual bool _equals (const Object& o) const {return Object::_equals (o);}
             private:
                 
                 String name;
         };
+
+        void to_json(Json& j, const Dummy& d)
+        {
+            j = Json{ {"class", d.class_name()}, {"id", d.get_id()}, "name", "d"};
+        }
+
+        void from_json(const Json& j, Dummy& d)
+        {
+            String class_name = d.class_name();
+            String json_class = j.at("class");
+            if (class_name == json_class)
+            {
+                d.set_id(j.at("id"));
+            	d.name = j.at("name");
+            }
+            else throw new std::runtime_error("Object expected class = " + class_name + " but json has " + json_class);
+        }
+        
+        
         TEST(ObjectClone)
         {
             pd::Object o(42);
@@ -55,5 +75,23 @@ namespace pensar_digital
             CHECK_EQ(Dummy, d, d1, "1. d == d1 should be true");
         }
         TEST_END(ObjectClone)
+
+        TEST(ObjectJsonConversion)
+        {
+			Object o(42);
+			Json j = o;
+            String expected = "{\"class\":\"pensar_digital::cpplib::Object\",\"id\":42}";
+            CHECK_EQ(String, j.dump (), expected, "0. json should be equal to " + expected + " but was " + j.dump() + ".");
+
+            Object o1 = j;
+            CHECK(o == o1, "1. o should be equal to o1");
+
+            Dummy d(42, "d");
+            j = d;
+            expected = "{\"class\":\"pensar_digital::unit_test::Dummy\",\"id\":42,\"name\":\"d\"}";
+            CHECK_EQ(String, j.dump (), expected, "2. json should be equal to " + expected + " but was " + j.dump() + ".");
+		}
+        TEST_END(ObjectJsonConversion)
+
     }
 }

@@ -146,6 +146,7 @@
     <ClCompile Include="locale.cpp" />
     <ClCompile Include="log.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Object.cpp" />
     <ClCompile Include="random_util.cpp" />
     <ClCompile Include="string_util.cpp" />
     <ClCompile Include="system.cpp" />
@@ -155,6 +156,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\unit-test\test.hpp" />
+    <ClInclude Include="algorithm_util.hpp" />
     <ClInclude Include="constants.hpp" />
     <ClInclude Include="country.hpp" />
     <ClInclude Include="cpplib_concepts.hpp" />
