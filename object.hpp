@@ -23,6 +23,7 @@ namespace pensar_digital
     namespace cpplib
     {
         using Json = nlohmann::json;
+        namespace pd = pensar_digital::cpplib;
         class Object
         {
             public:
@@ -133,9 +134,6 @@ namespace pensar_digital
 
                 virtual Object& assign (const Object& o) {id = o.get_id (); return *this;}
 
-                template<std::copy_constructible T = Object>
-                static T clone(const T& o) { return T(o); }
-
                 /** Assignment operator
                  *  \param o Object to assign from
                  *  \return A reference to this
@@ -174,7 +172,10 @@ namespace pensar_digital
                 std::ostream& operator << (std::ostream& os) const { return WriteToStream  (os, VERSION);};
                 friend void from_json(const Json& j, Object& o);
          };
-         
+
+         template<std::copy_constructible T = Object>
+         static T clone(const T& o) { return T(o); }
+
         static_assert(Initializable<Object, Id>);
 
         extern void to_json(Json& j, const Object& o);

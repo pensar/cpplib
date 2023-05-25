@@ -9,8 +9,9 @@
 
 namespace pensar_digital
 {
-    namespace pd = pensar_digital::cpplib;
-    namespace unit_test
+    namespace test = pensar_digital::unit_test;
+    using namespace pensar_digital::unit_test;
+    namespace cpplib
     {
         /// <summary>
         /// Dummy class is streamable and comparable.
@@ -29,7 +30,7 @@ namespace pensar_digital
                 friend std::ostream& operator << (std::ostream& os, const Dummy& d) { return os << d.get_id (); }   
                 using Object::operator !=;
 				virtual ~Dummy () {}
-                Dummy assign(const Dummy& d) noexcept { name = d.name; return *this; }
+                virtual Dummy assign(const Dummy& d) noexcept { name = d.name; return *this; }
 
 			/// Implicity convertion to object.
             /// \return A copy of the object.
@@ -47,7 +48,9 @@ namespace pensar_digital
 
         void to_json(Json& j, const Dummy& d)
         {
-            j = Json{ {"class", d.class_name()}, {"id", d.get_id()}, "name", "d"};
+            j["class"] = d.class_name();
+            j["id"]    = d.get_id();
+            j["name"]  = d.get_name();
         }
 
         void from_json(const Json& j, Dummy& d)
@@ -65,12 +68,12 @@ namespace pensar_digital
         
         TEST(ObjectClone)
         {
-            pd::Object o(42);
-            pd::Object o1 = o.clone(o);
+            Object o(42);
+            Object o1 = pd::clone (o);
             CHECK(o == o1, "0. o == o1 should be true");
 
             Dummy d(42, "d");
-            Dummy d1 = d.clone<Dummy>(d);
+            Dummy d1 = pd::clone<Dummy> (d);
             static_assert(OutputStreamable<Dummy>);
             CHECK_EQ(Dummy, d, d1, "1. d == d1 should be true");
         }
@@ -86,10 +89,15 @@ namespace pensar_digital
             Object o1 = j;
             CHECK(o == o1, "1. o should be equal to o1");
 
-            Dummy d(42, "d");
-            j = d;
-            expected = "{\"class\":\"pensar_digital::unit_test::Dummy\",\"id\":42,\"name\":\"d\"}";
-            CHECK_EQ(String, j.dump (), expected, "2. json should be equal to " + expected + " but was " + j.dump() + ".");
+           Dummy d(42, "d");
+           j = d;
+           expected = "{\"class\":\"pensar_digital::cpplib::Dummy\",\"id\":42,\"name\":\"d\"}";
+           CHECK_EQ(String, j.dump (), expected, "2. json should be equal to " + expected + " but was " + j.dump() + ".");
+
+           Dummy d1(1, "d1");
+           j.get_to(d1);
+           CHECK_EQ(Dummy, d, d1, "3. d should be equal to d1");
+
 		}
         TEST_END(ObjectJsonConversion)
 
