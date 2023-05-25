@@ -122,6 +122,9 @@
     <ClInclude Include="algorithm_util.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="header_lib\json.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

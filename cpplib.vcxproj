@@ -163,6 +163,7 @@
     <ClInclude Include="distance.hpp" />
     <ClInclude Include="error.hpp" />
     <ClInclude Include="factory.hpp" />
+    <ClInclude Include="header_lib\json.hpp" />
     <ClInclude Include="io_util.hpp" />
     <ClInclude Include="language.hpp" />
     <ClInclude Include="locale.hpp" />
