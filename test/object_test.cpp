@@ -36,6 +36,12 @@ namespace pensar_digital
             /// \return A copy of the object.
             operator Object () const noexcept { return Object (get_id ()); }
             
+            /// Implicity convertion to object.
+            /// \return A copy of the object.
+            /// \see Object::operator Object()
+            /// \see Object::operator == (const Object&)
+            operator Object& () noexcept { return *this; }
+
             String get_name () const noexcept { return name; }
             friend void to_json(Json& j, const Dummy& d);
             friend void from_json(const Json& j, Dummy& d);

@@ -50,23 +50,10 @@ namespace pensar_digital
                 /// \return  The current value of hash
                 virtual const Hash get_hash() const {return id;};
                 
-                /*
-                /// \brief Converts the object to a json string.
-                ///
-                /// \return A string with the object id.
-                /// \see to_string
-                virtual String to_json () const 
-                {
-                    Json j = {"class","pensar_digital::cpplib::Object", "id", to_string() };
-                    return j.dump();
-                }
+                // Conversion to json string.
+                String json_str() const { Json j = *this; return j.dump(); }
+
                 
-                template<class T = Object>
-                static T from_json (const String& sjson) 
-                {
-                    return _from_json (sjson);
-                }
-                */
 
                 bool operator == (const Object& o) const {return   equals (o);}
                 bool operator != (const Object& o) const {return ! equals (o);}
