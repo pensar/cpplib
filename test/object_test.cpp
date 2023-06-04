@@ -73,7 +73,6 @@ namespace pensar_digital
         
         
         TEST(ObjectClone)
-        {
             Object o(42);
             Object o1 = pd::clone (o);
             CHECK(o == o1, "0. o == o1 should be true");
@@ -82,11 +81,9 @@ namespace pensar_digital
             Dummy d1 = pd::clone<Dummy> (d);
             static_assert(OutputStreamable<Dummy>);
             CHECK_EQ(Dummy, d, d1, "1. d == d1 should be true");
-        }
         TEST_END(ObjectClone)
 
         TEST(ObjectJsonConversion)
-        {
 			Object o(42);
 			Json j = o;
             String expected = "{\"class\":\"pensar_digital::cpplib::Object\",\"id\":42}";
@@ -103,9 +100,14 @@ namespace pensar_digital
            Dummy d1(1, "d1");
            j.get_to(d1);
            CHECK_EQ(Dummy, d, d1, "3. d should be equal to d1");
-
-		}
         TEST_END(ObjectJsonConversion)
-
+        
+        TEST(ObjectXMLConversion)
+            Object o(42);
+            String xml = o.xml_str ();
+            String expected = "<object class_name = ""pensar_digital::cpplib::Object"" id = ""42""/>";
+            CHECK_EQ(String, xml, expected, "0. xml should be equal to " + expected + " but was " + xml + ".");
+        TEST_END(ObjectXMLConversion)
+        
     }
 }

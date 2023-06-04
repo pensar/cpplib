@@ -53,7 +53,11 @@ namespace pensar_digital
                 // Conversion to json string.
                 String json_str() const { Json j = *this; return j.dump(); }
 
-                
+                // Conversion to xml string.
+                virtual String xml_str() const noexcept 
+                { 
+                    return "<object class_name = """ + class_name() + """ id = """ + to_string() + """/>"; 
+                }
 
                 bool operator == (const Object& o) const {return   equals (o);}
                 bool operator != (const Object& o) const {return ! equals (o);}
