@@ -54,7 +54,10 @@
     <ClCompile Include="test\object_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Object.cpp">
+    <ClCompile Include="object.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp_lib\xmlParser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

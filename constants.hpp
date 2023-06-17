@@ -5,6 +5,7 @@
 #define constantesHPP
 //---------------------------------------------------------------------------
 #include <cstdint>
+#include "string_def.hpp"
 
 namespace pensar_digital
 {
@@ -14,6 +15,7 @@ namespace pensar_digital
         using Hash                      = int64_t;
         using Version                   = int16_t;
         using FileSize                  = int64_t;
+        extern String DOUBLE_QUOTES;
         extern const Id NULL_ID;
     }   // namespace cpplib
 }       // namespace pensar_digital

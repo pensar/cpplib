@@ -113,7 +113,8 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);VISUAL_STUDIO</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\mg\prj\unit-test;C:\mg\prj\cpplib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\mg\prj\cpplib\header_lib;C:\mg\prj\unit-test;C:\mg\prj\cpplib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -129,7 +130,8 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\mg\prj\unit-test;C:\mg\prj\cpplib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\mg\prj\cpplib\header_lib;C:\mg\prj\unit-test;C:\mg\prj\cpplib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -141,12 +143,13 @@
   <ItemGroup>
     <ClCompile Include="..\unit-test\test.cpp" />
     <ClCompile Include="constants.cpp" />
+    <ClCompile Include="cpp_lib\xmlParser.cpp" />
     <ClCompile Include="io_util.cpp" />
     <ClCompile Include="language.cpp" />
     <ClCompile Include="locale.cpp" />
     <ClCompile Include="log.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Object.cpp" />
+    <ClCompile Include="object.cpp" />
     <ClCompile Include="random_util.cpp" />
     <ClCompile Include="string_util.cpp" />
     <ClCompile Include="system.cpp" />
