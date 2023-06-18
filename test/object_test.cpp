@@ -19,18 +19,28 @@ namespace pensar_digital
         class Dummy: public Object 
         {
             public:
-				Dummy (const Id& id, const String& aname): Object (id), name(aname) {}
-                Dummy(const Dummy& d) : Object(d) { name = d.name; }
-                Dummy(Dummy&& d) noexcept : Object(d) { name = d.name; }
-				Dummy& operator = (const Dummy& d) noexcept {assign (d); return *this;}
-				Dummy& operator = (Dummy&& d) noexcept {assign(d); return *this;}
-                bool operator == (const Dummy& d) const {return (Object::operator == (d) && (name == d.name));}
-                //std::ostream& operator << (std::ostream& os) const { Object::operator << (os); return os;  }
-                /// Makes Dummy Streamable.
-                friend std::ostream& operator << (std::ostream& os, const Dummy& d) { return os << d.get_id (); }   
-                using Object::operator !=;
-				virtual ~Dummy () {}
-                virtual Dummy assign(const Dummy& d) noexcept { name = d.name; return *this; }
+
+            Dummy (const Id& id, const String& aname): Object (id), name(aname) {}
+            Dummy(const Dummy& d) : Object(d) { name = d.name; }
+            Dummy(Dummy&& d) noexcept : Object(d) { name = d.name; }
+			Dummy& operator = (const Dummy& d) noexcept {assign (d); return *this;}
+			Dummy& operator = (Dummy&& d) noexcept {assign(d); return *this;}
+            bool operator == (const Dummy& d) const {return (Object::operator == (d) && (name == d.name));}
+            //std::ostream& operator << (std::ostream& os) const { Object::operator << (os); return os;  }
+            /// Makes Dummy Streamable.
+            friend std::ostream& operator << (std::ostream& os, const Dummy& d) { return os << d.get_id (); }   
+            using Object::operator !=;
+			virtual ~Dummy () {}
+            virtual Dummy assign(const Dummy& d) noexcept { name = d.name; return *this; }
+
+            // Convertion to xml string.
+            virtual String to_xml () const noexcept 
+            {
+				String xml = ObjXMLPrefix();
+                xml += "<name>" + name + "</name>";
+				xml += "</object>";
+				return xml;
+			}
 
 			/// Implicity convertion to object.
             /// \return A copy of the object.
