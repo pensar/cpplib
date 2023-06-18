@@ -20,7 +20,7 @@ namespace pensar_digital
         {
             public:
 
-            Dummy (const Id& id, const String& aname): Object (id), name(aname) {}
+            Dummy (const Id& id = NULL_ID, const String& aname = "") : Object(id), name(aname) {}
             Dummy(const Dummy& d) : Object(d) { name = d.name; }
             Dummy(Dummy&& d) noexcept : Object(d) { name = d.name; }
 			Dummy& operator = (const Dummy& d) noexcept {assign (d); return *this;}
@@ -34,13 +34,21 @@ namespace pensar_digital
             virtual Dummy assign(const Dummy& d) noexcept { name = d.name; return *this; }
 
             // Convertion to xml string.
-            virtual String to_xml () const noexcept 
+            virtual String xml_str () const noexcept 
             {
-				String xml = ObjXMLPrefix();
+				String xml = ObjXMLPrefix() + ">";
                 xml += "<name>" + name + "</name>";
 				xml += "</object>";
 				return xml;
 			}
+
+            // Convertion from xml string.
+            virtual void from_xml(const String& sxml) 
+            {
+                XMLNode node = parse_object_tag (sxml);
+                XMLNode n = node.getChildNode("name");
+                if (!n.isEmpty()) name = n.getText();
+            }
 
 			/// Implicity convertion to object.
             /// \return A copy of the object.
@@ -124,6 +132,18 @@ namespace pensar_digital
             o1.from_xml(xml);
             CHECK(o == o1, "1. o should be equal to o1");
 
+            Dummy d(42, "d");
+            xml = d.xml_str ();
+            expected = "<object class_name = ";
+            expected += DOUBLE_QUOTES + "pensar_digital::cpplib::Dummy" + DOUBLE_QUOTES + " id = " + DOUBLE_QUOTES + "42" + DOUBLE_QUOTES + ">";
+            expected += "<name>d</name>";
+            expected += "</object>";
+            CHECK_EQ(String, xml, expected, "2. xml should be equal to " + expected + " but was " + xml + ".");
+
+            Dummy d1;
+            CHECK(d != d1, "3. d should be different from d1");
+            d1.from_xml(xml);
+            CHECK(d == d1, "4. d should be equal to d1");
         TEST_END(ObjectXMLConversion)
         
     }

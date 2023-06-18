@@ -104,21 +104,27 @@ namespace pensar_digital
                 return ObjXMLPrefix () + "/>";
             }
 
-            // Conversion from xml string.
-            virtual void from_xml(const String& sxml) 
+            XMLNode parse_object_tag(const pensar_digital::cpplib::String& sxml)
             {
-                const char* xml = sxml.c_str ();
+                const char* xml = sxml.c_str();
                 XMLCSTR tag = "object";
                 XMLResults* pResults = 0;
-                XMLNode node = XMLNode::parseString (xml, tag, pResults);  
+                XMLNode node = XMLNode::parseString(xml, tag, pResults);
                 String xml_class_name = node.getAttribute("class_name");
-                if (xml_class_name == class_name ())
+                if (xml_class_name == class_name())
                 {
                     String sid = node.getAttribute("id");
-                    id = std::stoi(sid);    
+                    id = std::stoi(sid);
                 }
                 else
                     throw std::runtime_error("Invalid class name");
+                return node;
+            }
+
+            // Conversion from xml string.
+            virtual void from_xml(const String& sxml) 
+            {
+                parse_object_tag(sxml);
 			}                                           
                      
             bool operator == (const Object& o) const {return   equals (o);}
