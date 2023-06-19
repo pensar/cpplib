@@ -21,11 +21,37 @@ namespace pensar_digital
 {
     namespace cpplib
     {
-            #ifdef _MSC_VER
-                namespace fs = std::filesystem;
-            #else
-                namespace fs = std::experimental::filesystem;
-            #endif
+        #ifdef _MSC_VER
+            namespace fs = std::filesystem;
+        #else
+            namespace fs = std::experimental::filesystem;
+        #endif
+
+        // Path class represents a path in the file system. It inherits from fs::path adding implicit conversion to std::string.
+        class Path : public fs::path
+		{
+			public:
+			Path (const fs::path& p) : fs::path (p) {}
+			Path (const std::string& s) : fs::path (s) {}
+			Path (const char* s) : fs::path (s) {}
+
+            // Assignment operator for std::string.
+            Path& operator = (const std::string& s) { fs::path::operator = (s); return *this; }
+            
+            // Assignment operator for const Path&.
+            Path& operator = (const Path& p) { fs::path::operator = (p); return *this; } 
+            
+            // Implicit conversion to std::string.
+            operator std::string () const { return fs::path::string (); }
+
+            // /= operator for std::string.
+            Path& operator /= (const std::string& s) { fs::path::operator /= (s); return *this; }
+
+            // /= operator for const Path&.
+            Path& operator /= (const Path& p) { fs::path::operator /= (p); return *this; }
+		};
+
+
         /// \brief File class.
         ///
         class File: Object
@@ -49,27 +75,38 @@ namespace pensar_digital
                 {
                     if (full_path.has_filename ())
                     {
-                        if (fs::file_size (full_path) < MAX_IN_MEMORY_FILE_SIZE_BYTE) //available_memory)
+                        std::vector<char> buffer;
+                        if (fs::file_size (full_path) < MAX_IN_MEMORY_FILE_SIZE_BYTE)
                         {
-                            // Read file into memory.
-							std::ifstream ifs (full_path, std::ios::binary | std::ios::ate);
-							std::ifstream::pos_type pos = ifs.tellg ();
-							size_t size = static_cast<size_t>(pos);
-							buffer.resize (size);
-							ifs.seekg (0, std::ios::beg);
-							ifs.read (&buffer[0], size);
-							ifs.close ();
+                            // Reads file into buffer.
+                            std::ifstream file (full_path, std::ios::binary);
+                            if (file.is_open ())
+							{
+								file.seekg (0, std::ios::end);
+								size_t size = file.tellg ();
+								file.seekg (0, std::ios::beg);
+								buffer.resize (size);
+								file.read (buffer.data (), size);
+								file.close ();
+							}
+                            else
+                            {
+                                // Discovers why file could not be opened.
+                                if (fs::exists(full_path))
+                                {
+									// File exists but could not be opened.
+									throw std::runtime_error ("Could not open file " + full_path.string ());
+								}
+								else
+								{
+									// File does not exist.
+									throw std::runtime_error ("File " + full_path.string () + " does not exist.");
+								}
+							}   
 						}
 						else
 						{
-							// Read file into memory.
-							std::ifstream ifs (full_path, std::ios::binary | std::ios::ate);
-							std::ifstream::pos_type pos = ifs.tellg ();
-							size_t size = static_cast<size_t>(pos);
-							buffer.resize (size);
-							ifs.seekg (0, std::ios::beg);
-							ifs.read (&buffer[0], size);
-							ifs.close ();
+							;
                         }
                     }
                 }
