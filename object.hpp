@@ -34,7 +34,7 @@ namespace pensar_digital
             Id id; //!< Member variable "id"
             
             protected:
-            
+
             String ObjXMLPrefix() const noexcept { return "<object class_name = \"" + class_name() + "\" id = \"" + to_string() + "\""; }
 
             virtual std::istream& ReadFromStream(std::istream& is, const Version v)
@@ -71,9 +71,15 @@ namespace pensar_digital
             virtual bool _equals(const Object& o) const { return (id == o.id); }
 
             public:
+            const static Version VERSION                     = 1;
+            const static Version PUBLIC_INTERFACE_VERSION    = 1;
+            const static Version PROTECTED_INTERFACE_VERSION = 1;
+            const static Version PRIVATE_INTERFACE_VERSION   = 1;
 
-            const static Version VERSION           = 1;
-            const static Version INTERFACE_VERSION = 1;
+            virtual Version get_version                     () const noexcept { return VERSION;                     }    
+            virtual Version get_public_interface_version    () const noexcept { return PUBLIC_INTERFACE_VERSION;    }
+            virtual Version get_protected_interface_version () const noexcept { return PROTECTED_INTERFACE_VERSION; }
+            virtual Version get_private_interface_version   () const noexcept { return PRIVATE_INTERFACE_VERSION;   }
 
             virtual String class_name() const { String c = typeid(*this).name(); c.erase(0, sizeof("class ") - 1); return c; }
 

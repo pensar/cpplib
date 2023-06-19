@@ -19,6 +19,15 @@ namespace pensar_digital
         class Dummy: public Object 
         {
             public:
+            const static Version VERSION                     = 1;
+            const static Version PUBLIC_INTERFACE_VERSION    = 1;
+            const static Version PROTECTED_INTERFACE_VERSION = 1;
+            const static Version PRIVATE_INTERFACE_VERSION   = 1;
+
+            virtual Version get_version                     () const noexcept { return VERSION;                     }
+            virtual Version get_public_interface_version    () const noexcept { return PUBLIC_INTERFACE_VERSION;    }
+            virtual Version get_protected_interface_version () const noexcept { return PROTECTED_INTERFACE_VERSION; }
+            virtual Version get_private_interface_version   () const noexcept { return PRIVATE_INTERFACE_VERSION;   }
 
             Dummy (const Id& id = NULL_ID, const String& aname = "") : Object(id), name(aname) {}
             Dummy(const Dummy& d) : Object(d) { name = d.name; }

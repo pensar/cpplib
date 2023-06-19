@@ -30,17 +30,46 @@ namespace pensar_digital
         ///
         class File: Object
         {
-            const static Version VERSION           = 1;
-            const static Version INTERFACE_VERSION = 1;
+            public:
+            const static Version VERSION                     = 1;
+            const static Version PUBLIC_INTERFACE_VERSION    = 1;
+            const static Version PROTECTED_INTERFACE_VERSION = 1;
+            const static Version PRIVATE_INTERFACE_VERSION   = 1;
+
+            virtual Version get_version                     () const noexcept { return VERSION;                     }
+            virtual Version get_public_interface_version    () const noexcept { return PUBLIC_INTERFACE_VERSION;    }
+            virtual Version get_protected_interface_version () const noexcept { return PROTECTED_INTERFACE_VERSION; }
+            virtual Version get_private_interface_version   () const noexcept { return PRIVATE_INTERFACE_VERSION;   }
+
+            const size_t MAX_IN_MEMORY_FILE_SIZE_BYTE = 1024 ^ 3;
+
             File (const fs::path& full_path, const Id aid = NULL_ID) : Object (aid)
             {
                 if (fs::exists (full_path))
                 {
                     if (full_path.has_filename ())
                     {
-                        if (fs::file_size (full_path) < 1000000) //available_memory)
+                        if (fs::file_size (full_path) < MAX_IN_MEMORY_FILE_SIZE_BYTE) //available_memory)
                         {
-
+                            // Read file into memory.
+							std::ifstream ifs (full_path, std::ios::binary | std::ios::ate);
+							std::ifstream::pos_type pos = ifs.tellg ();
+							size_t size = static_cast<size_t>(pos);
+							buffer.resize (size);
+							ifs.seekg (0, std::ios::beg);
+							ifs.read (&buffer[0], size);
+							ifs.close ();
+						}
+						else
+						{
+							// Read file into memory.
+							std::ifstream ifs (full_path, std::ios::binary | std::ios::ate);
+							std::ifstream::pos_type pos = ifs.tellg ();
+							size_t size = static_cast<size_t>(pos);
+							buffer.resize (size);
+							ifs.seekg (0, std::ios::beg);
+							ifs.read (&buffer[0], size);
+							ifs.close ();
                         }
                     }
                 }
