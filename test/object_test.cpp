@@ -123,8 +123,7 @@ namespace pensar_digital
         TEST(ObjectXMLConversion)
             Object o(42);
             String xml = o.xml_str ();
-            String expected = "<object class_name = ";
-            expected += DOUBLE_QUOTES + "pensar_digital::cpplib::Object" + DOUBLE_QUOTES + " id = " + DOUBLE_QUOTES + "42" + DOUBLE_QUOTES + "/>";
+            String expected = "<object class_name = \"pensar_digital::cpplib::Object\" id = \"42\"/>";
             CHECK_EQ(String, xml, expected, "0. xml should be equal to " + expected + " but was " + xml + ".");
 
             Object o1;
@@ -134,10 +133,7 @@ namespace pensar_digital
 
             Dummy d(42, "d");
             xml = d.xml_str ();
-            expected = "<object class_name = ";
-            expected += DOUBLE_QUOTES + "pensar_digital::cpplib::Dummy" + DOUBLE_QUOTES + " id = " + DOUBLE_QUOTES + "42" + DOUBLE_QUOTES + ">";
-            expected += "<name>d</name>";
-            expected += "</object>";
+            expected = "<object class_name = \"pensar_digital::cpplib::Dummy\" id = \"42\"><name>d</name></object>";
             CHECK_EQ(String, xml, expected, "2. xml should be equal to " + expected + " but was " + xml + ".");
 
             Dummy d1;
