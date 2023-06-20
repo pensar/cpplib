@@ -149,12 +149,14 @@
     <ClCompile Include="locale.cpp" />
     <ClCompile Include="log.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="memory.cpp" />
     <ClCompile Include="object.cpp" />
     <ClCompile Include="random_util.cpp" />
     <ClCompile Include="string_util.cpp" />
     <ClCompile Include="system.cpp" />
     <ClCompile Include="sys_user_info.cpp" />
     <ClCompile Include="test\factory_test.cpp" />
+    <ClCompile Include="test\io_util_test.cpp" />
     <ClCompile Include="test\object_test.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -171,7 +173,7 @@
     <ClInclude Include="language.hpp" />
     <ClInclude Include="locale.hpp" />
     <ClInclude Include="log.hpp" />
-    <ClInclude Include="memory.h" />
+    <ClInclude Include="memory.hpp" />
     <ClInclude Include="mg.hpp" />
     <ClInclude Include="name.hpp" />
     <ClInclude Include="object.hpp" />

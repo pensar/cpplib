@@ -5,6 +5,9 @@
 #define io_utilH
 
 #include "object.hpp"
+#include "string_def.hpp"
+#include "memory.hpp"
+
 #include <string>
 #ifdef _MSC_VER
 #include <filesystem>
@@ -35,6 +38,16 @@ namespace pensar_digital
 			Path (const std::string& s) : fs::path (s) {}
 			Path (const char* s) : fs::path (s) {}
 
+            // Copy constructor.
+            Path (const Path& p) noexcept : fs::path (p) {}
+
+            // Move constructor.
+            Path (Path&& p) noexcept : fs::path (p) {}
+
+
+            // Move assignment operator.
+            Path& operator = (Path&& p) { fs::path::operator = (p); return *this; }
+
             // Assignment operator for std::string.
             Path& operator = (const std::string& s) { fs::path::operator = (s); return *this; }
             
@@ -44,11 +57,17 @@ namespace pensar_digital
             // Implicit conversion to std::string.
             operator std::string () const { return fs::path::string (); }
 
+            // Implicit conversion to const char*.
+            operator const char* () const { String s = *this; return s.c_str(); }
+
             // /= operator for std::string.
             Path& operator /= (const std::string& s) { fs::path::operator /= (s); return *this; }
 
             // /= operator for const Path&.
             Path& operator /= (const Path& p) { fs::path::operator /= (p); return *this; }
+            
+            // + operator for std::string.s
+            Path operator + (const std::string& s) const { Path p = *this; p /= s; return p; }  
 		};
 
 
@@ -67,19 +86,20 @@ namespace pensar_digital
             virtual Version get_protected_interface_version () const noexcept { return PROTECTED_INTERFACE_VERSION; }
             virtual Version get_private_interface_version   () const noexcept { return PRIVATE_INTERFACE_VERSION;   }
 
-            const size_t MAX_IN_MEMORY_FILE_SIZE_BYTE = 1024 ^ 3;
+            const size_t MAX_IN_MEMORY_FILE_SIZE_BYTE = 1024 ^ 3; // 1 GB
 
-            File (const fs::path& full_path, const Id aid = NULL_ID) : Object (aid)
+            File (const Path& full_path, const Id aid = NULL_ID) : Object (aid)
             {
                 if (fs::exists (full_path))
                 {
                     if (full_path.has_filename ())
                     {
                         std::vector<char> buffer;
-                        if (fs::file_size (full_path) < MAX_IN_MEMORY_FILE_SIZE_BYTE)
+                        size_t file_size = fs::file_size (full_path);
+                        if ((file_size < MAX_IN_MEMORY_FILE_SIZE_BYTE) && (file_size < get_available_memory ()))
                         {
                             // Reads file into buffer.
-                            std::ifstream file (full_path, std::ios::binary);
+                            std::ifstream file (static_cast<fs::path>(full_path), std::ios::binary);
                             if (file.is_open ())
 							{
 								file.seekg (0, std::ios::end);
@@ -106,7 +126,8 @@ namespace pensar_digital
 						}
 						else
 						{
-							;
+							// Read a file when size > 1GB;
+
                         }
                     }
                 }

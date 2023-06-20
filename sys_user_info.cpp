@@ -1,5 +1,5 @@
-// $Id: sys_user_info.cpp 70 2014-01-16 07:04:22Z mgpensar $
-
+// author : Mauricio Gomes
+// license: MIT (https://opensource.org/licenses/MIT)
 
 #ifdef CODE_GEAR
 #pragma hdrstop
@@ -32,9 +32,9 @@ namespace pensar_digital
         }
         #endif
 
-        std::string get_user_home ()
+        Path get_user_home ()
         {
-            std::string home;
+            String home;
 
             #ifdef WINDOWS
             // Get home dir from environment variables

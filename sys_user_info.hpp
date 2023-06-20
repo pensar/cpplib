@@ -4,7 +4,8 @@
 #define sys_user_infoH
 //---------------------------------------------------------------------------
 
-#include <string>
+#include "string_def.hpp"
+#include "io_util.hpp"
 
 namespace pensar_digital
 {
@@ -13,7 +14,7 @@ namespace pensar_digital
         void get_user_name (std::string* s);
 
         /// Gets user home directory.
-        std::string get_user_home ();
+        Path get_user_home ();
     }   // namespace cpplib
 }       // namespace pensar_digital
 #endif

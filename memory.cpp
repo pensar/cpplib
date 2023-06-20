@@ -5,6 +5,15 @@
  *          http://creativecommons.org/licenses/by/3.0/deed.en_US
  */
 
+#include "memory.hpp"
+#include <stdlib.h>
+#include <string.h>
+#include <assert.h>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+
 #if defined(_WIN32)
 #include <windows.h>
 #include <psapi.h>
@@ -73,3 +82,62 @@ size_t getPeakRSS ()
 #endif
 }
 
+// Get available memory in bytes. Windows only.
+size_t get_windows_available_memory()
+{
+    MEMORYSTATUSEX status;
+    status.dwLength = sizeof(status);
+    GlobalMemoryStatusEx(&status);
+    return status.ullAvailPhys;
+}
+
+// Get available memory in bytes. Unix only.
+template <bool UseExceptions = false>
+size_t get_unix_available_memory()
+{
+	#if defined(_SC_AVPHYS_PAGES)
+		return sysconf(_SC_AVPHYS_PAGES) * sysconf(_SC_PAGESIZE);
+	#elif defined(_SC_PHYS_PAGES)
+		return sysconf(_SC_PHYS_PAGES) * sysconf(_SC_PAGESIZE);
+	#else
+		if (UseExceptions)
+            { throw std::runtime_error("Failed to determine available memory."); }
+        else
+            return 0L;          /* Unsupported. */
+	#endif
+}
+
+// Get available memory in bytes. Linux only.
+size_t get_linux_available_memory()
+{
+	std::ifstream meminfo("/proc/meminfo");
+	std::string line;
+    while (std::getline(meminfo, line))
+    {
+		std::istringstream iss(line);
+		std::string name;
+		size_t value;
+        if (iss >> name >> value)
+        {
+            if (name == "MemAvailable:")
+            {
+				return value * 1024;
+			}
+		}
+	}
+	return 0;
+}
+
+/// Get available memory in bytes.
+size_t get_available_memory()
+{
+    #if defined(_WIN32)
+		return get_windows_available_memory();
+    #elif defined(__unix__) || defined(__unix) || defined(unix) || (defined(__APPLE__) && defined(__MACH__))
+		return get_unix_available_memory<true>();
+    #elif defined(__linux__) || defined(__linux) || defined(linux) || defined(__gnu_linux__)
+        return get_linux_available_memory();
+    #else
+        #error "Cannot define get_available_memory () for an unknown OS."
+    #endif
+}

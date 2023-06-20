@@ -1,10 +1,10 @@
-// $Id: io_util.cpp 40 2010-07-16 22:04:49Z mgpensar $
+// author : Mauricio Gomes
+// license: MIT (https://opensource.org/licenses/MIT)
 
 #ifdef CODE_GEAR
 #pragma hdrstop
 #endif
 
-//#include "mg.h"
 #ifdef WINDOWS
 #include <windows.h>
 #endif
@@ -17,15 +17,10 @@
 #include <iostream>
 
 #include <fcntl.h>  // O_RDONLY
-// author : Mauricio Gomes
-// license: MIT (https://opensource.org/licenses/MIT)
 
 #ifndef _MSC_BUILD  
 #include <unistd.h> // read
 #endif
-
-// author : Mauricio Gomes
-// license: MIT (https://opensource.org/licenses/MIT)
 
 #include <cstring>  // memchr
 #include <fstream>
@@ -36,6 +31,19 @@ namespace pensar_digital
 {
     namespace cpplib
     {
+        // Create an empty file.
+        void create_empty_file(const Path& file_full_path)
+        {
+			std::ofstream fs(static_cast<const char*>(file_full_path), std::ios::out);
+            if (!fs.is_open())
+            {
+                String serror = "create_file: It was not possible to create file.";
+                const char* c = file_full_path;
+                throw std::runtime_error(serror + c);
+                fs.close();
+            }
+		}
+
         void handle_error(const char* msg)
         {
             perror(msg);
