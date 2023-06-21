@@ -46,7 +46,7 @@ namespace pensar_digital
 
 
             // Move assignment operator.
-            Path& operator = (Path&& p) { fs::path::operator = (p); return *this; }
+            Path& operator = (Path&& p) noexcept { fs::path::operator = (p); return *this; }
 
             // Assignment operator for std::string.
             Path& operator = (const std::string& s) { fs::path::operator = (s); return *this; }
@@ -57,8 +57,8 @@ namespace pensar_digital
             // Implicit conversion to std::string.
             operator std::string () const { return fs::path::string (); }
 
-            // Implicit conversion to const char*.
-            operator const char* () const { String s = *this; return s.c_str(); }
+            // Implicit conversion to const char* returning a value allocated in the heap using _strdup.
+            operator const char* () const { return _strdup (fs::path::string ().c_str ()); }
 
             // /= operator for std::string.
             Path& operator /= (const std::string& s) { fs::path::operator /= (s); return *this; }
@@ -67,7 +67,9 @@ namespace pensar_digital
             Path& operator /= (const Path& p) { fs::path::operator /= (p); return *this; }
             
             // + operator for std::string.s
-            Path operator + (const std::string& s) const { Path p = *this; p /= s; return p; }  
+            Path operator + (const std::string& s) const { Path p = *this; p /= s; return p; }
+
+            bool exists () const { return fs::exists (*this); }
 		};
 
 
@@ -75,7 +77,14 @@ namespace pensar_digital
         ///
         class File: Object
         {
+            private:
+
+            Path full_path;
+            std::ios_base::openmode mode;
+            std::fstream file;
+
             public:
+
             const static Version VERSION                     = 1;
             const static Version PUBLIC_INTERFACE_VERSION    = 1;
             const static Version PROTECTED_INTERFACE_VERSION = 1;
@@ -88,9 +97,11 @@ namespace pensar_digital
 
             const size_t MAX_IN_MEMORY_FILE_SIZE_BYTE = 1024 ^ 3; // 1 GB
 
-            File (const Path& full_path, const Id aid = NULL_ID) : Object (aid)
+            File(const Path& full_path, const std::ios_base::openmode amode, const Id aid = NULL_ID) : Object(aid), 
+                                                                                                       full_path(full_path), 
+                                                                                                       mode(amode)
             {
-                if (fs::exists (full_path))
+                if (full_path.exists ())
                 {
                     if (full_path.has_filename ())
                     {
@@ -99,7 +110,7 @@ namespace pensar_digital
                         if ((file_size < MAX_IN_MEMORY_FILE_SIZE_BYTE) && (file_size < get_available_memory ()))
                         {
                             // Reads file into buffer.
-                            std::ifstream file (static_cast<fs::path>(full_path), std::ios::binary);
+                            std::ifstream file (static_cast<fs::path>(full_path), mode);
                             if (file.is_open ())
 							{
 								file.seekg (0, std::ios::end);
@@ -111,28 +122,50 @@ namespace pensar_digital
 							}
                             else
                             {
-                                // Discovers why file could not be opened.
-                                if (fs::exists(full_path))
-                                {
-									// File exists but could not be opened.
-									throw std::runtime_error ("Could not open file " + full_path.string ());
-								}
-								else
-								{
-									// File does not exist.
-									throw std::runtime_error ("File " + full_path.string () + " does not exist.");
-								}
-							}   
-						}
-						else
-						{
-							// Read a file when size > 1GB;
+    							// File exists but could not be opened.
+	    						throw std::runtime_error ("Could not open file " + full_path.string ());
+							}
+						}   
+                        else
+                        {
+                            // Read a file when size > 1GB;
 
                         }
                     }
+                    else
+					{
+						// Path does not have a filename.
+						throw std::runtime_error("Path " + full_path.string() + " does not have a filename.");
+                    }
+                }
+                else
+                {
+                    // File does not exist.
+                    throw std::runtime_error("File " + full_path.string() + " does not exist.");
                 }
             }
+            bool is_open () const noexcept { return file.is_open (); }
+            void close () noexcept { file.close (); }
+            bool is_good () const noexcept { return file.good (); }
+            bool is_app                        () const noexcept { return (mode & std::ios::app) != 0; }
+            bool is_ate                        () const noexcept { return (mode & std::ios::ate) != 0; }
+            bool is_auto_seek_end_before_write () const noexcept { return is_app (); }
+            bool is_auto_seek_end_on_open      () const noexcept { return is_ate(); }
+            bool is_binary                     () const noexcept { return (mode & std::ios::binary) != 0; }
+            bool is_in                         () const noexcept { return (mode & std::ios::in) != 0; }
+            bool is_out                        () const noexcept { return (mode & std::ios::out) != 0; }
+            bool is_trunc                      () const noexcept { return (mode & std::ios::trunc) != 0; }
+            bool eof                           () const noexcept { return file.eof (); }
         };
+
+        class TextFile : public File
+        {
+			private:
+			public:
+            TextFile(const Path& full_path, const std::ios_base::openmode amode, const Id aid = NULL_ID) : File(full_path, (amode & ~std::ios::binary), aid)
+            {
+			}
+		};  
 
         using LINE_HANDLER = void(*)(const int64_t line_count, const std::string& line);
         extern uintmax_t read_file(const std::string& fname, LINE_HANDLER f);
