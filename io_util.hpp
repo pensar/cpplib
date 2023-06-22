@@ -69,6 +69,19 @@ namespace pensar_digital
             // + operator for std::string.s
             Path operator + (const std::string& s) const { Path p = *this; p /= s; return p; }
 
+            // == operator 
+            bool operator == (const Path& apath) const { return apath == fs::path::c_str (); }
+
+            // != operator for std::string.
+            bool operator != (const std::string& s) const { return ! (*this == s); }
+
+            // == operator for const char*.
+            bool operator == (const char* s) const { return *this == std::string (s); }     
+
+            // != operator for const char*.
+            bool operator != (const char* s) const { return ! (*this == s); }
+            
+
             bool exists () const { return fs::exists (*this); }
 		};
 
@@ -77,7 +90,7 @@ namespace pensar_digital
         ///
         class File: Object
         {
-            private:
+            protected:
 
             Path full_path;
             std::ios_base::openmode mode;
@@ -144,18 +157,35 @@ namespace pensar_digital
                     throw std::runtime_error("File " + full_path.string() + " does not exist.");
                 }
             }
-            bool is_open () const noexcept { return file.is_open (); }
-            void close () noexcept { file.close (); }
-            bool is_good () const noexcept { return file.good (); }
-            bool is_app                        () const noexcept { return (mode & std::ios::app) != 0; }
-            bool is_ate                        () const noexcept { return (mode & std::ios::ate) != 0; }
-            bool is_auto_seek_end_before_write () const noexcept { return is_app (); }
-            bool is_auto_seek_end_on_open      () const noexcept { return is_ate(); }
+            void close() noexcept { file.close(); }
+            
+            void open(const Path& afull_path = "", const std::ios_base::openmode amode = 0)
+            {
+                if (afull_path != "")
+				{
+					full_path = afull_path;
+				}  
+                if (amode != 0)
+                {
+                    mode = amode;
+    			}
+                file.open(static_cast<fs::path>(full_path), mode);
+            }
+
+            bool is_open                       () const noexcept { return file.is_open ();                }
+            bool is_good                       () const noexcept { return file.good ();                   }
+            bool is_app                        () const noexcept { return (mode & std::ios::app) != 0;    }
+            bool is_ate                        () const noexcept { return (mode & std::ios::ate) != 0;    }
+            bool is_auto_seek_end_before_write () const noexcept { return is_app ();                      }
+            bool is_auto_seek_end_on_open      () const noexcept { return is_ate();                       }
             bool is_binary                     () const noexcept { return (mode & std::ios::binary) != 0; }
-            bool is_in                         () const noexcept { return (mode & std::ios::in) != 0; }
-            bool is_out                        () const noexcept { return (mode & std::ios::out) != 0; }
-            bool is_trunc                      () const noexcept { return (mode & std::ios::trunc) != 0; }
-            bool eof                           () const noexcept { return file.eof (); }
+            bool is_in                         () const noexcept { return (mode & std::ios::in) != 0;     }
+            bool is_out                        () const noexcept { return (mode & std::ios::out) != 0;    }
+            bool is_trunc                      () const noexcept { return (mode & std::ios::trunc) != 0;  }
+            bool eof                           () const noexcept { return file.eof ();                    }
+            bool fail                          () const noexcept { return file.fail ();                   }
+            bool bad                           () const noexcept { return file.bad ();                    }
+            bool good                          () const noexcept { return file.good ();                   }
         };
 
         class TextFile : public File
@@ -165,6 +195,53 @@ namespace pensar_digital
             TextFile(const Path& full_path, const std::ios_base::openmode amode, const Id aid = NULL_ID) : File(full_path, (amode & ~std::ios::binary), aid)
             {
 			}
+            TextFile(const Path& full_path, const String& content = "", const Id aid = NULL_ID) : TextFile(full_path, std::ios::in | std::ios::out, aid)
+            {
+			}
+
+            File& add(const String& content)
+            {
+                if (is_open())
+                {
+                    file.seekg(0, std::ios::end);
+                }
+                else
+                {
+                    // open file.
+                    if (full_path.has_filename())
+					{
+						if (full_path.exists())
+						{
+							if (full_path.has_filename ())
+							{
+								file.open(static_cast<fs::path>(full_path), mode);
+							}
+                            else
+                            {
+								// Path exists but is not a file.
+								throw std::runtime_error("Path " + full_path.string() + " exists but is not a file.");
+							}
+						}
+						else
+						{
+							// Path does not exist.
+							throw std::runtime_error("Path " + full_path.string() + " does not exist.");
+						}
+					}
+					else
+					{
+						// Path does not have a filename.
+						throw std::runtime_error("Path " + full_path.string() + " does not have a filename.");
+					}   
+                    file.open(static_cast<fs::path>(full_path), mode);
+                };
+                file << content;
+                return *this;
+			}    
+		};
+
+        class BinaryFile : public File
+		{   
 		};  
 
         using LINE_HANDLER = void(*)(const int64_t line_count, const std::string& line);
