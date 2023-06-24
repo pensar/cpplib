@@ -54,6 +54,17 @@ namespace pensar_digital
             // Assignment operator for const Path&.
             Path& operator = (const Path& p) { fs::path::operator = (p); return *this; } 
             
+            void create_dir_if_does_not_exist () const noexcept
+            {
+                Path dir = *this;
+                if (has_filename())
+                    dir = parent_path();
+                if (! dir.exists ())
+                {
+                    fs::create_directories (dir);
+                }
+            }
+
             // Implicit conversion to std::string.
             operator std::string () const { return fs::path::string (); }
 
@@ -110,7 +121,7 @@ namespace pensar_digital
 
             const size_t MAX_IN_MEMORY_FILE_SIZE_BYTE = 1024 ^ 3; // 1 GB
 
-            File(const Path& full_path, const std::ios_base::openmode amode, const Id aid = NULL_ID) : Object(aid), 
+            File(const Path& full_path, const std::ios_base::openmode amode, const Id aid = NULL_ID) : Object(aid),
                                                                                                        full_path(full_path), 
                                                                                                        mode(amode)
             {
@@ -131,7 +142,7 @@ namespace pensar_digital
 								file.seekg (0, std::ios::beg);
 								buffer.resize (size);
 								file.read (buffer.data (), size);
-								file.close ();
+								close ();
 							}
                             else
                             {
@@ -154,11 +165,18 @@ namespace pensar_digital
                 else
                 {
                     // File does not exist.
-                    throw std::runtime_error("File " + full_path.string() + " does not exist.");
+                    full_path.create_dir_if_does_not_exist();
+                    mode |= std::ios::out;
+                    open (full_path, mode);
                 }
             }
+            
+            virtual ~File() noexcept { close(); }
+
             void close() noexcept { file.close(); }
             
+            bool exists() const { return full_path.exists(); }
+
             void open(const Path& afull_path = "", const std::ios_base::openmode amode = 0)
             {
                 if (afull_path != "")
@@ -192,14 +210,15 @@ namespace pensar_digital
         {
 			private:
 			public:
-            TextFile(const Path& full_path, const std::ios_base::openmode amode, const Id aid = NULL_ID) : File(full_path, (amode & ~std::ios::binary), aid)
+            TextFile(const Path& full_path, const std::ios_base::openmode amode, const String& content = "", const Id aid = NULL_ID) : File(full_path, (amode & ~std::ios::binary), aid)
             {
-			}
-            TextFile(const Path& full_path, const String& content = "", const Id aid = NULL_ID) : TextFile(full_path, std::ios::in | std::ios::out, aid)
+                save(content);
+            }
+            TextFile(const Path& full_path, const String& content = "", const Id aid = NULL_ID) : TextFile(full_path, std::ios::in | std::ios::out, content, aid)
             {
 			}
 
-            File& add(const String& content)
+            File& save(const String& content)
             {
                 if (is_open())
                 {
@@ -207,31 +226,22 @@ namespace pensar_digital
                 }
                 else
                 {
-                    // open file.
-                    if (full_path.has_filename())
+					if (full_path.exists())
 					{
-						if (full_path.exists())
+						if (full_path.has_filename ())
 						{
-							if (full_path.has_filename ())
-							{
-								file.open(static_cast<fs::path>(full_path), mode);
-							}
-                            else
-                            {
-								// Path exists but is not a file.
-								throw std::runtime_error("Path " + full_path.string() + " exists but is not a file.");
-							}
+							file.open(static_cast<fs::path>(full_path), mode);
 						}
-						else
-						{
-							// Path does not exist.
-							throw std::runtime_error("Path " + full_path.string() + " does not exist.");
+                        else
+                        {
+							// Path exists but is not a file.
+							throw std::runtime_error("Path " + full_path.string() + " exists but is not a file.");
 						}
 					}
 					else
 					{
-						// Path does not have a filename.
-						throw std::runtime_error("Path " + full_path.string() + " does not have a filename.");
+                        full_path.create_dir_if_does_not_exist ();
+						mode |= std::ios::out;
 					}   
                     file.open(static_cast<fs::path>(full_path), mode);
                 };
