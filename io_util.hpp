@@ -168,12 +168,13 @@ namespace pensar_digital
                     full_path.create_dir_if_does_not_exist();
                     mode |= std::ios::out;
                     open (full_path, mode);
+                    close();
                 }
             }
             
             virtual ~File() noexcept { close(); }
 
-            void close() noexcept { file.close(); }
+            void close() noexcept { if (is_open ()) file.close(); }
             
             bool exists() const { return full_path.exists(); }
 
@@ -246,6 +247,7 @@ namespace pensar_digital
                     file.open(static_cast<fs::path>(full_path), mode);
                 };
                 file << content;
+                close ();
                 return *this;
 			}    
 		};
