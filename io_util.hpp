@@ -120,8 +120,8 @@ namespace pensar_digital
             virtual Version get_private_interface_version   () const noexcept { return PRIVATE_INTERFACE_VERSION;   }
 
             const size_t MAX_IN_MEMORY_FILE_SIZE_BYTE = 1024 ^ 3; // 1 GB
-
-            File(const Path& full_path, const std::ios_base::openmode amode, const Id aid = NULL_ID) : Object(aid),
+            const static std::ios_base::openmode IN_OUT_ATE_MODE = std::ios::in | std::ios::out | std::ios::ate;
+            File(const Path& full_path, const std::ios_base::openmode amode = IN_OUT_ATE_MODE, const Id aid = NULL_ID) : Object(aid),
                                                                                                        full_path(full_path), 
                                                                                                        mode(amode)
             {
@@ -211,11 +211,11 @@ namespace pensar_digital
         {
 			private:
 			public:
-            TextFile(const Path& full_path, const std::ios_base::openmode amode, const String& content = "", const Id aid = NULL_ID) : File(full_path, (amode & ~std::ios::binary), aid)
-            {
+            TextFile(const Path& full_path, const std::ios_base::openmode amode, const String& content = "", const Id aid = NULL_ID) : File(full_path, (amode & (~std::ios::binary)), aid)
+            { 
                 save(content);
             }
-            TextFile(const Path& full_path, const String& content = "", const Id aid = NULL_ID) : TextFile(full_path, std::ios::in | std::ios::out, content, aid)
+            TextFile(const Path& full_path, const String& content = "", const Id aid = NULL_ID) : TextFile(full_path, IN_OUT_ATE_MODE, content, aid)
             {
 			}
 
