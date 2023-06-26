@@ -120,8 +120,9 @@ namespace pensar_digital
             virtual Version get_private_interface_version   () const noexcept { return PRIVATE_INTERFACE_VERSION;   }
 
             const size_t MAX_IN_MEMORY_FILE_SIZE_BYTE = 1024 ^ 3; // 1 GB
-            const static std::ios_base::openmode IN_OUT_ATE_MODE = std::ios::in | std::ios::out | std::ios::ate;
-            File(const Path& full_path, const std::ios_base::openmode amode = IN_OUT_ATE_MODE, const Id aid = NULL_ID) : Object(aid),
+            const static std::ios_base::openmode IN_OUT_ATE_MODE     = std::ios::in | std::ios::out | std::ios::ate;
+            const static std::ios_base::openmode IN_OUT_ATE_BIN_MODE = IN_OUT_ATE_MODE | std::ios::binary;
+            File(const Path& full_path, const std::ios_base::openmode amode = IN_OUT_ATE_BIN_MODE, const Id aid = NULL_ID) : Object(aid),
                                                                                                        full_path(full_path), 
                                                                                                        mode(amode)
             {
