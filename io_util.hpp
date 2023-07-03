@@ -130,7 +130,7 @@ namespace pensar_digital
                 {
                     if (full_path.has_filename ())
                     {
-                        std::vector<char> buffer;
+                        std::vector<char> buffer; 
                         size_t file_size = fs::file_size (full_path);
                         if ((file_size < MAX_IN_MEMORY_FILE_SIZE_BYTE) && (file_size < get_available_memory ()))
                         {
@@ -214,13 +214,13 @@ namespace pensar_digital
 			public:
             TextFile(const Path& full_path, const std::ios_base::openmode amode, const String& content = "", const Id aid = NULL_ID) : File(full_path, (amode & (~std::ios::binary)), aid)
             { 
-                save(content);
+                append(content);
             }
             TextFile(const Path& full_path, const String& content = "", const Id aid = NULL_ID) : TextFile(full_path, IN_OUT_ATE_MODE, content, aid)
             {
 			}
 
-            File& save(const String& content)
+            File& append (const String& content)
             {
                 if (is_open())
                 {

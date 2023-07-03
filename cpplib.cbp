@@ -3,67 +3,173 @@
 	<FileVersion major="1" minor="6" />
 	<Project>
 		<Option title="cpplib" />
-		<Option platforms="Windows;" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
-			<Target title="debug">
-				<Option platforms="Windows;" />
-				<Option output="$(#out)/debug/bin/cpplib" prefix_auto="1" extension_auto="1" />
-				<Option object_output="$(#out)/debug/obj/" />
-				<Option type="1" />
+			<Target title="Debug Win32">
+				<Option output="./Debug/cpplib" prefix_auto="1" extension_auto="1" />
+				<Option object_output="Debug/" />
+				<Option deps_output="./Debug/" />
+				<Option type="0" />
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
-				</Compiler>
-			</Target>
-			<Target title="release">
-				<Option output="$(#out)/release/bin/cpplib" prefix_auto="1" extension_auto="1" />
-				<Option object_output="$(#out)/release/obj/" />
-				<Option type="1" />
-				<Option compiler="gcc" />
-				<Compiler>
-					<Add option="-O2" />
+					<Add option="-DWIN32" />
+					<Add option="-D_DEBUG" />
+					<Add option="-D_CONSOLE" />
+					<Add option="-Wall" />
 				</Compiler>
 				<Linker>
-					<Add option="-s" />
+					<Add library="winmm.lib" />
+					<Add library="comctl32.lib" />
+					<Add library="kernel32.lib" />
+					<Add library="user32.lib" />
+					<Add library="gdi32.lib" />
+					<Add library="winspool.lib" />
+					<Add library="comdlg32.lib" />
+					<Add library="advapi32.lib" />
+					<Add library="shell32.lib" />
+					<Add library="ole32.lib" />
+					<Add library="oleaut32.lib" />
+					<Add library="uuid.lib" />
+					<Add library="odbc32.lib" />
+					<Add library="odbccp32.lib" />
+				</Linker>
+			</Target>
+			<Target title="Debug x64">
+				<Option output="c:/tmp/cpplib/x64/Debug/cpplib" prefix_auto="1" extension_auto="1" />
+				<Option object_output="c:/tmp/cpplib/x64/Debug/" />
+				<Option deps_output="c:/tmp/cpplib/x64/Debug/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-D_DEBUG" />
+					<Add option="-D_CONSOLE" />
+					<Add option="-DVISUAL_STUDIO" />
+					<Add option="-Wall" />
+					<Add directory="C:/mg/prj/cpplib/header_lib/" />
+					<Add directory="C:/mg/prj/unit-test/" />
+					<Add directory="C:/mg/prj/cpplib/" />
+				</Compiler>
+				<Linker>
+					<Add library="winmm.lib" />
+					<Add library="comctl32.lib" />
+					<Add library="kernel32.lib" />
+					<Add library="user32.lib" />
+					<Add library="gdi32.lib" />
+					<Add library="winspool.lib" />
+					<Add library="comdlg32.lib" />
+					<Add library="advapi32.lib" />
+					<Add library="shell32.lib" />
+					<Add library="ole32.lib" />
+					<Add library="oleaut32.lib" />
+					<Add library="uuid.lib" />
+					<Add library="odbc32.lib" />
+					<Add library="odbccp32.lib" />
+				</Linker>
+			</Target>
+			<Target title="Release x64">
+				<Option output="c:/tmp/cpplib/x64/Release/cpplib" prefix_auto="1" extension_auto="1" />
+				<Option object_output="c:/tmp/cpplib/x64/Release/" />
+				<Option deps_output="c:/tmp/cpplib/x64/Release/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-DNDEBUG" />
+					<Add option="-D_CONSOLE" />
+					<Add option="-Wall" />
+					<Add directory="C:/mg/prj/cpplib/header_lib/" />
+					<Add directory="C:/mg/prj/unit-test/" />
+					<Add directory="C:/mg/prj/cpplib/" />
+				</Compiler>
+				<Linker>
+					<Add library="winmm.lib" />
+					<Add library="comctl32.lib" />
+					<Add library="kernel32.lib" />
+					<Add library="user32.lib" />
+					<Add library="gdi32.lib" />
+					<Add library="winspool.lib" />
+					<Add library="comdlg32.lib" />
+					<Add library="advapi32.lib" />
+					<Add library="shell32.lib" />
+					<Add library="ole32.lib" />
+					<Add library="oleaut32.lib" />
+					<Add library="uuid.lib" />
+					<Add library="odbc32.lib" />
+					<Add library="odbccp32.lib" />
+				</Linker>
+			</Target>
+			<Target title="Release Win32">
+				<Option output="./Release/cpplib" prefix_auto="1" extension_auto="1" />
+				<Option object_output="Release/" />
+				<Option deps_output="./Release/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-DWIN32" />
+					<Add option="-DNDEBUG" />
+					<Add option="-D_CONSOLE" />
+					<Add option="-Wall" />
+				</Compiler>
+				<Linker>
+					<Add library="winmm.lib" />
+					<Add library="comctl32.lib" />
+					<Add library="kernel32.lib" />
+					<Add library="user32.lib" />
+					<Add library="gdi32.lib" />
+					<Add library="winspool.lib" />
+					<Add library="comdlg32.lib" />
+					<Add library="advapi32.lib" />
+					<Add library="shell32.lib" />
+					<Add library="ole32.lib" />
+					<Add library="oleaut32.lib" />
+					<Add library="uuid.lib" />
+					<Add library="odbc32.lib" />
+					<Add library="odbccp32.lib" />
 				</Linker>
 			</Target>
 		</Build>
-		<Compiler>
-			<Add option="-Wall" />
-			<Add option="-fexceptions" />
-		</Compiler>
-		<Unit filename="../unit-test/test.cpp">
-			<Option target="debug" />
-		</Unit>
-		<Unit filename="../unit-test/test.hpp">
-			<Option target="debug" />
-		</Unit>
+		<Unit filename="../unit-test/test.cpp" />
+		<Unit filename="../unit-test/test.hpp" />
+		<Unit filename="algorithm_util.hpp" />
 		<Unit filename="constants.cpp" />
 		<Unit filename="constants.hpp" />
+		<Unit filename="country.hpp" />
+		<Unit filename="cpp.hint" />
+		<Unit filename="cpp_lib/xmlParser.cpp" />
+		<Unit filename="cpplib_concepts.hpp" />
+		<Unit filename="distance.hpp" />
 		<Unit filename="error.hpp" />
 		<Unit filename="factory.hpp" />
-		<Unit filename="generator.hpp" />
+		<Unit filename="header_lib/json.hpp" />
 		<Unit filename="io_util.cpp" />
 		<Unit filename="io_util.hpp" />
-		<Unit filename="macros.hpp" />
+		<Unit filename="language.cpp" />
+		<Unit filename="language.hpp" />
+		<Unit filename="locale.cpp" />
+		<Unit filename="locale.hpp" />
+		<Unit filename="log.cpp" />
+		<Unit filename="log.hpp" />
 		<Unit filename="main.cpp" />
 		<Unit filename="memory.cpp" />
 		<Unit filename="memory.hpp" />
+		<Unit filename="mg.hpp" />
 		<Unit filename="name.hpp" />
+		<Unit filename="object.cpp" />
 		<Unit filename="object.hpp" />
+		<Unit filename="random_util.cpp" />
+		<Unit filename="random_util.hpp" />
 		<Unit filename="string_def.hpp" />
 		<Unit filename="string_util.cpp" />
 		<Unit filename="string_util.hpp" />
-		<Unit filename="test/factory_test.cpp">
-			<Option target="debug" />
-		</Unit>
-		<Unit filename="test/name_test.cpp">
-			<Option target="debug" />
-		</Unit>
-		<Extensions>
-			<lib_finder disable_auto="1" />
-		</Extensions>
+		<Unit filename="sys_user_info.cpp" />
+		<Unit filename="sys_user_info.hpp" />
+		<Unit filename="system.cpp" />
+		<Unit filename="test/factory_test.cpp" />
+		<Unit filename="test/io_util_test.cpp" />
+		<Unit filename="test/object_test.cpp" />
+		<Unit filename="wstring_stream_hack.hpp" />
+		<Extensions />
 	</Project>
 </CodeBlocks_project_file>
