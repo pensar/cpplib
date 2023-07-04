@@ -469,20 +469,20 @@ namespace pensar_digital
             return f;
         }
 
-        template<class String = std::string>
+        template<class String = std::string, bool use_grouping_char = false>
         String to_string (unsigned number, typename String::value_type grouping_char = ',')
         {
             std::ostringstream ss;
             ss << number;
             String s = ss.str ();
-            return insert_grouping_char<String> (s, grouping_char);
+            return use_grouping_char ? insert_grouping_char<String>(s, grouping_char) : s;
         }
 
-        template<class String = std::string>
+        template<class String = std::string, bool use_grouping_char = false>
         String to_string (int number, typename String::value_type grouping_char = ',')
         {
             String s = number >= 0 ? "" : "-";
-            s += to_string<String> ((unsigned)abs(number), grouping_char);
+            s += to_string<String, use_grouping_char> ((unsigned)abs(number), grouping_char);
             return s;
         }
 

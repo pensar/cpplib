@@ -8,6 +8,23 @@ namespace pensar_digital
 {
 	namespace cpplib
 	{
+		// Constrainable concept. Requires a member function ok() returning something convertible to bool.
+		template <typename T>
+		concept Constrainable = requires (T t)
+		{
+			{t.ok()} noexcept -> std::convertible_to<bool>;
+		};
+
+		// Versionable concept requires 4 member functions: Version get_public_interface_version (), Version get_protected_interface_version (), Version get_private_interface_version () and Version get_version ().	
+		template <typename T>
+		concept Versionable = requires (T t)
+		{
+			{t.get_public_interface_version ()}    noexcept -> std::convertible_to<Version>;
+			{t.get_protected_interface_version ()} noexcept -> std::convertible_to<Version>;
+			{t.get_private_interface_version ()}   noexcept -> std::convertible_to<Version>;
+			{t.get_version ()}                     noexcept -> std::convertible_to<Version>;
+		};
+
 		/// Concept for a class with a noexcept initialize method returning something convertible to bool.
 		template <typename T, typename... Args>
 		concept Initializable = requires (T t, Args&& ... args)

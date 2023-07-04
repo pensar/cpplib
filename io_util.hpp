@@ -107,6 +107,39 @@ namespace pensar_digital
             std::ios_base::openmode mode;
             std::fstream file;
 
+            template <typename T = const String&>
+            File& _append(const T& content)
+            {
+                if (is_open())
+                {
+                    file.seekg(0, std::ios::end);
+                }
+                else
+                {
+                    if (full_path.exists())
+                    {
+                        if (full_path.has_filename())
+                        {
+                            file.open(static_cast<fs::path>(full_path), mode);
+                        }
+                        else
+                        {
+                            // Path exists but is not a file.
+                            throw std::runtime_error("Path " + full_path.string() + " exists but is not a file.");
+                        }
+                    }
+                    else
+                    {
+                        full_path.create_dir_if_does_not_exist();
+                        mode |= std::ios::out;
+                    }
+                    file.open(static_cast<fs::path>(full_path), mode);
+                };
+                file << content;
+                close();
+                return *this;
+            }
+
             public:
 
             const static Version VERSION                     = 1;
@@ -114,7 +147,6 @@ namespace pensar_digital
             const static Version PROTECTED_INTERFACE_VERSION = 1;
             const static Version PRIVATE_INTERFACE_VERSION   = 1;
 
-            virtual Version get_version                     () const noexcept { return VERSION;                     }
             virtual Version get_public_interface_version    () const noexcept { return PUBLIC_INTERFACE_VERSION;    }
             virtual Version get_protected_interface_version () const noexcept { return PROTECTED_INTERFACE_VERSION; }
             virtual Version get_private_interface_version   () const noexcept { return PRIVATE_INTERFACE_VERSION;   }
@@ -222,34 +254,7 @@ namespace pensar_digital
 
             File& append (const String& content)
             {
-                if (is_open())
-                {
-                    file.seekg(0, std::ios::end);
-                }
-                else
-                {
-					if (full_path.exists())
-					{
-						if (full_path.has_filename ())
-						{
-							file.open(static_cast<fs::path>(full_path), mode);
-						}
-                        else
-                        {
-							// Path exists but is not a file.
-							throw std::runtime_error("Path " + full_path.string() + " exists but is not a file.");
-						}
-					}
-					else
-					{
-                        full_path.create_dir_if_does_not_exist ();
-						mode |= std::ios::out;
-					}   
-                    file.open(static_cast<fs::path>(full_path), mode);
-                };
-                file << content;
-                close ();
-                return *this;
+               return _append<String>(content);
 			}    
 		};
 

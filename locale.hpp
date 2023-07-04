@@ -21,7 +21,6 @@ namespace pensar_digital
             const static Version PROTECTED_INTERFACE_VERSION = 1;
             const static Version PRIVATE_INTERFACE_VERSION = 1;
 
-            virtual Version get_version() const noexcept { return VERSION; }
             virtual Version get_public_interface_version() const noexcept { return PUBLIC_INTERFACE_VERSION; }
             virtual Version get_protected_interface_version() const noexcept { return PROTECTED_INTERFACE_VERSION; }
             virtual Version get_private_interface_version() const noexcept { return PRIVATE_INTERFACE_VERSION; }

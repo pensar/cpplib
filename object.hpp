@@ -27,6 +27,7 @@ namespace pensar_digital
     {
         using Json = nlohmann::json;
         namespace pd = pensar_digital::cpplib;
+
         class Object
         {
             private:
@@ -37,19 +38,14 @@ namespace pensar_digital
 
             String ObjXMLPrefix() const noexcept { return "<object class_name = \"" + class_name() + "\" id = \"" + to_string() + "\""; }
 
-            virtual std::istream& ReadFromStream(std::istream& is, const Version v)
+            virtual std::istream& ReadFromStream(std::istream& is)
             {
-                switch (v)
-                {
-                case 1:
-                    return is >> id;
-                };
-                return is;
+               return is >> id;
             };
 
-            virtual std::ostream& WriteToStream(std::ostream& os, const Version v) const
+            virtual std::ostream& WriteToStream(std::ostream& os) const
             {
-                switch (v)
+                switch (get_public_interface_version ())
                 {
                 case 1:
                     return os << id;
@@ -71,15 +67,21 @@ namespace pensar_digital
             virtual bool _equals(const Object& o) const { return (id == o.id); }
 
             public:
-            const static Version VERSION                     = 1;
             const static Version PUBLIC_INTERFACE_VERSION    = 1;
             const static Version PROTECTED_INTERFACE_VERSION = 1;
             const static Version PRIVATE_INTERFACE_VERSION   = 1;
 
-            virtual Version get_version                     () const noexcept { return VERSION;                     }    
             virtual Version get_public_interface_version    () const noexcept { return PUBLIC_INTERFACE_VERSION;    }
             virtual Version get_protected_interface_version () const noexcept { return PROTECTED_INTERFACE_VERSION; }
             virtual Version get_private_interface_version   () const noexcept { return PRIVATE_INTERFACE_VERSION;   }
+            
+            // get_version () returns a string formed by the concatenation of public, protected and private interface versions using a dot as separator.
+            virtual String get_version () const noexcept 
+            { 
+                return pd::to_string<String, false> (get_public_interface_version ()) + "." + pd::to_string<String, false>(get_protected_interface_version ()) + "." + pd::to_string<String, false>(get_private_interface_version ());
+            }
+            
+                
 
             virtual String class_name() const { String c = typeid(*this).name(); c.erase(0, sizeof("class ") - 1); return c; }
 
@@ -181,8 +183,8 @@ namespace pensar_digital
             Object& operator=(const Object& o) { return assign (o); }
 
             virtual bool initialize(Id aid = NULL_ID) noexcept { id = aid; return true; }
-            std::istream& operator >> (std::istream& is)       { return ReadFromStream (is, VERSION);};
-            std::ostream& operator << (std::ostream& os) const { return WriteToStream  (os, VERSION);};
+            std::istream& operator >> (std::istream& is)       { return ReadFromStream (is);};
+            std::ostream& operator << (std::ostream& os) const { return WriteToStream  (os);};
             friend void from_json(const Json& j, Object& o);
          };
 
@@ -193,6 +195,13 @@ namespace pensar_digital
 
         extern void to_json(Json& j, const Object& o);
         extern void from_json(const Json& j, Object& o);
-   }
-}
+        // Dependency class is a Constrainable class used to define dependencies between objects.
+        template <Versionable v>
+        class Dependency
+        {
+        public:
+            virtual bool ok() const noexcept = 0;
+        };
+   } // namespace pensar_digital::cpplib
+} // namespace pensar_digital
 #endif // OBJECT_HPP
