@@ -196,11 +196,17 @@ namespace pensar_digital
         extern void to_json(Json& j, const Object& o);
         extern void from_json(const Json& j, Object& o);
         // Dependency class is a Constrainable class used to define dependencies between objects.
-        template <Versionable v>
+        template <Versionable MainClass, Versionable RequiredClass>
         class Dependency
         {
-        public:
+            private:
+                Version required_public_interface_version;
+                Version required_protected_interface_version;   
+                Version required_private_interface_version;
+            public:
             virtual bool ok() const noexcept = 0;
+
+            // method to set the class dependency. 
         };
    } // namespace pensar_digital::cpplib
 } // namespace pensar_digital
