@@ -9,10 +9,10 @@ namespace pensar_digital
 	namespace cpplib
 	{
 		// Constrainable concept. Requires a member function ok() returning something convertible to bool.
-		template <typename T>
-		concept Constrainable = requires (T t)
+		template <typename T, typename... Args>
+		concept Constrainable = requires (T t, Args&& ... args)
 		{
-			{t.ok()} noexcept -> std::convertible_to<bool>;
+			{t.ok(std::forward<Args>(args) ...)} noexcept -> std::convertible_to<bool>;
 		};
 		
 		// Negatable. Requires the unary operator ! to be defined returning something convertible to bool.
