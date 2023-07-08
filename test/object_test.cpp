@@ -109,6 +109,21 @@ namespace pensar_digital
             CHECK_EQ(Dummy, d, d1, "1. d == d1 should be true");
         TEST_END(ObjectClone)
 
+        TEST(ObjectStreaming)
+            Object o(42);
+			std::stringstream ss;
+			ss << o;
+            Object o2;
+            ss >> o2;
+            CHECK(o == o2, "0. o == o2 should be true");
+
+			Dummy d(42, "d");
+            ss << d;
+			Dummy d2;
+			ss >> d2;
+			CHECK_EQ(Dummy, d, d2, "1. d == d2 should be true");
+        TEST_END(ObjectStreaming)
+
         TEST(ObjectJsonConversion)
 			Object o(42);
 			Json j = o;

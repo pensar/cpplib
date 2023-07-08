@@ -40,15 +40,34 @@ namespace pensar_digital
 
             virtual std::istream& ReadFromStream(std::istream& is)
             {
+				Version public_interface_version    = 0;
+				Version protected_interface_version = 0;
+				Version private_interface_version   = 0;
+				is >> public_interface_version;
+				is >> protected_interface_version;
+				is >> private_interface_version;
+                if (public_interface_version != get_public_interface_version())
+                    // handles the case when the object is read from a file with a different version.
+                    ;
+                if (protected_interface_version != get_protected_interface_version ())
+                    // handles the case when the object is read from a file with a different version.
+					;
+			    
+                if (private_interface_version != get_private_interface_version())
+                    // handles the case when the object is read from a file with a different version.
+                    ;
                return is >> id;
             };
 
             virtual std::ostream& WriteToStream(std::ostream& os) const
             {
+                os << get_public_interface_version    ()  
+                   << get_protected_interface_version ()  
+                   << get_private_interface_version   ()
+                   << id;
                 switch (get_public_interface_version ())
                 {
-                case 1:
-                    return os << id;
+                    default:;
                 };
                 return os;
             };
@@ -171,7 +190,7 @@ namespace pensar_digital
             /** Copy constructor
                 *  \param other Object to copy from
                 */
-            Object(const Object& o) {assign (o);}
+            Object(const Object& o) { assign (o); }
 
 
             virtual Object& assign (const Object& o) {id = o.get_id (); return *this;}
