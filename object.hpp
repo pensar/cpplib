@@ -38,40 +38,6 @@ namespace pensar_digital
 
             String ObjXMLPrefix() const noexcept { return "<object class_name = \"" + class_name() + "\" id = \"" + to_string() + "\""; }
 
-            virtual std::istream& ReadFromStream(std::istream& is)
-            {
-				Version public_interface_version    = 0;
-				Version protected_interface_version = 0;
-				Version private_interface_version   = 0;
-				is >> public_interface_version;
-				is >> protected_interface_version;
-				is >> private_interface_version;
-                if (public_interface_version != get_public_interface_version())
-                    // handles the case when the object is read from a file with a different version.
-                    ;
-                if (protected_interface_version != get_protected_interface_version ())
-                    // handles the case when the object is read from a file with a different version.
-					;
-			    
-                if (private_interface_version != get_private_interface_version())
-                    // handles the case when the object is read from a file with a different version.
-                    ;
-               return is >> id;
-            };
-
-            virtual std::ostream& WriteToStream(std::ostream& os) const
-            {
-                os << get_public_interface_version    ()  
-                   << get_protected_interface_version ()  
-                   << get_private_interface_version   ()
-                   << id;
-                switch (get_public_interface_version ())
-                {
-                    default:;
-                };
-                return os;
-            };
-
             /** Set id
              * \param val New value to set
              */
@@ -124,6 +90,39 @@ namespace pensar_digital
                 
             // Conversion to json string.
             virtual String json_str() const { Json j = *this; return j.dump(); }
+            
+            virtual std::istream& ReadFromStream (std::istream& is)
+            {
+                Version public_interface_version = 0;
+                Version protected_interface_version = 0;
+                Version private_interface_version = 0;
+                is >> public_interface_version;
+                is >> protected_interface_version;
+                is >> private_interface_version;
+                /*
+                if (public_interface_version != get_public_interface_version())
+                    // handles the case when the object is read from a file with a different version.
+                    ;
+                if (protected_interface_version != get_protected_interface_version())
+                    // handles the case when the object is read from a file with a different version.
+                    ;
+
+                if (private_interface_version != get_private_interface_version())
+                    // handles the case when the object is read from a file with a different version.
+                    ;
+                    */
+                return is >> id;
+            };
+
+            virtual std::ostream& WriteToStream(std::ostream& os) const
+            {
+                os << get_public_interface_version() << " "
+                    << get_protected_interface_version() << " "
+                    << get_private_interface_version() << " "
+                    << id;
+                return os;
+            };
+
 
             // Conversion to xml string.s
             virtual String xml_str() const noexcept 
@@ -202,10 +201,11 @@ namespace pensar_digital
             Object& operator=(const Object& o) { return assign (o); }
 
             virtual bool initialize(Id aid = NULL_ID) noexcept { id = aid; return true; }
-            std::istream& operator >> (std::istream& is)       { return ReadFromStream (is);};
-            std::ostream& operator << (std::ostream& os) const { return WriteToStream  (os);};
             friend void from_json(const Json& j, Object& o);
          };
+
+         extern std::istream& operator >> (std::istream& is,       Object& o);
+         extern std::ostream& operator << (std::ostream& os, const Object& o);
 
          template<std::copy_constructible T = Object>
          static T clone(const T& o) { return T(o); }

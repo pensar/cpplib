@@ -34,7 +34,6 @@ namespace pensar_digital
             void set_error_message    (const String& error_msg) { error_message = error_msg; };
             void append_error_message (const String& error_msg) { error_message = error_message + error_msg; };
 
-            protected:
             virtual std::istream& ReadFromStream (std::istream& is)
             {
                 Id id;
@@ -53,6 +52,10 @@ namespace pensar_digital
             String error_message;
         };
 
+        extern std::ostream& operator<< (std::ostream& os, const Error& e);
+        extern std::istream& operator>> (std::istream& is,       Error& e);
+
+
         class UnsupportedVersion : public Error
         {
             public:
@@ -61,4 +64,4 @@ namespace pensar_digital
     }
 }
 
-#endif // ERROR_HPP_INCLUDED
+#endif // ERROR_HPP_INCLUDED;

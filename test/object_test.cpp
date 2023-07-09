@@ -113,6 +113,8 @@ namespace pensar_digital
             Object o(42);
 			std::stringstream ss;
 			ss << o;
+            String s = ss.str();
+            CHECK_EQ(String, s, "1 1 1 42", "0.");
             Object o2;
             ss >> o2;
             CHECK(o == o2, "0. o == o2 should be true");
