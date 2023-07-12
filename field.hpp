@@ -15,7 +15,7 @@ namespace pensar_digital
 		{
 			private:
 			T value;
-			bool is_null;
+			bool isnull;
 			String name;
 			String display_name;
 			String description;
@@ -29,12 +29,12 @@ namespace pensar_digital
 				virtual Version get_protected_interface_version () const noexcept { return PROTECTED_INTERFACE_VERSION; }
 				virtual Version get_private_interface_version   () const noexcept { return PRIVATE_INTERFACE_VERSION; }
 
-			Field(String name, String display_name, String description, bool is_null = true) : Object()
+			Field(String name, String adisplay_name, String adescription, bool aisnull = true) : Object()
 			{
 				name = aname;
 				display_name = adisplay_name;
 				description = adescription;
-				isNull = aisNull;
+				isnull = aisnull;
 			}
 
 			Field(String aname, String adisplay_name, String adescription, T avalue, bool ais_null = false) :
@@ -62,7 +62,7 @@ namespace pensar_digital
 				{
 					Object::operator=(other);
 					value = other.value;
-					is_null = other.is_null;
+					isnull = other.isnull;
 					name = other.name;
 					display_name = other.display_name;
 					description = other.description;
@@ -81,7 +81,7 @@ namespace pensar_digital
 				{
 					Object::operator=(std::move(other));
 					value = std::move(other.value);
-					is_null = std::move(other.is_null);
+					isnull = std::move(other.isnull);
 					name = std::move(other.name);
 					display_name = std::move(other.display_name);
 					description = std::move(other.description);
@@ -96,6 +96,43 @@ namespace pensar_digital
 
 			/// Move assignment operator.
 			virtual Field & operator= (Field &&other) {	return assign(other); }
+
+			virtual ~Field() {}
+
+			virtual T value() const { return value; }
+
+			virtual void set_value(const T& value) { this->value = value; }
+
+			virtual bool is_null() const { return isnull; }
+
+			// Implicit conversion to T
+			operator T() const { return value; }
+
+			virtual String name() const { return name; }
+
+			virtual String display_name() const { return display_name; }
+
+			virtual String description() const { return description; }
+
+			virtual String to_string() const { return value.to_string(); }
+
+			// Implicit conversion to String
+			operator String() const { return to_string(); }
+
+			virtual bool operator==(const Field& other) const { return value == other.value; }
+
+			virtual bool operator!=(const Field& other) const { return value != other.value; }
+
+			virtual bool operator<(const Field& other) const { return value < other.value; }	
+
+			virtual bool operator<=(const Field& other) const { return value <= other.value; }
+
+			virtual bool operator>(const Field& other) const { return value > other.value; }
+			
+			virtual bool operator>=(const Field& other) const { return value >= other.value; }
+
+			// Implicit conversion from value type.
+			Field& operator=(const T& value) { this->value = value; return *this; }
 		};
 
 		class StringField : public Field<String>
@@ -109,6 +146,39 @@ namespace pensar_digital
 				Field<String>(name, display_name, description, value, is_null)
 			{
 			}
+
+			/// Copy constructor.
+			StringField(const StringField& other) : Field<String>(other)
+			{
+				assign (other);
+			}
+
+			/// Move constructor.
+			StringField(StringField&& other) : Field<String>(std::move(other))
+			{
+				assign (other);
+			}
+
+			virtual StringField& assign(const StringField& other)
+			{
+				if (this != &other)
+				{
+					Field<String>::assign(other);
+				}
+				return *this;
+			}
+
+			virtual ~StringField() {}
+
+			/// Copy assignment operator.
+			/// @param other Object to copy from.
+			/// @return Reference to this object.
+			virtual StringField& operator=(const StringField& other) { return assign(other); }
+
+			/// Move assignment operator.
+			virtual StringField& operator=(StringField&& other) { return assign(other); }
+
+
 		};
 	} // namespace cpplib
 }     // namespace pensar_digital
