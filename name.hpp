@@ -56,9 +56,9 @@ namespace pensar_digital
                 void set_name (const std::string& n) { name = n; }
 
             protected:
-                virtual std::istream& ReadFromStream (std::istream& is)
+                virtual std::istream& read (std::istream& is)
                 {
-                    Object::ReadFromStream (is);
+                    Object::read (is);
                     switch (get_public_interface_version ())
                     {
                         case 1:
@@ -67,9 +67,9 @@ namespace pensar_digital
                     return is;
                 };
 
-                virtual std::ostream& WriteToStream (std::ostream& os) const
+                virtual std::ostream& write (std::ostream& os) const
                 {
-                    Object::WriteToStream (os);
+                    Object::write(os);
                     switch (get_public_interface_version ())
                     {
                         case 1:
@@ -78,8 +78,8 @@ namespace pensar_digital
                     return os;
                 };
             public:
-                std::istream& operator >> (std::istream& is)       { return ReadFromStream (is);};
-                std::ostream& operator << (std::ostream& os) const { return WriteToStream  (os);};
+                std::istream& operator >> (std::istream& is)       { return read  (is);};
+                std::ostream& operator << (std::ostream& os) const { return write (os);};
 
             private:
                 std::string name; //!< Member variable "name"

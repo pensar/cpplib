@@ -10,6 +10,7 @@
 #include "string_util.hpp"
 #include "header_lib/json.hpp"
 #include "header_lib/xmlParser.h"
+#include "factory.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -60,6 +61,8 @@ namespace pensar_digital
             virtual Version get_protected_interface_version () const noexcept { return PROTECTED_INTERFACE_VERSION; }
             virtual Version get_private_interface_version   () const noexcept { return PRIVATE_INTERFACE_VERSION;   }
             
+            //static pd::PoolFactory<pd::Object, pd::Id> factory(3, 10, 1);
+
             // get_version () returns a string formed by the concatenation of public, protected and private interface versions using a dot as separator.
             virtual String get_version () const noexcept 
             { 
@@ -89,43 +92,26 @@ namespace pensar_digital
             virtual const Hash get_hash() const {return id;};
                 
             // Conversion to json string.
-            virtual String json_str() const { Json j = *this; return j.dump(); }
+            virtual String json () const { Json j = *this; return j.dump(); }
             
-            virtual std::istream& ReadFromStream (std::istream& is)
+            virtual std::istream& read (std::istream& is)
             {
-                Version public_interface_version = 0;
-                Version protected_interface_version = 0;
-                Version private_interface_version = 0;
-                is >> public_interface_version;
-                is >> protected_interface_version;
-                is >> private_interface_version;
-                /*
-                if (public_interface_version != get_public_interface_version())
-                    // handles the case when the object is read from a file with a different version.
-                    ;
-                if (protected_interface_version != get_protected_interface_version())
-                    // handles the case when the object is read from a file with a different version.
-                    ;
-
-                if (private_interface_version != get_private_interface_version())
-                    // handles the case when the object is read from a file with a different version.
-                    ;
-                    */
-                return is >> id;
+                String sjson;
+                is >> sjson;
+				Json j = Json::parse (sjson);
+                j.get_to (*this);
+                return is ;
             };
 
-            virtual std::ostream& WriteToStream(std::ostream& os) const
+            virtual std::ostream& write (std::ostream& os) const
             {
-                os << get_public_interface_version() << " "
-                    << get_protected_interface_version() << " "
-                    << get_private_interface_version() << " "
-                    << id;
+                os << json ();
                 return os;
             };
 
 
             // Conversion to xml string.s
-            virtual String xml_str() const noexcept 
+            virtual String xml() const noexcept 
             { 
                 return ObjXMLPrefix () + "/>";
             }
@@ -200,7 +186,7 @@ namespace pensar_digital
                 */
             Object& operator=(const Object& o) { return assign (o); }
 
-            virtual bool initialize(Id aid = NULL_ID) noexcept { id = aid; return true; }
+            virtual bool initialize (Id aid = NULL_ID) noexcept { id = aid; return true; }
             friend void from_json(const Json& j, Object& o);
          };
 

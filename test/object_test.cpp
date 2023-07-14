@@ -34,9 +34,6 @@ namespace pensar_digital
 			Dummy& operator = (const Dummy& d) noexcept {assign (d); return *this;}
 			Dummy& operator = (Dummy&& d) noexcept {assign(d); return *this;}
             bool operator == (const Dummy& d) const {return (Object::operator == (d) && (name == d.name));}
-            //std::ostream& operator << (std::ostream& os) const { Object::operator << (os); return os;  }
-            /// Makes Dummy Streamable.
-            friend std::ostream& operator << (std::ostream& os, const Dummy& d) { return os << d.get_id (); }   
             using Object::operator !=;
 			virtual ~Dummy () {}
             virtual Dummy assign(const Dummy& d) noexcept { name = d.name; return *this; }
@@ -69,6 +66,14 @@ namespace pensar_digital
             operator Object& () noexcept { return *this; }
 
             String get_name () const noexcept { return name; }
+            void   set_name (const String& aname) noexcept { name = aname; }
+
+            // Read from stream.
+            std::istream& read(std::istream& is) { Object::read (is); is >> name; return is; }
+
+            // Write to stream.
+            std::ostream& write(std::ostream& os) const { Object::write (os); os << name; return os; }
+
             friend void to_json(Json& j, const Dummy& d);
             friend void from_json(const Json& j, Dummy& d);
 			protected:
@@ -78,6 +83,12 @@ namespace pensar_digital
                 String name;
         };
 
+        /// Makes Dummy Streamable.
+        std::ostream& operator << (std::ostream& os, const Dummy& d) { return d.write (os); }
+        std::istream& operator >> (std::istream& is, Dummy& d) { return d.read (is); }
+
+        
+        
         void to_json(Json& j, const Dummy& d)
         {
             j["class"] = d.class_name();
@@ -113,14 +124,17 @@ namespace pensar_digital
             Object o(42);
 			std::stringstream ss;
 			ss << o;
-            String s = ss.str();
-            CHECK_EQ(String, s, "1 1 1 42", "0.");
+            String expected = "{\"class\":\"pensar_digital::cpplib::Object\",\"id\":42,\"private_interface_version\":1,\"protected_interface_version\":1,\"public_interface_version\":1}";
+            CHECK_EQ(String, ss.str(), expected, "0. ss.str() should be equal to " + expected + " but was " + ss.str() + ".");
+
             Object o2;
             ss >> o2;
             CHECK(o == o2, "0. o == o2 should be true");
 
 			Dummy d(42, "d");
             ss << d;
+            expected =  expected + "{\"class\":\"pensar_digital::cpplib::Object\",\"id\":42,\"private_interface_version\":1,\"protected_interface_version\":1,\"public_interface_version\":1,\"name\":\"d\"}";
+            CHECK_EQ(String, ss.str(), expected, "1. ss.str() should be equal to " + expected + " but was " + ss.str() + ".");  
 			Dummy d2;
 			ss >> d2;
 			CHECK_EQ(Dummy, d, d2, "1. d == d2 should be true");
@@ -129,7 +143,7 @@ namespace pensar_digital
         TEST(ObjectJsonConversion)
 			Object o(42);
 			Json j = o;
-            String expected = "{\"class\":\"pensar_digital::cpplib::Object\",\"id\":42}";
+            String expected = "{\"class\":\"pensar_digital::cpplib::Object\",\"id\":42,\"private_interface_version\":1,\"protected_interface_version\":1,\"public_interface_version\":1}";
             CHECK_EQ(String, j.dump (), expected, "0. json should be equal to " + expected + " but was " + j.dump() + ".");
 
             Object o1 = j;
@@ -147,7 +161,7 @@ namespace pensar_digital
         
         TEST(ObjectXMLConversion)
             Object o(42);
-            String xml = o.xml_str ();
+            String xml = o.xml ();
             String expected = "<object class_name = \"pensar_digital::cpplib::Object\" id = \"42\"/>";
             CHECK_EQ(String, xml, expected, "0. xml should be equal to " + expected + " but was " + xml + ".");
 
