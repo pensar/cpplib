@@ -37,6 +37,22 @@ namespace pensar_digital
             using Object::operator !=;
 			virtual ~Dummy () {}
             virtual Dummy assign(const Dummy& d) noexcept { name = d.name; return *this; }
+            
+            // Conversion to json string.
+            virtual String json() const
+            {
+                return Object::json<Dummy> (*this);
+            }
+
+            virtual std::istream& read(std::istream& is)
+            {
+                return Object::read<Dummy> (is, *this);
+            };
+
+            virtual std::ostream& write(std::ostream& os) const
+            {
+                return Object::write<Dummy> (os, *this);
+            };
 
             // Convertion to xml string.
             virtual String xml_str () const noexcept 
@@ -55,24 +71,9 @@ namespace pensar_digital
                 if (!n.isEmpty()) name = n.getText();
             }
 
-			/// Implicity convertion to object.
-            /// \return A copy of the object.
-            operator Object () const noexcept { return Object (get_id ()); }
-            
-            /// Implicity convertion to object.
-            /// \return A copy of the object.
-            /// \see Object::operator Object()
-            /// \see Object::operator == (const Object&)
-            operator Object& () noexcept { return *this; }
-
             String get_name () const noexcept { return name; }
             void   set_name (const String& aname) noexcept { name = aname; }
 
-            // Read from stream.
-            std::istream& read(std::istream& is) { Object::read (is); is >> name; return is; }
-
-            // Write to stream.
-            std::ostream& write(std::ostream& os) const { Object::write (os); os << name; return os; }
 
             friend void to_json(Json& j, const Dummy& d);
             friend void from_json(const Json& j, Dummy& d);
@@ -91,9 +92,12 @@ namespace pensar_digital
         
         void to_json(Json& j, const Dummy& d)
         {
-            j["class"] = d.class_name();
-            j["id"]    = d.get_id();
-            j["name"]  = d.get_name();
+            j["class"                      ] = d.class_name();
+            j["id"                         ] = d.get_id();
+            j["private_interface_version"  ] = d.get_private_interface_version();
+            j["protected_interface_version"] = d.get_protected_interface_version();
+            j["public_interface_version"   ] = d.get_public_interface_version();
+            j["name"] = d.get_name();
         }
 
         void from_json(const Json& j, Dummy& d)
@@ -125,18 +129,20 @@ namespace pensar_digital
 			std::stringstream ss;
 			ss << o;
             String expected = "{\"class\":\"pensar_digital::cpplib::Object\",\"id\":42,\"private_interface_version\":1,\"protected_interface_version\":1,\"public_interface_version\":1}";
-            CHECK_EQ(String, ss.str(), expected, "0. ss.str() should be equal to " + expected + " but was " + ss.str() + ".");
+            CHECK_EQ(String, ss.str(), expected, "0");
 
             Object o2;
             ss >> o2;
             CHECK(o == o2, "0. o == o2 should be true");
 
+            std::stringstream ss2;
+
 			Dummy d(42, "d");
-            ss << d;
-            expected =  expected + "{\"class\":\"pensar_digital::cpplib::Object\",\"id\":42,\"private_interface_version\":1,\"protected_interface_version\":1,\"public_interface_version\":1,\"name\":\"d\"}";
-            CHECK_EQ(String, ss.str(), expected, "1. ss.str() should be equal to " + expected + " but was " + ss.str() + ".");  
+            ss2 << d;
+            expected =  "{\"class\":\"pensar_digital::cpplib::Dummy\",\"id\":42,\"name\":\"d\",\"private_interface_version\":1,\"protected_interface_version\":1,\"public_interface_version\":1}";
+            CHECK_EQ(String, ss2.str(), expected, "1");  
 			Dummy d2;
-			ss >> d2;
+			ss2 >> d2;
 			CHECK_EQ(Dummy, d, d2, "1. d == d2 should be true");
         TEST_END(ObjectStreaming)
 
@@ -151,8 +157,8 @@ namespace pensar_digital
 
            Dummy d(42, "d");
            j = d;
-           expected = "{\"class\":\"pensar_digital::cpplib::Dummy\",\"id\":42,\"name\":\"d\"}";
-           CHECK_EQ(String, j.dump (), expected, "2. json should be equal to " + expected + " but was " + j.dump() + ".");
+           expected = "{\"class\":\"pensar_digital::cpplib::Dummy\",\"id\":42,\"name\":\"d\",\"private_interface_version\":1,\"protected_interface_version\":1,\"public_interface_version\":1}";
+           CHECK_EQ(String, d.json (), expected, "2");
 
            Dummy d1(1, "d1");
            j.get_to(d1);

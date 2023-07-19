@@ -91,24 +91,41 @@ namespace pensar_digital
             /// \return  The current value of hash
             virtual const Hash get_hash() const {return id;};
                 
+            template <class T>
+            String json (const T& o) const { Json j = o; return j.dump(); }
+
+            template <class T>
+            std::istream& read (std::istream& is, T& o)
+            {
+				String sjson;
+				is >> sjson;
+                Json j = Json::parse(sjson);
+                j.get_to(o);
+                return is;
+            }
+
+            template <class T>
+            std::ostream& write(std::ostream& os, const T& o) const
+            {
+				return os << o.json ();
+			}
+
             // Conversion to json string.
-            virtual String json () const { Json j = *this; return j.dump(); }
-            
+            virtual String json() const 
+            { 
+                return json (*this); 
+            }
+
             virtual std::istream& read (std::istream& is)
             {
-                String sjson;
-                is >> sjson;
-				Json j = Json::parse (sjson);
-                j.get_to (*this);
-                return is ;
+                return read (is, *this);
             };
 
             virtual std::ostream& write (std::ostream& os) const
             {
-                os << json ();
-                return os;
-            };
-
+                return write (os, *this);
+			};
+                
 
             // Conversion to xml string.s
             virtual String xml() const noexcept 
