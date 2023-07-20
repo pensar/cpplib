@@ -11,6 +11,7 @@ namespace pensar_digital
 {
     namespace cpplib
     {
+        using namespace pensar_digital::cpplib::obj;
         class Name : public Object
         {
             public:
@@ -55,35 +56,35 @@ namespace pensar_digital
                  */
                 void set_name (const std::string& n) { name = n; }
 
-            protected:
-                virtual std::istream& read (std::istream& is)
+                // Conversion to json string.
+                virtual String json() const
                 {
-                    Object::read (is);
-                    switch (get_public_interface_version ())
-                    {
-                        case 1:
-                            is >> name;
-                    };
-                    return is;
+                    return Object::json<Name>(*this);
+                }
+
+                virtual std::istream& read(std::istream& is)
+                {
+                    return Object::read<Name>(is, *this);
                 };
 
-                virtual std::ostream& write (std::ostream& os) const
+                virtual std::ostream& write(std::ostream& os) const
                 {
-                    Object::write(os);
-                    switch (get_public_interface_version ())
-                    {
-                        case 1:
-                            os << name;
-                    };
-                    return os;
+                    return Object::write<Name>(os, *this);
                 };
-            public:
-                std::istream& operator >> (std::istream& is)       { return read  (is);};
-                std::ostream& operator << (std::ostream& os) const { return write (os);};
+
+                friend void to_json(Json& j, const Name& n);
+                friend void from_json(const Json& j, Name& n);
+                friend std::istream& operator >> (std::istream& is, Name& n);
+                friend std::ostream& operator << (std::ostream& os, const Name& n);
 
             private:
                 std::string name; //!< Member variable "name"
         };
+        extern std::istream& operator >> (std::istream& is,       Name& n);
+        extern std::ostream& operator << (std::ostream& os, const Name& n);
+
+        extern void to_json   (      Json& j, const Name& n);
+        extern void from_json (const Json& j,       Name& n);
     }
 }
 

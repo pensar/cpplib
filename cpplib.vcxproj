@@ -153,6 +153,7 @@
     <ClCompile Include="object.cpp" />
     <ClCompile Include="random_util.cpp" />
     <ClCompile Include="error.cpp" />
+    <ClCompile Include="name.cpp" />
     <ClCompile Include="string_util.cpp" />
     <ClCompile Include="system.cpp" />
     <ClCompile Include="sys_user_info.cpp" />
