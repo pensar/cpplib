@@ -10,8 +10,10 @@ namespace pensar_digital
 {
 	namespace cpplib
 	{
+		using namespace pensar_digital::cpplib::obj;
+
 		template <typename T>
-		class Field : public Object
+		class Field : public virtual Object
 		{
 			private:
 			T value;
@@ -21,13 +23,7 @@ namespace pensar_digital
 			String description;
 
 			public:
-				const static Version PUBLIC_INTERFACE_VERSION    = 1;
-				const static Version PROTECTED_INTERFACE_VERSION = 1;
-				const static Version PRIVATE_INTERFACE_VERSION   = 1;
-
-				virtual Version get_public_interface_version    () const noexcept { return PUBLIC_INTERFACE_VERSION; }
-				virtual Version get_protected_interface_version () const noexcept { return PROTECTED_INTERFACE_VERSION; }
-				virtual Version get_private_interface_version   () const noexcept { return PRIVATE_INTERFACE_VERSION; }
+				inline static const structVersion VERSION = structVersion(1, 1, 1);
 
 			Field(String name, String adisplay_name, String adescription, bool aisnull = true) : Object()
 			{
@@ -138,7 +134,8 @@ namespace pensar_digital
 		class StringField : public Field<String>
 		{
 			public:
-			StringField(String name, String display_name, String description, bool is_null = true) :
+				inline static const structVersion VERSION = structVersion(1, 1, 1);
+				StringField(String name, String display_name, String description, bool is_null = true) :
 				Field<String>(name, display_name, description, is_null)
 			{
 			}

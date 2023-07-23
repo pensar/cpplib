@@ -20,14 +20,7 @@ namespace pensar_digital
         class Dummy: public Object 
         {
             public:
-            const static Version VERSION                     = 1;
-            const static Version PUBLIC_INTERFACE_VERSION    = 1;
-            const static Version PROTECTED_INTERFACE_VERSION = 1;
-            const static Version PRIVATE_INTERFACE_VERSION   = 1;
-
-            virtual Version get_public_interface_version    () const noexcept { return PUBLIC_INTERFACE_VERSION;    }
-            virtual Version get_protected_interface_version () const noexcept { return PROTECTED_INTERFACE_VERSION; }
-            virtual Version get_private_interface_version   () const noexcept { return PRIVATE_INTERFACE_VERSION;   }
+                inline static const structVersion VERSION = structVersion(1, 1, 1);
 
             Dummy (const Id& id = NULL_ID, const String& aname = "") : Object(id), name(aname) {}
             Dummy(const Dummy& d) : Object(d) { name = d.name; }
@@ -95,9 +88,9 @@ namespace pensar_digital
         {
             j["class"                      ] = d.class_name();
             j["id"                         ] = d.get_id();
-            j["private_interface_version"  ] = d.get_private_interface_version();
-            j["protected_interface_version"] = d.get_protected_interface_version();
-            j["public_interface_version"   ] = d.get_public_interface_version();
+            j["private_interface_version"  ] = d.VERSION.PRIVATE;
+            j["protected_interface_version"] = d.VERSION.PROTECTED;
+            j["public_interface_version"   ] = d.VERSION.PUBLIC;
             j["name"] = d.get_name();
         }
 
@@ -113,10 +106,9 @@ namespace pensar_digital
             else throw new std::runtime_error("Object expected class = " + class_name + " but json has " + json_class);
         }
         
-        
         TEST(ObjectClone)
-            Object o(42);
-            Object o1 = pd::clone (o);
+            obj::Object o(42);
+            obj::Object o1 = o.clone ();
             CHECK(o == o1, "0. o == o1 should be true");
 
             Dummy d(42, "d");

@@ -1,75 +1,35 @@
 #ifndef VERSION_HPP_INCLUDED
 #define VERSION_HPP_INCLUDED
 
-#include "streamable.hpp"
 #include "constants.hpp"
-#include "error.hpp"
+#include "string_util.hpp"
 
 namespace pensar_digital
 {
     namespace cpplib
     {
-        /// Inherit from Version to have a read only version atributte.
-        /// \tparam T The type used to hold the version attribute.
+        namespace pd = pensar_digital::cpplib;
 
-        class Version : public Streamable
+        struct structVersion
         {
-            public:
-            typedef VersionType V;
+            VersionInt PUBLIC;
+            VersionInt PROTECTED;
+            VersionInt PRIVATE;
 
-            protected:
-            ~Version() {}
-            virtual std::istream& ReadFromStream (std::istream& is, const V v) = 0;
-            virtual std::ostream& WriteToStream ( std::ostream& os, const V v) const = 0;
+            structVersion(VersionInt pub, VersionInt prot, VersionInt priv) : PUBLIC(pub), PROTECTED(prot), PRIVATE(priv) {}
 
-            Version (const V v = -1): version(v) {};
-
-            /// Access version
-            /// \return The version number.
-            VersionType get_version () const { return version;}
-
-            bool operator == (const Version& v) const {return (v.version == version);}
-            bool operator != (const Version& v) const {return (v.version != version);}
-            bool operator  < (const Version& v) const {return (v.version  < version);}
-            bool operator  > (const Version& v) const {return (v.version  > version);}
-
-            virtual std::istream& ReadFromStream (std::istream& is)
+            String to_string() const noexcept
             {
-                switch (version)
-                {
-                    case 0:
-                        return is >> version;
-                        break;
-                    default:
-                       throw UnsupportedVersion (version);
-                };
-                ReadFromStream (is, version);
-                return is;
-            };
+                return pd::to_string<String, false>(PUBLIC) + "." + pd::to_string<String, false>(PROTECTED) + "." + pd::to_string<String, false>(PRIVATE);
+            }
 
-            virtual std::ostream& WriteToStream ( std::ostream& os) const
-            {
-                switch (version)
-                {
-                    case 0:
-                        return os << version;
-                        break;
-                    default:
-                       throw UnsupportedVersion (version);
-                };
-                WriteToStream (os, version);
-                return os;
-            };
+            bool operator == (const structVersion& o) const { return (PUBLIC == o.PUBLIC && PROTECTED == o.PROTECTED && PRIVATE == o.PRIVATE); }
+            bool operator != (const structVersion& o) const { return !(*this == o); }
 
-            using Streamable::operator <<;
-            using Streamable::operator >>;
-
-            private:
-            V version; ///< Member variable "id"
+            // Implicit conversion to string.
+            operator String() const noexcept { return to_string(); }
         };
     }
 }
-
-
 
 #endif // VERSION_HPP_INCLUDED

@@ -12,11 +12,11 @@ namespace pensar_digital
     namespace cpplib
     {
         using namespace pensar_digital::cpplib::obj;
-        class Name : public Object
+        class Name : public virtual Object
         {
             public:
-                const static Version VERSION           = 1;
-                const static Version INTERFACE_VERSION = 1;
+                inline static const structVersion VERSION = structVersion(1, 1, 1);
+
                 /** Access name;
                  * \return The current value of name;
                  */
@@ -35,6 +35,7 @@ namespace pensar_digital
                  *  \param n Object to copy from
                  */
                 Name (const Name&   n) {assign (n);};
+                
                 Name (const String& s) {name = s;}
 
                 Name& assign (const Name& n)
@@ -45,6 +46,7 @@ namespace pensar_digital
                 }
 
                 Name& assign (const String& s) { Name n(s); Object::assign(n); name = s; return *this;}
+                
                 /** Assignment operator
                  *  \param n Object to assign from
                  *  \return A reference to this

@@ -186,6 +186,7 @@
     <ClInclude Include="string_def.hpp" />
     <ClInclude Include="string_util.hpp" />
     <ClInclude Include="sys_user_info.hpp" />
+    <ClInclude Include="version.hpp" />
     <ClInclude Include="wstring_stream_hack.hpp" />
   </ItemGroup>
   <ItemGroup>

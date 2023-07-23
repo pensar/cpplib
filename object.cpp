@@ -4,18 +4,23 @@ namespace pensar_digital
 {
 	namespace cpplib
 	{
+        using namespace obj;
+        
+        std::istream& operator >> (std::istream& is, Object& o) { return o.read(is); };
+        std::ostream& operator << (std::ostream& os, const Object& o) { return o.write(os); };
         namespace obj
         {
-            std::istream& operator >> (std::istream& is, Object& o) { return o.read(is); };
-            std::ostream& operator << (std::ostream& os, const Object& o) { return o.write(os); };
+            // Initializes Object::factory with (3, 1, 0).
+            Object::Factory Object::factory = Object::Factory(3, 1, 0);
+
 
             void to_json(Json& j, const Object& o)
             {
-                j["class"] = o.class_name();
-                j["id"] = o.get_id();
-                j["public_interface_version"] = o.get_public_interface_version();
-                j["protected_interface_version"] = o.get_protected_interface_version();
-                j["private_interface_version"] = o.get_private_interface_version();
+                j["class"                      ] = o.class_name();
+                j["id"                         ] = o.get_id();
+                j["public_interface_version"   ] = o.VERSION.PUBLIC;
+                j["protected_interface_version"] = o.VERSION.PROTECTED;
+                j["private_interface_version"  ] = o.VERSION.PRIVATE;
             };
 
             void from_json(const Json& j, Object& o)

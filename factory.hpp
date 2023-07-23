@@ -1,6 +1,7 @@
 #ifndef FACTORY_HPP_INCLUDED
 #define FACTORY_HPP_INCLUDED
 
+#include "version.hpp"
 #include <memory>
 
 namespace pensar_digital
@@ -11,7 +12,8 @@ namespace pensar_digital
         class Factory
         {
             public:
-            virtual ~Factory (){}
+                inline static const structVersion VERSION = structVersion(1, 1, 1);
+                virtual ~Factory (){}
             virtual std::shared_ptr<T> get (Args&& ... args) = 0;
         };
 
@@ -19,7 +21,8 @@ namespace pensar_digital
         class NewFactory: public Factory <T, Args...>
         {
             public:
-            virtual ~NewFactory (){}
+                inline static const structVersion VERSION = structVersion(1, 1, 1);
+                virtual ~NewFactory (){}
             std::shared_ptr<T> get(Args&& ... args){ return std::make_shared<T> (std::forward<Args>(args) ... ); }
         };
 
@@ -27,6 +30,7 @@ namespace pensar_digital
         class MockupFactory: public Factory <T, Args...>
         {
         public:
+            inline static const structVersion VERSION = structVersion(1, 1, 1);
             MockupFactory(T* amockup_pointer) : mockup_pointer(amockup_pointer) { };
             virtual ~MockupFactory() {}
             std::shared_ptr<T>  get(Args&& ... args) { std::shared_ptr<T> ptr(mockup_pointer); return ptr; }
@@ -44,9 +48,10 @@ namespace pensar_digital
             */
         };
 
-        template <class T, typename... Args> requires Initializable<T, Args...>
+        template <class T, typename... Args>  //requires Initializable<T, Args...>
         class PoolFactory : public Factory <T, Args...>
         {
+            static_assert (Initializable <T, Args...>, "T must be Initializable <T, Args...>");
             private:
                 /// <summary>
                 /// Creates a pool of objects of type T containing pool_size objects created with the arguments args.
@@ -63,7 +68,8 @@ namespace pensar_digital
                     available_count = pool_size;
                 }
         public:
-            PoolFactory (const size_t initial_pool_size, const size_t a_refill_size, 
+            inline static const structVersion VERSION = structVersion(1, 1, 1);
+            PoolFactory (const size_t initial_pool_size, const size_t a_refill_size,
                          Args&& ... args) : 
                          available_count (initial_pool_size), 
                          refill_size(a_refill_size)
@@ -91,6 +97,7 @@ namespace pensar_digital
         class SingletonFactory : public Factory <T, Args...>
 		{
             public:
+                inline static const structVersion VERSION = structVersion(1, 1, 1);
                 SingletonFactory (Args&& ... args) : singleton(std::make_shared<T>(std::forward<Args>(args) ...)) { };
 				virtual ~SingletonFactory () {}
 				std::shared_ptr<T>  get (Args&& ... args) { return singleton; }

@@ -1,6 +1,8 @@
 #ifndef CPPLIB_CONCEPTS
 #define CPPLIB_CONCEPTS
 
+#include "version.hpp"
+#include "constants.hpp"
 #include <concepts>
 #include <iostream>
 
@@ -43,14 +45,11 @@ namespace pensar_digital
 			{t ^ t} noexcept -> std::convertible_to<bool>;
 		};
 
-		// Versionable concept requires 4 member functions: Version get_public_interface_version (), Version get_protected_interface_version (), Version get_private_interface_version () and Version get_version ().	
-		template <typename T>
+		// Versionable concept requires a inline static const structVersion public member named VERSION.
+		template <typename T>	
 		concept Versionable = requires (T t)
 		{
-			{t.get_public_interface_version ()}    noexcept -> std::convertible_to<Version>;
-			{t.get_protected_interface_version ()} noexcept -> std::convertible_to<Version>;
-			{t.get_private_interface_version ()}   noexcept -> std::convertible_to<Version>;
-			{t.get_version ()}                     noexcept -> std::convertible_to<Version>;
+			{t.VERSION} noexcept -> std::convertible_to<structVersion>;
 		};
 
 		/// Concept for a class with a noexcept initialize method returning something convertible to bool.
@@ -58,7 +57,14 @@ namespace pensar_digital
 		concept Initializable = requires (T t, Args&& ... args)
 		{
 			{T(std::forward<Args>(args) ...)} noexcept;
-			{t.initialize (std::forward<Args>(args) ...)} noexcept -> std::convertible_to<bool>;
+			{t.initialize(std::forward<Args>(args) ...)} noexcept -> std::convertible_to<bool>;
+		};
+
+		// Init is a concept to specify the requirements of PoolFactory's template parameter T. It must have a method called initialize taking zero or more arguments and returning something convertible to bool.
+		template <typename T, typename... Args>
+concept Init = requires (T t, Args&& ... args)
+		{
+			{t.initialize(std::forward<Args>(args) ...)} noexcept -> std::convertible_to<bool>;
 		};
 
 		// OutputStreamable concept.

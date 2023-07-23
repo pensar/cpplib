@@ -9,6 +9,8 @@ namespace pensar_digital
 {
     namespace cpplib
     {
+        using namespace pensar_digital::cpplib::obj; 
+
         /// <summary>
         /// Language contains ISO-638-3 information (2 and 3 letter codes, name, etc).
         /// See https://iso639-3.sil.org/code_tables/download_tables for more information and 
@@ -17,6 +19,7 @@ namespace pensar_digital
         class Language : public Object
         {
             public:
+                inline static const structVersion VERSION = structVersion(1, 1, 1);
                 /// \brief Default constructor.
                 Language(Id aid = NULL_ID) : Object (aid == NULL_ID ? generator.get() : aid){}
                 /** Default destructor */

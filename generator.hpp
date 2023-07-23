@@ -30,13 +30,7 @@ namespace pensar_digital
       class Generator : public Object
       {
         public:
-            const static Version PUBLIC_INTERFACE_VERSION    = 1;
-            const static Version PROTECTED_INTERFACE_VERSION = 1;
-            const static Version PRIVATE_INTERFACE_VERSION   = 1;
-
-            virtual Version get_public_interface_version    () const noexcept { return PUBLIC_INTERFACE_VERSION;    }
-            virtual Version get_protected_interface_version () const noexcept { return PROTECTED_INTERFACE_VERSION; }
-            virtual Version get_private_interface_version   () const noexcept { return PRIVATE_INTERFACE_VERSION;   }
+            inline static const structVersion VERSION = structVersion(1, 1, 1);
 
             /// \brief Constructs a Generator.
             /// \param [in] initial_value Initial value for the generator, defaults to 0.

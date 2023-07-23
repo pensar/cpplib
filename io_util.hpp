@@ -144,15 +144,7 @@ namespace pensar_digital
 
             public:
 
-            const static Version VERSION                     = 1;
-            const static Version PUBLIC_INTERFACE_VERSION    = 1;
-            const static Version PROTECTED_INTERFACE_VERSION = 1;
-            const static Version PRIVATE_INTERFACE_VERSION   = 1;
-
-            virtual Version get_public_interface_version    () const noexcept { return PUBLIC_INTERFACE_VERSION;    }
-            virtual Version get_protected_interface_version () const noexcept { return PROTECTED_INTERFACE_VERSION; }
-            virtual Version get_private_interface_version   () const noexcept { return PRIVATE_INTERFACE_VERSION;   }
-
+            inline static const structVersion VERSION = structVersion(1, 1, 1);
             const size_t MAX_IN_MEMORY_FILE_SIZE_BYTE = 1024 ^ 3; // 1 GB
             const static std::ios_base::openmode IN_OUT_ATE_MODE     = std::ios::in | std::ios::out | std::ios::ate;
             const static std::ios_base::openmode IN_OUT_ATE_BIN_MODE = IN_OUT_ATE_MODE | std::ios::binary;

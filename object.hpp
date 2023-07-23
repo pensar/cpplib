@@ -11,6 +11,7 @@
 #include "header_lib/json.hpp"
 #include "header_lib/xmlParser.h"
 #include "factory.hpp"
+#include "version.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -28,6 +29,7 @@ namespace pensar_digital
     {
         using Json = nlohmann::json;
         namespace pd = pensar_digital::cpplib;
+
         namespace obj
         {
             class Object
@@ -54,25 +56,19 @@ namespace pensar_digital
                 virtual bool _equals(const Object& o) const { return (id == o.id); }
 
             public:
-                const static Version PUBLIC_INTERFACE_VERSION = 1;
-                const static Version PROTECTED_INTERFACE_VERSION = 1;
-                const static Version PRIVATE_INTERFACE_VERSION = 1;
+                inline static const structVersion VERSION = structVersion (1, 1, 1);
 
-                virtual Version get_public_interface_version() const noexcept { return PUBLIC_INTERFACE_VERSION; }
-                virtual Version get_protected_interface_version() const noexcept { return PROTECTED_INTERFACE_VERSION; }
-                virtual Version get_private_interface_version() const noexcept { return PRIVATE_INTERFACE_VERSION; }
+                // PoolFactory of objects.
+                typedef PoolFactory<Object, Id> Factory;
 
-                //static pd::PoolFactory<pd::Object, pd::Id> factory(3, 10, 1);
-
-                // get_version () returns a string formed by the concatenation of public, protected and private interface versions using a dot as separator.
-                virtual String get_version() const noexcept
-                {
-                    return pd::to_string<String, false>(get_public_interface_version()) + "." + pd::to_string<String, false>(get_protected_interface_version()) + "." + pd::to_string<String, false>(get_private_interface_version());
-                }
-
-
+                // Object factory.
+                static Factory factory;
 
                 virtual String class_name() const { String c = typeid(*this).name(); c.erase(0, sizeof("class ") - 1); return c; }
+                
+                // Clone method for polymorphic copy. Returns an object reference avoiding unecessary copies.
+                virtual Object clone() const { return Object(*this); };
+                
 
                 /// Check if passed object equals self.
                 /// Derived classes must implement the _equals method. The hash compare logic is made on equals.
@@ -189,7 +185,7 @@ namespace pensar_digital
 
                 /** Default destructor */
                 virtual ~Object() {}
-
+                  
                 /** Copy constructor
                     *  \param other Object to copy from
                     */
@@ -207,35 +203,37 @@ namespace pensar_digital
                 virtual bool initialize(Id aid = NULL_ID) noexcept { id = aid; return true; }
                 friend void from_json(const Json& j, Object& o);
             };
-
-            extern std::istream& operator >> (std::istream& is, Object& o);
-            extern std::ostream& operator << (std::ostream& os, const Object& o);
-
-            template<std::copy_constructible T = Object>
-            static T clone(const T& o) { return T(o); }
-
-            static_assert(Initializable<Object, Id>);
-
             extern void to_json(Json& j, const Object& o);
             extern void from_json(const Json& j, Object& o);
+        } // namespace obj 
 
-            // Dependency class is a Constrainable class used to define dependencies between objects.
-            template <Versionable MainClass, Versionable RequiredClass>
-            class Dependency
-            {
-            private:
-                Version required_public_interface_version;
-                Version required_protected_interface_version;
-                Version required_private_interface_version;
-            public:
-                Dependency(Version public_interface_version, Version protected_interface_version, Version private_interface_version) noexcept
-                    : required_public_interface_version(public_interface_version), required_protected_interface_version(protected_interface_version), required_private_interface_version(private_interface_version) {}
-                virtual ~Dependency() {}
-                virtual bool ok() const noexcept = 0;
+        extern std::istream& operator >> (std::istream& is, obj::Object& o);
+        extern std::ostream& operator << (std::ostream& os, const obj::Object& o);
 
-                // method to set the class dependency. 
-            };
-        }
-    } // namespace pensar_digital::cpplib
+        template<std::copy_constructible T = obj::Object>
+        static T clone(const T& o) { return T(o); }
+
+        static_assert(Initializable<obj::Object, Id>);
+
+
+        // Dependency class is a Constrainable class used to define dependencies between objects.
+        template <Versionable MainClass, Versionable RequiredClass>
+        class Dependency
+        {
+        private:
+            VersionInt required_public_interface_version;
+            VersionInt required_protected_interface_version;
+            VersionInt required_private_interface_version;
+        public:
+            Dependency(structVersion v) noexcept
+                : required_public_interface_version(v.PUBLIC),
+                required_protected_interface_version(v.PROTECTED),
+                required_private_interface_version(v.PRIVATE) {}
+            virtual ~Dependency() {}
+            virtual bool ok() const noexcept = 0;
+
+            // method to set the class dependency. 
+        };
+    } // namespace cpplib
 } // namespace pensar_digital
 #endif // OBJECT_HPP
