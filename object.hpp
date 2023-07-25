@@ -42,11 +42,6 @@ namespace pensar_digital
 
                 String ObjXMLPrefix() const noexcept { return "<object class_name = \"" + class_name() + "\" id = \"" + to_string() + "\""; }
 
-                /** Set id
-                 * \param val New value to set
-                 */
-                void set_id(const Id& value) { id = value; }
-
                 /// \brief Compare objects.
                 ///
                 /// \param The object to be compared with.
@@ -59,7 +54,7 @@ namespace pensar_digital
                 inline static const structVersion VERSION = structVersion (1, 1, 1);
 
                 // PoolFactory of objects.
-                typedef PoolFactory<Object, Id> Factory;
+                typedef PoolFactory<Object> Factory;
 
                 // Object factory.
                 static Factory factory;
@@ -82,6 +77,10 @@ namespace pensar_digital
                 /// \return The current value of id
                 ///
                 virtual const Id get_id() const { return id; };
+                
+                /// Set id
+                /// \param val New value to set
+                void set_id(const Id& value) { id = value; }
 
                 /// \brief Access hash
                 ///
@@ -155,9 +154,15 @@ namespace pensar_digital
 
                 bool operator == (const Object& o) const { return   equals(o); }
                 bool operator != (const Object& o) const { return !equals(o); }
-                /** Default constructor */
-                Object() noexcept : id(NULL_ID) {};
+                
+                // Default constructor compliant with DefaultConstructible concept.
+                Object() noexcept { id = NULL_ID; };
+                
                 Object(Id aid) noexcept : id(aid) {};
+
+                /// Copy constructor
+                /// \param other Object to copy from
+                Object(const Object& o) { assign(o); }
 
                 /// Move constructor
                 Object(Object&& o) noexcept { assign(o); }
@@ -185,12 +190,6 @@ namespace pensar_digital
 
                 /** Default destructor */
                 virtual ~Object() {}
-                  
-                /** Copy constructor
-                    *  \param other Object to copy from
-                    */
-                Object(const Object& o) { assign(o); }
-
 
                 virtual Object& assign(const Object& o) { id = o.get_id(); return *this; }
 
@@ -213,7 +212,7 @@ namespace pensar_digital
         template<std::copy_constructible T = obj::Object>
         static T clone(const T& o) { return T(o); }
 
-        static_assert(Initializable<obj::Object, Id>);
+        //static_assert(DefaultConstructible<obj::Object>);
 
 
         // Dependency class is a Constrainable class used to define dependencies between objects.

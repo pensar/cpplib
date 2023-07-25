@@ -17,6 +17,14 @@ namespace pensar_digital
 			{t.ok(std::forward<Args>(args) ...)} noexcept -> std::convertible_to<bool>;
 		};
 		
+		// DefaultConstructible concept. Requires a default constructor.
+		template <typename T>
+		concept DefaultConstructible = requires
+		{
+			{T()} noexcept;
+		};
+
+
 		// Negatable. Requires the unary operator ! to be defined returning something convertible to bool.
 		template <typename T>
 		concept Negatable = requires (T t)
@@ -53,19 +61,14 @@ namespace pensar_digital
 		};
 
 		/// Concept for a class with a noexcept initialize method returning something convertible to bool.
+		/*
 		template <typename T, typename... Args>
 		concept Initializable = requires (T t, Args&& ... args)
 		{
 			{T(std::forward<Args>(args) ...)} noexcept;
 			{t.initialize(std::forward<Args>(args) ...)} noexcept -> std::convertible_to<bool>;
 		};
-
-		// Init is a concept to specify the requirements of PoolFactory's template parameter T. It must have a method called initialize taking zero or more arguments and returning something convertible to bool.
-		template <typename T, typename... Args>
-concept Init = requires (T t, Args&& ... args)
-		{
-			{t.initialize(std::forward<Args>(args) ...)} noexcept -> std::convertible_to<bool>;
-		};
+		*/
 
 		// OutputStreamable concept.
 		template<typename T>

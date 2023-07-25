@@ -11,7 +11,7 @@ namespace pensar_digital
         namespace obj
         {
             // Initializes Object::factory with (3, 1, 0).
-            Object::Factory Object::factory = Object::Factory(3, 1, 0);
+            Object::Factory Object::factory(3, 1);
 
 
             void to_json(Json& j, const Object& o)
