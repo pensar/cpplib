@@ -9,7 +9,7 @@ namespace pensar_digital
 {
     namespace cpplib
     {
-        template <class T>
+        template <class T> requires DefaultConstructible<T>
         class AbstractFactory
         {
             public:

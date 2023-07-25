@@ -30,6 +30,9 @@ namespace pensar_digital
         using Json = nlohmann::json;
         namespace pd = pensar_digital::cpplib;
 
+        template<std::copy_constructible T>
+        static T clone(const T& o) { return T(o); }
+
         namespace obj
         {
             class Object
@@ -61,8 +64,8 @@ namespace pensar_digital
 
                 virtual String class_name() const { String c = typeid(*this).name(); c.erase(0, sizeof("class ") - 1); return c; }
                 
-                // Clone method for polymorphic copy. Returns an object reference avoiding unecessary copies.
-                virtual Object clone() const { return Object(*this); };
+                // Clone method. 
+                Object clone() const { return pd::clone<Object>(*this); }
                 
 
                 /// Check if passed object equals self.
@@ -156,7 +159,11 @@ namespace pensar_digital
                 bool operator != (const Object& o) const { return !equals(o); }
                 
                 // Default constructor compliant with DefaultConstructible concept.
-                Object() noexcept { id = NULL_ID; };
+                Object() noexcept 
+                {
+                    static_assert(DefaultConstructible<Object>);
+                    id = NULL_ID;
+                };
                 
                 Object(Id aid) noexcept : id(aid) {};
 
@@ -208,11 +215,6 @@ namespace pensar_digital
 
         extern std::istream& operator >> (std::istream& is, obj::Object& o);
         extern std::ostream& operator << (std::ostream& os, const obj::Object& o);
-
-        template<std::copy_constructible T = obj::Object>
-        static T clone(const T& o) { return T(o); }
-
-        //static_assert(DefaultConstructible<obj::Object>);
 
 
         // Dependency class is a Constrainable class used to define dependencies between objects.

@@ -42,7 +42,7 @@ namespace pensar_digital
 
         TEST(MockupFactory)
 		{
-            Object* mockup = new obj::Object ();
+            obj::Object* mockup = new obj::Object ();
             mockup->set_id(1);
             MockupFactory<obj::Object> factory (mockup);
             std::shared_ptr<obj::Object> o  = factory.get ();
@@ -59,15 +59,15 @@ namespace pensar_digital
             o->set_id(1);
             CHECK(o->get_id () == 1, "0. o->get_id () should be 1 but is " + pd::to_string((int)o->get_id ()))
             CHECK(factory.get_available_count() == 2, "1. available_count should be 2.");   
-			std::shared_ptr<Object> o1 = factory.get ();
+			std::shared_ptr<obj::Object> o1 = factory.get ();
             o1->set_id(2);
             CHECK(o1->get_id() == 2, "0. o1->get_id () should be 2 but is " + pd::to_string((int)o->get_id()))
             CHECK(factory.get_available_count() == 1, "2. available_count should be 1.");
-            std::shared_ptr<Object> o2 = factory.get ();
+            std::shared_ptr<obj::Object> o2 = factory.get ();
             o2->set_id(3);
             CHECK(o2->get_id() == 3, "0. o2->get_id () should be 3 but is " + pd::to_string((int)o->get_id()))
             CHECK(factory.get_available_count() == 0, "3. available_count should be 0.");
-            std::shared_ptr<Object> o3 = factory.get ();
+            std::shared_ptr<obj::Object> o3 = factory.get ();
             o3->set_id(4);
             CHECK(factory.get_available_count() == 9, "4. available_count should be 9 but is " + pd::to_string((int)factory.get_available_count()));
             CHECK(o3->get_id() == 4, "0. o3->get_id () should be 2 but is " + pd::to_string((int)o->get_id()))

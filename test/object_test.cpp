@@ -32,6 +32,8 @@ namespace pensar_digital
 			virtual ~Dummy () {}
             virtual Dummy assign(const Dummy& d) noexcept { name = d.name; return *this; }
             
+            Dummy clone () const { return pd::clone<Dummy>(*this); }
+
             // Conversion to json string.
             virtual String json() const
             {
@@ -113,6 +115,7 @@ namespace pensar_digital
 
             Dummy d(42, "d");
             Dummy d1 = pd::clone<Dummy> (d);
+            Dummy d2 = d.clone();
             static_assert(OutputStreamable<Dummy>);
             CHECK_EQ(Dummy, d, d1, "1. d == d1 should be true");
         TEST_END(ObjectClone)
