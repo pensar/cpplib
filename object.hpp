@@ -22,6 +22,7 @@
 #include <string>
 #include <typeinfo>
 #include <string.h>
+#include <utility> // for std::move
 
 namespace pensar_digital
 {
@@ -30,8 +31,13 @@ namespace pensar_digital
         using Json = nlohmann::json;
         namespace pd = pensar_digital::cpplib;
 
-        template<std::copy_constructible T>
-        static T clone(const T& o) { return T(o); }
+        template<class T, typename... Args> //requires FactoryCloneable<T, Args...>
+        static T& clone(const T& other, const Args& ... args) 
+        { 
+            T& o = T::get(args ...); 
+            o.assign (other); 
+            return o; 
+        }
 
         class Object
         {
@@ -67,7 +73,7 @@ namespace pensar_digital
             // Constructors. 
                 
             /// Default constructor.
-            Object(Id aid = NULL_ID) noexcept : id(aid) 
+            Object(const Id& aid = NULL_ID) noexcept : id(aid) 
             {
             };
 
@@ -80,9 +86,10 @@ namespace pensar_digital
             virtual String class_name() const { String c = typeid(*this).name(); c.erase(0, sizeof("class ") - 1); return c; }
                 
             // Clone method. 
-            Object clone() const { return pd::clone<Object>(*this); }
+            Object& clone() const { return pd::clone<Object>(*this); }
                 
-
+            static Object& get(const Id& aid = NULL_ID) { return *factory.get(aid); }
+            
             /// Check if passed object equals self.
             /// Derived classes must implement the _equals method. The hash compare logic is made on equals.
             /// _equals is called from template method equals and should only implement the specific comparison.
@@ -102,7 +109,7 @@ namespace pensar_digital
             virtual const Hash get_hash() const { return id; };
 
             // Implements initialize method from Initializable concept.
-            virtual bool initialize(Id aid = NULL_ID) noexcept { id = aid; return true; }
+            virtual bool initialize(const Id& aid = NULL_ID) noexcept { id = aid; return true; }
 
             template <class T>
             String json(const T& o) const { Json j = o; return j.dump(); }
@@ -212,6 +219,7 @@ namespace pensar_digital
         extern std::istream& operator >> (std::istream& is, Object& o);
         extern std::ostream& operator << (std::ostream& os, const Object& o);
 
+        typedef std::shared_ptr<Object> ObjectPtr;
 
         // Dependency class is a Constrainable class used to define dependencies between objects.
         template <Versionable MainClass, Versionable RequiredClass>

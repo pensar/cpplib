@@ -72,6 +72,9 @@
     <ClCompile Include="name.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="test\dummy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="constants.hpp">
@@ -150,6 +153,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="version.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="test\dummy.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

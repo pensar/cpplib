@@ -16,7 +16,7 @@ namespace pensar_digital
             public:
                 inline static const structVersion VERSION = structVersion(1, 1, 1);
                 virtual ~NewFactory (){}
-                virtual std::shared_ptr<T> get(Args&& ... args){ return std::make_shared<T> (std::forward<Args>(args) ...); }
+                virtual std::shared_ptr<T> get(const Args& ... args) const { return std::make_shared<T> (args ...); }
         };
 
         template <class T, typename... Args>
@@ -26,7 +26,7 @@ namespace pensar_digital
                 inline static const structVersion VERSION = structVersion(1, 1, 1);
                 MockupFactory(T* amockup_pointer) : mockup_pointer(amockup_pointer) { };
                 virtual ~MockupFactory() {}
-                virtual std::shared_ptr<T>  get(Args&& ... args) { std::shared_ptr<T> ptr(mockup_pointer); return ptr; }
+                virtual std::shared_ptr<T>  get(const Args& ... args) const { std::shared_ptr<T> ptr(mockup_pointer); return ptr; }
 
             private:
                 T* mockup_pointer;
@@ -42,30 +42,30 @@ namespace pensar_digital
                 /// <param name="pool_size">Initial pool size.</param>
                 /// <param name="refill_size">When </param>
                 /// <param name="args"></param>
-                void fill_pool(const size_t& pool_size, Args&& ... args)
+                void fill_pool (const size_t& pool_size, const Args& ... args)
                 {
                     for (size_t i = 0; i <= pool_size; ++i)
                     {
-                        pool.push_back(std::make_shared<T>(std::forward<Args>(args) ...));
+                        pool.push_back(std::make_shared<T>(args ...));
                     }
                     available_count = pool_size;
                 }
         public:
             inline static const structVersion VERSION = structVersion(1, 1, 1);
-            PoolFactory (const size_t initial_pool_size, const size_t a_refill_size, Args&& ... args) :
+            PoolFactory (const size_t initial_pool_size, const size_t a_refill_size, const Args& ... args) :
                          available_count (initial_pool_size), 
                          refill_size(a_refill_size)
             {
-                fill_pool(initial_pool_size, std::forward<Args>(args) ...);
+                fill_pool(initial_pool_size, args ...);
             };
             virtual ~PoolFactory() {}
 
-            virtual std::shared_ptr<T>  get(Args&& ... args)
+            virtual std::shared_ptr<T>  get(const Args& ... args) 
             { 
                 if (available_count <= 0)  
-                    fill_pool(refill_size, std::forward<Args>(args) ...);
+                    fill_pool(refill_size, args ...);
                 std::shared_ptr<T> ptr = pool[available_count--];
-                ptr->initialize (std::forward<Args>(args) ...);
+                ptr->initialize (args ...);
                 return ptr; 
             }
             size_t get_available_count() const { return available_count; }
@@ -80,9 +80,9 @@ namespace pensar_digital
 		{
             public:
                 inline static const structVersion VERSION = structVersion(1, 1, 1);
-                SingletonFactory (Args&& ... args) : singleton(std::make_shared<T>(std::forward<Args>(args) ...)) { };
+                SingletonFactory (const Args& ... args) : singleton (std::make_shared<T>(args ...)) { };
 				virtual ~SingletonFactory () {}
-                virtual std::shared_ptr<T>  get (Args&& ... args) { return singleton; }
+                virtual std::shared_ptr<T>  get (const Args& ... args) const { return singleton; }
             private:
 				std::shared_ptr<T> singleton;
         };
