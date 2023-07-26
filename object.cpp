@@ -10,8 +10,7 @@ namespace pensar_digital
         std::ostream& operator << (std::ostream& os, const Object& o) { return o.write(os); };
         namespace obj
         {
-            // Initializes Object::factory with (3, 1, 0).
-            Object::Factory Object::factory(3, 1);
+            Object::Factory Object::factory(3, 1, 0);
 
 
             void to_json(Json& j, const Object& o)

@@ -61,14 +61,12 @@ namespace pensar_digital
 		};
 
 		/// Concept for a class with a noexcept initialize method returning something convertible to bool.
-		/*
 		template <typename T, typename... Args>
-		concept Initializable = requires (T t, Args&& ... args)
+		concept Initializable = requires (T t, Args... args)
 		{
 			{T(std::forward<Args>(args) ...)} noexcept;
 			{t.initialize(std::forward<Args>(args) ...)} noexcept -> std::convertible_to<bool>;
 		};
-		*/
 
 		// OutputStreamable concept.
 		template<typename T>

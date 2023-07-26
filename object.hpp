@@ -43,6 +43,10 @@ namespace pensar_digital
 
             protected:
 
+                /// Set id
+                /// \param val New value to set
+                void set_id(const Id& value) { id = value; }
+
                 String ObjXMLPrefix() const noexcept { return "<object class_name = \"" + class_name() + "\" id = \"" + to_string() + "\""; }
 
                 /// \brief Compare objects.
@@ -57,7 +61,7 @@ namespace pensar_digital
                 inline static const structVersion VERSION = structVersion (1, 1, 1);
 
                 // PoolFactory of objects.
-                typedef PoolFactory<Object> Factory;
+                typedef PoolFactory<Object, Id> Factory;
 
                 // Object factory.
                 static Factory factory;
@@ -80,15 +84,14 @@ namespace pensar_digital
                 /// \return The current value of id
                 ///
                 virtual const Id get_id() const { return id; };
-                
-                /// Set id
-                /// \param val New value to set
-                void set_id(const Id& value) { id = value; }
 
                 /// \brief Access hash
                 ///
                 /// \return  The current value of hash
                 virtual const Hash get_hash() const { return id; };
+
+                // Implements initialize method from Initializable concept.
+                virtual bool initialize(Id aid = NULL_ID) noexcept { id = aid; return true; }
 
                 template <class T>
                 String json(const T& o) const { Json j = o; return j.dump(); }
@@ -206,7 +209,6 @@ namespace pensar_digital
                     */
                 Object& operator=(const Object& o) { return assign(o); }
 
-                virtual bool initialize(Id aid = NULL_ID) noexcept { id = aid; return true; }
                 friend void from_json(const Json& j, Object& o);
             };
             extern void to_json(Json& j, const Object& o);
