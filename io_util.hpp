@@ -24,8 +24,6 @@ namespace pensar_digital
 {
     namespace cpplib
     {
-        using namespace pensar_digital::cpplib::obj;
-
         #ifdef _MSC_VER
             namespace fs = std::filesystem;
         #else

@@ -11,7 +11,6 @@ namespace pensar_digital
     {
         // alias for pensar_digital::cpplib namespace.
         namespace pd = pensar_digital::cpplib;
-        using namespace pd::obj;
         /// <summary>
         /// Country contains ISO-638-3 information (2 and 3 letter codes, name, etc).
         /// See https://iso639-3.sil.org/code_tables/download_tables for more information and 

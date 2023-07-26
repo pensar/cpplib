@@ -13,7 +13,6 @@ namespace pensar_digital
     using namespace pensar_digital::unit_test;
     namespace cpplib
     {
-        using namespace pensar_digital::cpplib::obj;
         /// <summary>
         /// Dummy class is streamable and comparable.
         /// </summary>
@@ -109,8 +108,8 @@ namespace pensar_digital
         }
         
         TEST(ObjectClone)
-            obj::Object o(42);
-            obj::Object o1 = o.clone ();
+            Object o(42);
+            Object o1 = o.clone ();
             CHECK(o == o1, "0. o == o1 should be true");
 
             Dummy d(42, "d");
@@ -124,7 +123,7 @@ namespace pensar_digital
             Object o(42);
 			std::stringstream ss;
 			ss << o;
-            String expected = "{\"class\":\"pensar_digital::cpplib::obj::Object\",\"id\":42,\"private_interface_version\":1,\"protected_interface_version\":1,\"public_interface_version\":1}";
+            String expected = "{\"class\":\"pensar_digital::cpplib::Object\",\"id\":42,\"private_interface_version\":1,\"protected_interface_version\":1,\"public_interface_version\":1}";
             CHECK_EQ(String, ss.str(), expected, "0");
 
             Object o2;
@@ -145,7 +144,7 @@ namespace pensar_digital
         TEST(ObjectJsonConversion)
 			Object o(42);
 			Json j = o;
-            String expected = "{\"class\":\"pensar_digital::cpplib::obj::Object\",\"id\":42,\"private_interface_version\":1,\"protected_interface_version\":1,\"public_interface_version\":1}";
+            String expected = "{\"class\":\"pensar_digital::cpplib::Object\",\"id\":42,\"private_interface_version\":1,\"protected_interface_version\":1,\"public_interface_version\":1}";
             CHECK_EQ(String, j.dump (), expected, "0. json should be equal to " + expected + " but was " + j.dump() + ".");
 
             Object o1 = j;
@@ -164,7 +163,7 @@ namespace pensar_digital
         TEST(ObjectXMLConversion)
             Object o(42);
             String xml = o.xml ();
-            String expected = "<object class_name = \"pensar_digital::cpplib::obj::Object\" id = \"42\"/>";
+            String expected = "<object class_name = \"pensar_digital::cpplib::Object\" id = \"42\"/>";
             CHECK_EQ(String, xml, expected, "0. xml should be equal to " + expected + " but was " + xml + ".");
 
             Object o1;

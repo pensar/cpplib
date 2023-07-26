@@ -10,8 +10,6 @@ namespace pensar_digital
 {
 	namespace cpplib
 	{
-		using namespace pensar_digital::cpplib::obj;
-
 		template <typename T>
 		class Field : public virtual Object
 		{

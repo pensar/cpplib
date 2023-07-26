@@ -11,8 +11,7 @@
 
 namespace pensar_digital
 {
-    namespace cpp = pensar_digital::cpplib;
-    namespace obj = pensar_digital::cpplib::obj;
+    namespace obj = pensar_digital::cpplib;
     namespace unit_test
     {
         TEST(NewFactory)

@@ -13,7 +13,6 @@ namespace pensar_digital
 {
     namespace cpplib
     {
-        using namespace obj;
         class Locale : public Object
         {
             public:

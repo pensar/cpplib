@@ -11,7 +11,6 @@ namespace pensar_digital
 {
     namespace cpplib
     {
-        using namespace pensar_digital::cpplib::obj;
       /// Generator is meant to be used as unique identifier generator for other classes.
       ///
       /// Usually this is used as a static member for an entity class in conjunction with the Id mixin class like in the Person class:

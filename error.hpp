@@ -14,7 +14,6 @@ namespace pensar_digital
 {
     namespace cpplib
     {
-        using namespace pensar_digital::cpplib::obj;
         #define INVALID_ARGUMENT(condition,message) \
             if (condition)\
             {\

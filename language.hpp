@@ -9,8 +9,6 @@ namespace pensar_digital
 {
     namespace cpplib
     {
-        using namespace pensar_digital::cpplib::obj; 
-
         /// <summary>
         /// Language contains ISO-638-3 information (2 and 3 letter codes, name, etc).
         /// See https://iso639-3.sil.org/code_tables/download_tables for more information and 
