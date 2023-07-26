@@ -66,6 +66,19 @@ namespace pensar_digital
                 // Object factory.
                 static Factory factory;
 
+                // Constructors. 
+                
+                /// Default constructor.
+                Object(Id aid = NULL_ID) noexcept : id(aid) 
+                {
+                };
+
+                /// Copy constructor
+                /// \param other Object to copy from
+                Object(const Object& o) { assign(o); }
+
+                /// Move constructor
+                Object(Object&& o) noexcept { assign(o); }
                 virtual String class_name() const { String c = typeid(*this).name(); c.erase(0, sizeof("class ") - 1); return c; }
                 
                 // Clone method. 
@@ -160,22 +173,6 @@ namespace pensar_digital
 
                 bool operator == (const Object& o) const { return   equals(o); }
                 bool operator != (const Object& o) const { return !equals(o); }
-                
-                // Default constructor compliant with DefaultConstructible concept.
-                Object() noexcept 
-                {
-                    static_assert(DefaultConstructible<Object>);
-                    id = NULL_ID;
-                };
-                
-                Object(Id aid) noexcept : id(aid) {};
-
-                /// Copy constructor
-                /// \param other Object to copy from
-                Object(const Object& o) { assign(o); }
-
-                /// Move constructor
-                Object(Object&& o) noexcept { assign(o); }
 
                 /// Move assignment operator
                 Object& operator=(Object&& o) noexcept { return assign(o); }
