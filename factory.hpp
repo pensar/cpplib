@@ -44,31 +44,68 @@ namespace pensar_digital
                 /// <param name="args"></param>
                 void fill_pool (const size_t& pool_size, const Args& ... args)
                 {
-                    for (size_t i = 0; i <= pool_size; ++i)
+                    for (size_t i = 0; i < pool_size; ++i)
                     {
-                        pool.push_back(std::make_shared<T>(args ...));
+                        std::shared_ptr<T>&& ptr = std::make_shared<T>(args ...);
+                        pool.push_back(std::move(ptr));
                     }
                     available_count = pool_size;
                 }
+                void add (const size_t& count, const Args& ... args)
+                {
+					for (size_t i = 0; i < count; ++i)
+					{
+                        std::shared_ptr<T>&& ptr = std::make_shared<T>(args ...);
+                        pool.push_back(ptr);
+                    }
+					available_count += count;
+				}
         public:
             inline static const structVersion VERSION = structVersion(1, 1, 1);
             PoolFactory (const size_t initial_pool_size, const size_t a_refill_size, const Args& ... args) :
-                         available_count (initial_pool_size), 
+                         available_count (0), 
                          refill_size(a_refill_size)
             {
                 fill_pool(initial_pool_size, args ...);
             };
+            
+            PoolFactory(const Args& ... args) : PoolFactory (10, 10, args ...) { };
+            
             virtual ~PoolFactory() {}
 
             virtual std::shared_ptr<T>  get(const Args& ... args) 
             { 
-                if (available_count <= 0)  
-                    fill_pool(refill_size, args ...);
-                std::shared_ptr<T> ptr = pool[available_count--];
-                ptr->initialize (args ...);
-                return ptr; 
+                // Iterate through the pool to find an available object.
+                for (auto& ptr : pool)
+                {
+					if (ptr.use_count () < 2)
+					{
+                        ptr->initialize (args ...);
+                        available_count--;
+
+                        // Need to copy to increase the use count.
+						return * new (std::shared_ptr<T>) (ptr); 
+					}
+				}
+                assert(available_count <= 0);
+    			add (refill_size, args ...);
+                return get (args ...);
             }
             size_t get_available_count() const { return available_count; }
+
+            size_t get_pool_size() const { return pool.size(); }
+
+            size_t get_refill_size() const { return refill_size; }
+
+            void set_refill_size(const size_t& value) { refill_size = value; }
+
+            void reset(const size_t& initial_pool_size, const size_t& a_refill_size, const Args& ... args)
+			{
+				pool.clear();
+				fill_pool(initial_pool_size, args ...);
+				available_count = initial_pool_size;
+				refill_size = a_refill_size;
+			}
         private:
             std::vector<typename std::shared_ptr<T>> pool;
             size_t available_count;

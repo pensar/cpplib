@@ -15,7 +15,7 @@ namespace pensar_digital
     using namespace pensar_digital::unit_test;
     namespace cpplib
     {
-        TEST(ObjectClone)
+        TEST(ObjectClone, true)
             Object&  o = Object::get(42);
             Object& o1 = o.clone ();
             CHECK(o == o1, "0. o == o1 should be true");
@@ -28,7 +28,7 @@ namespace pensar_digital
             CHECK_EQ(Dummy, d2, d, "1. d != d2");
             TEST_END(ObjectClone)
 
-        TEST(ObjectStreaming)
+        TEST(ObjectStreaming, true)
             Object& o = Object::get(42);
 			std::stringstream ss;
 			ss << o;
@@ -50,8 +50,8 @@ namespace pensar_digital
 			CHECK_EQ(Dummy, d, d2, "1. d == d2 should be true");
         TEST_END(ObjectStreaming)
 
-        TEST(ObjectJsonConversion)
-			Object& o = Object::get(42);
+        TEST(ObjectJsonConversion, true)
+            Object& o = Object::get(42);
 			Json j = o;
             String expected = "{\"class\":\"pensar_digital::cpplib::Object\",\"id\":42,\"private_interface_version\":1,\"protected_interface_version\":1,\"public_interface_version\":1}";
             CHECK_EQ(String, j.dump (), expected, "0. json should be equal to " + expected + " but was " + j.dump() + ".");
@@ -69,16 +69,16 @@ namespace pensar_digital
            CHECK_EQ(Dummy, d, d1, "3. d should be equal to d1");
         TEST_END(ObjectJsonConversion)
         
-        TEST(ObjectXMLConversion)
+        TEST(ObjectXMLConversion, true)
             Object& o = Object::get(42);
             String xml = o.xml ();
             String expected = "<object class_name = \"pensar_digital::cpplib::Object\" id = \"42\"/>";
             CHECK_EQ(String, xml, expected, "0. xml should be equal to " + expected + " but was " + xml + ".");
 
             Object& o1 = Object::get ();
-            CHECK (o != o1, "1. o == o1");
+            CHECK_NOT_EQ(Object, o, o1, "1. o == o1");
             o1.from_xml(xml);
-            CHECK (o == o1, "2. o != o1");
+            CHECK_EQ(Object, o, o1, "2. o != o1");
 
             Dummy& d = Dummy::get(42, "d");
             xml = d.xml_str ();

@@ -16,7 +16,7 @@ namespace pensar_digital
     using namespace pensar_digital::unit_test;
     namespace cpplib
     {
-        TEST(PathTest)
+        TEST(PathTest, true)
             Path temp_dir = get_user_home<true>() / "test_dir";
             Path file1 = temp_dir / "file_name";
             Path file2 = temp_dir / "dir" / "file_name";

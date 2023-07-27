@@ -14,8 +14,16 @@ namespace pensar_digital
     namespace obj = pensar_digital::cpplib;
     namespace unit_test
     {
-        TEST(NewFactory)
+        TEST(NewFactory, true)
             {
+                std::vector<std::shared_ptr<obj::Object>> v;
+                v.push_back (std::make_shared<obj::Object>(1));      
+                CHECK(v[0].use_count() == 1, "0. use_count() should be 1 but is " + pd::to_string((int)v[0].use_count()));
+
+                std::shared_ptr<obj::Object> ptr = v[0]; 
+                CHECK(ptr.use_count() == 2, "1. use_count() should be 2 but is " + pd::to_string((int)ptr.use_count()));
+
+
                 NewFactory <obj::Object> factory;
                 std::shared_ptr<obj::Object> o  = factory.get ();
                 NewFactory <obj::Object, pd::Id> factory1;
@@ -26,7 +34,7 @@ namespace pensar_digital
         }
         TEST_END(NewFactory)
         
-        TEST(SingletonFactory)
+        TEST(SingletonFactory, true)
         {
 				SingletonFactory <obj::Object, pd::Id> factory (1);
 				std::shared_ptr<obj::Object> o  = factory.get (1);
@@ -37,7 +45,7 @@ namespace pensar_digital
 		}
         TEST_END(SingletonFactory)
 
-        TEST(MockupFactory)
+        TEST(MockupFactory, true)
 		{
             obj::Object* mockup = new obj::Object (1);
             MockupFactory<obj::Object, pd::Id> factory (mockup);
@@ -46,23 +54,35 @@ namespace pensar_digital
         }
         TEST_END(MockupFactory)
 
-        TEST(PoolFactory)
+        TEST(PoolFactory, true)
         {
 			PoolFactory<obj::Object, pd::Id> factory (3, 10, 1);
-            CHECK(factory.get_available_count() == 3, "0. available_count should be 3 but is " + pd::to_string((int)factory.get_available_count ()));
+            {
+                size_t count = factory.get_available_count();
+                std::shared_ptr<obj::Object> ptr;
+                for (size_t i = 0; i < count; i++)
+                {
+                    ptr = factory.get(1);
+                    CHECK(factory.get_available_count () == factory.get_pool_size () - i - 1, "0.");
+                }
+                CHECK(factory.get_available_count() == 0, "0.1. available_count should be 0 but is " + pd::to_string((int)factory.get_available_count()));
+            }
+            factory.reset(3, 10, 0);
+
+            CHECK(factory.get_available_count() == 3, "1. available_count should be 3 but is " + pd::to_string((int)factory.get_available_count ()));
 			std::shared_ptr<obj::Object> o  = factory.get (1);
             CHECK(o->get_id () == 1, "0. o->get_id () should be 1 but is " + pd::to_string((int)o->get_id ()))
-            CHECK(factory.get_available_count() == 2, "1. available_count should be 2.");   
+            CHECK(factory.get_available_count() == 2, "2. available_count should be 2.");   
 			std::shared_ptr<obj::Object> o1 = factory.get (2);
-            CHECK(o1->get_id() == 2, "0. o1->get_id () should be 2 but is " + pd::to_string((int)o->get_id()))
-            CHECK(factory.get_available_count() == 1, "2. available_count should be 1.");
+            CHECK(o1->get_id() == 2, "3. o1->get_id () should be 2 but is " + pd::to_string((int)o->get_id()))
+            CHECK(factory.get_available_count() == 1, "4. available_count should be 1.");
             std::shared_ptr<obj::Object> o2 = factory.get (3);
-            CHECK(o2->get_id() == 3, "0. o2->get_id () should be 3 but is " + pd::to_string((int)o->get_id()))
-            CHECK(factory.get_available_count() == 0, "3. available_count should be 0.");
+            CHECK(o2->get_id() == 3, "5. o2->get_id () should be 3 but is " + pd::to_string((int)o->get_id()))
+            CHECK(factory.get_available_count() == 0, "6. available_count should be 0.");
             std::shared_ptr<obj::Object> o3 = factory.get (4);
-            CHECK(factory.get_available_count() == 9, "4. available_count should be 9 but is " + pd::to_string((int)factory.get_available_count()));
-            CHECK(o3->get_id() == 4, "0. o3->get_id () should be 2 but is " + pd::to_string((int)o->get_id()))
-            CHECK(*o != *o1, "0. *o != *o1 should be true.");
+            CHECK(factory.get_available_count() == 9, "7. available_count should be 9 but is " + pd::to_string((int)factory.get_available_count()));
+            CHECK(o3->get_id() == 4, "8. o3->get_id () should be 2 but is " + pd::to_string((int)o->get_id()))
+            CHECK(*o != *o1, "9. *o != *o1 should be true.");
 			o.reset();
 			CHECK(o.get () == nullptr, "1. managed object should have been deleted and assigned to nullptr.");
 		}
