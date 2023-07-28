@@ -20,9 +20,9 @@ namespace pensar_digital
             Object& o1 = o.clone ();
             CHECK(o == o1, "0. o == o1 should be true");
 
-            Dummy d(42, "d");
-            Dummy d1 = pd::clone<Dummy> (d);
-            Dummy d2 = d.clone();
+            Dummy& d = Dummy::get (42, "d");
+            Dummy& d1 = pd::clone<Dummy> (d);
+            Dummy& d2 = d.clone();
             static_assert(OutputStreamable<Dummy>);
             CHECK_EQ(Dummy, d1, d, "1. d != d1");
             CHECK_EQ(Dummy, d2, d, "1. d != d2");

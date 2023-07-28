@@ -165,10 +165,10 @@
   <ItemGroup>
     <ClInclude Include="..\unit-test\test.hpp" />
     <ClInclude Include="algorithm_util.hpp" />
-    <ClInclude Include="constants.hpp" />
+    <ClInclude Include="constant.hpp" />
     <ClInclude Include="constraint.hpp" />
     <ClInclude Include="country.hpp" />
-    <ClInclude Include="cpplib_concepts.hpp" />
+    <ClInclude Include="concept.hpp" />
     <ClInclude Include="distance.hpp" />
     <ClInclude Include="error.hpp" />
     <ClInclude Include="factory.hpp" />

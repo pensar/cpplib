@@ -2,7 +2,7 @@
 #define FACTORY_HPP_INCLUDED
 
 #include "version.hpp"
-#include "cpplib_concepts.hpp"
+#include "concept.hpp"
 #include <memory>
 #include <type_traits>
 

@@ -58,7 +58,7 @@ namespace pensar_digital
                 void set_name (const std::string& n) { name = n; }
 
                 // Conversion to json string.
-                virtual String json() const
+                virtual String json() const noexcept
                 {
                     return Object::json<Name>(*this);
                 }

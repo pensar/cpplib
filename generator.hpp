@@ -54,7 +54,7 @@ namespace pensar_digital
             void set_value(Id val) { fvalue = val; }
 
             // Conversion to json string.
-            virtual String json() const
+            virtual String json() const noexcept
             {
                 return Object::json<Generator>(*this);
             }

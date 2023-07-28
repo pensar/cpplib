@@ -77,7 +77,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="constants.hpp">
+    <ClInclude Include="constant.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="distance.hpp">
@@ -134,7 +134,7 @@
     <ClInclude Include="factory.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cpplib_concepts.hpp">
+    <ClInclude Include="concept.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="algorithm_util.hpp">

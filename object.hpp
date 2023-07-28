@@ -4,14 +4,11 @@
 #ifndef OBJECT_HPP
 #define OBJECT_HPP
 
-#include "constants.hpp"
-#include "string_def.hpp"
-#include "cpplib_concepts.hpp"
+#include "iobject.hpp"
+#include "concept.hpp"
 #include "string_util.hpp"
-#include "header_lib/json.hpp"
 #include "header_lib/xmlParser.h"
 #include "factory.hpp"
-#include "version.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -28,8 +25,8 @@ namespace pensar_digital
 {
     namespace cpplib
     {
-        using Json = nlohmann::json;
         namespace pd = pensar_digital::cpplib;
+        using Json = nlohmann::json;
 
         template<class T, typename... Args> //requires FactoryCloneable<T, Args...>
         static T& clone(const T& other, const Args& ... args) 
@@ -39,7 +36,7 @@ namespace pensar_digital
             return o; 
         }
 
-        class Object
+        class Object : public IObject
         {
         private:
 
@@ -59,7 +56,7 @@ namespace pensar_digital
             /// \return true if they are equal, false otherwise.
             /// \see equals
             ///
-            virtual bool _equals(const Object& o) const { return (id == o.id); }
+            virtual bool _equals(const IObject_RO& o) const { return (id == o.get_id ()); }
 
         public:
             inline static const structVersion VERSION = structVersion (1, 1, 1);
@@ -86,7 +83,7 @@ namespace pensar_digital
             virtual String class_name() const { String c = typeid(*this).name(); c.erase(0, sizeof("class ") - 1); return c; }
                 
             // Clone method. 
-            Object& clone() const { return pd::clone<Object>(*this); }
+            Object& clone() const noexcept { return pd::clone<Object>(*this); }
                 
             static Object& get(const Id& aid = NULL_ID) { return *factory.get(aid); }
             
@@ -95,18 +92,17 @@ namespace pensar_digital
             /// _equals is called from template method equals and should only implement the specific comparison.
             /// \see _equals
             /// \return true if objects have the same id, false otherwise.
-            const bool equals(const Object& o) const { return (get_hash() != o.get_hash() ? false : _equals(o)); }
-
+            bool equals(const IObject_RO& o) const noexcept { return (get_hash() != o.get_hash() ? false : _equals(o)); }
 
             /// Access object id
             /// \return The current value of id
             ///
-            virtual const Id get_id() const { return id; };
+            virtual const Id get_id() const noexcept { return id; };
 
             /// \brief Access hash
             ///
             /// \return  The current value of hash
-            virtual const Hash get_hash() const { return id; };
+            virtual const Hash get_hash() const noexcept { return id; };
 
             // Implements initialize method from Initializable concept.
             virtual bool initialize(const Id& aid = NULL_ID) noexcept { id = aid; return true; }
@@ -131,7 +127,7 @@ namespace pensar_digital
             }
 
             // Conversion to json string.
-            virtual String json() const
+            virtual String json() const noexcept
             {
                 return json(*this);
             }
@@ -176,23 +172,23 @@ namespace pensar_digital
                 parse_object_tag(sxml);
             }
 
-            bool operator == (const Object& o) const { return   equals(o); }
-            bool operator != (const Object& o) const { return !equals(o); }
+            bool operator == (const IObject_RO& o) const { return   equals(o); }
+            bool operator != (const IObject_RO& o) const { return !equals(o); }
 
             /// Move assignment operator
-            Object& operator=(Object&& o) noexcept { return assign(o); }
+            Object& operator=(IObject&& o) noexcept { return assign(o); }
 
             /// Conversion to string.
             /// \return A string with the object id.
-            virtual String to_string() const { return std::to_string(id); }
+            virtual String to_string() const noexcept { return std::to_string(id); }
 
             /// Implicit conversion to string.
             /// \return A string with the object id.
-            operator String () const { return to_string(); }
+            operator String () const noexcept { return to_string(); }
 
             /// Debug string.
             /// \return A string with the object id.
-            virtual String debug_string() const
+            virtual String debug_string() const noexcept
             {
                 std::stringstream ss;
                 ss << "id = " << to_string();
@@ -203,13 +199,12 @@ namespace pensar_digital
             /** Default destructor */
             virtual ~Object() {}
 
-            virtual Object& assign(const Object& o) { id = o.get_id(); return *this; }
+            virtual Object& assign(const IObject_RO& o) noexcept { id = o.get_id(); return *this; }
 
-            /** Assignment operator
-                *  \param o Object to assign from
-                *  \return A reference to this
-                */
-            Object& operator=(const Object& o) { return assign(o); }
+            /// Assignment operator
+            /// \param o Object to assign from
+            /// \return A reference to this
+            Object& operator=(const IObject_RO& o) { return assign(o); }
 
             friend void from_json(const Json& j, Object& o);
         };
