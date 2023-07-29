@@ -17,6 +17,8 @@ namespace pensar_digital
                 inline static const structVersion VERSION = structVersion(1, 1, 1);
                 virtual ~NewFactory (){}
                 virtual std::shared_ptr<T> get(const Args& ... args) const { return std::make_shared<T> (args ...); }
+
+            private:
         };
 
         template <class T, typename... Args>
@@ -123,7 +125,22 @@ namespace pensar_digital
             private:
 				std::shared_ptr<T> singleton;
         };
-    }
+
+        // Factory can be configured to be a NewFactory, MockupFactory, PoolFactory or SingletonFactory.   
+		template <class T, typename... Args>
+		class Factory
+		{
+			public:
+				inline static const structVersion VERSION = structVersion(1, 1, 1);
+                Factory(const Args& ... args) { ptr = std::make_shared<PoolFactory<T, Args...>>(3, 10, args ...); };
+                virtual ~Factory() { }
+				virtual std::shared_ptr<T>  get (const Args& ... args) const { return ptr->get(args ...); }
+				void set_factory (const NewFactory<T, Args...>* afactory) {ptr = afactory; }
+			private:
+                std::shared_ptr<NewFactory<T, Args...>> ptr;
+		};  
+
+    } // namespace cpplib
 }
 
 #endif // FACTORY_HPP_INCLUDED

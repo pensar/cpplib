@@ -62,10 +62,10 @@ namespace pensar_digital
             inline static const structVersion VERSION = structVersion (1, 1, 1);
 
             // PoolFactory of objects.
-            typedef PoolFactory<Object, Id> Factory;
+            typedef PoolFactory<Object, Id> ObjectFactory;
 
             // Object factory.
-            static Factory factory;
+            static ObjectFactory factory;
 
             // Constructors. 
                 

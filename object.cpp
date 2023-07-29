@@ -7,8 +7,8 @@ namespace pensar_digital
         
         std::istream& operator >> (std::istream& is, Object& o) { return o.read(is); };
         std::ostream& operator << (std::ostream& os, const Object& o) { return o.write(os); };
-        Object::Factory Object::factory(3, 1, 0);
-
+        Object::ObjectFactory Object::factory(3, 1, 0);
+        Factory<Object, Id> object_factory(0);
 
         void to_json(Json& j, const Object& o)
         {
