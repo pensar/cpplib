@@ -132,9 +132,18 @@ namespace pensar_digital
 		{
 			public:
 				inline static const structVersion VERSION = structVersion(1, 1, 1);
-                Factory(const Args& ... args) { ptr = std::make_shared<PoolFactory<T, Args...>>(3, 10, args ...); };
+                
+                Factory (const size_t pool_size, const size_t refill_size, const Args& ... args) 
+                { 
+                    ptr = std::make_shared<PoolFactory<T, Args...>>(pool_size, refill_size, args ...); 
+                };
+
                 virtual ~Factory() { }
-				virtual std::shared_ptr<T>  get (const Args& ... args) const { return ptr->get(args ...); }
+				
+                virtual std::shared_ptr<T>  get (const Args& ... args) { return ptr->get(args ...); }
+
+                NewFactory<T, Args...>& get_factory () const { return *ptr.get(); }
+                                
 				void set_factory (const NewFactory<T, Args...>* afactory) {ptr = afactory; }
 			private:
                 std::shared_ptr<NewFactory<T, Args...>> ptr;

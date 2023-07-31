@@ -151,6 +151,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="memory.cpp" />
     <ClCompile Include="object.cpp" />
+    <ClCompile Include="object_factory.cpp" />
     <ClCompile Include="random_util.cpp" />
     <ClCompile Include="error.cpp" />
     <ClCompile Include="name.cpp" />
@@ -174,6 +175,7 @@
     <ClInclude Include="factory.hpp" />
     <ClInclude Include="field.hpp" />
     <ClInclude Include="generator.hpp" />
+    <ClInclude Include="clone_util.hpp" />
     <ClInclude Include="header_lib\json.hpp" />
     <ClInclude Include="io_util.hpp" />
     <ClInclude Include="language.hpp" />
@@ -183,6 +185,7 @@
     <ClInclude Include="mg.hpp" />
     <ClInclude Include="name.hpp" />
     <ClInclude Include="object.hpp" />
+    <ClInclude Include="object_factory.hpp" />
     <ClInclude Include="random_util.hpp" />
     <ClInclude Include="string_def.hpp" />
     <ClInclude Include="string_util.hpp" />
