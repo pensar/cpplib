@@ -4,8 +4,6 @@ namespace pensar_digital
 {
     namespace cpplib
     {
-        Dummy::Factory Dummy::factory(3, 10, 0, "");
-
         /// Makes Dummy Streamable.
         std::ostream& operator << (std::ostream& os, const Dummy& d) { return d.write(os); }
         std::istream& operator >> (std::istream& is, Dummy& d) { return d.read(is); }

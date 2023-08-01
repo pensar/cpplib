@@ -158,7 +158,10 @@
     <ClCompile Include="string_util.cpp" />
     <ClCompile Include="system.cpp" />
     <ClCompile Include="sys_user_info.cpp" />
+    <ClCompile Include="test\constraint.cpp" />
+    <ClCompile Include="test\constraint_test.cpp" />
     <ClCompile Include="test\dummy.cpp" />
+    <ClCompile Include="test\dummy_factory.cpp" />
     <ClCompile Include="test\factory_test.cpp" />
     <ClCompile Include="test\io_util_test.cpp" />
     <ClCompile Include="test\object_test.cpp" />
@@ -167,7 +170,6 @@
     <ClInclude Include="..\unit-test\test.hpp" />
     <ClInclude Include="algorithm_util.hpp" />
     <ClInclude Include="constant.hpp" />
-    <ClInclude Include="constraint.hpp" />
     <ClInclude Include="country.hpp" />
     <ClInclude Include="concept.hpp" />
     <ClInclude Include="distance.hpp" />
@@ -190,7 +192,9 @@
     <ClInclude Include="string_def.hpp" />
     <ClInclude Include="string_util.hpp" />
     <ClInclude Include="sys_user_info.hpp" />
+    <ClInclude Include="test\constraint.hpp" />
     <ClInclude Include="test\dummy.hpp" />
+    <ClInclude Include="test\dummy_factory.hpp" />
     <ClInclude Include="version.hpp" />
     <ClInclude Include="wstring_stream_hack.hpp" />
   </ItemGroup>
