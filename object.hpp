@@ -13,11 +13,11 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
-#include <memory>
+#include <memory> // for std::shared_ptr
 #include <concepts>
 #include <exception>
 #include <string>
-#include <typeinfo>
+#include <typeinfo> // for typeid
 #include <string.h>
 #include <utility> // for std::move
 

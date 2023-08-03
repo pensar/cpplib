@@ -18,11 +18,11 @@ namespace pensar_digital
 		};
 
 		
-		// Constrainable concept. Requires a member function ok() returning something convertible to bool.
+		// Checkable concept. Requires a member function ok() returning something convertible to bool.
 		template <typename T, typename... Args>
-		concept Constrainable = requires (T t, Args&& ... args)
+		concept Checkable = requires (T t, Args& ... args)
 		{
-			{t.ok(std::forward<Args>(args) ...)} noexcept -> std::convertible_to<bool>;
+			{t.ok(args ...)}  -> std::convertible_to<bool>;
 		};
 		
 		// DefaultConstructible concept. Requires a default constructor.
