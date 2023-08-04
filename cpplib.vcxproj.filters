@@ -84,7 +84,7 @@
     <ClCompile Include="test\constraint_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="test\constraint.cpp">
+    <ClCompile Include="constraint.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -176,7 +176,7 @@
     <ClInclude Include="test\dummy_factory.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="test\constraint.hpp">
+    <ClInclude Include="constraint.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

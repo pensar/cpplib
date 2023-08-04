@@ -22,7 +22,7 @@ namespace pensar_digital
 		template <typename T, typename... Args>
 		concept Checkable = requires (T t, Args& ... args)
 		{
-			{t.ok(args ...)}  -> std::convertible_to<bool>;
+			{t.ok(args ...)} -> std::convertible_to<bool>;
 		};
 		
 		// DefaultConstructible concept. Requires a default constructor.

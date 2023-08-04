@@ -30,7 +30,7 @@ namespace pensar_digital
             CHECK(!sc2.ok (" bola"), "8");
             CHECK(!sc2.ok (""     ), "9");
 
-            CompositeConstraint<StringConstraint, StringConstraint, OrOperand<StringConstraint, StringConstraint>> sc3 (sc, sc2, * new OrOperand<StringConstraint, StringConstraint> ());
+            CompositeConstraint<StringConstraint, StringConstraint> sc3 = (sc || sc2);
             CHECK( sc3.ok ("bola" ), "10");
             CHECK( sc3.ok ("123"  ), "11"); 
             CHECK(!sc3.ok ("123bola" ), "12");
