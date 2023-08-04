@@ -185,7 +185,7 @@ namespace pensar_digital
                 /** Default destructor */
                 virtual ~Object() {}
 
-                virtual Object& assign(const IObject_RO& o) noexcept { id = o.get_id(); return *this; }
+                Object& assign(const IObject_RO& o) noexcept { id = o.get_id(); return *this; }
 
                 /// Assignment operator
                 /// \param o Object to assign from

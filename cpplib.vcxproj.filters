@@ -179,6 +179,12 @@
     <ClInclude Include="constraint.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="iobject.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="test\idummy.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

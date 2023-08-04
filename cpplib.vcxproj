@@ -180,6 +180,7 @@
     <ClInclude Include="generator.hpp" />
     <ClInclude Include="clone_util.hpp" />
     <ClInclude Include="header_lib\json.hpp" />
+    <ClInclude Include="iobject.hpp" />
     <ClInclude Include="io_util.hpp" />
     <ClInclude Include="language.hpp" />
     <ClInclude Include="locale.hpp" />
@@ -195,6 +196,7 @@
     <ClInclude Include="sys_user_info.hpp" />
     <ClInclude Include="test\dummy.hpp" />
     <ClInclude Include="test\dummy_factory.hpp" />
+    <ClInclude Include="test\idummy.hpp" />
     <ClInclude Include="version.hpp" />
     <ClInclude Include="wstring_stream_hack.hpp" />
   </ItemGroup>

@@ -68,7 +68,7 @@ namespace pensar_digital
                 virtual operator String () const noexcept = 0;   
         };
 
-        class IObject : public IObject_RO
+        class IObject : public virtual IObject_RO
         {
             public:
                 inline static const structVersion VERSION = structVersion(1, 1, 1);

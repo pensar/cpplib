@@ -177,6 +177,14 @@ namespace pensar_digital
 				/// Sets the name of the constraint
 				inline void set_name(const String& aname) { name = aname; }
 
+				// Implements initialize method from Initializable concept.
+				virtual bool initialize(const Id& aid = NULL_ID, const String& aname = "") noexcept
+				{
+					Object::set_id(aid);
+					name = aname;
+					return true;
+				}
+
 				template <typename... Args> bool ok (Args&& ... args) const noexcept
 				{
 					return static_cast<D*>(this)->::ok (std::forward<Args>(args)...);
@@ -292,7 +300,7 @@ namespace pensar_digital
 					return std::regex_search (s, regex);
 				};
 
-		};	// class StringConstraint
+		};	// class StringConstraint``m@e@maMriciGomes
 	}	// namespace cpplib
 }	// namespace pensar_digital
 

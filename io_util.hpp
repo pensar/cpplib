@@ -99,7 +99,7 @@ namespace pensar_digital
 
         /// \brief File class.
         ///
-        class File: Object
+        class File: public Object
         {
             protected:
 
@@ -243,6 +243,8 @@ namespace pensar_digital
             TextFile(const Path& full_path, const String& content = "", const Id aid = NULL_ID) : TextFile(full_path, IN_OUT_ATE_MODE, content, aid)
             {
 			}
+            
+            virtual ~TextFile () { close (); }
 
             File& append (const String& content)
             {

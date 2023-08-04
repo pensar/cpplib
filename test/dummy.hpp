@@ -8,6 +8,9 @@
 #include "../string_def.hpp"
 #include "../string_util.hpp"
 #include "../object.hpp"
+#include "idummy.hpp"
+
+
 #include <memory>
 
 namespace pensar_digital
@@ -20,7 +23,7 @@ namespace pensar_digital
         /// <summary>
         /// Dummy class is streamable and comparable.
         /// </summary>
-        class Dummy : protected virtual Object   
+        class Dummy : public IDummy, protected Object   
         {
         public:
             inline static const structVersion VERSION = structVersion(1, 1, 1);
@@ -33,7 +36,7 @@ namespace pensar_digital
             bool operator == (const Dummy& d) const { return (Object::operator == (d) && (name == d.name)); }
             using Object::operator !=;
             virtual ~Dummy() {}
-            virtual Dummy assign(const Dummy& d) noexcept { Object::assign(d); name = d.name; return *this; }
+            virtual Dummy& assign(const Dummy& d) noexcept { Object::assign(d); name = d.name; return *this; }
 
 
             // Implements initialize method from Initializable concept.
@@ -79,7 +82,7 @@ namespace pensar_digital
                 if (!n.isEmpty()) name = n.getText();
             }
 
-            String get_name() const noexcept { return name; }
+            virtual String get_name() const noexcept { return name; }
             void   set_name(const String& aname) noexcept { name = aname; }
 
 
