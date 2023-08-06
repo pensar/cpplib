@@ -59,6 +59,14 @@ namespace pensar_digital
 			{t.get(args ...)} noexcept -> std::convertible_to<std::shared_ptr<T>>;
 		};
 		
+		// Interfaceable concept two public typedefs named i_type and i_type_ro.
+		template <typename T>
+		concept Interfaceable = requires
+		{
+			typename T::I;
+			typename T::I_RO;
+		};	
+
 		// Negatable. Requires the unary operator ! to be defined returning something convertible to bool.
 		template <typename T>
 		concept Negatable = requires (T t)

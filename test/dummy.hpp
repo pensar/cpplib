@@ -18,7 +18,8 @@ namespace pensar_digital
     namespace cpplib
     {
         class Dummy;
-        typedef std::shared_ptr<Dummy> DummyPtr;
+#pragma warning( disable : 4250) // Disable warning C4250: inherits via dominance.
+typedef std::shared_ptr<Dummy> DummyPtr;
 
         /// <summary>
         /// Dummy class is streamable and comparable.
@@ -27,6 +28,8 @@ namespace pensar_digital
         {
         public:
             inline static const structVersion VERSION = structVersion(1, 1, 1);
+            typedef IDummy    I;    // Interface type.
+            typedef IDummy_RO I_RO; // Read only interface type.
 
             Dummy(const Id& id = NULL_ID, const String& aname = "") : Object(id), name(aname) {}
             Dummy(const Dummy& d) : Object(d) { name = d.name; }
@@ -66,7 +69,7 @@ namespace pensar_digital
             };
 
             // Convertion to xml string.
-            virtual String xml_str() const noexcept
+            virtual String xml() const noexcept
             {
                 String xml = ObjXMLPrefix() + ">";
                 xml += "<name>" + name + "</name>";
@@ -84,7 +87,19 @@ namespace pensar_digital
 
             virtual String get_name() const noexcept { return name; }
             void   set_name(const String& aname) noexcept { name = aname; }
+            
+            virtual String to_string() const noexcept { return Object::to_string () + " " + name; }
 
+            /// Implicit conversion to string.
+            /// \return A string with the object id.
+            operator String () const noexcept { return to_string(); }
+
+            /// Debug string.
+            /// \return A string with the object id.
+            virtual String debug_string() const noexcept
+            {
+				return Object::debug_string() + " name = " + name;
+            }
 
             friend void to_json(Json& j, const Dummy& d);
             friend void from_json(const Json& j, Dummy& d);

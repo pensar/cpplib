@@ -42,7 +42,7 @@ namespace pensar_digital
                 /// \param val New value to set
                 void set_id(const Id& value) { id = value; }
 
-                String ObjXMLPrefix() const noexcept { return "<object class_name = \"" + class_name() + "\" id = \"" + to_string() + "\""; }
+                String ObjXMLPrefix() const noexcept { return "<object class_name = \"" + class_name() + "\" id = \"" + Object::to_string() + "\""; }
 
                 /// \brief Compare objects.
                 ///
@@ -54,6 +54,9 @@ namespace pensar_digital
 
             public:
                 inline static const structVersion VERSION = structVersion (1, 1, 1);
+                
+                typedef IObject I;	     // Interface type.
+                typedef IObject_RO I_RO; // Read only interface type.
 
                 // Constructors. 
                 
@@ -129,7 +132,7 @@ namespace pensar_digital
                 };
 
 
-                // Conversion to xml string.s
+                // Conversion to xml string.
                 virtual String xml() const noexcept
                 {
                     return ObjXMLPrefix() + "/>";
@@ -199,8 +202,6 @@ namespace pensar_digital
 
             extern std::istream& operator >> (std::istream& is, Object& o);
             extern std::ostream& operator << (std::ostream& os, const Object& o);
-
-            typedef std::shared_ptr<Object> ObjectPtr;
 
             // Dependency class is a Constrainable class used to define dependencies between objects.
             template <Versionable MainClass, Versionable RequiredClass>

@@ -81,7 +81,7 @@ namespace pensar_digital
             CHECK_EQ(Object, *o, *o1, "2. o != o1");
 
             DummyPtr d = dummyf.get(42, "d");
-            xml = d->xml_str ();
+            xml = d->xml ();
             expected = "<object class_name = \"pensar_digital::cpplib::Dummy\" id = \"42\"><name>d</name></object>";
             CHECK_EQ(String, xml, expected, "2. xml should be equal to " + expected + " but was " + xml + ".");
 
