@@ -16,10 +16,12 @@
 namespace pensar_digital
 {
     namespace cpplib
+\
     {
         class IDummy;
         class IDummy_RO;
         typedef std::shared_ptr<IDummy_RO> IDummy_RO_Ptr;
+        typedef std::shared_ptr<IDummy> IDummyPtr;
 
         // / \brief Base class for all Dummys. Read only interface of Dummy.
         class IDummy_RO: public virtual IObject_RO
@@ -27,14 +29,22 @@ namespace pensar_digital
         public:
             inline static const structVersion VERSION = structVersion(1, 1, 1);
 
+            virtual String class_name() const = 0;
             virtual String get_name() const noexcept = 0;
+            virtual std::ostream& write(std::ostream& os) const = 0;
+            virtual String xml() const noexcept = 0;
+
         };
 
         class IDummy : public IDummy_RO
         {
         public:
             inline static const structVersion VERSION = structVersion(1, 1, 1);
+            virtual std::istream& read(std::istream& is) = 0;
+			virtual void set_name(const String& name) noexcept = 0;
 
+            // Convertion from xml string.
+            virtual void from_xml(const String& sxml) = 0;
         };
         //extern Factory<IDummy, Id, String> Dummy_factory;
 

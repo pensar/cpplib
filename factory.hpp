@@ -14,9 +14,11 @@ namespace pensar_digital
         class NewFactory
         {
             public:
+                using I = std::conditional<Interfaceable<T>, typename T::I, T>::type; // Interface type
+                typedef typename std::shared_ptr<I> P; // Pointer type.
                 inline static const structVersion VERSION = structVersion(1, 1, 1);
                 virtual ~NewFactory (){}
-                virtual std::shared_ptr<T> get(const Args& ... args) const { return std::make_shared<T> (args ...); }
+                virtual P get(const Args& ... args) const { return std::make_shared<T> (args ...); }
 
             private:
         };
@@ -25,10 +27,11 @@ namespace pensar_digital
         class MockupFactory: public NewFactory <T, Args...>
         {
             public:
+                using P = NewFactory<T, Args...>::P;
                 inline static const structVersion VERSION = structVersion(1, 1, 1);
                 MockupFactory(T* amockup_pointer) : mockup_pointer(amockup_pointer) { };
                 virtual ~MockupFactory() {}
-                virtual std::shared_ptr<T>  get(const Args& ... args) const { std::shared_ptr<T> ptr(mockup_pointer); return ptr; }
+                virtual P get(const Args& ... args) const { std::shared_ptr<T> ptr(mockup_pointer); return ptr; }
 
             private:
                 T* mockup_pointer;
@@ -38,6 +41,7 @@ namespace pensar_digital
         class PoolFactory : public NewFactory <T, Args...>
         {
             private:
+                using P = NewFactory<T, Args...>::P;
                 /// <summary>
                 /// Creates a pool of objects of type T containing pool_size objects created with the arguments args.
                 /// </summary>
@@ -75,7 +79,7 @@ namespace pensar_digital
             
             virtual ~PoolFactory() {}
 
-            virtual std::shared_ptr<T>  get(const Args& ... args) 
+            virtual P get(const Args& ... args) 
             { 
                 // Iterate through the pool to find an available object.
                 for (auto& ptr : pool)
@@ -117,11 +121,13 @@ namespace pensar_digital
         template <class T, typename... Args>
         class SingletonFactory : public NewFactory <T, Args...>
 		{
+            private:
+                using P = NewFactory<T, Args...>::P;
             public:
-                inline static const structVersion VERSION = structVersion(1, 1, 1);
+            inline static const structVersion VERSION = structVersion(1, 1, 1);
                 SingletonFactory (const Args& ... args) : singleton (std::make_shared<T>(args ...)) { };
 				virtual ~SingletonFactory () {}
-                virtual std::shared_ptr<T>  get (const Args& ... args) const { return singleton; }
+                virtual P get (const Args& ... args) const { return singleton; }
             private:
 				std::shared_ptr<T> singleton;
         };
@@ -130,6 +136,9 @@ namespace pensar_digital
 		template <class T, typename... Args>
 		class Factory
 		{
+            private:
+                using P = NewFactory<T, Args...>::P;
+
 			public:
 				inline static const structVersion VERSION = structVersion(1, 1, 1);
                 
@@ -140,8 +149,7 @@ namespace pensar_digital
 
                 virtual ~Factory() { }
 				
-                virtual std::shared_ptr<T>  get (const Args& ... args) { return ptr->get(args ...); }
-
+                virtual P get (const Args& ... args) { return ptr->get(args ...); }
                 NewFactory<T, Args...>& get_factory () const { return *ptr.get(); }
                                 
 				void set_factory (const NewFactory<T, Args...>* afactory) {ptr = afactory; }

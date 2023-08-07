@@ -24,7 +24,7 @@ typedef std::shared_ptr<Dummy> DummyPtr;
         /// <summary>
         /// Dummy class is streamable and comparable.
         /// </summary>
-        class Dummy : public IDummy, protected Object   
+        class Dummy : public IDummy, public Object   
         {
         public:
             inline static const structVersion VERSION = structVersion(1, 1, 1);
@@ -41,6 +41,7 @@ typedef std::shared_ptr<Dummy> DummyPtr;
             virtual ~Dummy() {}
             virtual Dummy& assign(const Dummy& d) noexcept { Object::assign(d); name = d.name; return *this; }
 
+            virtual String class_name() const noexcept { return Object::class_name (); }
 
             // Implements initialize method from Initializable concept.
             virtual bool initialize(const Id& aid = NULL_ID, const String& aname = "") noexcept
@@ -50,7 +51,7 @@ typedef std::shared_ptr<Dummy> DummyPtr;
                 return true;
             }
 
-            DummyPtr clone() const  noexcept { return pd::clone<Dummy>(*this, get_id (), name); }
+            IDummyPtr clone() const  noexcept { return pd::clone<Dummy>(*this, get_id (), name); }
 
             // Conversion to json string.
             virtual String json() const noexcept
@@ -101,7 +102,7 @@ typedef std::shared_ptr<Dummy> DummyPtr;
 				return Object::debug_string() + " name = " + name;
             }
 
-            friend void to_json(Json& j, const Dummy& d);
+            friend void to_json(Json& j, const IDummy& d);
             friend void from_json(const Json& j, Dummy& d);
         protected:
             virtual bool _equals(const Object& o) const { return Object::_equals(o); }
@@ -112,8 +113,8 @@ typedef std::shared_ptr<Dummy> DummyPtr;
         extern void to_json(Json& j, const Dummy& o);
         extern void from_json(const Json& j, Dummy& o);
 
-        extern std::istream& operator >> (std::istream& is, Dummy& o);
-        extern std::ostream& operator << (std::ostream& os, const Dummy& o);
+        extern std::istream& operator >> (std::istream& is, IDummy& o);
+        extern std::ostream& operator << (std::ostream& os, const IDummy& o);
 
     }  // namespace cpplib
 }      // namespace pensar_digital

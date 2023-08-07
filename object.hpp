@@ -25,6 +25,9 @@ namespace pensar_digital
 {
     namespace cpplib
     {
+        template <class T>
+        static String class_name() { String c = typeid(T).name(); c.erase(0, sizeof("class ") - 1); return c; }
+
         namespace pd = pensar_digital::cpplib;
         using Json = nlohmann::json;
         class Object;
@@ -55,7 +58,7 @@ namespace pensar_digital
             public:
                 inline static const structVersion VERSION = structVersion (1, 1, 1);
                 
-                typedef IObject I;	     // Interface type.
+                typedef IObject    I;	 // Interface type.
                 typedef IObject_RO I_RO; // Read only interface type.
 
                 // Constructors. 
@@ -71,10 +74,12 @@ namespace pensar_digital
 
                 /// Move constructor
                 Object(Object&& o) noexcept { assign(o); }
+
                 virtual String class_name() const { String c = typeid(*this).name(); c.erase(0, sizeof("class ") - 1); return c; }
                 
+
                 // Clone method. 
-                ObjectPtr clone() const noexcept { return pd::clone<Object>(*this, id); }
+                IObjectPtr clone() const noexcept { return pd::clone<Object>(*this, id); }
                 
                 /// Check if passed object equals self.
                 /// Derived classes must implement the _equals method. The hash compare logic is made on equals.
@@ -200,8 +205,8 @@ namespace pensar_digital
             extern void to_json(Json& j, const Object& o);
             extern void from_json(const Json& j, Object& o);
 
-            extern std::istream& operator >> (std::istream& is, Object& o);
-            extern std::ostream& operator << (std::ostream& os, const Object& o);
+            extern std::istream& operator >> (std::istream& is, IObject& o);
+            extern std::ostream& operator << (std::ostream& os, const IObject& o);
 
             // Dependency class is a Constrainable class used to define dependencies between objects.
             template <Versionable MainClass, Versionable RequiredClass>

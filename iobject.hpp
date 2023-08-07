@@ -19,6 +19,7 @@ namespace pensar_digital
         class IObject;
         class IObject_RO;
         typedef std::shared_ptr<IObject_RO> IObject_RO_Ptr;
+        typedef std::shared_ptr<IObject> IObjectPtr;
 
         // / \brief Base class for all objects. Read only interface of Object.
         class IObject_RO

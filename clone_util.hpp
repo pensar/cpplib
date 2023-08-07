@@ -6,7 +6,7 @@ namespace pensar_digital
 	namespace cpplib
 	{
         template<class T, typename... Args> //requires FactoryCloneable<T, Args...>
-        static std::shared_ptr<T> clone(const T& other, const Args& ... args)
+        static NewFactory<T, Args...>::P clone(const T& other, const Args& ... args)
         {
             NewFactory<T, Args...> factory;
             return factory.get(args...);

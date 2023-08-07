@@ -5,8 +5,8 @@ namespace pensar_digital
 	namespace cpplib
 	{
         
-        std::istream& operator >> (std::istream& is, Object& o) { return o.read(is); };
-        std::ostream& operator << (std::ostream& os, const Object& o) { return o.write(os); };
+        std::istream& operator >> (std::istream& is, IObject& o) { return o.read(is); };
+        std::ostream& operator << (std::ostream& os, const IObject& o) { return o.write(os); };
         
         void to_json(Json& j, const Object& o)
         {
