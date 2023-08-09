@@ -308,7 +308,7 @@ namespace pensar_digital
 		};	// class StringConstraint
 
 		// Range constraint.
-		template <typename T>	
+		template <RangeCheckable T>	
 		class RangeConstraint : public Constraint <RangeConstraint<T>>
 		{
 			private:

@@ -34,6 +34,16 @@ namespace pensar_digital
             CHECK( sc3.ok ("bola" ), "10");
             CHECK( sc3.ok ("123"  ), "11"); 
             CHECK(!sc3.ok ("123bola" ), "12");
-        TEST_END (Constraint)
+        TEST_END (Constraint);
+
+        TEST(RangeConstraint, true)
+			RangeConstraint<int> rc (0, 10);
+			CHECK( rc.ok (0  ), "0");
+			CHECK( rc.ok (10 ), "1");
+			CHECK( rc.ok (5  ), "2");
+			CHECK(!rc.ok (-1 ), "3");
+			CHECK(!rc.ok (11 ), "4");
+            CHECK(!rc.ok (100), "5");
+		TEST_END (RangeConstraint);
     }
 }

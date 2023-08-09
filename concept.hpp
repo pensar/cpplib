@@ -24,6 +24,14 @@ namespace pensar_digital
 		{
 			{t.ok(args ...)} -> std::convertible_to<bool>;
 		};
+
+		// RangeCheckable concept. Requires Checkable and operators >= and <=.
+		template <typename T>
+		concept RangeCheckable = requires (T t)
+		{
+			{t >= t} -> std::convertible_to<bool>;
+			{t <= t} -> std::convertible_to<bool>;
+		};
 		
 		// DefaultConstructible concept. Requires a default constructor.
 		template <typename T>
