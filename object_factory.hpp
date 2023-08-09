@@ -17,22 +17,23 @@ namespace pensar_digital
 				inline static const structVersion VERSION = structVersion(1, 1, 1);
 				ObjectFactory(const Id& aid = NULL_ID) : Factory<Object, Id> (3, 10, aid) { };
 				virtual ~ObjectFactory() { };
-				virtual IObjectPtr  get(const Id& aid = NULL_ID)
+				using P = Factory<Object, Id>::P;
+				virtual P  get(const Id& aid = NULL_ID)
 				{
 					return Factory<Object, Id>::get(aid);
 				};
 
-				IObjectPtr clone (const IObject_RO& aobj)
+				P clone (const IObjectRO& aobj)
 				{
 					return get (aobj.get_id());
 				};
 
-				IObjectPtr clone (const IObjectPtr& ptr)
+				P clone (const IObjectPtr& ptr)
 				{
 					return clone (*ptr);
 				};
 
-				IObjectPtr parse_json(const String& sjson)
+				P parse_json(const String& sjson)
 				{
 					auto j = Json::parse(sjson);
 					String json_class = j.at("class");

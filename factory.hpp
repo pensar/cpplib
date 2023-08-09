@@ -136,11 +136,9 @@ namespace pensar_digital
 		template <class T, typename... Args>
 		class Factory
 		{
-            private:
-                using P = NewFactory<T, Args...>::P;
-
 			public:
-				inline static const structVersion VERSION = structVersion(1, 1, 1);
+                using P = NewFactory<T, Args...>::P;
+                inline static const structVersion VERSION = structVersion(1, 1, 1);
                 
                 Factory (const size_t pool_size, const size_t refill_size, const Args& ... args) 
                 { 

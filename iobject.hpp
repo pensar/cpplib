@@ -17,12 +17,12 @@ namespace pensar_digital
     namespace cpplib
     {
         class IObject;
-        class IObject_RO;
-        typedef std::shared_ptr<IObject_RO> IObject_RO_Ptr;
+        class IObjectRO;
+        typedef std::shared_ptr<IObjectRO> IObjectROPtr;
         typedef std::shared_ptr<IObject> IObjectPtr;
 
         // / \brief Base class for all objects. Read only interface of Object.
-        class IObject_RO
+        class IObjectRO
         {
             public:
                 inline static const structVersion VERSION = structVersion(1, 1, 1);
@@ -36,7 +36,7 @@ namespace pensar_digital
                 /// _equals is called from template method equals and should only implement the specific comparison.
                 /// \see _equals
                 /// \return true if objects have the same id, false otherwise.
-                virtual bool equals(const IObject_RO& o) const noexcept = 0;
+                virtual bool equals(const IObjectRO& o) const noexcept = 0;
 
                 /// Access object id
                 /// \return The current value of id
@@ -61,15 +61,15 @@ namespace pensar_digital
                 virtual String xml() const noexcept = 0;
 
                 // Comparison operators.
-                virtual bool operator == (const IObject_RO& o) const = 0;
-                virtual bool operator != (const IObject_RO& o) const = 0;
+                virtual bool operator == (const IObjectRO& o) const = 0;
+                virtual bool operator != (const IObjectRO& o) const = 0;
 
                 /// Implicit conversion to string.
                 /// \return A string with the object id.
                 virtual operator String () const noexcept = 0;   
         };
 
-        class IObject : public virtual IObject_RO
+        class IObject : public virtual IObjectRO
         {
             public:
                 inline static const structVersion VERSION = structVersion(1, 1, 1);
@@ -90,12 +90,12 @@ namespace pensar_digital
                 /// Move assignment operator
                 virtual IObject& operator = (IObject&& o) noexcept = 0;
 
-                virtual IObject& assign (const IObject_RO& o) noexcept = 0;
+                virtual IObject& assign (const IObjectRO& o) noexcept = 0;
 
                 /// \brief Assignment operator.
                 /// \param o Object to assign from
                 /// \return A reference to this
-                virtual IObject& operator=(const IObject_RO& o) = 0;
+                virtual IObject& operator=(const IObjectRO& o) = 0;
         };
         //extern Factory<IObject, Id> object_factory;
 

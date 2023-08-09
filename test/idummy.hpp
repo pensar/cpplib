@@ -24,7 +24,7 @@ namespace pensar_digital
         typedef std::shared_ptr<IDummy> IDummyPtr;
 
         // / \brief Base class for all Dummys. Read only interface of Dummy.
-        class IDummy_RO: public virtual IObject_RO
+        class IDummy_RO: public virtual IObjectRO
         {
         public:
             inline static const structVersion VERSION = structVersion(1, 1, 1);

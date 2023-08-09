@@ -53,13 +53,13 @@ namespace pensar_digital
                 /// \return true if they are equal, false otherwise.
                 /// \see equals
                 ///
-                virtual bool _equals(const IObject_RO& o) const { return (id == o.get_id ()); }
+                virtual bool _equals(const IObjectRO& o) const { return (id == o.get_id ()); }
 
             public:
                 inline static const structVersion VERSION = structVersion (1, 1, 1);
                 
                 typedef IObject    I;	 // Interface type.
-                typedef IObject_RO I_RO; // Read only interface type.
+                typedef IObjectRO IRO; // Read only interface type.
 
                 // Constructors. 
                 
@@ -86,7 +86,7 @@ namespace pensar_digital
                 /// _equals is called from template method equals and should only implement the specific comparison.
                 /// \see _equals
                 /// \return true if objects have the same id, false otherwise.
-                bool equals(const IObject_RO& o) const noexcept { return (get_hash() != o.get_hash() ? false : _equals(o)); }
+                bool equals(const IObjectRO& o) const noexcept { return (get_hash() != o.get_hash() ? false : _equals(o)); }
 
                 /// Access object id
                 /// \return The current value of id
@@ -166,8 +166,8 @@ namespace pensar_digital
                     parse_object_tag(sxml);
                 }
 
-                bool operator == (const IObject_RO& o) const { return   equals(o); }
-                bool operator != (const IObject_RO& o) const { return !equals(o); }
+                bool operator == (const IObjectRO& o) const { return   equals(o); }
+                bool operator != (const IObjectRO& o) const { return !equals(o); }
 
                 /// Move assignment operator
                 Object& operator=(IObject&& o) noexcept { return assign(o); }
@@ -193,12 +193,12 @@ namespace pensar_digital
                 /** Default destructor */
                 virtual ~Object() {}
 
-                Object& assign(const IObject_RO& o) noexcept { id = o.get_id(); return *this; }
+                Object& assign(const IObjectRO& o) noexcept { id = o.get_id(); return *this; }
 
                 /// Assignment operator
                 /// \param o Object to assign from
                 /// \return A reference to this
-                Object& operator=(const IObject_RO& o) { return assign(o); }
+                Object& operator=(const IObjectRO& o) { return assign(o); }
 
                 friend void from_json(const Json& j, Object& o);
             };

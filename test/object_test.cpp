@@ -86,7 +86,6 @@ namespace pensar_digital
             CHECK(*d != *d1, "3. d == d1");
             d1->from_xml(xml);
             CHECK(*d == *d1, "4. d != d1");
-        TEST_END(ObjectXMLConversion)
-        
+            TEST_END(ObjectXMLConversion)         
     }
 }

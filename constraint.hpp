@@ -7,6 +7,7 @@
 #include "object.hpp"
 #include "version.hpp"
 #include "constant.hpp"
+#include "iconstraint.hpp"
 
 #include <cstdarg>
 #include <regex> // std::regex, std::regex_match
@@ -166,16 +167,19 @@ namespace pensar_digital
 
 			public:
 				inline static const structVersion VERSION = structVersion(1, 1, 1);
+				//typedef IConstraint<Constraint>     I; // Interface type.
+				//typedef IConstraintRO<Constraint> IRO; // Read only interface type.
+
 				/// Default constructor
 				Constraint(const Id aid = NULL_ID, const String& aname = "") : Object(aid), name(aname) {}
 			
-				virtual ~Constraint() {}
+				virtual ~Constraint () {}
 
 				/// Returns the name of the constraint
-				inline const String& get_name() const { return name; }
+				inline const String& get_name () const noexcept { return name; }
 
 				/// Sets the name of the constraint
-				inline void set_name(const String& aname) { name = aname; }
+				inline void set_name (const String& aname) { name = aname; }
 
 				// Implements initialize method from Initializable concept.
 				virtual bool initialize(const Id& aid = NULL_ID, const String& aname = "") noexcept
@@ -187,6 +191,7 @@ namespace pensar_digital
 
 				template <typename... Args> bool ok (Args&& ... args) const noexcept
 				{
+					static_assert (Checkable<D, Args>);
 					return static_cast<D*>(this)->::ok (std::forward<Args>(args)...);
 				};
 
@@ -300,7 +305,32 @@ namespace pensar_digital
 					return std::regex_search (s, regex);
 				};
 
-		};	// class StringConstraint``m@e@maMriciGomes
+		};	// class StringConstraint
+
+		// Range constraint.
+		template <typename T>	
+		class RangeConstraint : public Constraint <RangeConstraint<T>>
+		{
+			private:
+				typedef Constraint<RangeConstraint<T>> Base;
+				const T min;
+				const T max;
+
+			public:
+				inline static const structVersion VERSION = structVersion(1, 1, 1);
+
+				/// Default constructor
+				RangeConstraint (const T& amin, const T& amax, const Id aid = NULL_ID, const String& aname = "") 
+					: Base(aid, aname), min (amin), max (amax) { }
+
+				virtual ~RangeConstraint() {}
+
+				bool ok(const T& t = 0) const noexcept
+				{
+					return (t >= min) && (t <= max);
+				};
+
+		};	// class RangeConstraint
 	}	// namespace cpplib
 }	// namespace pensar_digital
 

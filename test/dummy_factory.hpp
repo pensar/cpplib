@@ -17,18 +17,19 @@ namespace pensar_digital
 			inline static const structVersion VERSION = structVersion(1, 1, 1);
 			DummyFactory(const Id& aid = NULL_ID, const String& aname = "") : Factory<Dummy, Id, String>(3, 10, aid, aname) { };
 			virtual ~DummyFactory() { };
-			virtual IDummyPtr get(const Id& aid = NULL_ID, const String& aname = "")
+			using P = Factory<Dummy, Id, String>::P;
+			virtual P get(const Id& aid = NULL_ID, const String& aname = "")
 			{
 				return Factory<Dummy, Id, String>::get(aid, aname);
 			};
 
-			IDummyPtr clone (const IDummy_RO& adummy)
+			P clone (const IDummy_RO& adummy)
 			{
 				return get (adummy.get_id (), adummy.get_name ());
 			};
-			IDummyPtr clone(const IDummyPtr& ptr) { return clone (*ptr);}
+			P clone(const IDummyPtr& ptr) { return clone (*ptr);}
 
-			IDummyPtr parse_json (const String& sjson)
+			P parse_json (const String& sjson)
 			{
 				auto j = Json::parse(sjson);
 				String json_class = j.at("class");

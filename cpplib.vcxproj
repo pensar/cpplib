@@ -159,6 +159,7 @@
     <ClCompile Include="string_util.cpp" />
     <ClCompile Include="system.cpp" />
     <ClCompile Include="sys_user_info.cpp" />
+    <ClCompile Include="test\concept_test.cpp" />
     <ClCompile Include="test\constraint_test.cpp" />
     <ClCompile Include="test\dummy.cpp" />
     <ClCompile Include="test\dummy_factory.cpp" />
@@ -180,6 +181,7 @@
     <ClInclude Include="generator.hpp" />
     <ClInclude Include="clone_util.hpp" />
     <ClInclude Include="header_lib\json.hpp" />
+    <ClInclude Include="iconstraint.hpp" />
     <ClInclude Include="iobject.hpp" />
     <ClInclude Include="io_util.hpp" />
     <ClInclude Include="language.hpp" />

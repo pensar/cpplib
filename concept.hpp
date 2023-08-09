@@ -20,7 +20,7 @@ namespace pensar_digital
 		
 		// Checkable concept. Requires a member function ok() returning something convertible to bool.
 		template <typename T, typename... Args>
-		concept Checkable = requires (T t, Args& ... args)
+		concept Checkable = requires (T t, Args&& ... args)
 		{
 			{t.ok(args ...)} -> std::convertible_to<bool>;
 		};
