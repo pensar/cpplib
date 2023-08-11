@@ -29,6 +29,8 @@ namespace pensar_digital
         public:
             inline static const Version VERSION = Version(1, 1, 1);
 
+            virtual ~IDummy_RO() noexcept = default;
+
             virtual String class_name() const = 0;
             virtual String get_name() const noexcept = 0;
             virtual std::ostream& write(std::ostream& os) const = 0;
@@ -40,6 +42,9 @@ namespace pensar_digital
         {
         public:
             inline static const Version VERSION = Version(1, 1, 1);
+
+            virtual ~IDummy() noexcept = default;
+            
             virtual std::istream& read(std::istream& is) = 0;
 			virtual void set_name(const String& name) noexcept = 0;
 

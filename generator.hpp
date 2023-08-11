@@ -5,7 +5,7 @@
 #define GENERATOR_HPP_INCLUDED
 
 #include "object.hpp"
-#include "error.hpp"
+#include "igenerator.hpp"
 
 namespace pensar_digital
 {
@@ -31,27 +31,31 @@ namespace pensar_digital
         public:
             inline static const Version VERSION = Version(1, 1, 1);
 
+            typedef IGenerator<T>     I; // Interface type.
+            typedef IGeneratorRO<T> IRO; // Read only interface type.
+
             /// \brief Constructs a Generator.
             /// \param [in] initial_value Initial value for the generator, defaults to 0.
             /// \param [in] astep Step to be used when incrementing the generator, defaults to 1.
             Generator(Id aid = NULL_ID, Id initial_value = 0, Id step = 1) : Object(aid), fvalue(initial_value), fstep(step) {};
-            virtual ~Generator(){};
+
+            virtual ~Generator () = default;
 
             /// \brief Increments value and return the new value.
             /// \return The new value.
-            const Id get() { fvalue += fstep; return fvalue; }
+            virtual const Id get() { fvalue += fstep; return fvalue; }
 
             /// \brief Gets the next value without incrementing the current one.
             /// \return The next value.
-            const Id get_next() { return (fvalue + fstep); }
+            virtual const Id get_next() { return (fvalue + fstep); }
 
             /// \brief Gets the current value.
             /// \return The current value.
-            const Id get_current () const { return fvalue; }
+            virtual const Id get_current () const { return fvalue; }
 
             /// \brief Set value. Next call to get will get value + 1.
             /// \param val New value to set
-            void set_value(Id val) { fvalue = val; }
+            virtual void set_value(Id val) { fvalue = val; }
 
             // Conversion to json string.
             virtual String json() const noexcept

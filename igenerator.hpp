@@ -30,14 +30,14 @@ namespace pensar_digital
             public:
                 inline static const Version VERSION = Version(1, 1, 1);
 
-            virtual ~Generator() {};
+            virtual ~IGeneratorRO() noexcept = default;
 
             /// \brief Gets the current value.
             /// \return The current value.
-            const Id get_current() const = 0;
+            virtual const Id get_current() const = 0;
 
             // Conversion to json string.
-            virtual String json() const = 0;
+            virtual String json() const noexcept = 0;
 
             virtual std::ostream& write(std::ostream& os) const = 0;
         };
@@ -47,6 +47,8 @@ namespace pensar_digital
         {
 			public:
 				inline static const Version VERSION = Version(1, 1, 1);
+                
+                virtual ~IGenerator() noexcept = default;
 
                 /// \brief Increments value and return the new value.
                 /// \return The new value.
@@ -54,7 +56,13 @@ namespace pensar_digital
 
                 /// \brief Gets the next value without incrementing the current one.
                 /// \return The next value.
-                const Id get_next() const = 0;
+                virtual const Id get_next() const = 0;
+                
+                /// \brief Set value. Next call to get will get value + 1.
+                /// \param val New value to set
+                virtual void set_value(Id val) = 0;
+
+                virtual std::istream& read(std::istream& is) = 0;
         };
     }   // namespace cpplib 
 }   // namespace pensar_digital

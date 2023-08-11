@@ -26,7 +26,9 @@ namespace pensar_digital
         {
             public:
                 inline static const Version VERSION = Version(1, 1, 1);
-        
+
+                virtual ~IObjectRO() noexcept = default;
+
                 /// Debug string.
                 /// \return A string with the object id.
                 virtual String debug_string() const noexcept = 0;
@@ -73,6 +75,8 @@ namespace pensar_digital
         {
             public:
                 inline static const Version VERSION = Version(1, 1, 1);
+
+                virtual ~IObject() noexcept = default;
 
                 // Implements initialize method from Initializable concept.
                 virtual bool initialize(const Id& aid = NULL_ID) noexcept = 0;

@@ -18,6 +18,8 @@ namespace pensar_digital
 			public:
 				inline static const Version VERSION = Version(1, 1, 1);
 
+				~IConstraintRO () noexcept = default;
+
 				/// Returns the name of the constraint
 				virtual const String& get_name() const noexcept = 0;
 		};	
@@ -26,6 +28,8 @@ namespace pensar_digital
 		{
 			public:
 				inline static const Version VERSION = Version(1, 1, 1);
+
+				~IConstraint () noexcept = default;
 
 				/// Returns the name of the constraint
 				virtual const String& get_name() const noexcept = 0;
