@@ -29,71 +29,73 @@ namespace pensar_digital
         #else
             namespace fs = std::experimental::filesystem;
         #endif
-
+        enum IO_MODE { BINARY = true, TEXT = false };
+        
         // Path class represents a path in the file system. It inherits from fs::path adding implicit conversion to std::string.
         class Path : public fs::path
 		{
 			public:
-			Path (const fs::path& p) : fs::path (p) {}
-			Path (const std::string& s) : fs::path (s) {}
-			Path (const char* s) : fs::path (s) {}
+                inline static const Version VERSION = Version(1, 1, 1);
+                Path (const fs::path& p) : fs::path (p) {}
+			    Path (const std::string& s) : fs::path (s) {}
+			    Path (const char* s) : fs::path (s) {}
 
-            // Copy constructor.
-            Path (const Path& p) noexcept : fs::path (p) {}
+                // Copy constructor.
+                Path (const Path& p) noexcept : fs::path (p) {}
 
-            // Move constructor.
-            Path (Path&& p) noexcept : fs::path (p) {}
+                // Move constructor.
+                Path (Path&& p) noexcept : fs::path (p) {}
 
 
-            // Move assignment operator.
-            Path& operator = (Path&& p) noexcept { fs::path::operator = (p); return *this; }
+                // Move assignment operator.
+                Path& operator = (Path&& p) noexcept { fs::path::operator = (p); return *this; }
 
-            // Assignment operator for std::string.
-            Path& operator = (const std::string& s) { fs::path::operator = (s); return *this; }
+                // Assignment operator for std::string.
+                Path& operator = (const std::string& s) { fs::path::operator = (s); return *this; }
             
-            // Assignment operator for const Path&.
-            Path& operator = (const Path& p) { fs::path::operator = (p); return *this; } 
+                // Assignment operator for const Path&.
+                Path& operator = (const Path& p) { fs::path::operator = (p); return *this; } 
             
-            void create_dir_if_does_not_exist () const noexcept
-            {
-                Path dir = *this;
-                if (has_filename())
-                    dir = parent_path();
-                if (! dir.exists ())
+                void create_dir_if_does_not_exist () const noexcept
                 {
-                    fs::create_directories (dir);
+                    Path dir = *this;
+                    if (has_filename())
+                        dir = parent_path();
+                    if (! dir.exists ())
+                    {
+                        fs::create_directories (dir);
+                    }
                 }
-            }
 
-            // Implicit conversion to std::string.
-            operator std::string () const { return fs::path::string (); }
+                // Implicit conversion to std::string.
+                operator std::string () const { return fs::path::string (); }
 
-            // Implicit conversion to const char* returning a value allocated in the heap using _strdup.
-            operator const char* () const { return _strdup (fs::path::string ().c_str ()); }
+                // Implicit conversion to const char* returning a value allocated in the heap using _strdup.
+                operator const char* () const { return _strdup (fs::path::string ().c_str ()); }
 
-            // /= operator for std::string.
-            Path& operator /= (const std::string& s) { fs::path::operator /= (s); return *this; }
+                // /= operator for std::string.
+                Path& operator /= (const std::string& s) { fs::path::operator /= (s); return *this; }
 
-            // /= operator for const Path&.
-            Path& operator /= (const Path& p) { fs::path::operator /= (p); return *this; }
+                // /= operator for const Path&.
+                Path& operator /= (const Path& p) { fs::path::operator /= (p); return *this; }
             
-            // + operator for std::string.s
-            Path operator + (const std::string& s) const { Path p = *this; p /= s; return p; }
+                // + operator for std::string.s
+                Path operator + (const std::string& s) const { Path p = *this; p /= s; return p; }
 
-            // == operator 
-            bool operator == (const Path& apath) const { return apath == fs::path::c_str (); }
+                // == operator 
+                bool operator == (const Path& apath) const { return apath == fs::path::c_str (); }
 
-            // != operator for std::string.
-            bool operator != (const std::string& s) const { return ! (*this == s); }
+                // != operator for std::string.
+                bool operator != (const std::string& s) const { return ! (*this == s); }
 
-            // == operator for const char*.
-            bool operator == (const char* s) const { return *this == std::string (s); }     
+                // == operator for const char*.
+                bool operator == (const char* s) const { return *this == std::string (s); }     
 
-            // != operator for const char*.
-            bool operator != (const char* s) const { return ! (*this == s); }
+                // != operator for const char*.
+                bool operator != (const char* s) const { return ! (*this == s); }
             
 
-            bool exists () const { return fs::exists (*this); }
+                bool exists () const { return fs::exists (*this); }
 		};
 
 
@@ -142,7 +144,7 @@ namespace pensar_digital
 
             public:
 
-            inline static const structVersion VERSION = structVersion(1, 1, 1);
+            inline static const Version VERSION = Version(1, 1, 1);
             const size_t MAX_IN_MEMORY_FILE_SIZE_BYTE = 1024 ^ 3; // 1 GB
             const static std::ios_base::openmode IN_OUT_ATE_MODE     = std::ios::in | std::ios::out | std::ios::ate;
             const static std::ios_base::openmode IN_OUT_ATE_BIN_MODE = IN_OUT_ATE_MODE | std::ios::binary;

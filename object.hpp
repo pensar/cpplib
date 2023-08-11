@@ -9,6 +9,7 @@
 #include "string_util.hpp"
 #include "header_lib/xmlParser.h"
 #include "clone_util.hpp"
+#include "json_util.hpp"  // for read_json and write_json.
 
 #include <fstream>
 #include <sstream>
@@ -29,7 +30,6 @@ namespace pensar_digital
         static String class_name() { String c = typeid(T).name(); c.erase(0, sizeof("class ") - 1); return c; }
 
         namespace pd = pensar_digital::cpplib;
-        using Json = nlohmann::json;
         class Object;
         typedef std::shared_ptr<Object> ObjectPtr;
 
@@ -56,9 +56,9 @@ namespace pensar_digital
                 virtual bool _equals(const IObjectRO& o) const { return (id == o.get_id ()); }
 
             public:
-                inline static const structVersion VERSION = structVersion (1, 1, 1);
+                inline static const Version VERSION = Version (1, 1, 1);
                 
-                typedef IObject    I;	 // Interface type.
+                typedef IObject    I;  // Interface type.
                 typedef IObjectRO IRO; // Read only interface type.
 
                 // Constructors. 
@@ -101,47 +101,15 @@ namespace pensar_digital
                 // Implements initialize method from Initializable concept.
                 virtual bool initialize(const Id& aid = NULL_ID) noexcept { id = aid; return true; }
 
-                template <class T>
-                String json(const T& o) const { Json j = o; return j.dump(); }
-
-                template <class T>
-                std::istream& read(std::istream& is, T& o)
-                {
-                    String sjson;
-                    is >> sjson;
-                    Json j = Json::parse(sjson);
-                    j.get_to(o);
-                    return is;
-                }
-
-                template <class T>
-                std::ostream& write(std::ostream& os, const T& o) const
-                {
-                    return os << o.json();
-                }
-
                 // Conversion to json string.
-                virtual String json() const noexcept
-                {
-                    return json(*this);
-                }
+                virtual String json() const noexcept { return pd::json<Object>(*this); }
 
-                virtual std::istream& read(std::istream& is)
-                {
-                    return read(is, *this);
-                };
+                virtual std::istream& read(std::istream& is);
 
-                virtual std::ostream& write(std::ostream& os) const
-                {
-                    return write(os, *this);
-                };
-
+                virtual std::ostream& write(std::ostream& os) const;
 
                 // Conversion to xml string.
-                virtual String xml() const noexcept
-                {
-                    return ObjXMLPrefix() + "/>";
-                }
+                virtual String xml() const noexcept { return ObjXMLPrefix() + "/>"; }
 
                 XMLNode parse_object_tag(const pensar_digital::cpplib::String& sxml)
                 {
@@ -205,7 +173,7 @@ namespace pensar_digital
             extern void to_json(Json& j, const Object& o);
             extern void from_json(const Json& j, Object& o);
 
-            extern std::istream& operator >> (std::istream& is, IObject& o);
+            extern std::istream& operator >> (std::istream& is, Object& o);
             extern std::ostream& operator << (std::ostream& os, const IObject& o);
 
             // Dependency class is a Constrainable class used to define dependencies between objects.
@@ -217,10 +185,10 @@ namespace pensar_digital
                 VersionInt required_protected_interface_version;
                 VersionInt required_private_interface_version;
             public:
-                Dependency(structVersion v) noexcept
-                    : required_public_interface_version(v.PUBLIC),
-                    required_protected_interface_version(v.PROTECTED),
-                    required_private_interface_version(v.PRIVATE) {}
+                Dependency(Version v) noexcept
+                    : required_public_interface_version(v.get_public ()),
+                    required_protected_interface_version(v.get_protected ()),
+                    required_private_interface_version(v.get_private ()) {}
                 virtual ~Dependency() {}
                 virtual bool ok() const noexcept = 0;
 

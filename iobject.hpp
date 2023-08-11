@@ -25,7 +25,7 @@ namespace pensar_digital
         class IObjectRO
         {
             public:
-                inline static const structVersion VERSION = structVersion(1, 1, 1);
+                inline static const Version VERSION = Version(1, 1, 1);
         
                 /// Debug string.
                 /// \return A string with the object id.
@@ -72,7 +72,7 @@ namespace pensar_digital
         class IObject : public virtual IObjectRO
         {
             public:
-                inline static const structVersion VERSION = structVersion(1, 1, 1);
+                inline static const Version VERSION = Version(1, 1, 1);
 
                 // Implements initialize method from Initializable concept.
                 virtual bool initialize(const Id& aid = NULL_ID) noexcept = 0;

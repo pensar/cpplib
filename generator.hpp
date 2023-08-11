@@ -29,7 +29,7 @@ namespace pensar_digital
       class Generator : public Object
       {
         public:
-            inline static const structVersion VERSION = structVersion(1, 1, 1);
+            inline static const Version VERSION = Version(1, 1, 1);
 
             /// \brief Constructs a Generator.
             /// \param [in] initial_value Initial value for the generator, defaults to 0.
@@ -39,15 +39,15 @@ namespace pensar_digital
 
             /// \brief Increments value and return the new value.
             /// \return The new value.
-            Id get () { fvalue += fstep; return fvalue; }
+            const Id get() { fvalue += fstep; return fvalue; }
 
             /// \brief Gets the next value without incrementing the current one.
             /// \return The next value.
-            Id get_next () const { return (fvalue + fstep); }
+            const Id get_next() { return (fvalue + fstep); }
 
             /// \brief Gets the current value.
             /// \return The current value.
-            Id get_current () const { return fvalue; }
+            const Id get_current () const { return fvalue; }
 
             /// \brief Set value. Next call to get will get value + 1.
             /// \param val New value to set
@@ -56,17 +56,17 @@ namespace pensar_digital
             // Conversion to json string.
             virtual String json() const noexcept
             {
-                return Object::json<Generator>(*this);
+                return pd::json<Generator>(*this);
             }
 
             virtual std::istream& read(std::istream& is)
             {
-                return Object::read<Generator<T>>(is, *this);
+                return read_json<Generator<T>>(is, *this);
             };
 
             virtual std::ostream& write(std::ostream& os) const
             {
-                return Object::write<Generator<T>>(os, *this);
+                return write_json<Generator<T>>(os, *this);
             };
             //friend void to_json(Json& j, const Generator<T>& g);
             //friend void from_json(const Json& j, Generator<T>& d);

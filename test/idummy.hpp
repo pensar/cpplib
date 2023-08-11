@@ -27,7 +27,7 @@ namespace pensar_digital
         class IDummy_RO: public virtual IObjectRO
         {
         public:
-            inline static const structVersion VERSION = structVersion(1, 1, 1);
+            inline static const Version VERSION = Version(1, 1, 1);
 
             virtual String class_name() const = 0;
             virtual String get_name() const noexcept = 0;
@@ -39,7 +39,7 @@ namespace pensar_digital
         class IDummy : public IDummy_RO
         {
         public:
-            inline static const structVersion VERSION = structVersion(1, 1, 1);
+            inline static const Version VERSION = Version(1, 1, 1);
             virtual std::istream& read(std::istream& is) = 0;
 			virtual void set_name(const String& name) noexcept = 0;
 

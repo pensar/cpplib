@@ -27,7 +27,7 @@ typedef std::shared_ptr<Dummy> DummyPtr;
         class Dummy : public IDummy, public Object   
         {
         public:
-            inline static const structVersion VERSION = structVersion(1, 1, 1);
+            inline static const Version VERSION = Version(1, 1, 1);
             typedef IDummy    I;    // Interface type.
             typedef IDummy_RO I_RO; // Read only interface type.
 
@@ -56,17 +56,17 @@ typedef std::shared_ptr<Dummy> DummyPtr;
             // Conversion to json string.
             virtual String json() const noexcept
             {
-                return Object::json<Dummy>(*this);
+                return pd::json<Dummy>(*this);
             }
 
             virtual std::istream& read(std::istream& is)
             {
-                return Object::read<Dummy>(is, *this);
+                return read_json<Dummy>(is, *this);
             };
 
             virtual std::ostream& write(std::ostream& os) const
             {
-                return Object::write<Dummy>(os, *this);
+                return write_json<Dummy>(os, *this);
             };
 
             // Convertion to xml string.

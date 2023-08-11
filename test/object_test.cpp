@@ -35,7 +35,7 @@ namespace pensar_digital
             String expected = "{\"class\":\"pensar_digital::cpplib::Object\",\"id\":42,\"private_interface_version\":1,\"protected_interface_version\":1,\"public_interface_version\":1}";
             CHECK_EQ(String, ss.str(), expected, "0");
 
-            IObjectPtr o2 = objectf.get();
+            ObjectPtr o2 = objectf.get();
             ss >> *o2;
             CHECK(*o == *o2, "0. o == o2 should be true");
 

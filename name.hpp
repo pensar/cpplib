@@ -14,7 +14,7 @@ namespace pensar_digital
         class Name : public virtual Object
         {
             public:
-                inline static const structVersion VERSION = structVersion(1, 1, 1);
+                inline static const Version VERSION = Version(1, 1, 1);
 
                 /** Access name;
                  * \return The current value of name;
@@ -60,17 +60,17 @@ namespace pensar_digital
                 // Conversion to json string.
                 virtual String json() const noexcept
                 {
-                    return Object::json<Name>(*this);
+                    return pd::json<Name>(*this);
                 }
 
                 virtual std::istream& read(std::istream& is)
                 {
-                    return Object::read<Name>(is, *this);
+                    return read_json<Name>(is, *this);
                 };
 
                 virtual std::ostream& write(std::ostream& os) const
                 {
-                    return Object::write<Name>(os, *this);
+                    return write_json<Name>(os, *this);
                 };
 
                 friend void to_json(Json& j, const Name& n);

@@ -1,3 +1,6 @@
+// author : Mauricio Gomes
+// license: MIT (https://opensource.org/licenses/MIT)
+
 #include "object.hpp"
 
 namespace pensar_digital
@@ -5,16 +8,48 @@ namespace pensar_digital
 	namespace cpplib
 	{
         
-        std::istream& operator >> (std::istream& is, IObject& o) { return o.read(is); };
+        std::istream& operator >> (std::istream& is, Object& o) { return o.read(is); };
         std::ostream& operator << (std::ostream& os, const IObject& o) { return o.write(os); };
         
+        // implements input stream member virtual std::istream& Object::read(std::istream& is)
+        std::istream& Object::read(std::istream& is)
+        {
+			// Check if os is in binary mode.
+            if (is.flags() & std::ios::binary)
+            {
+				String stream_class_name;
+				Version stream_version;
+				Id stream_id;
+				return is >> stream_class_name >> stream_version >> stream_id;
+			}
+            else
+            {
+				return read_json<Object>(is, *this);
+			}
+		};
+
+        std::ostream& Object::write(std::ostream& os) const
+        {
+            // Check if os is in binary mode.
+            if (os.flags() & std::ios::binary)
+            {
+                os << class_name() << VERSION << id;
+            }
+            else
+            {
+                // Write object as json string.
+                os << json();
+            }
+            return os;
+        };
+
         void to_json(Json& j, const Object& o)
         {
             j["class"                      ] = o.class_name();
             j["id"                         ] = o.get_id();
-            j["public_interface_version"   ] = o.VERSION.PUBLIC;
-            j["protected_interface_version"] = o.VERSION.PROTECTED;
-            j["private_interface_version"  ] = o.VERSION.PRIVATE;
+            j["public_interface_version"   ] = o.VERSION.get_public    ();
+            j["protected_interface_version"] = o.VERSION.get_protected ();
+            j["private_interface_version"  ] = o.VERSION.get_private   ();
         };
 
         void from_json(const Json& j, Object& o)

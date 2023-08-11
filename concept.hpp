@@ -48,6 +48,13 @@ namespace pensar_digital
 			{t.initialize(std::forward<Args>(args) ...)} noexcept -> std::convertible_to<bool>;
 		};
 
+		// Jsonable concept. Requires a member function json() returning something convertible to String.
+		template <typename T>
+		concept Jsonable = requires (T t)
+		{
+			{t.json()} noexcept -> std::convertible_to<String>;
+		};
+
 		// FactoryConstructible concept. Requires Initializable and a static factory method named get returning something convertible to T&.
 		template <typename T, typename... Args>
 		concept FactoryConstructible = Initializable<T, Args...>&& requires (Args... args)
@@ -103,11 +110,11 @@ namespace pensar_digital
 			{t ^ t} noexcept -> std::convertible_to<bool>;
 		};
 
-		// Versionable concept requires a inline static const structVersion public member named VERSION.
+		// Versionable concept requires a inline static const Version public member named VERSION.
 		template <typename T>	
 		concept Versionable = requires (T t)
 		{
-			{t.VERSION} noexcept -> std::convertible_to<structVersion>;
+			{t.VERSION} noexcept -> std::convertible_to<Version>;
 		};
 
 		// OutputStreamable concept.

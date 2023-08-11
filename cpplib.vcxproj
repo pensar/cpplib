@@ -166,6 +166,7 @@
     <ClCompile Include="test\factory_test.cpp" />
     <ClCompile Include="test\io_util_test.cpp" />
     <ClCompile Include="test\object_test.cpp" />
+    <ClCompile Include="version.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\unit-test\test.hpp" />
@@ -182,8 +183,10 @@
     <ClInclude Include="clone_util.hpp" />
     <ClInclude Include="header_lib\json.hpp" />
     <ClInclude Include="iconstraint.hpp" />
+    <ClInclude Include="igenerator.hpp" />
     <ClInclude Include="iobject.hpp" />
     <ClInclude Include="io_util.hpp" />
+    <ClInclude Include="json_util.hpp" />
     <ClInclude Include="language.hpp" />
     <ClInclude Include="locale.hpp" />
     <ClInclude Include="log.hpp" />

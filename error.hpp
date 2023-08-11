@@ -27,7 +27,7 @@ namespace pensar_digital
         class Error : public Object
         {
             public:
-                inline static const structVersion VERSION = structVersion(1, 1, 1);
+                inline static const Version VERSION = Version(1, 1, 1);
                 Error (const String& error_msg, const Id aid = 0): Object (aid), error_message (error_msg) {}
 
             const String& get_error_message () const { return error_message; } ;
@@ -60,8 +60,8 @@ namespace pensar_digital
         class UnsupportedVersion : public Error
         {
             public:
-                inline static const structVersion VERSION = structVersion(1, 1, 1);
-                UnsupportedVersion (const structVersion v): Error ("Unsupported version number: " + v.to_string ()) {};
+                inline static const Version VERSION = Version(1, 1, 1);
+                UnsupportedVersion (const Version v): Error ("Unsupported version number: " + v.to_string ()) {};
         };
     }
 }

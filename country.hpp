@@ -19,7 +19,7 @@ namespace pensar_digital
         class Country : public Object
         {
         public:
-            inline static const structVersion VERSION = structVersion(1, 1, 1);
+            inline static const Version VERSION = Version(1, 1, 1);
             /// \brief Default constructor.
             Country(Id aid = NULL_ID) : Object(aid == NULL_ID ? generator.get() : aid) {}
             /** Default destructor */

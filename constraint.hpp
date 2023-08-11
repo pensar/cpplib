@@ -27,11 +27,11 @@ namespace pensar_digital
 		class Operand : public Object
 		{
 			public:
-				inline static const structVersion VERSION = structVersion(1, 1, 1);
+				inline static const Version VERSION = Version(1, 1, 1);
 				Operand (const Id aid = NULL_ID) : Object(aid) {}
 				
 				template <typename ... Args>
-				ResultType operator () (L* left, R* right = nullptr, Args& ... args) const
+				ResultType operator () (L* left, R* right = nullptr, Args&& ... args) const
 				{
 					return static_cast<D*>(this)->::operator () (left, right, args ...);
 				};
@@ -45,14 +45,14 @@ namespace pensar_digital
 				typedef UnaryOperand<T, ResultType, D> UnaryOp;
 				typedef Operand <T, T, ResultType, UnaryOp> Base;
 			public:
-				inline static const structVersion VERSION = structVersion(1, 1, 1);
+				inline static const Version VERSION = Version(1, 1, 1);
 
 				UnaryOperand (const Id aid = NULL_ID) : Base(aid) {}
 				
 				virtual ~UnaryOperand() {}
 
 				template <typename ... Args>
-				ResultType operator () (T* ptr, const T* not_used = nullptr, Args& ... args) const
+				ResultType operator () (T* ptr, const T* not_used = nullptr, Args&& ... args) const
 				{
 					return static_cast<D*>(this)->::operator () (ptr, args ...);
 				};
@@ -64,14 +64,14 @@ namespace pensar_digital
 			private:
 				typedef UnaryOperand<T, bool, NotOperand<T>> Base;
 			public:
-				inline static const structVersion VERSION = structVersion(1, 1, 1);
+				inline static const Version VERSION = Version(1, 1, 1);
 				
 				NotOperand (const Id aid = NULL_ID) : Base(aid) {}
 			
 				virtual ~NotOperand() {}
 
 				template <typename ... Args>
-				bool operator () (const T* ptr, Args& ... args) const noexcept
+				bool operator () (const T* ptr, Args&& ... args) const noexcept
 				{
 					return !ptr->ok (args ...);
 				};
@@ -83,12 +83,12 @@ namespace pensar_digital
 			private:
 				typedef Operand<L, R, ResultType, BinaryOperand<L, R, ResultType, D>> Base;
 			public:
-				inline static const structVersion VERSION = structVersion(1, 1, 1);
+				inline static const Version VERSION = Version(1, 1, 1);
 				BinaryOperand (const Id aid = NULL_ID) : Base (aid) {}
 				virtual ~BinaryOperand() {}
 
 				template <typename ... Args>
-				ResultType operator () (const L* left, const R* right = nullptr, Args& ... args) const
+				ResultType operator () (const L* left, const R* right = nullptr, Args&& ... args) const
 				{
 					return static_cast<D*>(this)->operator () (left, right, args ...);
 				};
@@ -101,13 +101,13 @@ namespace pensar_digital
 				typedef BinaryOperand<L, R, bool, AndOperand<L, R>> Base;
 			
 			public:
-				inline static const structVersion VERSION = structVersion(1, 1, 1);
+				inline static const Version VERSION = Version(1, 1, 1);
 				AndOperand (const Id aid = NULL_ID) noexcept : Base (aid) {}
 			
 				virtual ~AndOperand() {}
 
 				template <typename ... Args>
-				bool operator ()  (const L& left, const R& right, Args& ... args) const noexcept 
+				bool operator ()  (const L& left, const R& right, Args&& ... args) const noexcept
 				{ 
 					return (left.ok(args ...) && right.ok(args ...));
 				}
@@ -121,13 +121,13 @@ namespace pensar_digital
 			typedef BinaryOperand<L, R, bool, OrOperand<L, R>> Base;
 
 		public:
-			inline static const structVersion VERSION = structVersion(1, 1, 1);
+			inline static const Version VERSION = Version(1, 1, 1);
 			OrOperand(const Id aid = NULL_ID) noexcept : Base(aid) {}
 
 			virtual ~OrOperand() {}
 
 			template <typename ... Args>
-			bool operator ()  (const L& left = nullptr, const R& right = nullptr, Args& ... args) const noexcept
+			bool operator ()  (const L& left = nullptr, const R& right = nullptr, Args&& ... args) const noexcept
 			{
 				return (left.ok(args ...) || right.ok(args ...));
 			}
@@ -141,13 +141,13 @@ namespace pensar_digital
 			typedef BinaryOperand<L, R, bool, XorOperand<L, R>> Base;
 
 		public:
-			inline static const structVersion VERSION = structVersion(1, 1, 1);
+			inline static const Version VERSION = Version(1, 1, 1);
 			XorOperand(const Id aid = NULL_ID) noexcept : Base(aid) {}
 
 			virtual ~XorOperand() {}
 
 			template <typename ... Args>
-			bool operator ()  (const L& left = nullptr, const R& right = nullptr, Args& ... args) const noexcept
+			bool operator ()  (const L& left = nullptr, const R& right = nullptr, Args&& ... args) const noexcept
 			{
 				return (left.ok(args ...) ^ right.ok(args ...));
 			}
@@ -166,7 +166,7 @@ namespace pensar_digital
 			String name;
 
 			public:
-				inline static const structVersion VERSION = structVersion(1, 1, 1);
+				inline static const Version VERSION = Version(1, 1, 1);
 				//typedef IConstraint<Constraint>     I; // Interface type.
 				//typedef IConstraintRO<Constraint> IRO; // Read only interface type.
 
@@ -241,7 +241,7 @@ namespace pensar_digital
 				const R& right;
 				OpType op;
 			public:
-				inline static const structVersion VERSION = structVersion(1, 1, 1);
+				inline static const Version VERSION = Version(1, 1, 1);
 				
 				CompositeConstraint (const L&    aleft,
 									 const R&  aright,
@@ -254,7 +254,7 @@ namespace pensar_digital
 				virtual ~CompositeConstraint() {}
 
 				template <typename ...Args> 
-				bool ok (Args& ...args) const noexcept				
+				bool ok (Args&& ...args) const noexcept				
 				{ 
 					switch (op.index ())
 {
@@ -292,7 +292,7 @@ namespace pensar_digital
 				const std::regex regex;
 
 			public:
-				inline static const structVersion VERSION = structVersion(1, 1, 1);
+				inline static const Version VERSION = Version(1, 1, 1);
 
 				/// Default constructor
 				StringConstraint (const String& aregex = "", const Id aid = NULL_ID, const String& aname = "") 
@@ -317,11 +317,14 @@ namespace pensar_digital
 				const T max;
 
 			public:
-				inline static const structVersion VERSION = structVersion(1, 1, 1);
+				inline static const Version VERSION = Version(1, 1, 1);
 
 				/// Default constructor
 				RangeConstraint (const T& amin, const T& amax, const Id aid = NULL_ID, const String& aname = "") 
 					: Base(aid, aname), min (amin), max (amax) { }
+
+				RangeConstraint (const T& avalue, const Id aid = NULL_ID, const String& aname = "") 
+					: Base(aid, aname), min (avalue), max (avalue) { }	
 
 				virtual ~RangeConstraint() {}
 
