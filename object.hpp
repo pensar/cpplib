@@ -137,9 +137,6 @@ namespace pensar_digital
                 bool operator == (const IObjectRO& o) const { return   equals(o); }
                 bool operator != (const IObjectRO& o) const { return !equals(o); }
 
-                /// Move assignment operator
-                Object& operator=(IObject&& o) noexcept { return assign(o); }
-
                 /// Conversion to string.
                 /// \return A string with the object id.
                 virtual String to_string() const noexcept { return std::to_string(id); }
@@ -166,7 +163,10 @@ namespace pensar_digital
                 /// Assignment operator
                 /// \param o Object to assign from
                 /// \return A reference to this
-                Object& operator=(const IObjectRO& o) { return assign(o); }
+                Object& operator=(const IObjectRO& o) noexcept { return assign(o); }
+
+                /// Move assignment operator
+                Object& operator=(IObjectRO&& o) noexcept { return assign(o); }
 
                 friend void from_json(const Json& j, Object& o);
             };

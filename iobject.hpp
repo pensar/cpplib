@@ -91,15 +91,15 @@ namespace pensar_digital
                 // Conversion from xml string.
                 virtual void from_xml(const String & sxml) = 0;
 
-                /// Move assignment operator
-                virtual IObject& operator = (IObject&& o) noexcept = 0;
-
                 virtual IObject& assign (const IObjectRO& o) noexcept = 0;
 
                 /// \brief Assignment operator.
                 /// \param o Object to assign from
                 /// \return A reference to this
-                virtual IObject& operator=(const IObjectRO& o) = 0;
+                virtual IObject& operator=(const IObjectRO& o) noexcept = 0;
+
+                /// Move assignment operator
+                virtual IObject& operator = (IObjectRO&& o) noexcept = 0;
         };
         //extern Factory<IObject, Id> object_factory;
 
