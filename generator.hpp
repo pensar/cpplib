@@ -11,6 +11,35 @@ namespace pensar_digital
 {
     namespace cpplib
     {
+        template <class T> class Generator;
+        
+        /// Makes Generator Streamable.
+        template <class T> std::ostream& operator << (std::ostream& os, const IGenerator<T>& g) { return g.write(os); }
+        template <class T> std::istream& operator >> (std::istream& is, IGenerator<T>& g) { return g.read(is); }
+
+        template <class T>
+        void to_json(Json& j, const IGenerator<T>& g)
+        {
+            j["class"     ] = g.class_name();
+            j["id"        ] = g.get_id();
+            j["mprivate"  ] = g.VERSION.get_private();
+            j["mprotected"] = g.VERSION.get_protected();
+            j["mpublic"   ] = g.VERSION.get_public();
+        }
+
+        template <class T>
+        void from_json(const Json& j, Generator<T>& g)
+        {
+            String class_name = g.class_name();
+            String json_class = j.at("class");
+            if (class_name == json_class)
+            {
+                g.Object::set_id(j.at("id"));
+                //g.name = j.at("name");
+            }
+            else throw new std::runtime_error("Object expected class = " + class_name + " but json has " + json_class);
+        }
+
       /// Generator is meant to be used as unique identifier generator for other classes.
       ///
       /// Usually this is used as a static member for an entity class in conjunction with the Id mixin class like in the Person class:
@@ -26,7 +55,7 @@ namespace pensar_digital
       ///  };
       /// \endcode
       template <class T>
-      class Generator : public Object
+      class Generator : public Object//, public IGenerator<T>
       {
         public:
             inline static const Version VERSION = Version(1, 1, 1);
@@ -60,7 +89,7 @@ namespace pensar_digital
             // Conversion to json string.
             virtual String json() const noexcept
             {
-                return pd::json<Generator>(*this);
+                return pd::json<Generator<T>>(*this);
             }
 
             virtual std::istream& read(std::istream& is)
@@ -72,32 +101,15 @@ namespace pensar_digital
             {
                 return write_json<Generator<T>>(os, *this);
             };
-            //friend void to_json(Json& j, const Generator<T>& g);
-            //friend void from_json(const Json& j, Generator<T>& d);
+            
+            friend void from_json<T>(const Json& j, Generator<T>& g);
 
         private:
             Id fvalue; //!< Member variable "id"
             Id fstep;  //!< Step to increment value.
-      };
-      /*
-      template <typename T>
-      void to_json(Json& j, const Generator<T>& g)
-      {
-          j["class"] = g.class_name();
-          j["id"] = g.get_id();
-          j["private_interface_version"] = g.get_private_interface_version();
-          j["protected_interface_version"] = g.get_protected_interface_version();
-          j["public_interface_version"] = g.get_public_interface_version();
-          j["name"] = g.get_name();
-      };
-
-      template <typename T>
-      void from_json(const Json& j, Generator<T>& d)
-      {
-      };
-      */
-    }
-}
+      }; // class Generator
+    } // namespace cpplib
+} // namespace pensar_digital
 /// \example GeneratorTest.cpp
 
 #endif // GENERATOR_HPP_INCLUDED

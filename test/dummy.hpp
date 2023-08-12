@@ -102,7 +102,7 @@ typedef std::shared_ptr<Dummy> DummyPtr;
 				return Object::debug_string() + " name = " + name;
             }
 
-            friend void to_json(Json& j, const IDummy& d);
+            friend void to_json(Json& j, const Dummy& d);
             friend void from_json(const Json& j, Dummy& d);
         protected:
             virtual bool _equals(const Object& o) const { return Object::_equals(o); }

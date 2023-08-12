@@ -145,6 +145,7 @@
     <ClCompile Include="constants.cpp" />
     <ClCompile Include="constraint.cpp" />
     <ClCompile Include="cpp_lib\xmlParser.cpp" />
+    <ClCompile Include="generator.cpp" />
     <ClCompile Include="io_util.cpp" />
     <ClCompile Include="language.cpp" />
     <ClCompile Include="locale.cpp" />
