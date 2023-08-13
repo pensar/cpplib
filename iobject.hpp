@@ -29,6 +29,8 @@ namespace pensar_digital
 
                 virtual ~IObjectRO() noexcept = default;
 
+                virtual String class_name() const = 0;
+                    
                 /// Debug string.
                 /// \return A string with the object id.
                 virtual String debug_string() const noexcept = 0;

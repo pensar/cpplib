@@ -11,7 +11,7 @@ namespace pensar_digital
 {
     namespace cpplib
     {
-        class Name : public virtual Object
+        class Name : public Object
         {
             public:
                 inline static const Version VERSION = Version(1, 1, 1);
@@ -25,7 +25,7 @@ namespace pensar_digital
                 bool operator == (const Name& n) const {return equals (n);}
 
                 /** Default constructor */
-                Name(const Id aid = NULL_ID, const String& aname = ""): Object(aid), name (aname) {}
+                Name (const Id aid = NULL_ID, const String& aname = ""): Object(aid), name (aname) {}
 
                 /** Default destructor */
                 virtual ~Name() {}

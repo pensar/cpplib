@@ -25,7 +25,7 @@ namespace pensar_digital
         ///  };
         /// \endcode
         template <class T>
-        class IGeneratorRO : public virtual IObjectRO
+        class IGeneratorRO //: public virtual IObjectRO
         {
             public:
                 inline static const Version VERSION = Version(1, 1, 1);
@@ -43,7 +43,7 @@ namespace pensar_digital
         };
 
         template <class T>
-        class IGenerator : public virtual IGeneratorRO<T>, public virtual IObject
+        class IGenerator : public virtual IGeneratorRO<T>//, public virtual IObject
         {
 			public:
 				inline static const Version VERSION = Version(1, 1, 1);
@@ -52,11 +52,11 @@ namespace pensar_digital
 
                 /// \brief Increments value and return the new value.
                 /// \return The new value.
-                virtual const Id get() const = 0;
+                virtual const Id get() = 0;
 
                 /// \brief Gets the next value without incrementing the current one.
                 /// \return The next value.
-                virtual const Id get_next() const = 0;
+                virtual const Id get_next() = 0;
                 
                 /// \brief Set value. Next call to get will get value + 1.
                 /// \param val New value to set
@@ -68,4 +68,4 @@ namespace pensar_digital
 }   // namespace pensar_digital
 
 
-#endif // GENERATOR_HPP_INCLUDED
+#endif // IGENERATOR_HPP_INCLUDED
