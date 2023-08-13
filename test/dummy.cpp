@@ -24,7 +24,7 @@ namespace pensar_digital
             String json_class = j.at("class");
             if (class_name == json_class)
             {
-                d.set_id(j.at("id"));
+                d.Object::set_id(j.at("id"));
                 d.name = j.at("name");
             }
             else throw new std::runtime_error("Object expected class = " + class_name + " but json has " + json_class);

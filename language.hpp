@@ -19,7 +19,7 @@ namespace pensar_digital
             public:
                 inline static const Version VERSION = Version(1, 1, 1);
                 /// \brief Default constructor.
-                Language(Id aid = NULL_ID) : Object (aid == NULL_ID ? generator.get() : aid){}
+                Language(Id aid = NULL_ID) : Object(aid) {}// == NULL_ID ? generator.get() : aid){}
                 /** Default destructor */
                 virtual ~Language() {};
                 /** Copy constructor
@@ -33,7 +33,7 @@ namespace pensar_digital
                 Language& operator=(const Language& other);
             protected:
             private:
-                static Generator<Language> generator;
+                //static Generator<Language> generator;
         };
     }
 }

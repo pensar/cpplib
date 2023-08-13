@@ -31,7 +31,6 @@ namespace pensar_digital
 
             virtual ~IDummy_RO() noexcept = default;
 
-            virtual String class_name() const = 0;
             virtual String get_name() const noexcept = 0;
             virtual std::ostream& write(std::ostream& os) const = 0;
             virtual String xml() const noexcept = 0;
