@@ -96,6 +96,9 @@
     <ClCompile Include="generator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="test\stop_watch_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="constant.hpp">
@@ -201,6 +204,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="igenerator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stop_watch.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

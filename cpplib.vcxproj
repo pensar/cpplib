@@ -167,6 +167,7 @@
     <ClCompile Include="test\factory_test.cpp" />
     <ClCompile Include="test\io_util_test.cpp" />
     <ClCompile Include="test\object_test.cpp" />
+    <ClCompile Include="test\stop_watch_test.cpp" />
     <ClCompile Include="version.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -197,6 +198,7 @@
     <ClInclude Include="object.hpp" />
     <ClInclude Include="object_factory.hpp" />
     <ClInclude Include="random_util.hpp" />
+    <ClInclude Include="stop_watch.hpp" />
     <ClInclude Include="string_def.hpp" />
     <ClInclude Include="string_util.hpp" />
     <ClInclude Include="sys_user_info.hpp" />
