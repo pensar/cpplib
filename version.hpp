@@ -37,7 +37,7 @@ namespace pensar_digital
 
                 String to_string() const noexcept
                 {
-                    return pd::to_string<String, false>(mpublic) + "." + pd::to_string<String, false>(mprotected) + "." + pd::to_string<String, false>(mprivate);
+                    return pd::to_string(mpublic) + "." + pd::to_string(mprotected) + "." + pd::to_string(mprivate);
                 }
 
                 bool operator == (const Version& o) const { return (mpublic == o.mpublic && mprotected == o.mprotected && mprivate == o.mprivate); }

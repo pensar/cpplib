@@ -23,6 +23,7 @@
 #include <cassert>
 
 #include "log.hpp"
+#include "string_def.hpp"
 
 namespace pensar_digital
 {
@@ -231,7 +232,7 @@ namespace pensar_digital
 
         /// \copydoc pad_copy(std::basic_string<T>&, const T, const typename std::basic_string<T>::size_type)
         /// \return Padded string.
-        inline std::string pad_copy (const char* s, const char c, const unsigned n, bool where = PAD_RIGHT)
+        inline String pad_copy (const char* s, const char c, const unsigned n, bool where = PAD_RIGHT)
         {
             assert (s != 0);
 
@@ -469,21 +470,51 @@ namespace pensar_digital
             return f;
         }
 
-        template<class String = std::string, bool use_grouping_char = false>
-        String to_string (unsigned number, typename String::value_type grouping_char = ',')
+        template<typename IntType = int, bool use_grouping_char = false>
+        String to_string (IntType number, typename String::value_type grouping_char = ',')
         {
             std::ostringstream ss;
             ss << number;
             String s = ss.str ();
+            if (number < 0)
+                s = "-" + s;
             return use_grouping_char ? insert_grouping_char<String>(s, grouping_char) : s;
         }
 
-        template<class String = std::string, bool use_grouping_char = false>
+        template<bool use_grouping_char = false>
         String to_string (int number, typename String::value_type grouping_char = ',')
         {
-            String s = number >= 0 ? "" : "-";
-            s += to_string<String, use_grouping_char> ((unsigned)abs(number), grouping_char);
-            return s;
+            return to_string <int, use_grouping_char> (number, grouping_char);
+        }
+
+        template<bool use_grouping_char = false>
+        String to_string(long number, typename String::value_type grouping_char = ',')
+        {
+            return to_string <long, use_grouping_char>(number, grouping_char);
+        }
+
+        template<bool use_grouping_char = false>
+        String to_string(long long int number, typename String::value_type grouping_char = ',')
+        {
+            return to_string <long long int, use_grouping_char>(number, grouping_char);
+        }
+
+        template<bool use_grouping_char = false>
+        String to_string(unsigned int number, typename String::value_type grouping_char = ',')
+        {
+            return to_string <unsigned int, use_grouping_char>(number, grouping_char);
+        }
+
+        template<bool use_grouping_char = false>
+        String to_string(unsigned long int number, typename String::value_type grouping_char = ',')
+        {
+            return to_string <unsigned long int, use_grouping_char>(number, grouping_char);
+        }
+
+        template<bool use_grouping_char = false>
+        String to_string(unsigned long long int number, typename String::value_type grouping_char = ',')
+        {
+            return to_string <unsigned long long int, use_grouping_char>(number, grouping_char);
         }
 
         // todo: use use_grouping.
@@ -505,6 +536,11 @@ namespace pensar_digital
             }
             pad<CharT> (decimal_part, '0', num_decimals);
             return s + decimal_part;
+        }
+
+        inline String pad_left0(long long number, const unsigned n = 4)
+        {
+            return pad_copy(to_string<long long>(number).c_str(), '0', n, PAD_LEFT);
         }
 
         /// Remove extension from file name.

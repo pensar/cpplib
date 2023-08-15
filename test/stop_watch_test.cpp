@@ -15,17 +15,17 @@ namespace pensar_digital
     {
         TEST(StopWatch, true)
             StopWatch<> sp;
-            std::this_thread::sleep_for(std::chrono::nanoseconds(1000000));
+            std::this_thread::sleep_for(std::chrono::nanoseconds(10000));
             sp.mark ();
             sp.stop ();
             StopWatch<>::ELAPSED_TYPE elapsed = sp.elapsed ();   
-            CHECK(elapsed >= 1000000, "0.");
-            CHECK(elapsed  < 30000000, "1.");
+            CHECK(elapsed >= 10000, "0.");
+            CHECK(elapsed  < 3000000, "1.");
             StopWatch<>::ELAPSED_TYPE mark_elapsed = sp.elapsed_since_mark ();
             String elapsed_formatted = sp.elapsed_formatted ();
             String elapsed_since_mark_formatted = sp.elapsed_since_mark_formatted ();
             CHECK(mark_elapsed < elapsed, "2. elapsed = " + elapsed_formatted + " elapsed_since_mark = " + elapsed_since_mark_formatted);
-            std::cout << "elapsed = " << elapsed_formatted << " elapsed_since_mark = " << elapsed_since_mark_formatted << std::endl;
+            //std::cout << "elapsed = " << elapsed_formatted << " elapsed_since_mark = " << elapsed_since_mark_formatted << std::endl;
         TEST_END(StopWatch)
     }
 }

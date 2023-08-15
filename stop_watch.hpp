@@ -69,13 +69,12 @@ namespace pensar_digital
 				elapsed -= milliseconds * 1000000;
 				ELAPSED_TYPE microseconds = elapsed / 1000;
 				elapsed -= microseconds * 1000;
-				std::string result;
-				result += std::to_string(hours) + ":";
-				result += std::to_string(minutes) + ":";
-				result += std::to_string(seconds) + ".";
-				result += std::to_string(milliseconds) + ".";
-				result += std::to_string(microseconds) + ".";
-				result += std::to_string(elapsed);
+				String result = pd::pad_left0 (hours, 2) + ":";
+				result += pd::pad_left0 (minutes, 2) + ":";
+				result += pd::pad_left0 (seconds, 2) + ".";
+				result += pd::pad_left0 (milliseconds, 3) + ".";
+				result += pd::pad_left0 (microseconds, 3) + ".";
+				result += pd::pad_left0 (elapsed, 3);
 
 				return result;
 			}
