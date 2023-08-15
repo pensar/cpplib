@@ -129,7 +129,7 @@ namespace pensar_digital
 			Field& operator=(const T& value) { this->value = value; return *this; }
 		};
 
-		class StringField : public Field<String>
+		class StringField : public virtual Field<String>
 		{
 			public:
 				inline static const Version VERSION = Version(1, 1, 1);

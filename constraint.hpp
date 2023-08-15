@@ -24,7 +24,7 @@ namespace pensar_digital
 		inline static const String ONLY_LETTERS_AND_DIGITS_AND_UNDERSCORES_REGEX = "^[a-zA-Z0-9_]*$";
 
 		template <typename L, typename R, typename ResultType, class D>
-		class Operand : public Object
+		class Operand : public virtual Object
 		{
 			public:
 				inline static const Version VERSION = Version(1, 1, 1);
@@ -39,7 +39,7 @@ namespace pensar_digital
 		};
 
 		template <typename T, typename ResultType, class D>
-		class UnaryOperand : public Operand<T, T, ResultType, UnaryOperand<T, ResultType, D>>
+		class UnaryOperand : public virtual Operand<T, T, ResultType, UnaryOperand<T, ResultType, D>>
 		{
 			private:
 				typedef UnaryOperand<T, ResultType, D> UnaryOp;
@@ -59,7 +59,7 @@ namespace pensar_digital
 		};
 		 
 		template <Checkable T>
-		class NotOperand : public UnaryOperand<T, bool, NotOperand<T>>	
+		class NotOperand : public virtual UnaryOperand<T, bool, NotOperand<T>>
 		{
 			private:
 				typedef UnaryOperand<T, bool, NotOperand<T>> Base;
@@ -78,7 +78,7 @@ namespace pensar_digital
 		};
 
 		template <typename L, typename R, typename ResultType, class D>
-		class BinaryOperand : public Operand<L, R, ResultType, BinaryOperand<L, R, ResultType, D>>
+		class BinaryOperand : public virtual Operand<L, R, ResultType, BinaryOperand<L, R, ResultType, D>>
 		{
 			private:
 				typedef Operand<L, R, ResultType, BinaryOperand<L, R, ResultType, D>> Base;
@@ -95,7 +95,7 @@ namespace pensar_digital
 		};
 
 		template <Checkable L, Checkable R>
-		class AndOperand : public BinaryOperand<L, R, bool, AndOperand<L, R>>
+		class AndOperand : public virtual BinaryOperand<L, R, bool, AndOperand<L, R>>
 		{
 			private:
 				typedef BinaryOperand<L, R, bool, AndOperand<L, R>> Base;
@@ -115,7 +115,7 @@ namespace pensar_digital
 
 
 		template <Checkable L, Checkable R>
-		class OrOperand : public BinaryOperand<L, R, bool, OrOperand<L, R>>
+		class OrOperand : public virtual BinaryOperand<L, R, bool, OrOperand<L, R>>
 		{
 		private:
 			typedef BinaryOperand<L, R, bool, OrOperand<L, R>> Base;
@@ -135,7 +135,7 @@ namespace pensar_digital
 
 
 		template <Checkable L, Checkable R>
-		class XorOperand : public BinaryOperand<L, R, bool, XorOperand<L, R>>
+		class XorOperand : public virtual BinaryOperand<L, R, bool, XorOperand<L, R>>
 		{
 		private:
 			typedef BinaryOperand<L, R, bool, XorOperand<L, R>> Base;
@@ -160,7 +160,7 @@ namespace pensar_digital
 		/// \note Base class for all constraints. It must be Constrainable.
 		/// DerivedConstraint is here to simulate a static polymorphism.
 		template <class D>
-		class Constraint : public Object
+		class Constraint : public virtual Object
 		{
 			private:
 			String name;
@@ -225,7 +225,7 @@ namespace pensar_digital
 		/// \date 2016-12-28
 		/// \version 1.0
 		template <Checkable L, Checkable R>
-		class CompositeConstraint : public Constraint <CompositeConstraint<L, R>>
+		class CompositeConstraint : public virtual Constraint <CompositeConstraint<L, R>>
 		{
 			public:
 				typedef std::variant <AndOperand <L, R>, OrOperand <L, R>, XorOperand <L, R>> OpType;
@@ -285,7 +285,7 @@ namespace pensar_digital
 		}
 
 		// String constraint.
-		class StringConstraint : public Constraint <StringConstraint>
+		class StringConstraint : public virtual Constraint <StringConstraint>
 		{
 			private:
 				typedef Constraint<StringConstraint> Base;
@@ -309,7 +309,7 @@ namespace pensar_digital
 
 		// Range constraint.
 		template <RangeCheckable T>	
-		class RangeConstraint : public Constraint <RangeConstraint<T>>
+		class RangeConstraint : public virtual Constraint <RangeConstraint<T>>
 		{
 			private:
 				typedef Constraint<RangeConstraint<T>> Base;

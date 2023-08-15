@@ -24,12 +24,12 @@ typedef std::shared_ptr<Dummy> DummyPtr;
         /// <summary>
         /// Dummy class is streamable and comparable.
         /// </summary>
-        class Dummy : public IDummy, public Object   
+        class Dummy : public virtual IDummy, public virtual Object   
         {
         public:
             inline static const Version VERSION = Version(1, 1, 1);
             typedef IDummy    I;    // Interface type.
-            typedef IDummy_RO I_RO; // Read only interface type.
+            typedef IDummy_RO IRO; // Read only interface type.
 
             Dummy(const Id& id = NULL_ID, const String& aname = "") : Object(id), name(aname) {}
             Dummy(const Dummy& d) : Object(d) { name = d.name; }
@@ -113,7 +113,7 @@ typedef std::shared_ptr<Dummy> DummyPtr;
         extern void to_json(Json& j, const Dummy& o);
         extern void from_json(const Json& j, Dummy& o);
 
-        extern std::istream& operator >> (std::istream& is, IDummy& o);
+        extern std::istream& operator >> (std::istream& is, Dummy& o);
         extern std::ostream& operator << (std::ostream& os, const IDummy& o);
 
     }  // namespace cpplib

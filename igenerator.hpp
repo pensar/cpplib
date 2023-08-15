@@ -25,7 +25,7 @@ namespace pensar_digital
         ///  };
         /// \endcode
         template <class T>
-        class IGeneratorRO //: public virtual IObjectRO
+        class IGeneratorRO : public virtual IObjectRO
         {
             public:
                 inline static const Version VERSION = Version(1, 1, 1);
@@ -43,7 +43,7 @@ namespace pensar_digital
         };
 
         template <class T>
-        class IGenerator : public virtual IGeneratorRO<T>//, public virtual IObject
+        class IGenerator : public virtual IGeneratorRO<T>, public virtual IObject
         {
 			public:
 				inline static const Version VERSION = Version(1, 1, 1);

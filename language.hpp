@@ -14,7 +14,7 @@ namespace pensar_digital
         /// See https://iso639-3.sil.org/code_tables/download_tables for more information and 
         /// download files.
         /// </summary>
-        class Language : public Object
+        class Language : public virtual Object
         {
             public:
                 inline static const Version VERSION = Version(1, 1, 1);

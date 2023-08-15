@@ -55,7 +55,7 @@ namespace pensar_digital
       ///  };
       /// \endcode
       template <class T>
-      class Generator : public Object, public IGenerator<T>
+      class Generator : public virtual Object//, public virtual IGenerator<T>
       {
         public:
             inline static const Version VERSION = Version(1, 1, 1);

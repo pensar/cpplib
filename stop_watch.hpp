@@ -14,7 +14,7 @@ namespace pensar_digital
 
     // StopWatch: measures time intervals in nanoseconds by default (but it is configurable) using std::chrono.
 	template <typename Resolution = std::chrono::nanoseconds>
-    class StopWatch : public Object
+    class StopWatch : public virtual Object
     {
 		private:
 			typedef std::chrono::time_point<std::chrono::steady_clock> TimePoint;

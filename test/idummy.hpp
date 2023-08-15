@@ -16,7 +16,6 @@
 namespace pensar_digital
 {
     namespace cpplib
-\
     {
         class IDummy;
         class IDummy_RO;
@@ -37,7 +36,7 @@ namespace pensar_digital
 
         };
 
-        class IDummy : public IDummy_RO
+        class IDummy : public virtual IDummy_RO// public virtual IObject
         {
         public:
             inline static const Version VERSION = Version(1, 1, 1);

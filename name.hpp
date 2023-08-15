@@ -11,7 +11,7 @@ namespace pensar_digital
 {
     namespace cpplib
     {
-        class Name : public Object
+        class Name : public virtual Object
         {
             public:
                 inline static const Version VERSION = Version(1, 1, 1);

@@ -45,7 +45,7 @@ namespace pensar_digital
             ss2 << *d;
             expected =  "{\"class\":\"pensar_digital::cpplib::Dummy\",\"id\":42,\"name\":\"d\",\"private_interface_version\":1,\"protected_interface_version\":1,\"public_interface_version\":1}";
             CHECK_EQ(String, ss2.str(), expected, "1");  
-			IDummyPtr d2 = dummyf.get ();
+			DummyPtr d2 = dummyf.get ();
 			ss2 >> *d2;
 			CHECK_EQ(IDummy, *d, *d2, "1. d == d2 should be true");
         TEST_END(ObjectStreaming)
