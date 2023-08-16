@@ -194,9 +194,6 @@
     <ClInclude Include="iobject.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="test\idummy.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="iconstraint.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -207,6 +204,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="stop_watch.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="xml_util.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="type_util.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="test\idummy.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

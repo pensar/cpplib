@@ -6,6 +6,7 @@
 
 #include "object.hpp"
 #include "igenerator.hpp"
+#include "constant.hpp"
 
 namespace pensar_digital
 {
@@ -103,6 +104,33 @@ namespace pensar_digital
             };
             
             friend void from_json<T>(const Json& j, Generator<T>& g);
+            
+            void set_id (const Id& aid) { Object::set_id (aid); }
+
+            // Convertion to xml string.
+            virtual String xml() const noexcept
+            {
+                String xml = ObjXMLPrefix() + ">";
+                //xml += VERSION.xml(); //todo.
+                xml += "<value>" + pd::to_string(fvalue) + "</value>";
+                xml += "<step>" + pd::to_string(fstep) + "</step>";
+                xml += "</object>";
+                return xml;
+            }   
+            
+            // Convertion from xml string.
+            virtual void from_xml(const String& sxml)
+            {
+                XMLNode node = parse_object_tag(sxml);
+                // todo: check version.
+                XMLNode n = node.getChildNode("value");
+                if (!n.isEmpty())
+                    fvalue = atoi (n.getText());
+
+                n = node.getChildNode("step");
+				if (!n.isEmpty()) 
+                    fstep = atoi (n.getText());
+            }
 
         private:
             Id fvalue; //!< Member variable "id"

@@ -1,7 +1,6 @@
 #ifndef CONCEPT
 #define CONCEPT
 
-#include "version.hpp"
 #include "constant.hpp"
 #include <concepts>
 #include <iostream>
@@ -10,13 +9,13 @@ namespace pensar_digital
 {
 	namespace cpplib
 	{
-		// Assignable concept. Requires a member function assign(const T&).
-		template <class T>
-		concept Assignable = requires (T t, const T & a)
-		{
-			{t.assign(a)};
-		};
+		// Assignable concept. Requires a member function T& assign(const T&).
 
+		template <typename T>
+		concept Assignable = requires (T t)
+		{
+			{t.assign(t)} noexcept -> std::convertible_to<T&>;
+		};
 		
 		// Checkable concept. Requires a member function ok() returning something convertible to bool.
 		template <typename T, typename... Args>
@@ -46,13 +45,6 @@ namespace pensar_digital
 		{
 			{T(std::forward<Args>(args) ...)} noexcept;
 			{t.initialize(std::forward<Args>(args) ...)} noexcept -> std::convertible_to<bool>;
-		};
-
-		// Jsonable concept. Requires a member function json() returning something convertible to String.
-		template <typename T>
-		concept Jsonable = requires (T t)
-		{
-			{t.json()} noexcept -> std::convertible_to<String>;
 		};
 
 		// FactoryConstructible concept. Requires Initializable and a static factory method named get returning something convertible to T&.
@@ -108,13 +100,6 @@ namespace pensar_digital
 		concept Xorable = requires (T t)
 		{
 			{t ^ t} noexcept -> std::convertible_to<bool>;
-		};
-
-		// Versionable concept requires a inline static const Version public member named VERSION.
-		template <typename T>	
-		concept Versionable = requires (T t)
-		{
-			{t.VERSION} noexcept -> std::convertible_to<Version>;
 		};
 
 		// OutputStreamable concept.

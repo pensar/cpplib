@@ -17,6 +17,9 @@ namespace pensar_digital
     {
         ObjectFactory objectf;
         DummyFactory dummyf;
+        
+        static_assert(Assignable<Dummy>);
+
         TEST(ObjectClone, true)
             IObjectPtr  o = pd::objectf.get(42);
             IObjectPtr o1 = pd::objectf.clone (*o);

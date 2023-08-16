@@ -6,6 +6,7 @@
 
 #include "object.hpp"
 #include "string_def.hpp"
+#include "json_util.hpp"
 
 namespace pensar_digital
 {
@@ -65,12 +66,12 @@ namespace pensar_digital
 
                 virtual std::istream& read(std::istream& is)
                 {
-                    return read_json<Name>(is, *this);
+                    return pd::read_json<Name>(is, *this);
                 };
 
                 virtual std::ostream& write(std::ostream& os) const
                 {
-                    return write_json<Name>(os, *this);
+                    return pd::write_json<Name>(os, *this);
                 };
 
                 friend void to_json(Json& j, const Name& n);

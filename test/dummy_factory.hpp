@@ -1,8 +1,8 @@
 // author : Mauricio Gomes
 // license: MIT (https://opensource.org/licenses/MIT)
 
-#ifndef DUMMY_FACTORy_HPP
-#define DUMMY_FACTORy_HPP
+#ifndef DUMMY_FACTORY_HPP
+#define DUMMY_FACTORY_HPP
 
 #include "factory.hpp"
 #include "dummy.hpp"
@@ -23,7 +23,7 @@ namespace pensar_digital
 				return Factory<Dummy, Id, String>::get(aid, aname);
 			};
 
-			P clone (const IDummy_RO& adummy)
+			P clone (const IDummyRO& adummy)
 			{
 				return get (adummy.get_id (), adummy.get_name ());
 			};
@@ -45,5 +45,5 @@ namespace pensar_digital
 	}
 }
 
-#endif // DUMMY_FACTORy_HPP    
+#endif // DUMMY_FACTORY_HPP    
 

@@ -7,7 +7,7 @@
 #include "constant.hpp"
 #include "string_def.hpp"
 #include "header_lib/json.hpp"
-#include "version.hpp"
+
 
 #include <iostream>
 #include <memory> // for std::shared_ptr
@@ -25,7 +25,7 @@ namespace pensar_digital
         class IObjectRO
         {
             public:
-                inline static const Version VERSION = Version(1, 1, 1);
+                //inline static const Version VERSION = Version(1, 1, 1);
 
                 virtual ~IObjectRO() noexcept = default;
 
@@ -76,12 +76,9 @@ namespace pensar_digital
         class IObject : public virtual IObjectRO
         {
             public:
-                inline static const Version VERSION = Version(1, 1, 1);
+                //inline static const Version VERSION = Version(1, 1, 1);
 
                 virtual ~IObject() noexcept = default;
-
-                // Implements initialize method from Initializable concept.
-                virtual bool initialize(const Id& aid = NULL_ID) noexcept = 0;
 
                 /// Sets id value.
                 /// \param new value for id.
@@ -92,16 +89,6 @@ namespace pensar_digital
 
                 // Conversion from xml string.
                 virtual void from_xml(const String & sxml) = 0;
-
-                virtual IObject& assign (const IObjectRO& o) noexcept = 0;
-
-                /// \brief Assignment operator.
-                /// \param o Object to assign from
-                /// \return A reference to this
-                virtual IObject& operator=(const IObjectRO& o) noexcept = 0;
-
-                /// Move assignment operator
-                virtual IObject& operator = (IObjectRO&& o) noexcept = 0;
         };
         //extern Factory<IObject, Id> object_factory;
 

@@ -10,6 +10,8 @@
 #include "header_lib/xmlParser.h"
 #include "clone_util.hpp"
 #include "json_util.hpp"  // for read_json and write_json.
+#include "xml_util.hpp"   // for read_xml and write_xml.
+#include "version.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -26,9 +28,6 @@ namespace pensar_digital
 {
     namespace cpplib
     {
-        template <class T>
-        static String class_name() { String c = typeid(T).name(); c.erase(0, sizeof("class ") - 1); return c; }
-
         namespace pd = pensar_digital::cpplib;
         class Object;
         typedef std::shared_ptr<Object> ObjectPtr;
@@ -75,8 +74,12 @@ namespace pensar_digital
                 /// Move constructor
                 Object(Object&& o) noexcept { assign(o); }
 
+                /** Default destructor */
+                virtual ~Object() {}
+
+                Object& assign(const IObjectRO& o) noexcept { id = o.get_id(); return *this; }
+
                 virtual String class_name() const { String c = typeid(*this).name(); c.erase(0, sizeof("class ") - 1); return c; }
-                
 
                 // Clone method. 
                 IObjectPtr clone() const noexcept { return pd::clone<Object>(*this, id); }
@@ -154,11 +157,6 @@ namespace pensar_digital
                     return ss.str();
 
                 }
-
-                /** Default destructor */
-                virtual ~Object() {}
-
-                Object& assign(const IObjectRO& o) noexcept { id = o.get_id(); return *this; }
 
                 /// Assignment operator
                 /// \param o Object to assign from

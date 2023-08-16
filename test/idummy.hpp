@@ -18,25 +18,22 @@ namespace pensar_digital
     namespace cpplib
     {
         class IDummy;
-        class IDummy_RO;
-        typedef std::shared_ptr<IDummy_RO> IDummy_RO_Ptr;
+        class IDummyRO;
+        typedef std::shared_ptr<IDummyRO> IDummy_RO_Ptr;
         typedef std::shared_ptr<IDummy> IDummyPtr;
 
         // / \brief Base class for all Dummys. Read only interface of Dummy.
-        class IDummy_RO: public virtual IObjectRO
+        class IDummyRO: public virtual IObjectRO
         {
         public:
             inline static const Version VERSION = Version(1, 1, 1);
 
-            virtual ~IDummy_RO() noexcept = default;
+            virtual ~IDummyRO() noexcept = default;
 
             virtual String get_name() const noexcept = 0;
-            virtual std::ostream& write(std::ostream& os) const = 0;
-            virtual String xml() const noexcept = 0;
-
         };
 
-        class IDummy : public virtual IDummy_RO// public virtual IObject
+        class IDummy : public virtual IDummyRO, public virtual IObject
         {
         public:
             inline static const Version VERSION = Version(1, 1, 1);

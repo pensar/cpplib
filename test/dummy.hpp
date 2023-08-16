@@ -9,7 +9,7 @@
 #include "../string_util.hpp"
 #include "../object.hpp"
 #include "idummy.hpp"
-
+#include "../json_util.hpp"
 
 #include <memory>
 
@@ -29,7 +29,7 @@ typedef std::shared_ptr<Dummy> DummyPtr;
         public:
             inline static const Version VERSION = Version(1, 1, 1);
             typedef IDummy    I;    // Interface type.
-            typedef IDummy_RO IRO; // Read only interface type.
+            typedef IDummyRO IRO; // Read only interface type.
 
             Dummy(const Id& id = NULL_ID, const String& aname = "") : Object(id), name(aname) {}
             Dummy(const Dummy& d) : Object(d) { name = d.name; }
@@ -39,10 +39,12 @@ typedef std::shared_ptr<Dummy> DummyPtr;
             bool operator == (const Dummy& d) const { return (Object::operator == (d) && (name == d.name)); }
             using Object::operator !=;
             virtual ~Dummy() {}
-            virtual Dummy& assign(const Dummy& d) noexcept { Object::assign(d); name = d.name; return *this; }
+            Dummy& assign(const Dummy& d) noexcept { Object::assign(d); name = d.name; return *this; }
 
             virtual String class_name() const noexcept { return Object::class_name (); }
 
+            virtual void set_id(const Id& aid) noexcept { Object::set_id(aid); }
+            
             // Implements initialize method from Initializable concept.
             virtual bool initialize(const Id& aid = NULL_ID, const String& aname = "") noexcept
             {

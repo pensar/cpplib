@@ -205,8 +205,10 @@
     <ClInclude Include="test\dummy.hpp" />
     <ClInclude Include="test\dummy_factory.hpp" />
     <ClInclude Include="test\idummy.hpp" />
+    <ClInclude Include="type_util.hpp" />
     <ClInclude Include="version.hpp" />
     <ClInclude Include="wstring_stream_hack.hpp" />
+    <ClInclude Include="xml_util.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

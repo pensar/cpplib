@@ -16,6 +16,13 @@ namespace pensar_digital
     {
         using Json = nlohmann::json;
 
+        // Jsonable concept. Requires a member function json() returning something convertible to String.
+        template <typename T>
+        concept Jsonable = requires (T t)
+        {
+            {t.json()} noexcept -> std::convertible_to<String>;
+        };
+
         template <class T>
         std::istream& read_json(std::istream& is, T& o)
         {
@@ -26,7 +33,7 @@ namespace pensar_digital
             return is;
         }
 
-        template <Jsonable T>
+        template <class T> 
         std::ostream& write_json(std::ostream& os, const T& o) 
         {
             return os << o.json();
