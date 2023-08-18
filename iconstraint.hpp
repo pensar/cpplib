@@ -7,6 +7,7 @@
 #include "iobject.hpp"
 #include "constraint.hpp"
 #include "concept.hpp"
+#include "version_factory.hpp"
 
 namespace pensar_digital
 {
@@ -16,7 +17,7 @@ namespace pensar_digital
 		class IConstraintRO : public virtual IObjectRO 
 		{
 			public:
-				inline static const Version VERSION = Version(1, 1, 1);
+				inline static const IVersionPtr VERSION = pd::versionf.get (1, 1, 1);
 
 				~IConstraintRO () noexcept = default;
 
@@ -27,7 +28,7 @@ namespace pensar_digital
 		class IConstraint : public virtual IConstraintRO<Derived>, public virtual IObject	
 		{
 			public:
-				inline static const Version VERSION = Version(1, 1, 1);
+				inline static const IVersionPtr VERSION = pd::versionf.get (1, 1, 1);
 
 				~IConstraint () noexcept = default;
 

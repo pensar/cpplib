@@ -14,7 +14,7 @@ namespace pensar_digital
 		class ObjectFactory : public Factory<Object, Id>
 		{
 			public:
-				inline static const Version VERSION = Version(1, 1, 1);
+				inline static const IVersionPtr VERSION = pd::versionf.get (1, 1, 1);
 				ObjectFactory(const Id& aid = NULL_ID) : Factory<Object, Id> (3, 10, aid) { };
 				virtual ~ObjectFactory() { };
 				using P = Factory<Object, Id>::P;

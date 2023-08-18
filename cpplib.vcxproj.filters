@@ -99,6 +99,9 @@
     <ClCompile Include="test\stop_watch_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="iversion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="constant.hpp">
@@ -213,6 +216,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="test\idummy.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="iversion.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="version_factory.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -5,6 +5,7 @@
 #define IGENERATOR_HPP_INCLUDED
 
 #include "iobject.hpp"
+#include "version_factory.hpp"
 
 namespace pensar_digital
 {
@@ -28,7 +29,7 @@ namespace pensar_digital
         class IGeneratorRO : public virtual IObjectRO
         {
             public:
-                inline static const Version VERSION = Version(1, 1, 1);
+                inline static const IVersionPtr VERSION = pd::versionf.get (1, 1, 1);
 
             virtual ~IGeneratorRO() noexcept = default;
 
@@ -46,7 +47,7 @@ namespace pensar_digital
         class IGenerator : public virtual IGeneratorRO<T>, public virtual IObject
         {
 			public:
-				inline static const Version VERSION = Version(1, 1, 1);
+				inline static const IVersionPtr VERSION = pd::versionf.get (1, 1, 1);
                 
                 virtual ~IGenerator() noexcept = default;
 

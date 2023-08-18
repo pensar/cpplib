@@ -25,7 +25,7 @@ namespace pensar_digital
         class IObjectRO
         {
             public:
-                //inline static const Version VERSION = Version(1, 1, 1);
+                //inline static const IVersionPtr VERSION = pd::versionf.get (1, 1, 1);
 
                 virtual ~IObjectRO() noexcept = default;
 
@@ -34,13 +34,6 @@ namespace pensar_digital
                 /// Debug string.
                 /// \return A string with the object id.
                 virtual String debug_string() const noexcept = 0;
-
-                /// Check if passed object equals self.
-                /// Derived classes must implement the _equals method. The hash compare logic is made on equals.
-                /// _equals is called from template method equals and should only implement the specific comparison.
-                /// \see _equals
-                /// \return true if objects have the same id, false otherwise.
-                virtual bool equals(const IObjectRO& o) const noexcept = 0;
 
                 /// Access object id
                 /// \return The current value of id
@@ -76,7 +69,7 @@ namespace pensar_digital
         class IObject : public virtual IObjectRO
         {
             public:
-                //inline static const Version VERSION = Version(1, 1, 1);
+                //inline static const IVersionPtr VERSION = pd::versionf.get (1, 1, 1);
 
                 virtual ~IObject() noexcept = default;
 

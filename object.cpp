@@ -47,9 +47,9 @@ namespace pensar_digital
         {
             j["class"                      ] = o.class_name();
             j["id"                         ] = o.get_id();
-            j["public_interface_version"   ] = o.VERSION.get_public    ();
-            j["protected_interface_version"] = o.VERSION.get_protected ();
-            j["private_interface_version"  ] = o.VERSION.get_private   ();
+            j["public_interface_version"   ] = o.VERSION->get_public    ();
+            j["protected_interface_version"] = o.VERSION->get_protected ();
+            j["private_interface_version"  ] = o.VERSION->get_private   ();
         };
 
         void from_json(const Json& j, Object& o)

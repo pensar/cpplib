@@ -27,7 +27,7 @@ typedef std::shared_ptr<Dummy> DummyPtr;
         class Dummy : public virtual IDummy, public virtual Object   
         {
         public:
-            inline static const Version VERSION = Version(1, 1, 1);
+            inline static const IVersionPtr VERSION = pd::versionf.get (1, 1, 1);
             typedef IDummy    I;    // Interface type.
             typedef IDummyRO IRO; // Read only interface type.
 

@@ -147,6 +147,7 @@
     <ClCompile Include="cpp_lib\xmlParser.cpp" />
     <ClCompile Include="generator.cpp" />
     <ClCompile Include="io_util.cpp" />
+    <ClCompile Include="iversion.cpp" />
     <ClCompile Include="language.cpp" />
     <ClCompile Include="locale.cpp" />
     <ClCompile Include="log.cpp" />
@@ -188,6 +189,7 @@
     <ClInclude Include="igenerator.hpp" />
     <ClInclude Include="iobject.hpp" />
     <ClInclude Include="io_util.hpp" />
+    <ClInclude Include="iversion.hpp" />
     <ClInclude Include="json_util.hpp" />
     <ClInclude Include="language.hpp" />
     <ClInclude Include="locale.hpp" />
@@ -207,6 +209,7 @@
     <ClInclude Include="test\idummy.hpp" />
     <ClInclude Include="type_util.hpp" />
     <ClInclude Include="version.hpp" />
+    <ClInclude Include="version_factory.hpp" />
     <ClInclude Include="wstring_stream_hack.hpp" />
     <ClInclude Include="xml_util.hpp" />
   </ItemGroup>

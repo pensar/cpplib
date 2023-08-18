@@ -12,9 +12,9 @@ namespace pensar_digital
         {
             j["class"] = d.class_name();
             j["id"] = d.get_id();
-            j["private_interface_version"] = d.VERSION.get_private();
-            j["protected_interface_version"] = d.VERSION.get_protected();
-            j["public_interface_version"] = d.VERSION.get_public();
+            j["private_interface_version"] = d.VERSION->get_private();
+            j["protected_interface_version"] = d.VERSION->get_protected();
+            j["public_interface_version"] = d.VERSION->get_public();
             j["name"] = d.get_name();
         }
 

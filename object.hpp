@@ -11,7 +11,7 @@
 #include "clone_util.hpp"
 #include "json_util.hpp"  // for read_json and write_json.
 #include "xml_util.hpp"   // for read_xml and write_xml.
-#include "version.hpp"
+#include "version_factory.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -55,7 +55,7 @@ namespace pensar_digital
                 virtual bool _equals(const IObjectRO& o) const { return (id == o.get_id ()); }
 
             public:
-                inline static const Version VERSION = Version (1, 1, 1);
+                inline static const IVersionPtr VERSION = pd::versionf.get (1, 1, 1);
                 
                 typedef IObject    I;  // Interface type.
                 typedef IObjectRO IRO; // Read only interface type.

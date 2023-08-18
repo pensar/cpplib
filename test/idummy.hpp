@@ -26,7 +26,7 @@ namespace pensar_digital
         class IDummyRO: public virtual IObjectRO
         {
         public:
-            inline static const Version VERSION = Version(1, 1, 1);
+            inline static const IVersionPtr VERSION = pd::versionf.get (1, 1, 1);
 
             virtual ~IDummyRO() noexcept = default;
 
@@ -36,7 +36,7 @@ namespace pensar_digital
         class IDummy : public virtual IDummyRO, public virtual IObject
         {
         public:
-            inline static const Version VERSION = Version(1, 1, 1);
+            inline static const IVersionPtr VERSION = pd::versionf.get (1, 1, 1);
 
             virtual ~IDummy() noexcept = default;
             

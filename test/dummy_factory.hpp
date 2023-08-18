@@ -14,7 +14,7 @@ namespace pensar_digital
 		class DummyFactory : public Factory<Dummy, Id, String>
 		{
 		public:
-			inline static const Version VERSION = Version(1, 1, 1);
+			inline static const IVersionPtr VERSION = pd::versionf.get (1, 1, 1);
 			DummyFactory(const Id& aid = NULL_ID, const String& aname = "") : Factory<Dummy, Id, String>(3, 10, aid, aname) { };
 			virtual ~DummyFactory() { };
 			using P = Factory<Dummy, Id, String>::P;

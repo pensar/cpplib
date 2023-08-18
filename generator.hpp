@@ -23,9 +23,9 @@ namespace pensar_digital
         {
             j["class"     ] = g.class_name();
             j["id"        ] = g.get_id();
-            j["mprivate"  ] = g.VERSION.get_private();
-            j["mprotected"] = g.VERSION.get_protected();
-            j["mpublic"   ] = g.VERSION.get_public();
+            j["mprivate"  ] = g.VERSION->get_private();
+            j["mprotected"] = g.VERSION->get_protected();
+            j["mpublic"   ] = g.VERSION->get_public();
         }
 
         template <class T>
@@ -59,7 +59,7 @@ namespace pensar_digital
       class Generator : public virtual Object//, public virtual IGenerator<T>
       {
         public:
-            inline static const Version VERSION = Version(1, 1, 1);
+            inline static const IVersionPtr VERSION = pd::versionf.get (1, 1, 1);
 
             typedef IGenerator<T>     I; // Interface type.
             typedef IGeneratorRO<T> IRO; // Read only interface type.
@@ -111,7 +111,7 @@ namespace pensar_digital
             virtual String xml() const noexcept
             {
                 String xml = ObjXMLPrefix() + ">";
-                //xml += VERSION.xml(); //todo.
+                //xml += VERSION->xml(); //todo.
                 xml += "<value>" + pd::to_string(fvalue) + "</value>";
                 xml += "<step>" + pd::to_string(fstep) + "</step>";
                 xml += "</object>";

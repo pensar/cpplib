@@ -35,7 +35,7 @@ namespace pensar_digital
         class Path : public fs::path
 		{
 			public:
-                inline static const Version VERSION = Version(1, 1, 1);
+                inline static const IVersionPtr VERSION = pd::versionf.get (1, 1, 1);
                 Path (const fs::path& p) : fs::path (p) {}
 			    Path (const std::string& s) : fs::path (s) {}
 			    Path (const char* s) : fs::path (s) {}
@@ -144,7 +144,7 @@ namespace pensar_digital
 
             public:
 
-            inline static const Version VERSION = Version(1, 1, 1);
+            inline static const IVersionPtr VERSION = pd::versionf.get (1, 1, 1);
             const size_t MAX_IN_MEMORY_FILE_SIZE_BYTE = 1024 ^ 3; // 1 GB
             const static std::ios_base::openmode IN_OUT_ATE_MODE     = std::ios::in | std::ios::out | std::ios::ate;
             const static std::ios_base::openmode IN_OUT_ATE_BIN_MODE = IN_OUT_ATE_MODE | std::ios::binary;

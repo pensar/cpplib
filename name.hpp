@@ -15,7 +15,7 @@ namespace pensar_digital
         class Name : public virtual Object
         {
             public:
-                inline static const Version VERSION = Version(1, 1, 1);
+                inline static const IVersionPtr VERSION = pd::versionf.get (1, 1, 1);
 
                 /** Access name;
                  * \return The current value of name;

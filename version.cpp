@@ -12,6 +12,30 @@ namespace pensar_digital
 {
 	namespace cpplib
 	{
+
+		void to_json(Json& j, const Version& v)
+		{
+			j["class"] = v.class_name();
+			j["id"] = v.get_id();
+			j["mpublic"] = v.get_public();
+			j["mprotected"] = v.get_protected();
+			j["mprivate"] = v.get_private();
+		}
+
+		void from_json(const Json& j, Version& v)
+		{
+			String class_name = v.class_name();
+			String json_class = j.at("class");
+			if (class_name == json_class)
+			{
+				v.set_id(j.at("id"));
+				v.mpublic = j.at("mpublic");
+				v.mprotected = j.at("mprotected");
+				v.mprivate = j.at("mprivate");
+			}
+			else throw new std::runtime_error("Version expected class = " + class_name + " but json has " + json_class);
+		}
+
 		std::istream& operator >> (std::istream& is, Version& v)
 		{
 			// Check if os is in binary mode.
@@ -23,9 +47,9 @@ namespace pensar_digital
 			{
 				Json j;
 				is >> j;
-				v.mpublic    = j.at("public_interface_version"   ).get<VersionInt>();
-				v.mprotected = j.at("protected_interface_version").get<VersionInt>();
-				v.mprivate   = j.at("private_interface_version"  ).get<VersionInt>();
+				v.mpublic    = j.at("mpublic"   ).get<VersionInt>();
+				v.mprotected = j.at("mprotected").get<VersionInt>();
+				v.mprivate   = j.at("mprivate"  ).get<VersionInt>();
 				return is;
 			}
 		}
@@ -40,9 +64,9 @@ namespace pensar_digital
 			else // json format
 			{
 				Json j;
-				j["public_interface_version"   ] = v.get_public    ();
-				j["protected_interface_version"] = v.get_protected ();
-				j["private_interface_version"  ] = v.get_private   ();
+				j["mpublic"   ] = v.get_public    ();
+				j["mprotected"] = v.get_protected ();
+				j["mprivate"  ] = v.get_private   ();
 				os << j;
 			}
 			return os;
@@ -56,65 +80,55 @@ namespace pensar_digital
 		{
 			return String();
 		}
-		bool Version::equals(const IObjectRO& o) const noexcept
+		
+		bool Version::equals(const Version& v) const noexcept
 		{
-			// Check if o is a Version.
-			if (typeid(o) != typeid(Version))
-			{
-				return false;
-			}
-			// Cast o to Version.
-			const Version& v = static_cast<const Version&>(o);
-			return (v.mid == mid) && (v.mprivate == mprivate) && (v.mprotected == mprotected) && (v.mpublic == mpublic);	
+			return (v.get_id () == get_id ()) && (v.mprivate == mprivate) && (v.mprotected == mprotected) && (v.mpublic == mpublic);
 		}
-		const Id Version::get_id() const noexcept
+
+		void Version::from_xml (const String& sxml)
 		{
-			return mid;
+			XMLNode node = pd::parse_object_tag<Version> (sxml, &mid);
+			XMLNode n = node.getChildNode("mprivate");
+			if (!n.isEmpty())
+				mprivate = atoi(n.getText());
+			n = node.getChildNode("mprotected");
+			if (!n.isEmpty())
+				mprotected = atoi(n.getText());
+			n = node.getChildNode("mpublic");
+			if (!n.isEmpty())
+				mpublic = atoi(n.getText());
 		}
+		 
+		String Version::xml() const noexcept
+		{
+			String xml = pd::ObjXMLPrefix(*this) + ">";
+			xml += "<mpublic>" + pd::to_string(mpublic) + "</mpublic>";
+			xml += "<mprotected>" + pd::to_string(mprotected) + "</mprotected>";
+			xml += "<mprivate>" + pd::to_string(mprivate) + "</mprivate>";
+
+			xml += "</object>";
+			return xml;
+		}
+
 		const Hash Version::get_hash() const noexcept
 		{
-			return Hash(897896785686); // todo: implement hash.
+			return Hash (897896785686); // todo: implement hash.
 		}
 
 		String Version::json() const noexcept
 		{
 			return pd::json<Version>(*this);
 		}
+	
+		std::istream& Version::read (std::istream& is)
+		{
+			return pd::read_json<Version> (is, *this);
+		}
+
 		std::ostream& Version::write(std::ostream& os) const
 		{
 			return write_json<Version>(os, *this);
-		}
-		bool Version::operator==(const IObjectRO& o) const
-		{
-			return equals (o);
-		}
-		bool Version::operator!=(const IObjectRO& o) const
-		{
-			return ! equals (o);
-		}
-
-
-		void to_json(Json& j, const Version& v)
-		{
-			j["class"                      ] = v.class_name    ();
-			j["id"                         ] = v.get_id        ();
-			j["private_interface_version"  ] = v.get_private   ();
-			j["protected_interface_version"] = v.get_protected ();
-			j["public_interface_version"   ] = v.get_public    ();
-		}
-
-		void from_json(const Json& j, Version& v)
-		{
-			String class_name = v.class_name();
-			String json_class = j.at("class");
-			if (class_name == json_class)
-			{
-				v.mid        = j.at ("id"                         );
-				v.mprivate   = j.at ("private_interface_version"  );
-				v.mprotected = j.at ("protected_interface_version");
-				v.mpublic    = j.at ("public_interface_version"   );	
-			}
-			else throw new std::runtime_error("Version expected class = " + class_name + " but json has " + json_class);
 		}
 	} // namespace cpplib
 } // namespace pensar_digital
