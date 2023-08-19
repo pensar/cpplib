@@ -89,6 +89,23 @@ namespace pensar_digital
             CHECK(*d != *d1, "3. d == d1");
             d1->from_xml(xml);
             CHECK(*d == *d1, "4. d != d1");
-            TEST_END(ObjectXMLConversion)         
+            TEST_END(ObjectXMLConversion) 
+
+            TEST(ObjectTextStreaming, true)
+                // Creates a vector with 1000 objects
+                std::vector<IObjectPtr> objects;
+                for (Id i = 0; i < 1000; i++)
+                {
+					    objects.push_back(objectf.get(i));
+				}
+                for (Id i = 0; i < 1000; i++)
+                {
+                    String si = pd::to_string(i);
+                    IObjectPtr o = objectf.get(i);
+                    String expected = "{\"class\":\"pensar_digital::cpplib::Object\",\"id\":" + si;
+                    expected += ",\"private_interface_version\":1,\"protected_interface_version\":1,\"public_interface_version\":1}";
+                    CHECK_EQ(String, o->json(), expected, si);
+                }
+            TEST_END(ObjectTextStreaming)
     }
 }
