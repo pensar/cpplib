@@ -107,5 +107,21 @@ namespace pensar_digital
                     CHECK_EQ(String, o->json(), expected, si);
                 }
             TEST_END(ObjectTextStreaming)
+
+            TEST(ObjectBinaryStreaming, true)
+				// Creates a vector with 1000 objects
+				std::vector<IObjectPtr> objects;
+                for (Id i = 0; i < 1000; i++)
+                {
+					objects.push_back(objectf.get(i));
+				}
+                std::ofstream out ("c:\\tmp\\test\\ObjectBinaryStreaming\\test.bin", std::ios::binary);
+                for (Id i = 0; i < 1000; i++)
+                {
+                   // *(objects[i]) >> out;
+                }
+                TEST_END(ObjectBinaryStreaming)
+
+
     }
 }
