@@ -115,6 +115,33 @@ namespace pensar_digital
                 }
             TEST_END(ObjectTextStreaming)
 
+            TEST(ObjectTextStreaming2, true)
+                // Creates a vector with 1000 objects
+                std::vector<IObjectPtr> objects;
+                for (Id i = 0; i < 1000; i++)
+                {
+                    objects.push_back(objectf.get(i));
+                }
+                //pd::TextFile f("c:\\tmp\\test\\ObjectTextStreaming\\test.txt", "blah");
+                std::ofstream out("c:\\tmp\\test\\ObjectTextStreaming\\test.txt");
+
+                for (Id i = 0; i < 1000; i++)
+                {
+                    out << *objects[i] << std::endl;
+                }
+                out.flush ();
+                out.close();
+
+                std::ifstream in("c:\\tmp\\test\\ObjectTextStreaming\\test.txt");
+                for (Id i = 0; i < 1000; i++)
+                {
+                    IObjectPtr o = objectf.get();
+                    in >> o;
+                    IObjectPtr o1 = objectf.get(i);
+                    CHECK_EQ(IObject, *o, *o1, pd::to_string(i));
+                }
+                TEST_END(ObjectTextStreaming2)
+                
             TEST(ObjectBinaryStreaming, true)
 				// Creates a vector with 1000 objects
 				std::vector<IObjectPtr> objects;
@@ -122,19 +149,22 @@ namespace pensar_digital
                 {
 					objects.push_back(objectf.get(i));
 				}
-                pd::File f ("c:\\tmp\\test\\ObjectBinaryStreaming\\test.bin");
+                std::ofstream out ("c:\\tmp\\test\\ObjectBinaryStreaming\\test.bin", std::ios::binary);
 
                 for (Id i = 0; i < 1000; i++)
                 {
-                    f.fstream () << objects[i] ;    
+                    out << objects[i] << std::endl;    
                 }
-				f.close();
+				out.close();
                 std::ifstream in ("c:\\tmp\\test\\ObjectBinaryStreaming\\test.bin", std::ios::binary);
                 for (Id i = 0; i < 1000; i++)
                 {
-                    ;
+					IObjectPtr o = objectf.get();
+					in >> o;
+                    IObjectPtr o1 = objectf.get(i);
+                    CHECK_EQ(IObject, *o, *o1, pd::to_string(i));
                 }
-                TEST_END(ObjectBinaryStreaming)
+             TEST_END(ObjectBinaryStreaming)
 
 
     }
