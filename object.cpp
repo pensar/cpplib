@@ -8,9 +8,11 @@ namespace pensar_digital
 	namespace cpplib
 	{
         
-        std::istream& operator >> (std::istream& is, Object& o) { return o.read(is); };
-        std::ostream& operator << (std::ostream& os, const IObject& o) { return o.write(os); };
-        
+        inline std::istream& operator >> (std::istream& is,       IObject&   o) { return o.read(is);  }
+        inline std::ostream& operator << (std::ostream& os, const IObject&   o) { return o.write(os); }
+        inline std::istream& operator >> (std::istream& is,       IObjectPtr o) { return is >> *o;    }
+        inline std::ostream& operator << (std::ostream& os, const IObjectPtr o) { return os << *o;    }
+
         // implements input stream member virtual std::istream& Object::read(std::istream& is)
         std::istream& Object::read(std::istream& is)
         {
@@ -47,9 +49,9 @@ namespace pensar_digital
         {
             j["class"                      ] = o.class_name();
             j["id"                         ] = o.get_id();
-            j["public_interface_version"   ] = o.VERSION->get_public    ();
-            j["protected_interface_version"] = o.VERSION->get_protected ();
-            j["private_interface_version"  ] = o.VERSION->get_private   ();
+            j["mpublic"   ] = o.VERSION->get_public    ();
+            j["mprotected"] = o.VERSION->get_protected ();
+            j["mprivate"  ] = o.VERSION->get_private   ();
         };
 
         void from_json(const Json& j, Object& o)

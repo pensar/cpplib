@@ -171,8 +171,10 @@ namespace pensar_digital
             extern void to_json(Json& j, const Object& o);
             extern void from_json(const Json& j, Object& o);
 
-            extern std::istream& operator >> (std::istream& is, Object& o);
+            extern std::istream& operator >> (std::istream& is, IObject& o);
             extern std::ostream& operator << (std::ostream& os, const IObject& o);
+            extern std::istream& operator >> (std::istream& is, IObjectPtr o);
+            extern std::ostream& operator << (std::ostream& os, const IObjectPtr o);
 
             // Dependency class is a Constrainable class used to define dependencies between objects.
             template <Versionable MainClass, Versionable RequiredClass>

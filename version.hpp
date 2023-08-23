@@ -31,9 +31,9 @@ namespace pensar_digital
         	Id         mid;
 
             // Setters.
-            void set_public(VersionInt v) noexcept { mpublic = v; }
-            void set_protected(VersionInt v) noexcept { mprotected = v; }
-            void set_private(VersionInt v) noexcept { mprivate = v; }
+            void set_public    (VersionInt v) noexcept { mpublic    = v; }
+            void set_protected (VersionInt v) noexcept { mprotected = v; }
+            void set_private   (VersionInt v) noexcept { mprivate   = v; }
 
         public:
             inline static const VersionInt NULL_VERSION = -1;

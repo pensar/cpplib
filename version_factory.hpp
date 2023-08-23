@@ -35,7 +35,7 @@ namespace pensar_digital
 
 			P clone(const IVersionRO& aversion)
 			{
-				return get(aversion.get_id(), aversion.get_public(), aversion.get_protected (), aversion.get_private ());
+				return get (aversion.get_public(), aversion.get_protected (), aversion.get_private (), aversion.get_id());
 			};
 
 			P clone (const IVersionPtr& ptr) { return clone(*ptr); }

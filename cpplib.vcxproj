@@ -182,13 +182,16 @@
     <ClInclude Include="error.hpp" />
     <ClInclude Include="factory.hpp" />
     <ClInclude Include="field.hpp" />
+    <ClInclude Include="file_factory.hpp" />
     <ClInclude Include="generator.hpp" />
     <ClInclude Include="clone_util.hpp" />
     <ClInclude Include="header_lib\json.hpp" />
     <ClInclude Include="iconstraint.hpp" />
+    <ClInclude Include="ifile.hpp" />
     <ClInclude Include="igenerator.hpp" />
     <ClInclude Include="iobject.hpp" />
     <ClInclude Include="io_util.hpp" />
+    <ClInclude Include="ipath.hpp" />
     <ClInclude Include="iversion.hpp" />
     <ClInclude Include="json_util.hpp" />
     <ClInclude Include="language.hpp" />
@@ -199,6 +202,7 @@
     <ClInclude Include="name.hpp" />
     <ClInclude Include="object.hpp" />
     <ClInclude Include="object_factory.hpp" />
+    <ClInclude Include="path_factory.hpp" />
     <ClInclude Include="random_util.hpp" />
     <ClInclude Include="stop_watch.hpp" />
     <ClInclude Include="string_def.hpp" />

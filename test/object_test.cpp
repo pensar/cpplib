@@ -7,7 +7,14 @@
 #include "../object.hpp"
 #include "../object_factory.hpp"
 #include "dummy_factory.hpp"
+#include "../io_util.hpp"
 #include <memory>
+
+#ifdef _MSC_VER
+#include <filesystem>
+#else
+#include <experimental/filesystem>
+#endif
 
 namespace pensar_digital
 {
@@ -35,7 +42,7 @@ namespace pensar_digital
             IObjectPtr o = objectf.get(42);
 			std::stringstream ss;
 			ss << *o;
-            String expected = "{\"class\":\"pensar_digital::cpplib::Object\",\"id\":42,\"private_interface_version\":1,\"protected_interface_version\":1,\"public_interface_version\":1}";
+            String expected = "{\"class\":\"pensar_digital::cpplib::Object\",\"id\":42,\"mprivate\":1,\"mprotected\":1,\"mpublic\":1}";
             CHECK_EQ(String, ss.str(), expected, "0");
 
             ObjectPtr o2 = objectf.get();
@@ -46,7 +53,7 @@ namespace pensar_digital
 
 			IDummyPtr d = dummyf.get (42, "d");
             ss2 << *d;
-            expected =  "{\"class\":\"pensar_digital::cpplib::Dummy\",\"id\":42,\"name\":\"d\",\"private_interface_version\":1,\"protected_interface_version\":1,\"public_interface_version\":1}";
+            expected =  "{\"class\":\"pensar_digital::cpplib::Dummy\",\"id\":42,\"mprivate\":1,\"mprotected\":1,\"mpublic\":1,\"name\":\"d\"}";
             CHECK_EQ(String, ss2.str(), expected, "1");  
 			DummyPtr d2 = dummyf.get ();
 			ss2 >> *d2;
@@ -55,14 +62,14 @@ namespace pensar_digital
 
         TEST(ObjectJsonConversion, true)
             IObjectPtr o = objectf.get(42);
-            String expected = "{\"class\":\"pensar_digital::cpplib::Object\",\"id\":42,\"private_interface_version\":1,\"protected_interface_version\":1,\"public_interface_version\":1}";
+            String expected = "{\"class\":\"pensar_digital::cpplib::Object\",\"id\":42,\"mprivate\":1,\"mprotected\":1,\"mpublic\":1}";
             CHECK_EQ(String, o->json (), expected, "0.");
 
             IObjectPtr o1 = objectf.parse_json (o->json());
             CHECK(*o == *o1, "1. o should be equal to o1");
 
            IDummyPtr d = dummyf.get (42, "d");
-           expected = "{\"class\":\"pensar_digital::cpplib::Dummy\",\"id\":42,\"name\":\"d\",\"private_interface_version\":1,\"protected_interface_version\":1,\"public_interface_version\":1}";
+           expected = "{\"class\":\"pensar_digital::cpplib::Dummy\",\"id\":42,\"mprivate\":1,\"mprotected\":1,\"mpublic\":1,\"name\":\"d\"}";
            CHECK_EQ(String, d->json (), expected, "2");
 
            IDummyPtr d1 = dummyf.parse_json (d->json());
@@ -96,14 +103,14 @@ namespace pensar_digital
                 std::vector<IObjectPtr> objects;
                 for (Id i = 0; i < 1000; i++)
                 {
-					    objects.push_back(objectf.get(i));
+			        objects.push_back(objectf.get(i));
 				}
                 for (Id i = 0; i < 1000; i++)
                 {
                     String si = pd::to_string(i);
                     IObjectPtr o = objectf.get(i);
                     String expected = "{\"class\":\"pensar_digital::cpplib::Object\",\"id\":" + si;
-                    expected += ",\"private_interface_version\":1,\"protected_interface_version\":1,\"public_interface_version\":1}";
+                    expected += ",\"mprivate\":1,\"mprotected\":1,\"mpublic\":1}";
                     CHECK_EQ(String, o->json(), expected, si);
                 }
             TEST_END(ObjectTextStreaming)
@@ -115,10 +122,17 @@ namespace pensar_digital
                 {
 					objects.push_back(objectf.get(i));
 				}
-                std::ofstream out ("c:\\tmp\\test\\ObjectBinaryStreaming\\test.bin", std::ios::binary);
+                pd::File f ("c:\\tmp\\test\\ObjectBinaryStreaming\\test.bin");
+
                 for (Id i = 0; i < 1000; i++)
                 {
-                   // *(objects[i]) >> out;
+                    f.fstream () << objects[i] ;    
+                }
+				f.close();
+                std::ifstream in ("c:\\tmp\\test\\ObjectBinaryStreaming\\test.bin", std::ios::binary);
+                for (Id i = 0; i < 1000; i++)
+                {
+                    ;
                 }
                 TEST_END(ObjectBinaryStreaming)
 

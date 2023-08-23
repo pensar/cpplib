@@ -10,12 +10,12 @@ namespace pensar_digital
 
         void to_json(Json& j, const Dummy& d)
         {
-            j["class"] = d.class_name();
-            j["id"] = d.get_id();
-            j["private_interface_version"] = d.VERSION->get_private();
-            j["protected_interface_version"] = d.VERSION->get_protected();
-            j["public_interface_version"] = d.VERSION->get_public();
-            j["name"] = d.get_name();
+            j["class"     ] = d.class_name();
+            j["id"        ] = d.get_id();
+            j["mpublic"] = d.VERSION->get_public();
+            j["mprotected"] = d.VERSION->get_protected();
+            j["mprivate"] = d.VERSION->get_private();
+            j["name"      ] = d.get_name();
         }
 
         void from_json(const Json& j, Dummy& d)
