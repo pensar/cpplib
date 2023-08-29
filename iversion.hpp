@@ -21,6 +21,14 @@ namespace pensar_digital
 
         typedef std::shared_ptr <IVersionRO> IVersionROPtr;
         typedef std::shared_ptr <IVersion  > IVersionPtr  ;
+       
+        // Versionable concept requires a inline static const Version public member named VERSION convertible to IVersionPtr.
+        template <typename T>
+        concept Versionable = requires (T t)
+        {
+            {t.VERSION} noexcept -> std::convertible_to<IVersionPtr>;
+        };
+
 
         extern VersionFactory versionf;
 

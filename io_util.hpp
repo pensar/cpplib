@@ -11,6 +11,8 @@
 #include "ipath.hpp"
 #include "ifile.hpp"
 #include "version_factory.hpp"
+#include "concept.hpp"
+#include "json_util.hpp"
 
 #include <string>
 #ifdef _MSC_VER
@@ -28,8 +30,65 @@ namespace pensar_digital
 {
     namespace cpplib
     {
-        template <typename DataType = uint8_t, typename CharType = char>
-        std::basic_string<CharType>& BinaryToString (const std::vector<DataType>& data, std::basic_string<CharType>& out)
+        template <typename T>
+        void binary_write(std::ostream& os, const T& t, const size_t& size, const ByteOrder& byte_order = LITTLE_ENDIAN)
+        {
+			if (byte_order == LITTLE_ENDIAN) {
+				for (size_t i = 0; i < size; ++i) {
+					os.put(static_cast<char>(t >> (i * 8)));
+				}
+			}
+			else {
+				for (size_t i = 0; i < size; ++i) {
+					os.put(static_cast<char>(t >> ((size - i - 1) * 8)));
+				}
+			}
+		}
+                      
+        /*
+        template <typename T>
+        void binary_write(std::ostream& os, const T& t, const size_t& size)
+        {
+            os.write(reinterpret_cast<const char*>(&t), size);
+        }
+        */
+
+        template <typename T>
+
+        void binary_write (std::ostream& os, const T& t, const ByteOrder& byte_order = LITTLE_ENDIAN)
+        {
+           binary_write<T> (os, t, sizeof(t));
+		}
+
+        template <typename T>
+        void binary_read (std::istream& is, T& t, const size_t& size, const ByteOrder& byte_order = LITTLE_ENDIAN)
+		{
+            t = 0;
+			if (byte_order == LITTLE_ENDIAN) 
+            {
+                for (size_t i = 0; i < size; ++i) 
+                {
+                    t |= static_cast<T>(static_cast<uint8_t>(is.get())) << (i * 8);
+                }
+            }
+            else 
+            {
+                for (size_t i = 0; i < size; ++i) 
+                {
+                    t |= static_cast<T>(static_cast<uint8_t>(is.get())) << ((size - i - 1) * 8);
+                }
+            }
+        }
+
+        template <typename T>
+        void binary_read (std::istream& is, T& t, const ByteOrder& byte_order = LITTLE_ENDIAN)
+        {
+            binary_read<T> (is, t, sizeof(t), byte_order);
+        }
+
+
+        template <typename DataType = uint8_t, typename CharType = String::value_type>
+        std::basic_string<CharType>& binary_to_string (const std::vector<DataType>& data, std::basic_string<CharType>& out)
         {
             out.clear();
             out.reserve(data.size() * sizeof(DataType) / sizeof(CharType));
@@ -42,7 +101,7 @@ namespace pensar_digital
         }
 
         template <typename DataType = uint8_t, typename CharType = char>
-        void StringToBinary(const std::basic_string<CharType>& in, std::vector<DataType>& out)
+        void string_to_binary (const std::basic_string<CharType>&in, std::vector<DataType>&out)
         {
 			out.clear();
 			out.reserve(in.size() * sizeof(CharType) / sizeof(DataType));
@@ -53,9 +112,8 @@ namespace pensar_digital
 				}
 				out.push_back(byte);
 			}
-		}   
+		} 
 
-        enum IO_MODE { BINARY = true, TEXT = false };
         class Path;
         typedef std::shared_ptr<Path> PathPtr;
         class File;
@@ -205,17 +263,39 @@ namespace pensar_digital
                 // Conversion to json string.
                 virtual String json () const noexcept
                 {
-					return pd::json<Path> (*this);
+					std::stringstream ss (pd::json<Path> (*this));
+                    ss << ",path:" << this->fs::path::string() << "}";
+                    return ss.str ();
 				}   
 
-                virtual std::istream& read (std::istream& is)
+                virtual std::istream& read (std::istream& is, const IO_Mode& amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN)
                 {
-                    return read_json<Path> (is, *this);
+                    if (amode == BINARY)
+                    {
+                        // todo: implement binary read.
+                    }
+                    else // json format
+                    {
+                        Json j;
+                        IVersionPtr v;
+                        Id stream_id;
+                        pd::read_json<Path>(is, *this, &stream_id, v, &j);
+                        set_id (stream_id);
+                        *this = j["path"].get<std::string>();
+                    }
+                    return is;
                 };
 
-                virtual std::ostream& write (std::ostream& os) const
+                virtual std::ostream& write (std::ostream& os, const IO_Mode& amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN) const
                 {
-                    return write_json<Path> (os, *this);
+                    if (amode == BINARY)
+                    {
+                        // todo: implement binary read.
+                    }
+                    else // json format
+                    {
+                        return os << json ();
+                    }
                 };
 
                 // Convertion to xml string.
@@ -462,7 +542,21 @@ namespace pensar_digital
                 // Conversion to json string.
                 virtual String json() const noexcept
                 {
-                    return pd::json<File>(*this);
+                    std::stringstream ss;
+                    String s = pd::json<File>(*this);
+                    ss << ", \"full_path\" : " << full_path.to_string () << " , \"mode\" : " << mode;
+                    if (is_binary ())
+					{
+                        String s;
+                        pd::binary_to_string<decltype(binary_data)::value_type, String::value_type>(binary_data, s);
+                        ss << " , \"binary_data\" : " << s;
+					}
+					else
+					{
+						ss << " , \"text_data\" : " << text_data;
+					}
+                    ss << " }";
+                    return ss.str();
                 }
 
                 virtual std::ios_base::openmode get_mode() const noexcept
@@ -470,14 +564,45 @@ namespace pensar_digital
                     return mode;
                 }
 
-                virtual std::istream& read(std::istream& is)
+                virtual std::istream& read (std::istream& is, const IO_Mode& amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN)
                 {
-                    return read_json<File>(is, *this);
+                    if (amode == BINARY)
+                    {
+                        // todo: implement binary read.
+                    }
+                    else // json format
+                    {
+                        Json j;
+                        IVersionPtr v;
+                        Id id;
+                        read_json<File>(is, *this, &id, v, &j);
+                        set_id (id);
+                        full_path = j["full_path"].get<String>();
+						mode = j["mode"].get<std::ios_base::openmode>();
+						if (is_binary())
+						{
+							String s = j["binary_data"].get<String>();
+							//pd::string_to_binary<String::value_type, decltype(binary_data)::value_type>(s, binary_data);
+						}
+						else
+						{
+							text_data = j["text_data"].get<String>();
+						}
+                        return is;
+                    }
                 };
 
-                virtual std::ostream& write(std::ostream& os) const
+                virtual std::ostream& write (std::ostream& os, const IO_Mode& amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN) const
                 {
-                    return write_json<File>(os, *this);
+                    if (amode == BINARY)
+                    {
+                        // todo: implement binary read.
+                    }
+                    else // json format
+                    {
+                        os << json ();
+                    }
+                    return os;
                 };
 
                 // Convertion to xml string.
@@ -494,7 +619,7 @@ namespace pensar_digital
 						{
 							xml += "<buffer type=\"binary\">";
                             String s;
-                            xml += pd::BinaryToString<decltype(binary_data)::value_type, String::value_type> (binary_data, s);  
+                            xml += pd::binary_to_string<decltype(binary_data)::value_type, String::value_type> (binary_data, s);  
 						}
 						else
 						{
@@ -522,7 +647,7 @@ namespace pensar_digital
                         if (type == "binary")
                         {
 							String s = n.getText();
-							pd::StringToBinary<String::value_type, decltype(binary_data)::value_type>(s, binary_data);
+                            pd::binary_to_string<decltype(binary_data)::value_type, String::value_type>(binary_data, s);
 						}
 						else
 						{
@@ -558,8 +683,8 @@ namespace pensar_digital
 					return file;
 				}
 
-                friend void to_json   (      Json& j, const File& f);
-                friend void from_json (const Json& j,       File& f);
+                //friend void to_json   (      Json& j, const File& f);
+                //friend void from_json (const Json& j,       File& f);
 
                 // Inherited via IFile
                 fs::path get_full_path() const noexcept override;
@@ -628,10 +753,10 @@ namespace pensar_digital
         extern std::ostream& operator << (std::ostream& os, const File& file);
 
         // Json conversion.
-        extern void to_json   (      Json& j, const Path& p);
-        extern void from_json (const Json& j,       Path& p);
-        extern void to_json   (      Json& j, const File& f);
-        extern void from_json (const Json& j,       File& f);
+        //extern void to_json   (      Json& j, const Path& p);
+        //extern void from_json (const Json& j,       Path& p);
+        //extern void to_json   (      Json& j, const File& f);
+        //extern void from_json (const Json& j,       File& f);
 
     }   // namespace cpplib
 }       // namespace pensar_digital

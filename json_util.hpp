@@ -7,6 +7,8 @@
 #include "concept.hpp"
 #include "string_def.hpp"
 #include "header_lib/json.hpp"
+#include "iversion.hpp"
+#include "version_factory.hpp" // versionf
 
 #include <iostream>
 
@@ -23,25 +25,47 @@ namespace pensar_digital
             {t.json()} noexcept -> std::convertible_to<String>;
         };
 
+        template<class T>
+        Id get_id(const String& sjson, Json* j)
+        {
+            if (j == nullptr)
+            {
+                auto k = Json::parse(sjson);
+                String json_class = k.at("class");
+                if (json_class != pd::class_name<T>())
+                    throw std::runtime_error("Invalid class name: " + pd::class_name<T>());
+                return k.at("id");
+            }
+            else
+            {
+                *j = Json::parse(sjson);
+                String json_class = j->at("class");
+                if (json_class != pd::class_name<T>())
+                    throw std::runtime_error("Invalid class name: " + pd::class_name<T>());
+                return j->at("id");
+            }
+
+        }
+
         template <class T>
-        std::istream& read_json(std::istream& is, T& o)
+        std::istream& read_json(std::istream& is, T& o, Id* out_id, IVersionPtr out_v, Json* out_j = nullptr)
         {
             String sjson;
             is >> sjson;
-            Json j = Json::parse(sjson);
-            j.get_to(o);
+            *out_id = (get_id<T>(sjson, out_j));
+            out_v = versionf.get(out_j->at("mpublic").get<VersionInt>(), out_j->at("mprotected").get<VersionInt>(), out_j->at("mprivate").get<VersionInt>());
             return is;
         }
 
-        template <class T> 
-        std::ostream& write_json(std::ostream& os, const T& o) 
+        template <Versionable T>
+        String json (const T& o)
         {
-            return os << o.json();
+            std::stringstream ss;
+            ss << "{ \"class\" : " << o.class_name();
+            ss << ", \"id\" : " << o.get_id() << ", ";
+            ss << *(o.VERSION);
+            return ss.str();
         }
-
-        template <class T>
-        String json (const T& o) { Json j = o; return j.dump(); }
-
     } // namespace cpplib
 } // namespace pensar_digital
     

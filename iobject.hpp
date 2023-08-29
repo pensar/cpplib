@@ -52,7 +52,7 @@ namespace pensar_digital
                 /// \return A string with the object id.
                 virtual String to_string() const noexcept = 0;
 
-                virtual std::ostream& write(std::ostream& os) const = 0;
+                virtual std::ostream& write (std::ostream& os, const IO_Mode& amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN) const = 0;
         
                 // Conversion to xml string.s
                 virtual String xml() const noexcept = 0;
@@ -78,7 +78,7 @@ namespace pensar_digital
                 virtual void set_id (const Id& value) = 0;
 
                 /// Reads object from stream.
-                virtual std::istream& read(std::istream& is) = 0;
+                virtual std::istream& read (std::istream& os, const IO_Mode& amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN) = 0;
 
                 // Conversion from xml string.
                 virtual void from_xml(const String & sxml) = 0;

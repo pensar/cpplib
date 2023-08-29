@@ -40,7 +40,7 @@ namespace pensar_digital
             // Conversion to json string.
             virtual String json() const noexcept = 0;
 
-            virtual std::ostream& write(std::ostream& os) const = 0;
+            virtual std::ostream& write (std::ostream& os, const IO_Mode& amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN) const = 0;
         };
 
         template <class T>
@@ -63,7 +63,7 @@ namespace pensar_digital
                 /// \param val New value to set
                 virtual void set_value(Id val) = 0;
 
-                virtual std::istream& read(std::istream& is) = 0;
+                virtual std::istream& read (std::istream& os, const IO_Mode& amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN) = 0;
         };
     }   // namespace cpplib 
 }   // namespace pensar_digital

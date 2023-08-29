@@ -58,6 +58,7 @@ namespace pensar_digital
             else throw new std::runtime_error("Object expected class = " + class_name + " but json has " + json_class);
         }
 
+        /*
         void to_json(Json& j, const File& f)
         {
             j["class"] = f.class_name();
@@ -88,6 +89,7 @@ namespace pensar_digital
             }
             else throw new std::runtime_error("Object expected class = " + class_name + " but json has " + json_class);
         }
+        */
 
         // Create an empty file.
         void create_empty_file(const Path& file_full_path)

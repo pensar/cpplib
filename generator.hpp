@@ -7,6 +7,7 @@
 #include "object.hpp"
 #include "igenerator.hpp"
 #include "constant.hpp"
+#include "json_util.hpp"
 
 namespace pensar_digital
 {
@@ -18,6 +19,7 @@ namespace pensar_digital
         template <class T> std::ostream& operator << (std::ostream& os, const IGenerator<T>& g) { return g.write(os); }
         template <class T> std::istream& operator >> (std::istream& is, IGenerator<T>& g) { return g.read(is); }
 
+        /*
         template <class T>
         void to_json(Json& j, const IGenerator<T>& g)
         {
@@ -40,6 +42,7 @@ namespace pensar_digital
             }
             else throw new std::runtime_error("Object expected class = " + class_name + " but json has " + json_class);
         }
+        */
 
       /// Generator is meant to be used as unique identifier generator for other classes.
       ///
@@ -67,43 +70,64 @@ namespace pensar_digital
             /// \brief Constructs a Generator.
             /// \param [in] initial_value Initial value for the generator, defaults to 0.
             /// \param [in] astep Step to be used when incrementing the generator, defaults to 1.
-            Generator(Id aid = NULL_ID, Id initial_value = 0, Id step = 1) : Object(aid), fvalue(initial_value), fstep(step) {};
+            Generator(Id aid = NULL_ID, Id initial_value = 0, Id step = 1) : Object(aid), mvalue(initial_value), mstep(step) {};
 
             virtual ~Generator () = default;
 
             /// \brief Increments value and return the new value.
             /// \return The new value.
-            virtual const Id get() { fvalue += fstep; return fvalue; }
+            virtual const Id get() { mvalue += mstep; return mvalue; }
 
             /// \brief Gets the next value without incrementing the current one.
             /// \return The next value.
-            virtual const Id get_next() { return (fvalue + fstep); }
+            virtual const Id get_next() { return (mvalue + mstep); }
 
             /// \brief Gets the current value.
             /// \return The current value.
-            virtual const Id get_current () const { return fvalue; }
+            virtual const Id get_current () const { return mvalue; }
 
             /// \brief Set value. Next call to get will get value + 1.
             /// \param val New value to set
-            virtual void set_value(Id val) { fvalue = val; }
+            virtual void set_value(Id val) { mvalue = val; }
 
             // Conversion to json string.
             virtual String json() const noexcept
             {
-                return pd::json<Generator<T>>(*this);
+                std::stringstream ss (pd::json<Generator<T>>(*this));
+                ss << ", \"mvalue\": " << mvalue << ", \"mstep\": " << mstep << "}";
+                return ss.str();
             }
 
-            virtual std::istream& read(std::istream& is)
+            virtual std::istream& read (std::istream& is, const IO_Mode& amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN)
             {
-                return read_json<Generator<T>>(is, *this);
+                if (amode == BINARY)
+                {
+                    // todo: implement binary read.
+                }
+                else // json format
+                {
+                    Json j;
+                    Id id;
+                    IVersionPtr v;
+                    read_json<Generator<T>>(is, *this, &id, v, &j);
+                }
+                return is;
             };
 
-            virtual std::ostream& write(std::ostream& os) const
+            virtual std::ostream& write (std::ostream& os, const IO_Mode& amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN) const
             {
-                return write_json<Generator<T>>(os, *this);
+                if (amode == BINARY)
+                {
+                    // todo: implement binary write.
+                }
+                else // json format
+                {
+                    os << json ();
+                }
+                return os;
             };
             
-            friend void from_json<T>(const Json& j, Generator<T>& g);
+            //friend void from_json<T>(const Json& j, Generator<T>& g);
             
             void set_id (const Id& aid) { Object::set_id (aid); }
 
@@ -112,8 +136,8 @@ namespace pensar_digital
             {
                 String xml = ObjXMLPrefix() + ">";
                 //xml += VERSION->xml(); //todo.
-                xml += "<value>" + pd::to_string(fvalue) + "</value>";
-                xml += "<step>" + pd::to_string(fstep) + "</step>";
+                xml += "<value>" + pd::to_string(mvalue) + "</value>";
+                xml += "<step>" + pd::to_string(mstep) + "</step>";
                 xml += "</object>";
                 return xml;
             }   
@@ -125,16 +149,16 @@ namespace pensar_digital
                 // todo: check version.
                 XMLNode n = node.getChildNode("value");
                 if (!n.isEmpty())
-                    fvalue = atoi (n.getText());
+                    mvalue = atoi (n.getText());
 
                 n = node.getChildNode("step");
 				if (!n.isEmpty()) 
-                    fstep = atoi (n.getText());
+                    mstep = atoi (n.getText());
             }
 
         private:
-            Id fvalue; //!< Member variable "id"
-            Id fstep;  //!< Step to increment value.
+            Id mvalue; //!< Member variable "id"
+            Id mstep;  //!< Step to increment value.
       }; // class Generator
     } // namespace cpplib
 } // namespace pensar_digital

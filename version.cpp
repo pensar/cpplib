@@ -2,9 +2,9 @@
 // license: MIT (https://opensource.org/licenses/MIT)
 
 #include "version.hpp"
-#include "json_util.hpp"
 #include "iobject.hpp"
 #include "type_util.hpp"
+#include "io_util.hpp"
 
 #include <iostream>
 
@@ -13,6 +13,7 @@ namespace pensar_digital
 	namespace cpplib
 	{
 
+		/*
 		void to_json(Json& j, const Version& v)
 		{
 			j["class"] = v.class_name();
@@ -35,6 +36,7 @@ namespace pensar_digital
 			}
 			else throw new std::runtime_error("Version expected class = " + class_name + " but json has " + json_class);
 		}
+		*/
 
 		std::istream& operator >> (std::istream& is, Version& v)
 		{
@@ -53,7 +55,7 @@ namespace pensar_digital
 				return is;
 			}
 		}
-
+				
 		std::ostream& operator << (std::ostream& os, const Version& v)
 		{
 			// Check if os is in binary mode.
@@ -63,11 +65,7 @@ namespace pensar_digital
 			}
 			else // json format
 			{
-				Json j;
-				j["mpublic"   ] = v.get_public    ();
-				j["mprotected"] = v.get_protected ();
-				j["mprivate"  ] = v.get_private   ();
-				os << j;
+				os << v.json ();
 			}
 			return os;
 		}
@@ -118,17 +116,50 @@ namespace pensar_digital
 
 		String Version::json() const noexcept
 		{
-			return pd::json<Version>(*this);
+			std::stringstream ss;
+			ss << "{ \"class\" : \"" << pd::class_name<Version>() << "\" , \"id\" : " << get_id() << ", \"mpublic\" : " << mpublic << ", \"mprotected\" : " << mprotected << ", \"mprivate\" : " << mprivate << " }";
+			return ss.str();
 		}
 	
-		std::istream& Version::read (std::istream& is)
+		std::istream& Version::read (std::istream& is, const IO_Mode& amode, const ByteOrder& abyte_order)
 		{
-			return pd::read_json<Version> (is, *this);
+			if (amode == BINARY)
+			{
+				binary_read<Id>        (is, mid, abyte_order);
+				binary_read<VersionInt>(is, mpublic, abyte_order);
+				binary_read<VersionInt>(is, mprotected, abyte_order);
+				binary_read<VersionInt>(is, mprivate, abyte_order);
+			}
+			else // json format
+			{
+				String sjson;
+				is >> sjson;
+				auto j = Json::parse(sjson);
+				String json_class = j.at("class");
+				if (json_class != pd::class_name<Version>())
+					throw std::runtime_error("Invalid class name: " + pd::class_name<Version>());
+				mid = j.at("id").get<Id>();
+				mpublic = j.at("mpublic").get<VersionInt>();
+				mprotected = j.at("mprotected").get<VersionInt>();
+				mprivate = j.at("mprivate").get<VersionInt>();
+			}
+			return is;
 		}
 
-		std::ostream& Version::write(std::ostream& os) const
+		std::ostream& Version::write(std::ostream& os, const IO_Mode& amode, const ByteOrder& abyte_order) const
 		{
-			return write_json<Version>(os, *this);
+			if (amode == BINARY)
+			{
+				binary_write<Id> (os, get_id (), abyte_order);
+				binary_write<VersionInt>(os, mpublic);	
+				binary_write<VersionInt>(os, mprotected);
+				binary_write<VersionInt>(os, mprivate);	
+				return os;
+			}
+			else // json format
+			{
+				return os << json ();
+			}
 		}
 	} // namespace cpplib
 } // namespace pensar_digital

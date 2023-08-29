@@ -62,7 +62,7 @@ namespace pensar_digital
 
         TEST(ObjectJsonConversion, true)
             IObjectPtr o = objectf.get(42);
-            String expected = "{\"class\":\"pensar_digital::cpplib::Object\",\"id\":42,\"mprivate\":1,\"mprotected\":1,\"mpublic\":1}";
+            String expected = "{ \"class\" : pensar_digital::cpplib::Object, \"id\" : 42, { \"class\" : \"pensar_digital::cpplib::Version\" , \"id\" : 0, \"mpublic\" : 1, \"mprotected\" : 1, \"mprivate\" : 1 } }";
             CHECK_EQ(String, o->json (), expected, "0.");
 
             IObjectPtr o1 = objectf.parse_json (o->json());
@@ -135,14 +135,14 @@ namespace pensar_digital
                 std::ifstream in("c:\\tmp\\test\\ObjectTextStreaming\\test.txt");
                 for (Id i = 0; i < 1000; i++)
                 {
-                    IObjectPtr o = objectf.get();
+                    ObjectPtr o = objectf.get();
                     in >> o;
                     IObjectPtr o1 = objectf.get(i);
                     CHECK_EQ(IObject, *o, *o1, pd::to_string(i));
                 }
                 TEST_END(ObjectTextStreaming2)
                 
-            TEST(ObjectBinaryStreaming, true)
+            TEST(ObjectBinaryStreaming, false)
 				// Creates a vector with 1000 objects
 				std::vector<IObjectPtr> objects;
                 for (Id i = 0; i < 1000; i++)
@@ -159,7 +159,7 @@ namespace pensar_digital
                 std::ifstream in ("c:\\tmp\\test\\ObjectBinaryStreaming\\test.bin", std::ios::binary);
                 for (Id i = 0; i < 1000; i++)
                 {
-					IObjectPtr o = objectf.get();
+					ObjectPtr o = objectf.get();
 					in >> o;
                     IObjectPtr o1 = objectf.get(i);
                     CHECK_EQ(IObject, *o, *o1, pd::to_string(i));

@@ -61,21 +61,44 @@ namespace pensar_digital
                 // Conversion to json string.
                 virtual String json() const noexcept
                 {
-                    return pd::json<Name>(*this);
+                    std::stringstream ss (pd::json<Name>(*this));
+                    ss << " , \"name\" : \"" << name << "\" }";
+                    return ss.str();
                 }
 
-                virtual std::istream& read(std::istream& is)
+                virtual std::istream& read (std::istream& is, const IO_Mode& amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN)
                 {
-                    return pd::read_json<Name>(is, *this);
+                    if (amode == BINARY)
+                    {
+                        // todo: implement binary read.
+                    }
+                    else // json format
+                    {
+                        Json j;
+                        Id id;
+                        IVersionPtr v;
+                        pd::read_json<Name>(is, *this, &id, v, &j);
+                        set_id (id);
+                        name = j["name"];
+                    }
+                    return is;
                 };
 
-                virtual std::ostream& write(std::ostream& os) const
+                virtual std::ostream& write (std::ostream& os, const IO_Mode& amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN) const
                 {
-                    return pd::write_json<Name>(os, *this);
+                    if (amode == BINARY)
+                    {
+                        // todo: implement binary read.
+                    }
+                    else // json format
+                    {
+                        os << json ();
+                    }
+                    return os;
                 };
 
-                friend void to_json(Json& j, const Name& n);
-                friend void from_json(const Json& j, Name& n);
+                //friend void to_json(Json& j, const Name& n);
+                //friend void from_json(const Json& j, Name& n);
                 friend std::istream& operator >> (std::istream& is, Name& n);
                 friend std::ostream& operator << (std::ostream& os, const Name& n);
 

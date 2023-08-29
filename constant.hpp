@@ -17,6 +17,9 @@ namespace pensar_digital
         using FileSize   = int64_t;
         extern String DOUBLE_QUOTES;
         extern const Id NULL_ID;
+        enum ByteOrder { LITTLE_ENDIAN = true, BIG_ENDIAN = false };
+        enum IO_Mode { BINARY = true, TEXT = false };
+
     }   // namespace cpplib
 }       // namespace pensar_digital
 

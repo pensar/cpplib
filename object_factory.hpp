@@ -6,6 +6,7 @@
 
 #include "factory.hpp"
 #include "object.hpp"
+#include "json_util.hpp"  // for read_json and write_json.
 
 namespace pensar_digital
 {
@@ -35,13 +36,11 @@ namespace pensar_digital
 
 				P parse_json(const String& sjson)
 				{
-					auto j = Json::parse(sjson);
-					String json_class = j.at("class");
-					if (json_class != pd::class_name<Object> ())
-						throw std::runtime_error("Invalid class name: " + pd::class_name<Object> ());
-					Object o = j;
-
-					return clone(o);
+					Json j;
+					P ptr = get ();
+					std::stringstream ss (sjson);
+					ss >> *ptr;
+					return ptr;
 				}
 
 		};

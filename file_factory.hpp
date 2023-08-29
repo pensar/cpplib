@@ -37,13 +37,11 @@ namespace pensar_digital
 
 			P parse_json(const String& sjson)
 			{
-				auto j = Json::parse(sjson);
-				String json_class = j.at("class");
-				if (json_class != pd::class_name<File>())
-					throw std::runtime_error("Invalid class name: " + pd::class_name<File>());
-				File p = j;
-
-				return clone(p);
+				Json j;
+				P ptr = get();
+				std::stringstream ss(sjson);
+				ss >> *ptr;
+				return ptr;
 			};
 		};
 

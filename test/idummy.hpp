@@ -40,7 +40,7 @@ namespace pensar_digital
 
             virtual ~IDummy() noexcept = default;
             
-            virtual std::istream& read(std::istream& is) = 0;
+            virtual std::istream& read (std::istream& os, const IO_Mode& amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN) = 0;
 			virtual void set_name(const String& name) noexcept = 0;
 
             // Convertion from xml string.

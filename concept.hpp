@@ -113,7 +113,41 @@ namespace pensar_digital
 		// Streamable concept.
 		template<typename T>
 		concept Streamable = OutputStreamable<T> && InputStreamable<T>;
-	}
-}
+
+		// A concept requiring a type that supports reinterpret_cast<char*>(*t).
+		template <typename T>
+		concept CharCastable = requires(T * t) {
+			{ reinterpret_cast<char*>(*t) } -> std::same_as<char*>;
+		};
+
+		// SizeableType, a concept requiring a type that supports sizeof(t).
+		template <typename T>
+		concept SizeableType = requires(T t)
+		{
+			{ sizeof(t) } -> std::same_as<size_t>;
+		};
+
+		// SizeableObject requires a public size () method returning something convertible to size_t .
+		template <typename T>
+		concept SizeableObject = requires(T t) { { t.size() } -> std::convertible_to<size_t>; };
+
+		// Sizeable, requires SizeableType or SizeableObject.
+		template <typename T>
+			concept Sizeable = SizeableType<T> || SizeableObject<T>;
+
+		// BinaryStreamable concept requires CharCastable, Sizeable and Streamable.
+		template <typename T>
+		concept BinaryStreamable = CharCastable<T> && Sizeable<T> && Streamable<T>;
+
+		// BinaryConvertible concept requires SizeableObject and a public method to_binary() returning something convertible to char *.
+		template <typename T>
+		concept BinaryConvertible = requires(T t) { { t.to_binary () } -> std::convertible_to<char*>; } && SizeableObject<T>;
+
+		template <typename T>
+		concept BinaryStreamableObject = BinaryConvertible<T> && Streamable<T>;
+
+
+	} // namespace cpplib
+} // namespace pensar_digital	
 #endif // CONCEPT
 

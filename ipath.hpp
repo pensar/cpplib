@@ -49,7 +49,7 @@ namespace pensar_digital
 
             virtual ~IPath() noexcept = default;
 
-            virtual std::istream& read(std::istream& is) = 0;
+            virtual std::istream& read (std::istream& os, const IO_Mode& amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN) = 0;
 
             // Convertion from xml string.
             virtual void from_xml(const String& sxml) = 0;

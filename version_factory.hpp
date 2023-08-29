@@ -25,7 +25,7 @@ namespace pensar_digital
 													const Id& aid = NULL_ID) : VersionFactoryBase (3, 10, pub, pro, pri, aid) { };
 			virtual ~VersionFactory() { };
 			using P = VersionFactoryBase::P;
-			virtual P get (const VersionInt& pub = Version::NULL_VERSION,
+			virtual P get (const VersionInt& pub = pd::Version::NULL_VERSION,
 						   const VersionInt& pro = Version::NULL_VERSION,
 						   const VersionInt& pri = Version::NULL_VERSION,
 						   const Id& aid = NULL_ID)
@@ -42,13 +42,11 @@ namespace pensar_digital
 
 			P parse_json (const String& sjson)
 			{
-				auto j = Json::parse(sjson);
-				String json_class = j.at("class");
-				if (json_class != pd::class_name<Version>())
-					throw std::runtime_error("Invalid class name: " + pd::class_name<Version>());
-				Version v = j;
-
-				return clone(v);
+				Json j;
+				P ptr = get();
+				std::stringstream ss(sjson);
+				ss >> *ptr;
+				return ptr;
 			};
 		};
 

@@ -8,7 +8,8 @@ namespace pensar_digital
 
         std::ostream& operator << (std::ostream& os, const Name& n) { return n.write(os); };
 
-        void to_json (Json& j, const Name& n)
+        /*
+        void to_json(Json& j, const Name& n)
         {
             j["class"                      ] = n.class_name();
             pd::to_json (j, static_cast<const Object&> (n));
@@ -26,6 +27,6 @@ namespace pensar_digital
             }
             else throw new std::runtime_error("Expected class = " + class_name + " but json has " + json_class);
         }
-
+        */
 	}
 }

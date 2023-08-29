@@ -9,9 +9,9 @@
 #include "string_util.hpp"
 #include "header_lib/xmlParser.h"
 #include "clone_util.hpp"
-#include "json_util.hpp"  // for read_json and write_json.
 #include "xml_util.hpp"   // for read_xml and write_xml.
 #include "version_factory.hpp"
+#include "json_util.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -105,11 +105,14 @@ namespace pensar_digital
                 virtual bool initialize(const Id& aid = NULL_ID) noexcept { id = aid; return true; }
 
                 // Conversion to json string.
-                virtual String json() const noexcept { return pd::json<Object>(*this); }
+                inline virtual String json () const noexcept 
+                { 
+                    return pd::json<Object> (*this) + " }";
+                }
 
-                virtual std::istream& read(std::istream& is);
+                virtual std::istream& read (std::istream& is, const IO_Mode& amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN);
 
-                virtual std::ostream& write(std::ostream& os) const;
+                virtual std::ostream& write (std::ostream& os, const IO_Mode& amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN) const;
 
                 // Conversion to xml string.
                 virtual String xml() const noexcept { return ObjXMLPrefix() + "/>"; }
@@ -166,15 +169,16 @@ namespace pensar_digital
                 /// Move assignment operator
                 Object& operator=(IObjectRO&& o) noexcept { return assign(o); }
 
-                friend void from_json(const Json& j, Object& o);
+                //friend void from_json(const Json& j, Object& o);
             };
-            extern void to_json(Json& j, const Object& o);
-            extern void from_json(const Json& j, Object& o);
+            //extern void to_json(Json& j, const Object& o);
+            //extern void from_json(const Json& j, Object& o);
 
-            extern std::istream& operator >> (std::istream& is, IObject& o);
-            extern std::ostream& operator << (std::ostream& os, const IObject& o);
-            extern std::istream& operator >> (std::istream& is, IObjectPtr o);
-            extern std::ostream& operator << (std::ostream& os, const IObjectPtr o);
+            inline std::istream& operator >> (std::istream& is,          Object& o) { return o.read (is) ; }
+            inline std::ostream& operator << (std::ostream& os, const   IObject& o) { return o.write (os); }
+            inline std::istream& operator >> (std::istream& is,        ObjectPtr o) { return is >> *o    ; }
+            inline std::ostream& operator << (std::ostream& os, const IObjectPtr o) { return os << *o    ; }
+
 
             // Dependency class is a Constrainable class used to define dependencies between objects.
             template <Versionable MainClass, Versionable RequiredClass>
