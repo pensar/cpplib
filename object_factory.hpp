@@ -37,9 +37,13 @@ namespace pensar_digital
 				P parse_json(const String& sjson)
 				{
 					Json j;
-					P ptr = get ();
-					std::stringstream ss (sjson);
-					ss >> *ptr;
+					P ptr = get (pd::get_id<Object>(sjson, &j));
+
+					IVersionPtr v = versionf.get (j);
+
+					// todo: check version compatibility.
+					if (*(ptr->VERSION) != *v)
+						throw std::runtime_error("ObjectFactory::parse_json: version mismatch.");
 					return ptr;
 				}
 

@@ -40,6 +40,21 @@ namespace pensar_digital
 
 			P clone (const IVersionPtr& ptr) { return clone(*ptr); }
 
+			/// <summary>
+			/// To be called when parsing a json object with an embedded IVersionPtr object.
+			/// </summary>
+			/// <param name="j"></param>
+			/// <returns></returns>
+			P get (const Json& j)
+			{
+				Id vid                = j["VERSION"]["id"        ].get<VersionInt>();
+				VersionInt vpublic    = j["VERSION"]["mpublic"   ].get<VersionInt>();
+				VersionInt vprotected = j["VERSION"]["mprotected"].get<VersionInt>();
+				VersionInt vprivate   = j["VERSION"]["mprivate"  ].get<VersionInt>();
+				
+				return versionf.get (vpublic, vprotected, vprivate, vid);
+			};
+
 			P parse_json (const String& sjson)
 			{
 				Json j;

@@ -61,8 +61,8 @@ namespace pensar_digital
         String json (const T& o)
         {
             std::stringstream ss;
-            ss << "{ \"class\" : " << o.class_name();
-            ss << ", \"id\" : " << o.get_id() << ", ";
+            ss << "{ \"class\" : \"" << o.class_name();
+            ss << "\", \"id\" : " << o.get_id() << ", \"VERSION\": ";
             ss << *(o.VERSION);
             return ss.str();
         }

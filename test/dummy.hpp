@@ -61,8 +61,9 @@ typedef std::shared_ptr<Dummy> DummyPtr;
                 // Conversion to json string.
                 virtual String json() const noexcept
                 {
-                    std::stringstream ss(pd::json<Dummy> (*this));
-                    ss << " , \"name\" : " << name << " }";
+                    std::stringstream ss;
+                    ss << (pd::json<Dummy>(*this));
+                    ss << ", \"name\" : \"" << name << "\" }";
                     return ss.str();
                 }
 

@@ -33,8 +33,12 @@ namespace pensar_digital
 			{
 				Json j;
 				P ptr = get(pd::get_id<Dummy>(sjson, &j));
-				return ptr;
 				ptr->set_name (j.at("name"));
+				IVersionPtr v = versionf.get(j);
+
+				// todo: check version compatibility.
+				if (*(ptr->VERSION) != *v)
+					throw std::runtime_error("DummyFactory::parse_json: version mismatch.");
 
 				return ptr;
 			};

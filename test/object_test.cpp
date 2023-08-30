@@ -42,34 +42,36 @@ namespace pensar_digital
             IObjectPtr o = objectf.get(42);
 			std::stringstream ss;
 			ss << *o;
-            String expected = "{\"class\":\"pensar_digital::cpplib::Object\",\"id\":42,\"mprivate\":1,\"mprotected\":1,\"mpublic\":1}";
+            String expected = "{ \"class\" : \"pensar_digital::cpplib::Object\", \"id\" : 42, \"VERSION\": { \"class\" : \"pensar_digital::cpplib::Version\" , \"id\" : 0, \"mpublic\" : 1, \"mprotected\" : 1, \"mprivate\" : 1 } }";
             CHECK_EQ(String, ss.str(), expected, "0");
 
             ObjectPtr o2 = objectf.get();
-            ss >> *o2;
+            std::stringstream ss2;
+            ss2 << o->json();
+            ss2 >> *o2;
             CHECK(*o == *o2, "0. o == o2 should be true");
 
-            std::stringstream ss2;
-
 			IDummyPtr d = dummyf.get (42, "d");
-            ss2 << *d;
-            expected =  "{\"class\":\"pensar_digital::cpplib::Dummy\",\"id\":42,\"mprivate\":1,\"mprotected\":1,\"mpublic\":1,\"name\":\"d\"}";
-            CHECK_EQ(String, ss2.str(), expected, "1");  
+            std::stringstream ss3;
+            ss3 << *d;
+            String expected2 = "{ \"class\" : \"pensar_digital::cpplib::Dummy\", \"id\" : 42, \"VERSION\": { \"class\" : \"pensar_digital::cpplib::Version\" , \"id\" : 0, \"mpublic\" : 1, \"mprotected\" : 1, \"mprivate\" : 1 } }";
+            CHECK_EQ(String, ss3.str(), expected2, "1");
 			DummyPtr d2 = dummyf.get ();
-			ss2 >> *d2;
+			ss3 >> *d2;
 			CHECK_EQ(IDummy, *d, *d2, "1. d == d2 should be true");
         TEST_END(ObjectStreaming)
 
         TEST(ObjectJsonConversion, true)
             IObjectPtr o = objectf.get(42);
-            String expected = "{ \"class\" : pensar_digital::cpplib::Object, \"id\" : 42, { \"class\" : \"pensar_digital::cpplib::Version\" , \"id\" : 0, \"mpublic\" : 1, \"mprotected\" : 1, \"mprivate\" : 1 } }";
+            String expected = "{ \"class\" : \"pensar_digital::cpplib::Object\", \"id\" : 42, \"VERSION\": { \"class\" : \"pensar_digital::cpplib::Version\" , \"id\" : 0, \"mpublic\" : 1, \"mprotected\" : 1, \"mprivate\" : 1 } }";
             CHECK_EQ(String, o->json (), expected, "0.");
 
             IObjectPtr o1 = objectf.parse_json (o->json());
             CHECK(*o == *o1, "1. o should be equal to o1");
 
            IDummyPtr d = dummyf.get (42, "d");
-           expected = "{\"class\":\"pensar_digital::cpplib::Dummy\",\"id\":42,\"mprivate\":1,\"mprotected\":1,\"mpublic\":1,\"name\":\"d\"}";
+           expected = "{ \"class\" : \"pensar_digital::cpplib::Dummy\", \"id\" : 42, \"VERSION\": { \"class\" : \"pensar_digital::cpplib::Version\" , \"id\" : 0, \"mpublic\" : 1, \"mprotected\" : 1, \"mprivate\" : 1 }, \"name\" : \"" 
+                      + d->get_name() + "\" }";
            CHECK_EQ(String, d->json (), expected, "2");
 
            IDummyPtr d1 = dummyf.parse_json (d->json());
