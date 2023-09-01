@@ -279,9 +279,11 @@ namespace pensar_digital
                         Json j;
                         IVersionPtr v;
                         Id stream_id;
-                        pd::read_json<Path>(is, *this, &stream_id, v, &j);
+                        pd::read_json<Path>(is, *this, &stream_id, &v, &j);
                         set_id (stream_id);
                         *this = j["path"].get<std::string>();
+
+                        if (*VERSION != *v) throw std::runtime_error ("Version mismatch.");
                     }
                     return is;
                 };
@@ -575,7 +577,7 @@ namespace pensar_digital
                         Json j;
                         IVersionPtr v;
                         Id id;
-                        read_json<File>(is, *this, &id, v, &j);
+                        read_json<File>(is, *this, &id, &v, &j);
                         set_id (id);
                         full_path = j["full_path"].get<String>();
 						mode = j["mode"].get<std::ios_base::openmode>();

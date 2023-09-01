@@ -78,7 +78,7 @@ typedef std::shared_ptr<Dummy> DummyPtr;
                         Json j;
                         Id id;
                         IVersionPtr v;
-                        pd::read_json<Dummy>(is, *this, &id, v, &j);
+                        pd::read_json<Dummy>(is, *this, &id, &v, &j);
                         set_id (id);
                         name = j["name"].get<String>();
                     }

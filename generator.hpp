@@ -109,7 +109,7 @@ namespace pensar_digital
                     Json j;
                     Id id;
                     IVersionPtr v;
-                    read_json<Generator<T>>(is, *this, &id, v, &j);
+                    read_json<Generator<T>>(is, *this, &id, &v, &j);
                 }
                 return is;
             };

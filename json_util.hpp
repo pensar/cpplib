@@ -46,14 +46,20 @@ namespace pensar_digital
             }
 
         }
+        template <class T>
+        T& read_json(const String& sjson, T& o, Id* out_id, IVersionPtr* out_v, Json* out_j = nullptr)
+        {
+            *out_id = (get_id<T>(sjson, out_j));
+            *out_v = versionf.get(*out_j);
+            return o;
+        }
 
         template <class T>
-        std::istream& read_json(std::istream& is, T& o, Id* out_id, IVersionPtr out_v, Json* out_j = nullptr)
+        std::istream& read_json(std::istream& is, T& o, Id* out_id, IVersionPtr* out_v, Json* out_j = nullptr)
         {
             String sjson;
             is >> sjson;
-            *out_id = (get_id<T>(sjson, out_j));
-            out_v = versionf.get(out_j->at("mpublic").get<VersionInt>(), out_j->at("mprotected").get<VersionInt>(), out_j->at("mprivate").get<VersionInt>());
+            read_json(sjson, o, out_id, out_v, out_j);
             return is;
         }
 

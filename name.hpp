@@ -77,9 +77,16 @@ namespace pensar_digital
                         Json j;
                         Id id;
                         IVersionPtr v;
-                        pd::read_json<Name>(is, *this, &id, v, &j);
+                        pd::read_json<Name>(is, *this, &id, &v, &j);
                         set_id (id);
                         name = j["name"];
+
+                        if (*VERSION != *v)
+						{
+							std::stringstream ss;
+							ss << "Version mismatch: " << *VERSION << " != " << *v;
+							throw std::runtime_error (ss.str());
+						}
                     }
                     return is;
                 };

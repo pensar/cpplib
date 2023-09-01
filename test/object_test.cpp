@@ -46,15 +46,13 @@ namespace pensar_digital
             CHECK_EQ(String, ss.str(), expected, "0");
 
             ObjectPtr o2 = objectf.get();
-            std::stringstream ss2;
-            ss2 << o->json();
-            ss2 >> *o2;
+            o->json () >> *o2;
             CHECK(*o == *o2, "0. o == o2 should be true");
 
 			IDummyPtr d = dummyf.get (42, "d");
             std::stringstream ss3;
             ss3 << *d;
-            String expected2 = "{ \"class\" : \"pensar_digital::cpplib::Dummy\", \"id\" : 42, \"VERSION\": { \"class\" : \"pensar_digital::cpplib::Version\" , \"id\" : 0, \"mpublic\" : 1, \"mprotected\" : 1, \"mprivate\" : 1 } }";
+            String expected2 = "{ \"class\" : \"pensar_digital::cpplib::Dummy\", \"id\" : 42, \"VERSION\": { \"class\" : \"pensar_digital::cpplib::Version\" , \"id\" : 0, \"mpublic\" : 1, \"mprotected\" : 1, \"mprivate\" : 1 }, \"name\" : \"d\" }";
             CHECK_EQ(String, ss3.str(), expected2, "1");
 			DummyPtr d2 = dummyf.get ();
 			ss3 >> *d2;

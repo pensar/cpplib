@@ -8,6 +8,20 @@ namespace pensar_digital
 	namespace cpplib
 	{
         
+        Object& Object::parse_json (const String& sjson)
+        {
+            IVersionPtr v;
+            Id aid;
+            Json j;
+            pd::read_json<Object> (sjson, *this, &aid, &v, &j);
+            id = aid;
+
+            // todo: check version compatibility.
+            if (*VERSION != *v)
+                throw std::runtime_error("ObjectFactory::parse_json: version mismatch.");
+            return *this;
+        }
+
         // implements input stream member virtual std::istream& Object::read(std::istream& is)
         std::istream& Object::read(std::istream& is, const IO_Mode& amode, const ByteOrder& abyte_order)
         {
@@ -21,7 +35,10 @@ namespace pensar_digital
 				IVersionPtr stream_version;
 				Id stream_id;
                 Json j;
-                pd::read_json<Object>(is, *this, &stream_id, stream_version, &j);
+                pd::read_json<Object>(is, *this, &stream_id, &stream_version, &j);
+                id = stream_id;
+                if (*VERSION != *stream_version)
+                    throw new std::runtime_error("Object::read: version mismatch.");
             }
             return is;
         };

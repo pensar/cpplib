@@ -143,6 +143,8 @@ namespace pensar_digital
                 bool operator == (const IObjectRO& o) const { return   equals(o); }
                 bool operator != (const IObjectRO& o) const { return !equals(o); }
 
+                Object& parse_json(const String& sjson);
+
                 /// Conversion to string.
                 /// \return A string with the object id.
                 virtual String to_string() const noexcept { return std::to_string(id); }
@@ -175,6 +177,7 @@ namespace pensar_digital
             //extern void from_json(const Json& j, Object& o);
 
             inline std::istream& operator >> (std::istream& is,          Object& o) { return o.read (is) ; }
+            inline       Object& operator >> (const String& sjson      , Object& o) { return o.parse_json(sjson); }
             inline std::ostream& operator << (std::ostream& os, const   IObject& o) { return o.write (os); }
             inline std::istream& operator >> (std::istream& is,        ObjectPtr o) { return is >> *o    ; }
             inline std::ostream& operator << (std::ostream& os, const IObjectPtr o) { return os << *o    ; }
