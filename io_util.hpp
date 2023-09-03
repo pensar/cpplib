@@ -16,20 +16,72 @@
 
 #include <string>
 #ifdef _MSC_VER
+#include <io.h>
+#include <windows.h>
 #include <filesystem>
 #else
 #include <experimental/filesystem>
-#endif
-
-
-#ifdef WINDOWS
-    #include <io.h>
 #endif
 
 namespace pensar_digital
 {
     namespace cpplib
     {
+
+#ifdef _MSC_VER
+        inline String& windows_read_file (const String& filename, String* s) 
+        {
+            HANDLE file = CreateFileA(filename.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+            if (file == INVALID_HANDLE_VALUE) {
+                // handle error
+            }
+            DWORD file_size = GetFileSize(file, NULL);
+            HANDLE file_mapping = CreateFileMapping(file, NULL, PAGE_READONLY, 0, 0, NULL);
+            if (file_mapping == NULL) {
+                // handle error
+            }
+            char* addr = static_cast<char*>(MapViewOfFile(file_mapping, FILE_MAP_READ, 0, 0, file_size));
+            if (addr == NULL) {
+                // handle error
+            }
+            s = new String(addr, file_size);
+            UnmapViewOfFile(addr);
+            CloseHandle(file_mapping);
+            CloseHandle(file);
+            return *s;
+        }
+#endif
+#ifdef __linux__
+        inline String& linux_read_file (const String& filename, String* s)
+		{
+			int fd = open(filename.c_str(), O_RDONLY);
+			if (fd == -1) {
+				// handle error
+			}
+			struct stat sb;
+			if (fstat(fd, &sb) == -1) {
+				// handle error
+			}
+			char* addr = static_cast<char*>(mmap(NULL, sb.st_size, PROT_READ, MAP_PRIVATE, fd, 0u));
+			if (addr == MAP_FAILED) {
+				// handle error
+			}
+			s = new String (addr, sb.st_size);
+			munmap(addr, sb.st_size);
+			close(fd);
+			return s;
+		}
+#endif  
+        inline String& read_file_mmap (const String& filename, String *s) 
+		{   
+#ifdef _MSC_VER
+			return windows_read_file (filename, s);
+#endif  
+#ifdef __linux__    
+        	return linux_read_file (filename, s);
+#endif  
+        }
+
         template <typename T>
         void binary_write(std::ostream& os, const T& t, const size_t& size, const ByteOrder& byte_order = LITTLE_ENDIAN)
         {
@@ -555,9 +607,9 @@ namespace pensar_digital
 					}
 					else
 					{
-						ss << " , \"text_data\" : " << text_data;
+						ss << " , \"text_data\" : \"" << text_data;
 					}
-                    ss << " }";
+                    ss << "\" }";
                     return ss.str();
                 }
 
@@ -702,7 +754,7 @@ namespace pensar_digital
         {
 			private:
 			public:
-            TextFile(const Path& full_path, const std::ios_base::openmode amode, const String& content = "", const Id aid = NULL_ID) : File(full_path, (amode & (~std::ios::binary)), aid)
+            TextFile(const Path& full_path, const std::ios_base::openmode amode = IN_OUT_ATE_MODE, const String& content = "", const Id aid = NULL_ID) : File(full_path, (amode & (~std::ios::binary)), aid)
             { 
                 append(content);
             }
@@ -715,7 +767,18 @@ namespace pensar_digital
             File& append (const String& content)
             {
                return _append<String>(content);
-			}    
+			} 
+
+            String to_string() const noexcept
+			{
+				return text_data;
+			}
+
+            // Implicit conversion to string.
+            operator String() const noexcept
+			{
+				return to_string();
+			}
 		};
 
         class BinaryFile : public File
@@ -724,6 +787,34 @@ namespace pensar_digital
 
         using LINE_HANDLER = void(*)(const int64_t line_count, const std::string& line);
         extern uintmax_t read_file(const std::string& fname, LINE_HANDLER f);
+
+/*
+#include <fstream>
+#include <string>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+        std::string read_file(const std::string& filename) {
+            int fd = open(filename.c_str(), O_RDONLY);
+            if (fd == -1) {
+                // handle error
+            }
+            struct stat sb;
+            if (fstat(fd, &sb) == -1) {
+                // handle error
+            }
+            char* addr = static_cast<char*>(mmap(nullptr, sb.st_size, PROT_READ, MAP_PRIVATE, fd, 0));
+            if (addr == MAP_FAILED) {
+                // handle error
+            }
+            std::string str(addr, sb.st_size);
+            munmap(addr, sb.st_size);
+            close(fd);
+            return str;
+        }
+*/
 
         // Constantes usadas em is_same ().
         extern const int SAME_NAME;

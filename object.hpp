@@ -171,10 +171,10 @@ namespace pensar_digital
                 /// Move assignment operator
                 Object& operator=(IObjectRO&& o) noexcept { return assign(o); }
 
-                //friend void from_json(const Json& j, Object& o);
+                friend void from_json(const Json& j, Object& o);
             };
-            //extern void to_json(Json& j, const Object& o);
-            //extern void from_json(const Json& j, Object& o);
+            extern void to_json(Json& j, const Object& o);
+            extern void from_json(const Json& j, Object& o);
 
             inline std::istream& operator >> (std::istream& is,          Object& o) { return o.read (is) ; }
             inline       Object& operator >> (const String& sjson      , Object& o) { return o.parse_json(sjson); }

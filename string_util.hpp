@@ -34,6 +34,20 @@ namespace pensar_digital
         extern const bool TRIM_ELEMENTS;
         extern const bool INCLUDE_EMPTY_FIELDS;
 
+        // Reads all chars from a istream into a string.
+        // \param is the input stream.
+        // \param s the string to hold the result.
+        inline String& read_all (std::basic_istream<String::value_type>& is, String& s)
+        {
+			String::value_type c;
+			while (is.get (c))
+				s += c;
+            return s;
+		}
+        
+        //std::string str((std::istreambuf_iterator<char>(input_stream)), std::istreambuf_iterator<char>());
+
+        
         template<typename T>
         static inline std::basic_string<T>& ltrim (std::basic_string<T> &s)
         {

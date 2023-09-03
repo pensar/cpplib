@@ -34,6 +34,21 @@ namespace pensar_digital
 					return clone (*ptr);
 				};
 
+				P parse_json (const Json& j)
+				{
+					String json_class = j.at("class");
+					if (json_class != pd::class_name<Object>())
+						throw std::runtime_error("Invalid class name: " + pd::class_name<Object>());
+					P ptr = get (j.at("id"));
+
+					IVersionPtr v = versionf.get(j["VERSION"]);
+
+					if (*(ptr->VERSION) != *v)
+						throw std::runtime_error("ObjectFactory::parse_json: version mismatch.");
+
+					return ptr;
+				}
+
 				P parse_json(const String& sjson)
 				{
 					Json j;

@@ -58,8 +58,7 @@ namespace pensar_digital
         std::istream& read_json(std::istream& is, T& o, Id* out_id, IVersionPtr* out_v, Json* out_j = nullptr)
         {
             String sjson;
-            is >> sjson;
-            read_json(sjson, o, out_id, out_v, out_j);
+            read_json (read_all (is, sjson), o, out_id, out_v, out_j);
             return is;
         }
 

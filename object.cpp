@@ -57,7 +57,7 @@ namespace pensar_digital
             return os;
         };
 
-        /*
+        
         void to_json(Json& j, const Object& o)
         {
             j["class"                      ] = o.class_name();
@@ -73,6 +73,6 @@ namespace pensar_digital
                 o.set_id(j.at("id"));
             else throw new std::runtime_error("Object expected class = " + class_name + " but json has " + json_class);
         }
-        */
+        
     }
 }                                                                                                                                                                                                                                                                                                                                                                                           

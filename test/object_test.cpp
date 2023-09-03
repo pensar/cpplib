@@ -68,8 +68,8 @@ namespace pensar_digital
             CHECK(*o == *o1, "1. o should be equal to o1");
 
            IDummyPtr d = dummyf.get (42, "d");
-           expected = "{ \"class\" : \"pensar_digital::cpplib::Dummy\", \"id\" : 42, \"VERSION\": { \"class\" : \"pensar_digital::cpplib::Version\" , \"id\" : 0, \"mpublic\" : 1, \"mprotected\" : 1, \"mprivate\" : 1 }, \"name\" : \"" 
-                      + d->get_name() + "\" }";
+           expected = "{ \"class\" : \"pensar_digital::cpplib::Dummy\", \"id\" : 42, \"VERSION\": { \"class\" : \"pensar_digital::cpplib::Version\" , \"id\" : 0, \"mpublic\" : 1, \"mprotected\" : 1, \"mprivate\" : 1 }, \"name\" : \""
+                        + d->get_name() + "\" }";
            CHECK_EQ(String, d->json (), expected, "2");
 
            IDummyPtr d1 = dummyf.parse_json (d->json());
@@ -109,8 +109,8 @@ namespace pensar_digital
                 {
                     String si = pd::to_string(i);
                     IObjectPtr o = objectf.get(i);
-                    String expected = "{\"class\":\"pensar_digital::cpplib::Object\",\"id\":" + si;
-                    expected += ",\"mprivate\":1,\"mprotected\":1,\"mpublic\":1}";
+                    String expected = "{ \"class\" : \"pensar_digital::cpplib::Object\", \"id\" : " + si;
+                    expected += ", \"VERSION\": { \"class\" : \"pensar_digital::cpplib::Version\" , \"id\" : 0, \"mpublic\" : 1, \"mprotected\" : 1, \"mprivate\" : 1 } }";
                     CHECK_EQ(String, o->json(), expected, si);
                 }
             TEST_END(ObjectTextStreaming)
@@ -124,22 +124,30 @@ namespace pensar_digital
                 }
                 //pd::TextFile f("c:\\tmp\\test\\ObjectTextStreaming\\test.txt", "blah");
                 std::ofstream out("c:\\tmp\\test\\ObjectTextStreaming\\test.txt");
-
-                for (Id i = 0; i < 1000; i++)
+                out << "[";
+                for (Id i = 0; i < 999; i++)
                 {
-                    out << *objects[i] << std::endl;
+                    out << *objects[i] << ", " << std::endl;
                 }
+                out << *objects[999] << "]";
                 out.flush ();
                 out.close();
 
-                std::ifstream in("c:\\tmp\\test\\ObjectTextStreaming\\test.txt");
-                for (Id i = 0; i < 1000; i++)
+               std::ifstream f ("c:\\tmp\\test\\ObjectTextStreaming\\test.txt");
+               String s;
+               pd::read_all (f, s);
+                
+                Json j = Json::parse (s);
+
+                int i = 0;
+                for (const auto& item : j)
+                //for (int i = 0; i < 1000; i++)
                 {
-                    ObjectPtr o = objectf.get();
-                    in >> o;
-                    IObjectPtr o1 = objectf.get(i);
-                    CHECK_EQ(IObject, *o, *o1, pd::to_string(i));
+                    Object o = item;    
+                    CHECK_EQ(IObject, o, *objects[i], pd::to_string(i));
+                    ++i;
                 }
+
                 TEST_END(ObjectTextStreaming2)
                 
             TEST(ObjectBinaryStreaming, false)
