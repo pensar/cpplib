@@ -10,7 +10,7 @@ namespace pensar_digital
         
         Object& Object::parse_json (const String& sjson)
         {
-            IVersionPtr v;
+            VersionPtr v;
             Id aid;
             Json j;
             pd::read_json<Object> (sjson, *this, &aid, &v, &j);
@@ -32,7 +32,7 @@ namespace pensar_digital
             else // json format
             {
                 String stream_class_name;
-				IVersionPtr stream_version;
+				VersionPtr stream_version;
 				Id stream_id;
                 Json j;
                 pd::read_json<Object>(is, *this, &stream_id, &stream_version, &j);

@@ -7,6 +7,7 @@
 #include "factory.hpp"
 #include "object.hpp"
 #include "json_util.hpp"  // for read_json and write_json.
+#include "type_util.hpp"  // for class_name and get_id.
 
 namespace pensar_digital
 {
@@ -15,7 +16,7 @@ namespace pensar_digital
 		class ObjectFactory : public Factory<Object, Id>
 		{
 			public:
-				inline static const IVersionPtr VERSION = pd::versionf.get (1, 1, 1);
+				inline static const VersionPtr VERSION = pd::versionf.get (1, 1, 1);
 				ObjectFactory(const Id& aid = NULL_ID) : Factory<Object, Id> (3, 10, aid) { };
 				virtual ~ObjectFactory() { };
 				using P = Factory<Object, Id>::P;
@@ -24,12 +25,12 @@ namespace pensar_digital
 					return Factory<Object, Id>::get(aid);
 				};
 
-				P clone (const IObjectRO& aobj)
+				P clone (const Object& aobj)
 				{
 					return get (aobj.get_id());
 				};
 
-				P clone (const IObjectPtr& ptr)
+				P clone (const ObjectPtr& ptr)
 				{
 					return clone (*ptr);
 				};
@@ -41,7 +42,7 @@ namespace pensar_digital
 						throw std::runtime_error("Invalid class name: " + pd::class_name<Object>());
 					P ptr = get (j.at("id"));
 
-					IVersionPtr v = versionf.get(j["VERSION"]);
+					VersionPtr v = versionf.get(j["VERSION"]);
 
 					if (*(ptr->VERSION) != *v)
 						throw std::runtime_error("ObjectFactory::parse_json: version mismatch.");
@@ -54,7 +55,7 @@ namespace pensar_digital
 					Json j;
 					P ptr = get (pd::get_id<Object>(sjson, &j));
 
-					IVersionPtr v = versionf.get (j);
+					VersionPtr v = versionf.get (j);
 
 					// todo: check version compatibility.
 					if (*(ptr->VERSION) != *v)

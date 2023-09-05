@@ -28,18 +28,18 @@ namespace pensar_digital
         static_assert(Assignable<Dummy>);
 
         TEST(ObjectClone, true)
-            IObjectPtr  o = pd::objectf.get(42);
-            IObjectPtr o1 = pd::objectf.clone (*o);
+            ObjectPtr  o = pd::objectf.get(42);
+            ObjectPtr o1 = pd::objectf.clone (*o);
             CHECK(*o == *o1, "0. o == o1 should be true");
 
-            IDummyPtr d = dummyf.get (42, "d");
-            IDummyPtr d1 = dummyf.clone(d);
-            static_assert(OutputStreamable<IDummy>);
-            CHECK_EQ(IDummy, *d1, *d, "1. d != d1");
+            DummyPtr d = dummyf.get (42, "d");
+            DummyPtr d1 = dummyf.clone(d);
+            static_assert(OutputStreamable<Dummy>);
+            CHECK_EQ(Dummy, *d1, *d, "1. d != d1");
             TEST_END(ObjectClone)
 
         TEST(ObjectStreaming, true)
-            IObjectPtr o = objectf.get(42);
+            ObjectPtr o = objectf.get(42);
 			std::stringstream ss;
 			ss << *o;
             String expected = "{ \"class\" : \"pensar_digital::cpplib::Object\", \"id\" : 42, \"VERSION\": { \"class\" : \"pensar_digital::cpplib::Version\" , \"id\" : 0, \"mpublic\" : 1, \"mprotected\" : 1, \"mprivate\" : 1 } }";
@@ -49,50 +49,50 @@ namespace pensar_digital
             o->json () >> *o2;
             CHECK(*o == *o2, "0. o == o2 should be true");
 
-			IDummyPtr d = dummyf.get (42, "d");
+			DummyPtr d = dummyf.get (42, "d");
             std::stringstream ss3;
             ss3 << *d;
             String expected2 = "{ \"class\" : \"pensar_digital::cpplib::Dummy\", \"id\" : 42, \"VERSION\": { \"class\" : \"pensar_digital::cpplib::Version\" , \"id\" : 0, \"mpublic\" : 1, \"mprotected\" : 1, \"mprivate\" : 1 }, \"name\" : \"d\" }";
             CHECK_EQ(String, ss3.str(), expected2, "1");
 			DummyPtr d2 = dummyf.get ();
 			ss3 >> *d2;
-			CHECK_EQ(IDummy, *d, *d2, "1. d == d2 should be true");
+			CHECK_EQ(Dummy, *d, *d2, "1. d == d2 should be true");
         TEST_END(ObjectStreaming)
 
         TEST(ObjectJsonConversion, true)
-            IObjectPtr o = objectf.get(42);
+            ObjectPtr o = objectf.get(42);
             String expected = "{ \"class\" : \"pensar_digital::cpplib::Object\", \"id\" : 42, \"VERSION\": { \"class\" : \"pensar_digital::cpplib::Version\" , \"id\" : 0, \"mpublic\" : 1, \"mprotected\" : 1, \"mprivate\" : 1 } }";
             CHECK_EQ(String, o->json (), expected, "0.");
 
-            IObjectPtr o1 = objectf.parse_json (o->json());
+            ObjectPtr o1 = objectf.parse_json (o->json());
             CHECK(*o == *o1, "1. o should be equal to o1");
 
-           IDummyPtr d = dummyf.get (42, "d");
+           DummyPtr d = dummyf.get (42, "d");
            expected = "{ \"class\" : \"pensar_digital::cpplib::Dummy\", \"id\" : 42, \"VERSION\": { \"class\" : \"pensar_digital::cpplib::Version\" , \"id\" : 0, \"mpublic\" : 1, \"mprotected\" : 1, \"mprivate\" : 1 }, \"name\" : \""
                         + d->get_name() + "\" }";
            CHECK_EQ(String, d->json (), expected, "2");
 
-           IDummyPtr d1 = dummyf.parse_json (d->json());
-           CHECK_EQ(IDummy, *d, *d1, "3. d should be equal to d1");
+           DummyPtr d1 = dummyf.parse_json (d->json());
+           CHECK_EQ(Dummy, *d, *d1, "3. d should be equal to d1");
         TEST_END(ObjectJsonConversion)
         
         TEST(ObjectXMLConversion, true)
-            IObjectPtr o = objectf.get(42);
+            ObjectPtr o = objectf.get(42);
             String xml = o->xml ();
             String expected = "<object class_name = \"pensar_digital::cpplib::Object\" id = \"42\"/>";
             CHECK_EQ(String, xml, expected, "0. xml should be equal to " + expected + " but was " + xml + ".");
 
-            IObjectPtr o1 = objectf.get ();
-            CHECK_NOT_EQ(IObject, *o, *o1, "1. o == o1");
+            ObjectPtr o1 = objectf.get ();
+            CHECK_NOT_EQ(Object, *o, *o1, "1. o == o1");
             o1->from_xml(xml);
-            CHECK_EQ(IObject, *o, *o1, "2. o != o1");
+            CHECK_EQ(Object, *o, *o1, "2. o != o1");
 
-            IDummyPtr d = dummyf.get(42, "d");
+            DummyPtr d = dummyf.get(42, "d");
             xml = d->xml ();
             expected = "<object class_name = \"pensar_digital::cpplib::Dummy\" id = \"42\"><name>d</name></object>";
             CHECK_EQ(String, xml, expected, "2. xml should be equal to " + expected + " but was " + xml + ".");
 
-            IDummyPtr d1 = dummyf.get();
+            DummyPtr d1 = dummyf.get();
             CHECK(*d != *d1, "3. d == d1");
             d1->from_xml(xml);
             CHECK(*d == *d1, "4. d != d1");
@@ -100,7 +100,7 @@ namespace pensar_digital
 
             TEST(ObjectTextStreaming, true)
                 // Creates a vector with 1000 objects
-                std::vector<IObjectPtr> objects;
+                std::vector<ObjectPtr> objects;
                 for (Id i = 0; i < 1000; i++)
                 {
 			        objects.push_back(objectf.get(i));
@@ -108,7 +108,7 @@ namespace pensar_digital
                 for (Id i = 0; i < 1000; i++)
                 {
                     String si = pd::to_string(i);
-                    IObjectPtr o = objectf.get(i);
+                    ObjectPtr o = objectf.get(i);
                     String expected = "{ \"class\" : \"pensar_digital::cpplib::Object\", \"id\" : " + si;
                     expected += ", \"VERSION\": { \"class\" : \"pensar_digital::cpplib::Version\" , \"id\" : 0, \"mpublic\" : 1, \"mprotected\" : 1, \"mprivate\" : 1 } }";
                     CHECK_EQ(String, o->json(), expected, si);
@@ -117,7 +117,7 @@ namespace pensar_digital
 
             TEST(ObjectTextStreaming2, true)
                 // Creates a vector with 1000 objects
-                std::vector<IObjectPtr> objects;
+                std::vector<ObjectPtr> objects;
                 for (Id i = 0; i < 1000; i++)
                 {
                     objects.push_back(objectf.get(i));
@@ -144,7 +144,7 @@ namespace pensar_digital
                 //for (int i = 0; i < 1000; i++)
                 {
                     Object o = item;    
-                    CHECK_EQ(IObject, o, *objects[i], pd::to_string(i));
+                    CHECK_EQ(Object, o, *objects[i], pd::to_string(i));
                     ++i;
                 }
 
@@ -152,7 +152,7 @@ namespace pensar_digital
                 
             TEST(ObjectBinaryStreaming, false)
 				// Creates a vector with 1000 objects
-				std::vector<IObjectPtr> objects;
+				std::vector<ObjectPtr> objects;
                 for (Id i = 0; i < 1000; i++)
                 {
 					objects.push_back(objectf.get(i));
@@ -169,8 +169,8 @@ namespace pensar_digital
                 {
 					ObjectPtr o = objectf.get();
 					in >> o;
-                    IObjectPtr o1 = objectf.get(i);
-                    CHECK_EQ(IObject, *o, *o1, pd::to_string(i));
+                    ObjectPtr o1 = objectf.get(i);
+                    CHECK_EQ(Object, *o, *o1, pd::to_string(i));
                 }
              TEST_END(ObjectBinaryStreaming)
 

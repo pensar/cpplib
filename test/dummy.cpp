@@ -5,7 +5,7 @@ namespace pensar_digital
     namespace cpplib
     {
         /// Makes Dummy Streamable.
-        std::ostream& operator << (std::ostream& os, const IDummy& d) { return d.write(os); }
+        std::ostream& operator << (std::ostream& os, const Dummy& d) { return d.write(os); }
         std::istream& operator >> (std::istream& is, Dummy& d) { return d.read(is); }
 
        /*

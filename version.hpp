@@ -6,9 +6,6 @@
 
 #include "constant.hpp"
 #include "string_util.hpp"
-#include "xml_util.hpp"
-#include "iobject.hpp"
-#include "iversion.hpp"  // IVersion, IVersionRO
 #include "header_lib/json.hpp"
 
 #include <iostream> // std::istream, std::ostream
@@ -23,7 +20,7 @@ namespace pensar_digital
         
         typedef std::shared_ptr<Version> VersionPtr;
         
-        class Version : public IVersion  
+        class Version   
         {
             private:
                 VersionInt mpublic;
@@ -38,8 +35,8 @@ namespace pensar_digital
 
             public:
                 inline static const VersionInt NULL_VERSION = -1;
-                typedef IVersion    I;  // Interface type.
-                typedef IVersionRO IRO; // Read only interface type.
+                typedef Version    I;  // Interface type.
+                typedef Version IRO; // Read only interface type.
                 Version(const VersionInt& pub = NULL_VERSION, const VersionInt& prot = NULL_VERSION, const VersionInt& priv = NULL_VERSION, const Id& aid = NULL_ID)
                     : mpublic(pub), mprotected(prot), mprivate(priv), mid (aid) {}
 
@@ -49,7 +46,7 @@ namespace pensar_digital
                 VersionInt get_private() const noexcept { return mprivate; }
 
                 // Setters.
-                inline void set_id (const Id& aid) noexcept override { mid = aid; }
+                inline void set_id (const Id& aid) noexcept { mid = aid; }
 
                 bool equals (const Version& v) const noexcept;
 	
@@ -69,10 +66,10 @@ namespace pensar_digital
                 }
 
                 // Convertion to xml string.
-                String xml() const noexcept override;
-                void from_xml(const String& sxml) override;
+                String xml() const noexcept;
+                void from_xml(const String& sxml);
             
-                std::istream& read (std::istream& os, const IO_Mode& amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN) override;
+                std::istream& read (std::istream& os, const IO_Mode& amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN);
 
                 inline bool operator == (const Version& v) const { return ((mid == v.mid) && (mpublic == v.mpublic) && (mprotected == v.mprotected) && (mprivate == v.mprivate)); }
                 inline bool operator != (const Version& v) const { return !(*this == v); }
@@ -82,25 +79,23 @@ namespace pensar_digital
 
                 friend std::istream& operator >> (std::istream& is, Version& v);
 
-                // Inherited via IObjectRO
-                String class_name() const override;
-                String debug_string() const noexcept override;
-                inline const Id get_id() const noexcept override { return mid; }
-                const Hash get_hash() const noexcept override;
-                String json() const noexcept override;
-                std::ostream& write (std::ostream& os, const IO_Mode& amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN) const override;
-                bool operator == (const IObjectRO& o) const override { return (mid == o.get_id()); }
-                bool operator != (const IObjectRO& o) const override { return (mid != o.get_id()); }
+                // Inherited via Object
+                String class_name() const;
+                String debug_string() const noexcept;
+                inline const Id get_id() const noexcept { return mid; }
+                const Hash get_hash() const noexcept;
+                String json() const noexcept;
+                std::ostream& write (std::ostream& os, const IO_Mode& amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN) const;
 
             
-                //friend void from_json(const Json& j, Version& o);
+                friend void from_json(const Json& j, Version& o);
 
         }; // class Version
         // Stream operators.
         extern std::istream& operator >> (std::istream& is, Version& v);
         extern std::ostream& operator << (std::ostream& os, const Version& v);
-        //extern void to_json(Json& j, const Version& o);
-        //extern void from_json(const Json& j, Version& o);
+        extern void to_json(Json& j, const Version& o);
+        extern void from_json(const Json& j, Version& o);
 
     } // namespace cpplib
 } // namespace pensar_digital

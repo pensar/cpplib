@@ -19,7 +19,7 @@ namespace pensar_digital
 		class FileFactory : public FileFactoryBase
 		{
 		public:
-			inline static const IVersionPtr VERSION = pd::versionf.get(1, 1, 1);
+			inline static const VersionPtr VERSION = pd::versionf.get(1, 1, 1);
 			FileFactory(const Path& afull_path = ".", const std::ios_base::openmode amode = File::IN_OUT_ATE_BIN_MODE, const Id aid = NULL_ID) : FileFactoryBase(3, 10, afull_path, amode, aid) { };
 			virtual ~FileFactory() { };
 			using P = FileFactoryBase::P;
@@ -28,12 +28,12 @@ namespace pensar_digital
 				return FileFactoryBase::get (afull_path, amode, aid);
 			};
 
-			P clone(const IFileRO& afile)
+			P clone(const FileRO& afile)
 			{
 				return get(afile.get_full_path(), afile.get_mode (), afile.get_id ());
 			}
 
-			P clone(const IFilePtr& ptr) { return clone(*ptr); }
+			P clone(const FilePtr& ptr) { return clone(*ptr); }
 
 			P parse_json(const String& sjson)
 			{

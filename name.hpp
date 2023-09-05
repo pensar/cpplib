@@ -15,7 +15,7 @@ namespace pensar_digital
         class Name : public virtual Object
         {
             public:
-                inline static const IVersionPtr VERSION = pd::versionf.get (1, 1, 1);
+                inline static const VersionPtr VERSION = pd::versionf.get (1, 1, 1);
 
                 /** Access name;
                  * \return The current value of name;
@@ -76,7 +76,7 @@ namespace pensar_digital
                     {
                         Json j;
                         Id id;
-                        IVersionPtr v;
+                        VersionPtr v;
                         pd::read_json<Name>(is, *this, &id, &v, &j);
                         set_id (id);
                         name = j["name"];

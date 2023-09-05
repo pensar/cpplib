@@ -187,12 +187,8 @@
     <ClInclude Include="clone_util.hpp" />
     <ClInclude Include="header_lib\json.hpp" />
     <ClInclude Include="iconstraint.hpp" />
-    <ClInclude Include="ifile.hpp" />
     <ClInclude Include="igenerator.hpp" />
-    <ClInclude Include="iobject.hpp" />
     <ClInclude Include="io_util.hpp" />
-    <ClInclude Include="ipath.hpp" />
-    <ClInclude Include="iversion.hpp" />
     <ClInclude Include="json_util.hpp" />
     <ClInclude Include="language.hpp" />
     <ClInclude Include="locale.hpp" />
@@ -210,7 +206,6 @@
     <ClInclude Include="sys_user_info.hpp" />
     <ClInclude Include="test\dummy.hpp" />
     <ClInclude Include="test\dummy_factory.hpp" />
-    <ClInclude Include="test\idummy.hpp" />
     <ClInclude Include="type_util.hpp" />
     <ClInclude Include="version.hpp" />
     <ClInclude Include="version_factory.hpp" />

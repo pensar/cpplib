@@ -14,10 +14,10 @@ namespace pensar_digital
 	namespace cpplib
 	{
 		template <Checkable Derived>
-		class IConstraintRO : public virtual IObjectRO 
+		class IConstraintRO : public virtual Object 
 		{
 			public:
-				inline static const IVersionPtr VERSION = pd::versionf.get (1, 1, 1);
+				inline static const VersionPtr VERSION = pd::versionf.get (1, 1, 1);
 
 				~IConstraintRO () noexcept = default;
 
@@ -25,10 +25,10 @@ namespace pensar_digital
 				virtual const String& get_name() const noexcept = 0;
 		};	
 		template <Checkable Derived>
-		class IConstraint : public virtual IConstraintRO<Derived>, public virtual IObject	
+		class IConstraint : public virtual IConstraintRO<Derived>, public virtual Object	
 		{
 			public:
-				inline static const IVersionPtr VERSION = pd::versionf.get (1, 1, 1);
+				inline static const VersionPtr VERSION = pd::versionf.get (1, 1, 1);
 
 				~IConstraint () noexcept = default;
 

@@ -21,7 +21,7 @@ namespace pensar_digital
 			String description;
 
 			public:
-				inline static const IVersionPtr VERSION = pd::versionf.get (1, 1, 1);
+				inline static const VersionPtr VERSION = pd::versionf.get (1, 1, 1);
 
 			Field(String name, String adisplay_name, String adescription, bool aisnull = true) : Object()
 			{
@@ -132,7 +132,7 @@ namespace pensar_digital
 		class StringField : public virtual Field<String>
 		{
 			public:
-				inline static const IVersionPtr VERSION = pd::versionf.get (1, 1, 1);
+				inline static const VersionPtr VERSION = pd::versionf.get (1, 1, 1);
 				StringField(String name, String display_name, String description, bool is_null = true) :
 				Field<String>(name, display_name, description, is_null)
 			{

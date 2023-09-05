@@ -194,9 +194,6 @@
     <ClInclude Include="constraint.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="iobject.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="iconstraint.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -215,19 +212,7 @@
     <ClInclude Include="type_util.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="test\idummy.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="iversion.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="version_factory.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ipath.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ifile.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="path_factory.hpp">

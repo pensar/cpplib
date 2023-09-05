@@ -1,3 +1,6 @@
+#ifndef CLONE_UTIL_HPP
+#define CLONE_UTIL_HPP
+
 #include "factory.hpp"
 #include <memory> // for std::shared_ptr
 
@@ -12,4 +15,5 @@ namespace pensar_digital
             return factory.get(args...);
         }
 	} // namespace cpplib
-}
+} // namespace pensar_digital
+#endif // CLONE_UTIL_HPP

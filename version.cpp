@@ -2,10 +2,9 @@
 // license: MIT (https://opensource.org/licenses/MIT)
 
 #include "version.hpp"
-#include "iobject.hpp"
 #include "type_util.hpp"
 #include "io_util.hpp"
-
+#include "xml_util.hpp"
 #include <iostream>
 
 namespace pensar_digital
@@ -13,7 +12,6 @@ namespace pensar_digital
 	namespace cpplib
 	{
 
-		/*
 		void to_json(Json& j, const Version& v)
 		{
 			j["class"] = v.class_name();
@@ -36,8 +34,7 @@ namespace pensar_digital
 			}
 			else throw new std::runtime_error("Version expected class = " + class_name + " but json has " + json_class);
 		}
-		*/
-
+		
 		std::istream& operator >> (std::istream& is, Version& v)
 		{
 			// Check if os is in binary mode.
@@ -100,7 +97,7 @@ namespace pensar_digital
 		 
 		String Version::xml() const noexcept
 		{
-			String xml = pd::ObjXMLPrefix(*this) + ">";
+			String xml = pd::ObjXMLPrefix<Version>(*this) + ">";
 			xml += "<mpublic>" + pd::to_string(mpublic) + "</mpublic>";
 			xml += "<mprotected>" + pd::to_string(mprotected) + "</mprotected>";
 			xml += "<mprivate>" + pd::to_string(mprivate) + "</mprivate>";

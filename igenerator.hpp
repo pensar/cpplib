@@ -26,10 +26,10 @@ namespace pensar_digital
         ///  };
         /// \endcode
         template <class T>
-        class IGeneratorRO : public virtual IObjectRO
+        class IGeneratorRO : public virtual Object
         {
             public:
-                inline static const IVersionPtr VERSION = pd::versionf.get (1, 1, 1);
+                inline static const VersionPtr VERSION = pd::versionf.get (1, 1, 1);
 
             virtual ~IGeneratorRO() noexcept = default;
 
@@ -44,10 +44,10 @@ namespace pensar_digital
         };
 
         template <class T>
-        class IGenerator : public virtual IGeneratorRO<T>, public virtual IObject
+        class IGenerator : public virtual IGeneratorRO<T>, public virtual Object
         {
 			public:
-				inline static const IVersionPtr VERSION = pd::versionf.get (1, 1, 1);
+				inline static const VersionPtr VERSION = pd::versionf.get (1, 1, 1);
                 
                 virtual ~IGenerator() noexcept = default;
 

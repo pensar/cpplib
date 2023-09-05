@@ -19,7 +19,7 @@ namespace pensar_digital
         class Country : public Object
         {
         public:
-            inline static const IVersionPtr VERSION = pd::versionf.get (1, 1, 1);
+            inline static const VersionPtr VERSION = pd::versionf.get (1, 1, 1);
             /// \brief Default constructor.
             Country(Id aid = NULL_ID) : Object(aid == NULL_ID ? generator.get() : aid) {}
             /** Default destructor */

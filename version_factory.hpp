@@ -11,6 +11,14 @@ namespace pensar_digital
 {
 	namespace cpplib
 	{
+
+		// Versionable concept requires a inline static const Version public member named VERSION convertible to VersionPtr.
+		template <typename T>
+		concept Versionable = requires (T t)
+		{
+			{t.VERSION} noexcept -> std::convertible_to<VersionPtr>;
+		};
+
 		typedef Factory<Version, const VersionInt&,
 								 const VersionInt&,
 								 const VersionInt&,
@@ -33,15 +41,15 @@ namespace pensar_digital
 				return VersionFactoryBase::get (pub, pro, pri, aid);
 			};
 
-			P clone(const IVersionRO& aversion)
+			P clone(const Version& aversion)
 			{
 				return get (aversion.get_public(), aversion.get_protected (), aversion.get_private (), aversion.get_id());
 			};
 
-			P clone (const IVersionPtr& ptr) { return clone(*ptr); }
+			P clone (const VersionPtr& ptr) { return clone(*ptr); }
 
 			/// <summary>
-			/// To be called when parsing a json object with an embedded IVersionPtr object.
+			/// To be called when parsing a json object with an embedded VersionPtr object.
 			/// </summary>
 			/// <param name="j"></param>
 			/// <returns></returns>
@@ -52,7 +60,7 @@ namespace pensar_digital
 				VersionInt vprotected = j["VERSION"]["mprotected"].get<VersionInt>();
 				VersionInt vprivate   = j["VERSION"]["mprivate"  ].get<VersionInt>();
 				
-				return versionf.get (vpublic, vprotected, vprivate, vid);
+				return get (vpublic, vprotected, vprivate, vid);
 			};
 
 			P parse_json (const String& sjson)

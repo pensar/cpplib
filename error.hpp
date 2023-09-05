@@ -27,7 +27,7 @@ namespace pensar_digital
         class Error : public Object
         {
             public:
-                inline static const IVersionPtr VERSION = pd::versionf.get (1, 1, 1);
+                inline static const VersionPtr VERSION = pd::versionf.get (1, 1, 1);
                 Error (const String& error_msg, const Id aid = 0): Object (aid), error_message (error_msg) {}
 
             const String& get_error_message () const { return error_message; } ;
@@ -60,7 +60,7 @@ namespace pensar_digital
         class UnsupportedVersion : public Error
         {
             public:
-                inline static const IVersionPtr VERSION = pd::versionf.get (1, 1, 1);
+                inline static const VersionPtr VERSION = pd::versionf.get (1, 1, 1);
                 UnsupportedVersion (const Version v): Error ("Unsupported version number: " + v.to_string ()) {};
         };
     }

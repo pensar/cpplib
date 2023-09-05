@@ -25,7 +25,7 @@ namespace pensar_digital
         class IObjectRO
         {
             public:
-                //inline static const IVersionPtr VERSION = pd::versionf.get (1, 1, 1);
+                //inline static const VersionPtr VERSION = pd::versionf.get (1, 1, 1);
 
                 virtual ~IObjectRO() noexcept = default;
 
@@ -69,7 +69,7 @@ namespace pensar_digital
         class IObject : public virtual IObjectRO
         {
             public:
-                //inline static const IVersionPtr VERSION = pd::versionf.get (1, 1, 1);
+                //inline static const VersionPtr VERSION = pd::versionf.get (1, 1, 1);
 
                 virtual ~IObject() noexcept = default;
 

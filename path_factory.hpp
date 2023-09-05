@@ -16,7 +16,7 @@ namespace pensar_digital
 		class PathFactory : public PathFactoryBase
 		{
 		public:
-			inline static const IVersionPtr VERSION = pd::versionf.get(1, 1, 1);
+			inline static const VersionPtr VERSION = pd::versionf.get(1, 1, 1);
 			PathFactory(const fs::path& p = ".", const Id& aid = NULL_ID) : PathFactoryBase(3, 10, p, aid) { };
 			virtual ~PathFactory() { };
 			using P = PathFactoryBase::P;
@@ -25,11 +25,11 @@ namespace pensar_digital
 				return PathFactoryBase::get(p, aid);
 			};
 
-			P clone(const IPathRO& apath)
+			P clone(const PathRO& apath)
 			{
 				return get(apath.to_std_path (), apath.get_id());
 			};
-			P clone(const IPathPtr& ptr) { return clone(*ptr); }
+			P clone(const PathPtr& ptr) { return clone(*ptr); }
 
 			P parse_json(const String& sjson)
 			{

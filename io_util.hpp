@@ -8,8 +8,6 @@
 #include "string_def.hpp"
 #include "memory.hpp"
 #include "constant.hpp"
-#include "ipath.hpp"
-#include "ifile.hpp"
 #include "version_factory.hpp"
 #include "concept.hpp"
 #include "json_util.hpp"
@@ -27,6 +25,7 @@ namespace pensar_digital
 {
     namespace cpplib
     {
+        namespace fs = std::filesystem;
 
 #ifdef _MSC_VER
         inline String& windows_read_file (const String& filename, String* s) 
@@ -171,12 +170,12 @@ namespace pensar_digital
         class File;
         typedef std::shared_ptr<File> FilePtr;
         // Path class represents a path in the file system. It inherits from fs::path adding implicit conversion to std::string.
-        class Path : public fs::path, public Object, public IPath
+        class Path : public fs::path, public Object
 		{
 			public:
-                inline static const IVersionPtr VERSION = pd::versionf.get (1, 1, 1);
-                typedef IPath    I;  // Interface type.
-                typedef IPathRO IRO; // Read only interface type.
+                inline static const VersionPtr VERSION = pd::versionf.get (1, 1, 1);
+                typedef Path   I;  // Interface type.
+                typedef Path IRO; // Read only interface type.
 
                 Path (const fs::path& p = ".", const Id& aid = NULL_ID) : Object(aid), fs::path(p) {}
 			    Path (const std::string& s = ".", const Id& aid = NULL_ID) : Object(aid), fs::path (s) {}
@@ -329,7 +328,7 @@ namespace pensar_digital
                     else // json format
                     {
                         Json j;
-                        IVersionPtr v;
+                        VersionPtr v;
                         Id stream_id;
                         pd::read_json<Path>(is, *this, &stream_id, &v, &j);
                         set_id (stream_id);
@@ -394,10 +393,10 @@ namespace pensar_digital
                     }
                 }
 
-                inline fs::path to_std_path () const noexcept override { return static_cast<const fs::path&>(*this); }  
+                inline fs::path std_path () const noexcept { return static_cast<const fs::path&>(*this); }  
 
                 // Implicit conversion to fs::path.
-                operator fs::path () const noexcept { return to_std_path (); }
+                operator fs::path () const noexcept { return std_path (); }
                 
                 // Implicit conversion to std::string.
                 operator std::string () const noexcept { return fs::path::string (); }
@@ -429,13 +428,13 @@ namespace pensar_digital
                 friend void from_json(const Json& j, Path& d);
 
                 // Inherited via Object
-                inline void set_id(const Id& value) override { Object::set_id (value); }
+                inline void set_id(const Id& value) { Object::set_id (value); }
 };  // class Path
 
 
         /// \brief File class.
         ///
-        class File: public Object, public IFile
+        class File: public Object
         {
             protected:
                 typedef std::vector<char> Buffer;
@@ -479,10 +478,10 @@ namespace pensar_digital
                 }
 
             public:
-                typedef IPath    I;  // Interface type.
-                typedef IPathRO IRO; // Read only interface type.
+                typedef File   I;  // Interface type.
+                typedef File IRO; // Read only interface type.
 
-                inline static const IVersionPtr VERSION = pd::versionf.get (1, 1, 1);
+                inline static const VersionPtr VERSION = pd::versionf.get (1, 1, 1);
                 inline static const size_t MAX_IN_MEMORY_FILE_SIZE_BYTE = 1024 ^ 3; // 1 GB
                 inline const static std::ios_base::openmode IN_OUT_ATE_MODE     = std::ios::in | std::ios::out | std::ios::ate;
                 inline const static std::ios_base::openmode IN_OUT_ATE_BIN_MODE = IN_OUT_ATE_MODE | std::ios::binary;
@@ -627,7 +626,7 @@ namespace pensar_digital
                     else // json format
                     {
                         Json j;
-                        IVersionPtr v;
+                        VersionPtr v;
                         Id id;
                         read_json<File>(is, *this, &id, &v, &j);
                         set_id (id);
@@ -732,7 +731,7 @@ namespace pensar_digital
                 {
                     if (!is_open())
                     {
-						file.open(static_cast<fs::path>(full_path), mode);
+						file.open (static_cast<fs::path>(full_path), mode);
 					}
 					return file;
 				}
@@ -740,14 +739,14 @@ namespace pensar_digital
                 //friend void to_json   (      Json& j, const File& f);
                 //friend void from_json (const Json& j,       File& f);
 
-                // Inherited via IFile
-                fs::path get_full_path() const noexcept override;
+                // Inherited via File
+                fs::path get_full_path () const noexcept;
 
                 // Inherited via Object
-                void set_id(const Id& value) override;
+                void set_id (const Id& value);
 
-                // Inherited via IFile
-                void set_name(const String& name) noexcept override;
+                // Inherited via File
+                void set_name (const String& name) noexcept;
 };  // class File   
 
         class TextFile : public File

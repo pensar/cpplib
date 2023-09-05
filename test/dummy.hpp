@@ -8,8 +8,8 @@
 #include "../string_def.hpp"
 #include "../string_util.hpp"
 #include "../object.hpp"
-#include "idummy.hpp"
 #include "../json_util.hpp"
+#include "../clone_util.hpp"
 
 #include <memory>
 
@@ -24,15 +24,13 @@ typedef std::shared_ptr<Dummy> DummyPtr;
         /// <summary>
         /// Dummy class is streamable and comparable.
         /// </summary>
-        class Dummy : public virtual IDummy, public virtual Object   
+        class Dummy : public Object   
         {
             private:
 
                 String name;
             public:
-                inline static const IVersionPtr VERSION = pd::versionf.get (1, 1, 1);
-                typedef IDummy    I;    // Interface type.
-                typedef IDummyRO IRO; // Read only interface type.
+                inline static const VersionPtr VERSION = pd::versionf.get (1, 1, 1);
 
                 Dummy(const Id& id = NULL_ID, const String& aname = "") : Object(id), name(aname) {}
                 Dummy(const Dummy& d) : Object(d) { name = d.name; }
@@ -56,7 +54,7 @@ typedef std::shared_ptr<Dummy> DummyPtr;
                     return true;
                 }
 
-                IDummyPtr clone() const  noexcept { return pd::clone<Dummy>(*this, get_id (), name); }
+                DummyPtr clone() const  noexcept { return pd::clone<Dummy>(*this, get_id (), name); }
 
                 // Conversion to json string.
                 virtual String json() const noexcept
@@ -77,7 +75,7 @@ typedef std::shared_ptr<Dummy> DummyPtr;
                     {
                         Json j;
                         Id id;
-                        IVersionPtr v;
+                        VersionPtr v;
                         pd::read_json<Dummy>(is, *this, &id, &v, &j);
                         set_id (id);
                         name = j["name"].get<String>();
@@ -140,7 +138,7 @@ typedef std::shared_ptr<Dummy> DummyPtr;
         //extern void from_json(const Json& j, Dummy& o);
 
         extern std::istream& operator >> (std::istream& is, Dummy& o);
-        extern std::ostream& operator << (std::ostream& os, const IDummy& o);
+        extern std::ostream& operator << (std::ostream& os, const Dummy& o);
 
     }  // namespace cpplib
 }      // namespace pensar_digital

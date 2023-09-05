@@ -4,12 +4,10 @@
 #ifndef OBJECT_HPP
 #define OBJECT_HPP
 
-#include "iobject.hpp"
 #include "concept.hpp"
 #include "string_util.hpp"
 #include "header_lib/xmlParser.h"
 #include "clone_util.hpp"
-#include "xml_util.hpp"   // for read_xml and write_xml.
 #include "version_factory.hpp"
 #include "json_util.hpp"
 
@@ -32,7 +30,7 @@ namespace pensar_digital
         class Object;
         typedef std::shared_ptr<Object> ObjectPtr;
 
-        class Object : public IObject
+        class Object 
         {
             private:
 
@@ -52,13 +50,13 @@ namespace pensar_digital
                 /// \return true if they are equal, false otherwise.
                 /// \see equals
                 ///
-                virtual bool _equals(const IObjectRO& o) const { return (id == o.get_id ()); }
+                virtual bool _equals(const Object& o) const { return (id == o.get_id ()); }
 
             public:
-                inline static const IVersionPtr VERSION = pd::versionf.get (1, 1, 1);
-                
-                typedef IObject    I;  // Interface type.
-                typedef IObjectRO IRO; // Read only interface type.
+                inline static const VersionPtr VERSION = pd::versionf.get (1, 1, 1);
+                // Verifies if Object complies with Versionable concept.
+                typedef Object    I;  // Interface type.
+                typedef Object IRO; // Read only interface type.
 
                 // Constructors. 
                 
@@ -77,19 +75,19 @@ namespace pensar_digital
                 /** Default destructor */
                 virtual ~Object() {}
 
-                Object& assign(const IObjectRO& o) noexcept { id = o.get_id(); return *this; }
+                Object& assign(const Object& o) noexcept { id = o.get_id(); return *this; }
 
                 virtual String class_name() const { String c = typeid(*this).name(); c.erase(0, sizeof("class ") - 1); return c; }
 
                 // Clone method. 
-                IObjectPtr clone() const noexcept { return pd::clone<Object>(*this, id); }
+                ObjectPtr clone() const noexcept { return pd::clone<Object>(*this, id); }
                 
                 /// Check if passed object equals self.
                 /// Derived classes must implement the _equals method. The hash compare logic is made on equals.
                 /// _equals is called from template method equals and should only implement the specific comparison.
                 /// \see _equals
                 /// \return true if objects have the same id, false otherwise.
-                bool equals(const IObjectRO& o) const noexcept { return (get_hash() != o.get_hash() ? false : _equals(o)); }
+                bool equals(const Object& o) const noexcept { return (get_hash() != o.get_hash() ? false : _equals(o)); }
 
                 /// Access object id
                 /// \return The current value of id
@@ -140,8 +138,8 @@ namespace pensar_digital
                     parse_object_tag(sxml);
                 }
 
-                bool operator == (const IObjectRO& o) const { return   equals(o); }
-                bool operator != (const IObjectRO& o) const { return !equals(o); }
+                bool operator == (const Object& o) const { return   equals(o); }
+                bool operator != (const Object& o) const { return !equals(o); }
 
                 Object& parse_json(const String& sjson);
 
@@ -166,10 +164,10 @@ namespace pensar_digital
                 /// Assignment operator
                 /// \param o Object to assign from
                 /// \return A reference to this
-                Object& operator=(const IObjectRO& o) noexcept { return assign(o); }
+                Object& operator=(const Object& o) noexcept { return assign(o); }
 
                 /// Move assignment operator
-                Object& operator=(IObjectRO&& o) noexcept { return assign(o); }
+                Object& operator=(Object&& o) noexcept { return assign(o); }
 
                 friend void from_json(const Json& j, Object& o);
             };
@@ -178,9 +176,9 @@ namespace pensar_digital
 
             inline std::istream& operator >> (std::istream& is,          Object& o) { return o.read (is) ; }
             inline       Object& operator >> (const String& sjson      , Object& o) { return o.parse_json(sjson); }
-            inline std::ostream& operator << (std::ostream& os, const   IObject& o) { return o.write (os); }
+            inline std::ostream& operator << (std::ostream& os, const   Object& o) { return o.write (os); }
             inline std::istream& operator >> (std::istream& is,        ObjectPtr o) { return is >> *o    ; }
-            inline std::ostream& operator << (std::ostream& os, const IObjectPtr o) { return os << *o    ; }
+            inline std::ostream& operator << (std::ostream& os, const ObjectPtr o) { return os << *o    ; }
 
 
             // Dependency class is a Constrainable class used to define dependencies between objects.
