@@ -2,6 +2,7 @@
 // license: MIT (https://opensource.org/licenses/MIT)
 
 #include "object.hpp"
+#include "io_util.hpp"
 
 namespace pensar_digital
 {
@@ -14,7 +15,7 @@ namespace pensar_digital
             Id aid;
             Json j;
             pd::read_json<Object> (sjson, *this, &aid, &v, &j);
-            id = aid;
+            mid = aid;
 
             // todo: check version compatibility.
             if (*VERSION != *v)
@@ -27,7 +28,16 @@ namespace pensar_digital
         {
             if (amode == BINARY)
             {
-                // todo: implement binary read.
+                String sclass_name;
+                binary_read<String>(is, sclass_name, abyte_order);
+                if (sclass_name != class_name())
+					throw new std::runtime_error("Object::read: class name mismatch.");
+                binary_read<Id>(is, mid, abyte_order);
+
+                Version v;
+                v.read (is, amode, abyte_order);
+                if (*VERSION != v)
+					throw new std::runtime_error("Object::read: version mismatch.");
             }
             else // json format
             {
@@ -36,7 +46,7 @@ namespace pensar_digital
 				Id stream_id;
                 Json j;
                 pd::read_json<Object>(is, *this, &stream_id, &stream_version, &j);
-                id = stream_id;
+                mid = stream_id;
                 if (*VERSION != *stream_version)
                     throw new std::runtime_error("Object::read: version mismatch.");
             }
@@ -47,7 +57,10 @@ namespace pensar_digital
         {
             if (amode == BINARY)
             {
-                // todo: implement binary read.
+                binary_write     (os, class_name(), abyte_order);
+                binary_write<Id> (os,           mid, abyte_order);
+
+                VERSION->write   (os, amode, abyte_order);  
             }
             else // json format
             {

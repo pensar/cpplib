@@ -8,7 +8,6 @@
 #include "io_util.hpp"
 #include "version_factory.hpp"	
 #include "json_util.hpp"
-#include "ifile.hpp"
 
 
 namespace pensar_digital
@@ -28,7 +27,7 @@ namespace pensar_digital
 				return FileFactoryBase::get (afull_path, amode, aid);
 			};
 
-			P clone(const FileRO& afile)
+			P clone(const File& afile)
 			{
 				return get(afile.get_full_path(), afile.get_mode (), afile.get_id ());
 			}

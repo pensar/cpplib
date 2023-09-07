@@ -120,10 +120,12 @@ namespace pensar_digital
                 std::vector<ObjectPtr> objects;
                 for (Id i = 0; i < 1000; i++)
                 {
-                    objects.push_back(objectf.get(i));
+                    ObjectPtr p = objectf.get(i);
+                    p->set_mode(TEXT);
+                    objects.push_back(p);
                 }
                 //pd::TextFile f("c:\\tmp\\test\\ObjectTextStreaming\\test.txt", "blah");
-                std::ofstream out("c:\\tmp\\test\\ObjectTextStreaming\\test.txt");
+                std::ofstream out("c:\\tmp\\test\\ObjectTextStreaming\\test.txt", File::OUTPUT);
                 out << "[";
                 for (Id i = 0; i < 999; i++)
                 {

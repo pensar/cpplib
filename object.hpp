@@ -34,13 +34,13 @@ namespace pensar_digital
         {
             private:
 
-                Id id; //!< Member variable "id"
-
+                Id mid; //!< Member variable "id"
+                IO_Mode mmode;
             protected:
 
                 /// Set id
                 /// \param val New value to set
-                void set_id(const Id& value) { id = value; }
+                void set_id(const Id& value) { mid = value; }
 
                 String ObjXMLPrefix() const noexcept { return "<object class_name = \"" + class_name() + "\" id = \"" + Object::to_string() + "\""; }
 
@@ -50,18 +50,18 @@ namespace pensar_digital
                 /// \return true if they are equal, false otherwise.
                 /// \see equals
                 ///
-                virtual bool _equals(const Object& o) const { return (id == o.get_id ()); }
+                virtual bool _equals(const Object& o) const { return (mid == o.mid); }
 
             public:
                 inline static const VersionPtr VERSION = pd::versionf.get (1, 1, 1);
                 // Verifies if Object complies with Versionable concept.
-                typedef Object    I;  // Interface type.
+                typedef Object   I; // Interface type.
                 typedef Object IRO; // Read only interface type.
 
                 // Constructors. 
                 
                 /// Default constructor.
-                Object(const Id& aid = NULL_ID) noexcept : id(aid) 
+                Object(const Id& id = NULL_ID, const IO_Mode& mode = BINARY) noexcept : mid(id) 
                 {
                 };
 
@@ -75,12 +75,12 @@ namespace pensar_digital
                 /** Default destructor */
                 virtual ~Object() {}
 
-                Object& assign(const Object& o) noexcept { id = o.get_id(); return *this; }
+                Object& assign(const Object& o) noexcept { mid = o.mid; return *this; }
 
                 virtual String class_name() const { String c = typeid(*this).name(); c.erase(0, sizeof("class ") - 1); return c; }
 
                 // Clone method. 
-                ObjectPtr clone() const noexcept { return pd::clone<Object>(*this, id); }
+                ObjectPtr clone() const noexcept { return pd::clone<Object>(*this, mid); }
                 
                 /// Check if passed object equals self.
                 /// Derived classes must implement the _equals method. The hash compare logic is made on equals.
@@ -92,15 +92,27 @@ namespace pensar_digital
                 /// Access object id
                 /// \return The current value of id
                 ///
-                virtual const Id get_id() const noexcept { return id; };
+                virtual const Id get_id() const noexcept { return mid; };
+
+                /// <summary>
+                ///  Sets io mode.
+                /// </summary>
+                /// <returns></returns>
+                void set_mode(const IO_Mode& mode) noexcept { mmode = mode; }
+
+                /// <summary>
+                ///  Gets io mode.
+                /// </summary>
+                /// <returns>IO_Mode</returns>
+                const IO_Mode& get_mode() const noexcept { return mmode; }
 
                 /// \brief Access hash
                 ///
                 /// \return  The current value of hash
-                virtual const Hash get_hash() const noexcept { return id; };
+                virtual const Hash get_hash() const noexcept { return mid; };
 
                 // Implements initialize method from Initializable concept.
-                virtual bool initialize(const Id& aid = NULL_ID) noexcept { id = aid; return true; }
+                virtual bool initialize(const Id& aid = NULL_ID) noexcept { mid = aid; return true; }
 
                 // Conversion to json string.
                 inline virtual String json () const noexcept 
@@ -108,9 +120,9 @@ namespace pensar_digital
                     return pd::json<Object> (*this) + " }";
                 }
 
-                virtual std::istream& read (std::istream& is, const IO_Mode& amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN);
+                virtual std::istream& read (std::istream& is, const IO_Mode& amode = BINARY, const ByteOrder& abyte_order = LITTLE_ENDIAN);
 
-                virtual std::ostream& write (std::ostream& os, const IO_Mode& amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN) const;
+                virtual std::ostream& write (std::ostream& os, const IO_Mode& amode = BINARY, const ByteOrder& abyte_order = LITTLE_ENDIAN) const;
 
                 // Conversion to xml string.
                 virtual String xml() const noexcept { return ObjXMLPrefix() + "/>"; }
@@ -125,7 +137,7 @@ namespace pensar_digital
                     if (xml_class_name == class_name())
                     {
                         String sid = node.getAttribute("id");
-                        id = std::stoi(sid);
+                        mid = std::stoi(sid);
                     }
                     else
                         throw std::runtime_error("Invalid class name");
@@ -145,7 +157,7 @@ namespace pensar_digital
 
                 /// Conversion to string.
                 /// \return A string with the object id.
-                virtual String to_string() const noexcept { return std::to_string(id); }
+                virtual String to_string() const noexcept { return std::to_string(mid); }
 
                 /// Implicit conversion to string.
                 /// \return A string with the object id.
@@ -174,10 +186,32 @@ namespace pensar_digital
             extern void to_json(Json& j, const Object& o);
             extern void from_json(const Json& j, Object& o);
 
-            inline std::istream& operator >> (std::istream& is,          Object& o) { return o.read (is) ; }
+            inline std::istream& operator >> (std::istream& is, Object& o) 
+            { 
+                // if is is a stringstream, then calls read with TEXT mode.
+                if (typeid(is) == typeid(std::stringstream))
+					return o.read(is, TEXT);
+				else
+                    return o.read  (is) ; 
+            }
+    
+            inline std::ostream& operator << (std::ostream& os, const Object& o) 
+            { 
+                // if os is a stringstream, then calls write with TEXT mode.
+                if (typeid(os) == typeid(std::stringstream))
+                    const_cast<Object&>(o).set_mode (TEXT); 
+                
+                return o.write (os, o.get_mode ());
+            }
+
+            //inline std::stringstream& operator >> (std::stringstream& ss, Object& o) { o.read  (ss, TEXT); return ss; }
+            //inline std::stringstream& operator << (std::stringstream& ss, Object& o) { o.write (ss, TEXT); return ss; }
+            //inline std::stringstream& operator >> (std::stringstream& ss, ObjectPtr o) { o->read(ss, TEXT); return ss; }
+            //inline std::stringstream& operator << (std::stringstream& ss, ObjectPtr o) { o->write(ss, TEXT); return ss; }
+
             inline       Object& operator >> (const String& sjson      , Object& o) { return o.parse_json(sjson); }
-            inline std::ostream& operator << (std::ostream& os, const   Object& o) { return o.write (os); }
-            inline std::istream& operator >> (std::istream& is,        ObjectPtr o) { return is >> *o    ; }
+
+            inline std::istream& operator >> (std::istream& is,       ObjectPtr o) { return is >> *o    ; }
             inline std::ostream& operator << (std::ostream& os, const ObjectPtr o) { return os << *o    ; }
 
 

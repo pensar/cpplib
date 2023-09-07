@@ -84,7 +84,11 @@ namespace pensar_digital
         template <typename T>
         void binary_write(std::ostream& os, const T& t, const size_t& size, const ByteOrder& byte_order = LITTLE_ENDIAN)
         {
-			if (byte_order == LITTLE_ENDIAN) {
+            os.write((char*)&size, sizeof(size));
+            os.write((char*)&t, size);
+            
+            /*
+            if (byte_order == LITTLE_ENDIAN) {
 				for (size_t i = 0; i < size; ++i) {
 					os.put(static_cast<char>(t >> (i * 8)));
 				}
@@ -94,6 +98,7 @@ namespace pensar_digital
 					os.put(static_cast<char>(t >> ((size - i - 1) * 8)));
 				}
 			}
+            */
 		}
                       
         /*
@@ -104,18 +109,37 @@ namespace pensar_digital
         }
         */
 
-        template <typename T>
-
+        template <SizeableType T>
         void binary_write (std::ostream& os, const T& t, const ByteOrder& byte_order = LITTLE_ENDIAN)
         {
-           binary_write<T> (os, t, sizeof(t));
+           binary_write<T> (os, t, sizeof(t), byte_order);
+		}
+
+        // binary_write for std::basic_string.
+        template <typename CharType>
+		void binary_write (std::ostream& os, const std::basic_string<CharType>& s, const ByteOrder& byte_order = LITTLE_ENDIAN)
+		{
+			binary_write<size_t> (os, s.size(), byte_order);
+			for (auto&& c : s) {
+				binary_write<CharType> (os, c, byte_order);
+			}
+		}  
+
+        // binary_write for String.
+        inline void binary_write (std::ostream& os, const String& s, const ByteOrder& byte_order = LITTLE_ENDIAN)
+        {
+            binary_write<String::value_type> (os, s, byte_order);
 		}
 
         template <typename T>
         void binary_read (std::istream& is, T& t, const size_t& size, const ByteOrder& byte_order = LITTLE_ENDIAN)
 		{
+            is.read ((char*)(&size), sizeof(size));
+            //str.resize(size);
+            is.read ((char*)(&t), size);
+            /*
             t = 0;
-			if (byte_order == LITTLE_ENDIAN) 
+			if (bye_order == LITTLE_ENDIAN) 
             {
                 for (size_t i = 0; i < size; ++i) 
                 {
@@ -129,14 +153,33 @@ namespace pensar_digital
                     t |= static_cast<T>(static_cast<uint8_t>(is.get())) << ((size - i - 1) * 8);
                 }
             }
+            */
         }
 
-        template <typename T>
+        template <Sizeable T>
         void binary_read (std::istream& is, T& t, const ByteOrder& byte_order = LITTLE_ENDIAN)
         {
             binary_read<T> (is, t, sizeof(t), byte_order);
         }
 
+        template <typename CharType>
+        void binary_read (std::istream& is, std::basic_string<CharType>& s, const ByteOrder& byte_order = LITTLE_ENDIAN)
+		{
+			size_t size;
+			binary_read<size_t> (is, size, byte_order);
+			s.clear();
+			s.reserve(size);
+			for (size_t i = 0; i < size; ++i) {
+				CharType c;
+				binary_read<CharType> (is, c, byte_order);
+				s.push_back(c);
+			}
+		}
+
+        inline void binary_read (std::istream& is, String& s, const ByteOrder& byte_order = LITTLE_ENDIAN)
+		{
+			binary_read<String::value_type> (is, s, byte_order);
+		}
 
         template <typename DataType = uint8_t, typename CharType = String::value_type>
         std::basic_string<CharType>& binary_to_string (const std::vector<DataType>& data, std::basic_string<CharType>& out)
@@ -483,6 +526,10 @@ namespace pensar_digital
 
                 inline static const VersionPtr VERSION = pd::versionf.get (1, 1, 1);
                 inline static const size_t MAX_IN_MEMORY_FILE_SIZE_BYTE = 1024 ^ 3; // 1 GB
+                inline const static std::ios_base::openmode INPUT               = std::ios::in;
+                inline const static std::ios_base::openmode OUTPUT              = std::ios::out;
+                inline const static std::ios_base::openmode IN_OUT_MODE         = std::ios::in | std::ios::out;
+                inline const static std::ios_base::openmode IN_OUT              = std::ios::out;
                 inline const static std::ios_base::openmode IN_OUT_ATE_MODE     = std::ios::in | std::ios::out | std::ios::ate;
                 inline const static std::ios_base::openmode IN_OUT_ATE_BIN_MODE = IN_OUT_ATE_MODE | std::ios::binary;
                 File (const Path& afull_path = ".", const std::ios_base::openmode amode = IN_OUT_ATE_BIN_MODE, const Id aid = NULL_ID) : 

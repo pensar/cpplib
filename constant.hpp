@@ -18,7 +18,7 @@ namespace pensar_digital
         extern String DOUBLE_QUOTES;
         extern const Id NULL_ID;
         enum ByteOrder { LITTLE_ENDIAN = true, BIG_ENDIAN = false };
-        enum IO_Mode { BINARY = true, TEXT = false };
+        enum IO_Mode { BINARY = 1, TEXT = 0, Mixed = 2};
 
     }   // namespace cpplib
 }       // namespace pensar_digital
