@@ -75,7 +75,7 @@ namespace pensar_digital
                 /** Default destructor */
                 virtual ~Object() {}
 
-                Object& assign(const Object& o) noexcept { mid = o.mid; return *this; }
+                Object& assign(const Object& o) noexcept { mid = o.mid; mmode = o.mmode; return *this; }
 
                 virtual String class_name() const { String c = typeid(*this).name(); c.erase(0, sizeof("class ") - 1); return c; }
 
@@ -112,7 +112,7 @@ namespace pensar_digital
                 virtual const Hash get_hash() const noexcept { return mid; };
 
                 // Implements initialize method from Initializable concept.
-                virtual bool initialize(const Id& aid = NULL_ID) noexcept { mid = aid; return true; }
+                virtual bool initialize(const Id& id = NULL_ID, const IO_Mode& mode = BINARY) noexcept { mid = id; mmode = mode; return true; }
 
                 // Conversion to json string.
                 inline virtual String json () const noexcept 

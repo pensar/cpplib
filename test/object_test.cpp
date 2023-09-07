@@ -152,7 +152,7 @@ namespace pensar_digital
 
                 TEST_END(ObjectTextStreaming2)
                 
-            TEST(ObjectBinaryStreaming, false)
+            TEST(ObjectBinaryStreaming, true)
 				// Creates a vector with 1000 objects
 				std::vector<ObjectPtr> objects;
                 for (Id i = 0; i < 1000; i++)
