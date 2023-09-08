@@ -3,7 +3,33 @@
 
 #include "object.hpp"
 #include "io_util.hpp"
+//#include "header_lib/json.hpp"
+//#include "type_util.hpp"
+//#include "object_factory.hpp"
+//#include "json_util.hpp"
 
+namespace pd = pensar_digital::cpplib;
+
+/*/namespace nlohmann
+{
+    template <>
+    struct adl_serializer<pd::Object>
+    {
+        // note: the return type is no longer 'void', and the method only takes
+        // one argument
+        pd::Object from_json (const pd::Json& j) 
+        {
+            pd::String class_name = pd::class_name<pd::Object> ();
+            pd::String json_class = j.at("class");
+            if (class_name == json_class)
+            {
+                return *pd::objectf.get (j.at("id"));
+            }
+            else throw new std::runtime_error("Object expected class = " + class_name + " but json has " + json_class);
+        }
+    };
+}
+*/
 namespace pensar_digital
 {
 	namespace cpplib
@@ -86,6 +112,5 @@ namespace pensar_digital
                 o.set_id(j.at("id"));
             else throw new std::runtime_error("Object expected class = " + class_name + " but json has " + json_class);
         }
-        
     }
 }                                                                                                                                                                                                                                                                                                                                                                                           

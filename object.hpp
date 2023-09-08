@@ -185,6 +185,7 @@ namespace pensar_digital
             };
             extern void to_json(Json& j, const Object& o);
             extern void from_json(const Json& j, Object& o);
+            //extern Object nlohmann::from_json (const Json& j);
 
             inline std::istream& operator >> (std::istream& is, Object& o) 
             { 
@@ -214,6 +215,8 @@ namespace pensar_digital
             inline std::istream& operator >> (std::istream& is,       ObjectPtr o) { return is >> *o    ; }
             inline std::ostream& operator << (std::ostream& os, const ObjectPtr o) { return os << *o    ; }
 
+            static_assert (std::is_move_constructible_v <Object>);
+            static_assert (std::is_move_assignable_v    <Object>);  
 
             // Dependency class is a Constrainable class used to define dependencies between objects.
             template <Versionable MainClass, Versionable RequiredClass>
