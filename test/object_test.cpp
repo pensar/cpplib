@@ -163,7 +163,7 @@ namespace pensar_digital
 
                 for (Id i = 0; i < 1000; i++)
                 {
-                    out << objects[i] << std::endl;    
+                    out << objects[i];    
                 }
 				out.close();
                 std::ifstream in ("c:\\tmp\\test\\ObjectBinaryStreaming\\test.bin", std::ios::binary);

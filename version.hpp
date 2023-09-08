@@ -69,7 +69,7 @@ namespace pensar_digital
                 String xml() const noexcept;
                 void from_xml(const String& sxml);
             
-                std::istream& read (std::istream& os, const IO_Mode& amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN);
+                std::istream& read (std::istream& os, const IO_Mode amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN);
 
                 inline bool operator == (const Version& v) const { return ((mid == v.mid) && (mpublic == v.mpublic) && (mprotected == v.mprotected) && (mprivate == v.mprivate)); }
                 inline bool operator != (const Version& v) const { return !(*this == v); }
@@ -85,7 +85,7 @@ namespace pensar_digital
                 inline const Id get_id() const noexcept { return mid; }
                 const Hash get_hash() const noexcept;
                 String json() const noexcept;
-                std::ostream& write (std::ostream& os, const IO_Mode& amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN) const;
+                std::ostream& write (std::ostream& os, const IO_Mode amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN) const;
 
             
                 friend void from_json(const Json& j, Version& o);

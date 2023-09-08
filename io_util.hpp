@@ -112,7 +112,7 @@ namespace pensar_digital
         template <SizeableType T>
         void binary_write (std::ostream& os, const T& t, const ByteOrder& byte_order = LITTLE_ENDIAN)
         {
-           binary_write<T> (os, t, sizeof(t), byte_order);
+            os.write ((char*)&t, sizeof(t));
 		}
 
         // binary_write for std::basic_string.
@@ -159,7 +159,7 @@ namespace pensar_digital
         template <Sizeable T>
         void binary_read (std::istream& is, T& t, const ByteOrder& byte_order = LITTLE_ENDIAN)
         {
-            binary_read<T> (is, t, sizeof(t), byte_order);
+            is.read ((char*)(&t), sizeof(t));
         }
 
         template <typename CharType>
