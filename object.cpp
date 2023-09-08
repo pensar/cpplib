@@ -24,12 +24,12 @@ namespace pensar_digital
         }
 
         // implements input stream member virtual std::istream& Object::read(std::istream& is)
-        std::istream& Object::read(std::istream& is, const IO_Mode& amode, const ByteOrder& abyte_order)
+        std::istream& Object::read(std::istream& is, const IO_Mode amode, const ByteOrder& abyte_order)
         {
             if (amode == BINARY)
             {
                 String sclass_name;
-                binary_read<String>(is, sclass_name, abyte_order);
+                binary_read (is, sclass_name, abyte_order);
                 if (sclass_name != class_name())
 					throw new std::runtime_error("Object::read: class name mismatch.");
                 binary_read<Id>(is, mid, abyte_order);
@@ -53,7 +53,7 @@ namespace pensar_digital
             return is;
         };
 
-        std::ostream& Object::write (std::ostream& os, const IO_Mode& amode, const ByteOrder& abyte_order) const
+        std::ostream& Object::write (std::ostream& os, const IO_Mode amode, const ByteOrder& abyte_order) const
         {
             if (amode == BINARY)
             {

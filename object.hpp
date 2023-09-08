@@ -61,7 +61,7 @@ namespace pensar_digital
                 // Constructors. 
                 
                 /// Default constructor.
-                Object(const Id& id = NULL_ID, const IO_Mode& mode = BINARY) noexcept : mid(id) 
+                Object (const Id& id = NULL_ID, const IO_Mode mode = BINARY) noexcept : mid(id), mmode(mode)
                 {
                 };
 
@@ -104,7 +104,7 @@ namespace pensar_digital
                 ///  Gets io mode.
                 /// </summary>
                 /// <returns>IO_Mode</returns>
-                const IO_Mode& get_mode() const noexcept { return mmode; }
+                const IO_Mode get_mode() const noexcept { return mmode; }
 
                 /// \brief Access hash
                 ///
@@ -112,7 +112,7 @@ namespace pensar_digital
                 virtual const Hash get_hash() const noexcept { return mid; };
 
                 // Implements initialize method from Initializable concept.
-                virtual bool initialize(const Id& id = NULL_ID, const IO_Mode& mode = BINARY) noexcept { mid = id; mmode = mode; return true; }
+                virtual bool initialize(const Id& id = NULL_ID, const IO_Mode mode = BINARY) noexcept { mid = id; mmode = mode; return true; }
 
                 // Conversion to json string.
                 inline virtual String json () const noexcept 
@@ -120,9 +120,9 @@ namespace pensar_digital
                     return pd::json<Object> (*this) + " }";
                 }
 
-                virtual std::istream& read (std::istream& is, const IO_Mode& amode = BINARY, const ByteOrder& abyte_order = LITTLE_ENDIAN);
+                virtual std::istream& read (std::istream& is, const IO_Mode amode = BINARY, const ByteOrder& abyte_order = LITTLE_ENDIAN);
 
-                virtual std::ostream& write (std::ostream& os, const IO_Mode& amode = BINARY, const ByteOrder& abyte_order = LITTLE_ENDIAN) const;
+                virtual std::ostream& write (std::ostream& os, const IO_Mode amode = BINARY, const ByteOrder& abyte_order = LITTLE_ENDIAN) const;
 
                 // Conversion to xml string.
                 virtual String xml() const noexcept { return ObjXMLPrefix() + "/>"; }
