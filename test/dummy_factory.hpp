@@ -11,12 +11,12 @@ namespace pensar_digital
 {
 	namespace cpplib
 	{
-		class DummyFactory : public Factory<Dummy, Id, String>
+		class DummyFactory2 : public Factory<Dummy, Id, String>
 		{
 		public:
 			inline static const VersionPtr VERSION = pd::versionf.get (1, 1, 1);
-			DummyFactory(const Id& aid = NULL_ID, const String& aname = "") : Factory<Dummy, Id, String>(3, 10, aid, aname) { };
-			virtual ~DummyFactory() { };
+			DummyFactory2(const Id& aid = NULL_ID, const String& aname = "") : Factory<Dummy, Id, String>(3, 10, aid, aname) { };
+			virtual ~DummyFactory2() { };
 			using P = Factory<Dummy, Id, String>::P;
 			virtual P get(const Id& aid = NULL_ID, const String& aname = "")
 			{
@@ -44,7 +44,7 @@ namespace pensar_digital
 			};
 		};
 
-		extern DummyFactory dummyf;
+		extern DummyFactory2 dummyf;
 	}
 }
 

@@ -10,6 +10,7 @@
 #include "../object.hpp"
 #include "../json_util.hpp"
 #include "../clone_util.hpp"
+#include "../factory.hpp"
 
 #include <memory>
 
@@ -21,6 +22,8 @@ namespace pensar_digital
 #pragma warning( disable : 4250) // Disable warning C4250: inherits via dominance.
 typedef std::shared_ptr<Dummy> DummyPtr;
 
+        typedef Factory<Dummy, Id, String> DummyFactory;
+
         /// <summary>
         /// Dummy class is streamable and comparable.
         /// </summary>
@@ -30,11 +33,38 @@ typedef std::shared_ptr<Dummy> DummyPtr;
 
                 String name;
             public:
+                inline static DummyFactory factory = {3, 10, NULL_ID, ""};
                 inline static const VersionPtr VERSION = pd::versionf.get (1, 1, 1);
 
                 Dummy(const Id& id = NULL_ID, const String& aname = "") : Object(id), name(aname) {}
                 Dummy(const Dummy& d) : Object(d) { name = d.name; }
                 Dummy(Dummy&& d) noexcept : Object(d) { name = d.name; }
+                
+                inline static DummyFactory::P get(const Id& aid = NULL_ID, const String& aname = "")
+                {
+                    return factory.get(aid, aname);
+                };
+
+                inline DummyFactory::P clone ()
+                {
+                    return get(get_id  (), get_name ());
+                };
+                inline DummyFactory::P clone(const DummyPtr& ptr) { return ptr->clone (); }
+
+                inline static DummyFactory::P parse_json(const String& sjson)
+                {
+                    Json j;
+                    DummyFactory::P ptr = get(pd::get_id<Dummy>(sjson, &j));
+                    ptr->set_name(j.at("name"));
+                    VersionPtr v = versionf.get(j);
+
+                    // todo: check version compatibility.
+                    if (*(ptr->VERSION) != *v)
+                        throw std::runtime_error("DummyFactory::parse_json: version mismatch.");
+
+                    return ptr;
+                };
+
                 Dummy& operator = (const Dummy& d) noexcept { assign(d); return *this; }
                 Dummy& operator = (Dummy&& d) noexcept { assign(d); return *this; }
                 bool operator == (const Dummy& d) const { return (Object::operator == (d) && (name == d.name)); }

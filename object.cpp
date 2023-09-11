@@ -23,7 +23,7 @@ namespace pd = pensar_digital::cpplib;
             pd::String json_class = j.at("class");
             if (class_name == json_class)
             {
-                return *pd::objectf.get (j.at("id"));
+                return *pd::Object::get.get (j.at("id"));
             }
             else throw new std::runtime_error("Object expected class = " + class_name + " but json has " + json_class);
         }
@@ -34,8 +34,7 @@ namespace pensar_digital
 {
 	namespace cpplib
 	{
-        
-        Object& Object::parse_json (const String& sjson)
+        Object& Object::from_json(const String& sjson)
         {
             VersionPtr v;
             Id aid;
@@ -48,7 +47,7 @@ namespace pensar_digital
                 throw std::runtime_error("ObjectFactory::parse_json: version mismatch.");
             return *this;
         }
-
+        
         // implements input stream member virtual std::istream& Object::read(std::istream& is)
         std::istream& Object::read(std::istream& is, const IO_Mode amode, const ByteOrder& abyte_order)
         {

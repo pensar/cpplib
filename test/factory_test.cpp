@@ -6,7 +6,7 @@
 #include "../factory.hpp"
 #include "../string_def.hpp"
 #include "../string_util.hpp"
-#include "../object_factory.hpp"
+#include "../object.hpp"
 #include <memory>
 
 namespace pensar_digital

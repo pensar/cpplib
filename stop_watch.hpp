@@ -4,7 +4,7 @@
 #ifndef STOP_WATCH_HPP_INCLUDED
 #define STOP_WATCH_HPP_INCLUDED
 
-#include "object_factory.hpp"
+#include "object.hpp"
 #include <chrono>
 
 namespace pensar_digital

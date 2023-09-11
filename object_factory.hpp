@@ -13,12 +13,12 @@ namespace pensar_digital
 {
 	namespace cpplib
 	{
-		class ObjectFactory : public Factory<Object, Id>
+		class ObjectFactory2 : public Factory<Object, Id>
 		{
 			public:
 				inline static const VersionPtr VERSION = pd::versionf.get (1, 1, 1);
-				ObjectFactory(const Id& aid = NULL_ID) : Factory<Object, Id> (3, 10, aid) { };
-				virtual ~ObjectFactory() { };
+				ObjectFactory2(const Id& aid = NULL_ID) : Factory<Object, Id> (3, 10, aid) { };
+				virtual ~ObjectFactory2() { };
 				using P = Factory<Object, Id>::P;
 				virtual P  get(const Id& aid = NULL_ID)
 				{
@@ -65,7 +65,7 @@ namespace pensar_digital
 
 		};
 
-		extern ObjectFactory objectf;
+		extern ObjectFactory2 objectf;
 	}	
 }
 

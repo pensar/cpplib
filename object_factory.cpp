@@ -8,7 +8,7 @@ namespace pensar_digital
 {
 	namespace cpplib
 	{
-		static ObjectFactory objectf;
+		static ObjectFactory2 objectf;
 	}
 }
 

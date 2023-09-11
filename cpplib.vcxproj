@@ -147,14 +147,12 @@
     <ClCompile Include="cpp_lib\xmlParser.cpp" />
     <ClCompile Include="generator.cpp" />
     <ClCompile Include="io_util.cpp" />
-    <ClCompile Include="iversion.cpp" />
     <ClCompile Include="language.cpp" />
     <ClCompile Include="locale.cpp" />
     <ClCompile Include="log.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="memory.cpp" />
     <ClCompile Include="object.cpp" />
-    <ClCompile Include="object_factory.cpp" />
     <ClCompile Include="random_util.cpp" />
     <ClCompile Include="error.cpp" />
     <ClCompile Include="name.cpp" />
@@ -164,7 +162,6 @@
     <ClCompile Include="test\concept_test.cpp" />
     <ClCompile Include="test\constraint_test.cpp" />
     <ClCompile Include="test\dummy.cpp" />
-    <ClCompile Include="test\dummy_factory.cpp" />
     <ClCompile Include="test\factory_test.cpp" />
     <ClCompile Include="test\io_util_test.cpp" />
     <ClCompile Include="test\object_test.cpp" />
@@ -186,8 +183,6 @@
     <ClInclude Include="generator.hpp" />
     <ClInclude Include="clone_util.hpp" />
     <ClInclude Include="header_lib\json.hpp" />
-    <ClInclude Include="iconstraint.hpp" />
-    <ClInclude Include="igenerator.hpp" />
     <ClInclude Include="io_util.hpp" />
     <ClInclude Include="json_util.hpp" />
     <ClInclude Include="language.hpp" />
@@ -197,8 +192,6 @@
     <ClInclude Include="mg.hpp" />
     <ClInclude Include="name.hpp" />
     <ClInclude Include="object.hpp" />
-    <ClInclude Include="object_factory.hpp" />
-    <ClInclude Include="path_factory.hpp" />
     <ClInclude Include="random_util.hpp" />
     <ClInclude Include="stop_watch.hpp" />
     <ClInclude Include="string_def.hpp" />

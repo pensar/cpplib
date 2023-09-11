@@ -66,9 +66,6 @@
     <ClCompile Include="name.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="object_factory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="test\dummy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -76,9 +73,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="test\factory_test.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="test\dummy_factory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="test\constraint_test.cpp">
@@ -97,9 +91,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="test\stop_watch_test.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="iversion.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -182,9 +173,6 @@
     <ClInclude Include="clone_util.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="object_factory.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="test\dummy.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -194,13 +182,7 @@
     <ClInclude Include="constraint.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="iconstraint.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="json_util.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="igenerator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="stop_watch.hpp">
@@ -213,9 +195,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="version_factory.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="path_factory.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="file_factory.hpp">

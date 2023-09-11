@@ -10,6 +10,7 @@
 #include "clone_util.hpp"
 #include "version_factory.hpp"
 #include "json_util.hpp"
+#include "factory.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -29,11 +30,11 @@ namespace pensar_digital
         namespace pd = pensar_digital::cpplib;
         class Object;
         typedef std::shared_ptr<Object> ObjectPtr;
-
+        typedef Factory<Object, Id> ObjectFactory;  
         class Object 
         {
             private:
-
+                inline static ObjectFactory factory = { 3, 10, NULL_ID }; //!< Member variable "factory"
                 Id mid; //!< Member variable "id"
                 IO_Mode mmode;
             protected:
@@ -55,8 +56,8 @@ namespace pensar_digital
             public:
                 inline static const VersionPtr VERSION = pd::versionf.get (1, 1, 1);
                 // Verifies if Object complies with Versionable concept.
-                typedef Object   I; // Interface type.
-                typedef Object IRO; // Read only interface type.
+                //typedef Object   I; // Interface type.
+                //typedef Object IRO; // Read only interface type.
 
                 // Constructors. 
                 
@@ -112,7 +113,12 @@ namespace pensar_digital
                 virtual const Hash get_hash() const noexcept { return mid; };
 
                 // Implements initialize method from Initializable concept.
-                virtual bool initialize(const Id& id = NULL_ID, const IO_Mode mode = BINARY) noexcept { mid = id; mmode = mode; return true; }
+                virtual bool initialize(const Id& id = NULL_ID, const IO_Mode mode = BINARY) noexcept 
+                { 
+                    mid = id; 
+                    mmode = mode; 
+                    return true; 
+                }
 
                 // Conversion to json string.
                 inline virtual String json () const noexcept 
@@ -153,7 +159,7 @@ namespace pensar_digital
                 bool operator == (const Object& o) const { return   equals(o); }
                 bool operator != (const Object& o) const { return !equals(o); }
 
-                Object& parse_json(const String& sjson);
+                Object& from_json(const String& sjson);
 
                 /// Conversion to string.
                 /// \return A string with the object id.
@@ -182,7 +188,45 @@ namespace pensar_digital
                 Object& operator=(Object&& o) noexcept { return assign(o); }
 
                 friend void from_json(const Json& j, Object& o);
-            };
+                
+                static inline ObjectFactory::P  get(const Id& aid = NULL_ID)
+                {
+                    return factory.get(aid);
+                };
+
+                ObjectFactory::P clone ()
+                {
+                    return get (mid);
+                };
+
+                inline static ObjectFactory::P get (const Json& j)
+                {
+                    String json_class = j.at("class");
+                    if (json_class != pd::class_name<Object>())
+                        throw std::runtime_error("Invalid class name: " + pd::class_name<Object>());
+                    ObjectFactory::P ptr = get(j.at("id"));
+
+                    VersionPtr v = versionf.get(j["VERSION"]);
+
+                    if (*(ptr->VERSION) != *v)
+                        throw std::runtime_error("ObjectFactory::parse_json: version mismatch.");
+
+                    return ptr;
+                }
+
+                inline static ObjectFactory::P get (const String& sjson)
+                {
+                    Json j;
+                    ObjectFactory::P ptr = get(pd::get_id<Object>(sjson, &j));
+
+                    VersionPtr v = versionf.get(j);
+
+                    // todo: check version compatibility.
+                    if (*(ptr->VERSION) != *v)
+                        throw std::runtime_error("ObjectFactory::parse_json: version mismatch.");
+                    return ptr;
+                } // parse_json
+        }; // Object
             extern void to_json(Json& j, const Object& o);
             extern void from_json(const Json& j, Object& o);
             //extern Object nlohmann::from_json (const Json& j);
@@ -210,7 +254,7 @@ namespace pensar_digital
             //inline std::stringstream& operator >> (std::stringstream& ss, ObjectPtr o) { o->read(ss, TEXT); return ss; }
             //inline std::stringstream& operator << (std::stringstream& ss, ObjectPtr o) { o->write(ss, TEXT); return ss; }
 
-            inline       Object& operator >> (const String& sjson      , Object& o) { return o.parse_json(sjson); }
+            inline       Object& operator >> (const String& sjson      , Object& o) { return o.from_json(sjson); }
 
             inline std::istream& operator >> (std::istream& is,       ObjectPtr o) { return is >> *o    ; }
             inline std::ostream& operator << (std::ostream& os, const ObjectPtr o) { return os << *o    ; }
@@ -236,6 +280,6 @@ namespace pensar_digital
 
                 // method to set the class dependency. 
             };
-        } // namespace cpplib
+         } // namespace cpplib
 } // namespace pensar_digital
 #endif // OBJECT_HPP

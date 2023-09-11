@@ -15,8 +15,8 @@ namespace pensar_digital
         class NewFactory
         {
             public:
-                using I = std::conditional<Interfaceable<T>, typename T::I, T>::type; // Interface type
-                typedef typename std::shared_ptr<I> P; // Pointer type.
+                //using I = std::conditional<Interfaceable<T>, typename T::I, T>::type; // Interface type
+                typedef typename std::shared_ptr<T> P; // Pointer type.
                 //inline static const VersionPtr VERSION = pd::versionf.get (1, 1, 1);
                 virtual ~NewFactory (){}
                 virtual P get(const Args& ... args) const { return std::make_shared<T> (args ...); }

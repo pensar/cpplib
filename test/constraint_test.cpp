@@ -5,7 +5,6 @@
 #include "../string_def.hpp"
 #include "../string_util.hpp"
 #include "../object.hpp"
-#include "../object_factory.hpp"
 #include "constraint.hpp"
 
 namespace pensar_digital
