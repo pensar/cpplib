@@ -390,8 +390,9 @@ namespace pensar_digital
                     }
                     else // json format
                     {
-                        return os << json ();
+                        os << json ();
                     }
+                    return os;
                 };
 
                 // Convertion to xml string.
@@ -688,8 +689,8 @@ namespace pensar_digital
 						{
 							text_data = j["text_data"].get<String>();
 						}
-                        return is;
                     }
+                    return is;
                 };
 
                 virtual std::ostream& write (std::ostream& os, const IO_Mode amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN) const

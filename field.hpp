@@ -5,6 +5,7 @@
 #define FIELD_HPP
 
 #include "object.hpp"
+#include "generator.hpp"
 
 namespace pensar_digital
 {
@@ -19,11 +20,12 @@ namespace pensar_digital
 			String name;
 			String display_name;
 			String description;
+			static Generator<Field<T>> generator;
 
 			public:
 				inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
 
-			Field(String name, String adisplay_name, String adescription, bool aisnull = true) : Object()
+				Field(String name, String adisplay_name, String adescription, bool aisnull = true, Id id = NULL_ID) : Object(id == NULL_ID ? generator.get() : id)
 			{
 				name = aname;
 				display_name = adisplay_name;
@@ -108,7 +110,7 @@ namespace pensar_digital
 
 			virtual String description() const { return description; }
 
-			virtual String to_string() const { return value.to_string(); }
+			virtual String to_string() const noexcept { return value.to_string(); }
 
 			// Implicit conversion to String
 			operator String() const { return to_string(); }

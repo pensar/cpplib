@@ -34,7 +34,7 @@ namespace pensar_digital
         class Object 
         {
             private:
-                inline static ObjectFactory factory = { 3, 10, NULL_ID }; //!< Member variable "factory"
+                inline static ObjectFactory mfactory = { 3, 10, NULL_ID }; //!< Member variable "factory"
                 Id mid; //!< Member variable "id"
                 IO_Mode mmode;
             protected:
@@ -191,7 +191,7 @@ namespace pensar_digital
                 
                 static inline ObjectFactory::P  get(const Id& aid = NULL_ID)
                 {
-                    return factory.get(aid);
+                    return mfactory.get(aid);
                 };
 
                 ObjectFactory::P clone ()

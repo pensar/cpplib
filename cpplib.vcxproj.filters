@@ -176,9 +176,6 @@
     <ClInclude Include="test\dummy.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="test\dummy_factory.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="constraint.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -192,9 +189,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="type_util.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="file_factory.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

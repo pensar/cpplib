@@ -179,7 +179,6 @@
     <ClInclude Include="error.hpp" />
     <ClInclude Include="factory.hpp" />
     <ClInclude Include="field.hpp" />
-    <ClInclude Include="file_factory.hpp" />
     <ClInclude Include="generator.hpp" />
     <ClInclude Include="clone_util.hpp" />
     <ClInclude Include="header_lib\json.hpp" />
@@ -198,7 +197,6 @@
     <ClInclude Include="string_util.hpp" />
     <ClInclude Include="sys_user_info.hpp" />
     <ClInclude Include="test\dummy.hpp" />
-    <ClInclude Include="test\dummy_factory.hpp" />
     <ClInclude Include="type_util.hpp" />
     <ClInclude Include="version.hpp" />
     <ClInclude Include="wstring_stream_hack.hpp" />

@@ -64,8 +64,8 @@ namespace pensar_digital
         public:
             inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
 
-            typedef IGenerator<T>     I; // Interface type.
-            typedef IGeneratorRO<T> IRO; // Read only interface type.
+            //typedef IGenerator<T>     I; // Interface type.
+            //typedef IGeneratorRO<T> IRO; // Read only interface type.
 
             /// \brief Constructs a Generator.
             /// \param [in] initial_value Initial value for the generator, defaults to 0.
