@@ -8,7 +8,7 @@
 #include "string_def.hpp"
 #include "memory.hpp"
 #include "constant.hpp"
-#include "version_factory.hpp"
+#include "version.hpp"
 #include "concept.hpp"
 #include "json_util.hpp"
 
@@ -216,7 +216,7 @@ namespace pensar_digital
         class Path : public fs::path, public Object
 		{
 			public:
-                inline static const VersionPtr VERSION = pd::versionf.get (1, 1, 1);
+                inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
                 typedef Path   I;  // Interface type.
                 typedef Path IRO; // Read only interface type.
 
@@ -524,7 +524,7 @@ namespace pensar_digital
                 typedef File   I;  // Interface type.
                 typedef File IRO; // Read only interface type.
 
-                inline static const VersionPtr VERSION = pd::versionf.get (1, 1, 1);
+                inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
                 inline static const size_t MAX_IN_MEMORY_FILE_SIZE_BYTE = 1024 ^ 3; // 1 GB
                 inline const static std::ios_base::openmode INPUT               = std::ios::in;
                 inline const static std::ios_base::openmode OUTPUT              = std::ios::out;

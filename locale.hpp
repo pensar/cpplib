@@ -16,7 +16,7 @@ namespace pensar_digital
         class Locale : public virtual Object
         {
             public:
-                inline static const VersionPtr VERSION = pd::versionf.get (1, 1, 1);
+                inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
 
                 /** Default constructor */
                 Locale(const typename Id aid = NULL_ID) {}

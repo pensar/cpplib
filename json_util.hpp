@@ -7,7 +7,7 @@
 #include "concept.hpp"
 #include "string_def.hpp"
 #include "header_lib/json.hpp"
-#include "version_factory.hpp" // versionf
+#include "version.hpp" // versionf
 #include "type_util.hpp"
 
 #include <iostream>
@@ -50,7 +50,7 @@ namespace pensar_digital
         T& read_json(const String& sjson, T& o, Id* out_id, VersionPtr* out_v, Json* out_j = nullptr)
         {
             *out_id = (get_id<T>(sjson, out_j));
-            *out_v = versionf.get(*out_j);
+            *out_v = Version::get(*out_j);
             return o;
         }
 

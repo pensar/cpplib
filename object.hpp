@@ -8,7 +8,7 @@
 #include "string_util.hpp"
 #include "header_lib/xmlParser.h"
 #include "clone_util.hpp"
-#include "version_factory.hpp"
+#include "version.hpp"
 #include "json_util.hpp"
 #include "factory.hpp"
 
@@ -54,7 +54,7 @@ namespace pensar_digital
                 virtual bool _equals(const Object& o) const { return (mid == o.mid); }
 
             public:
-                inline static const VersionPtr VERSION = pd::versionf.get (1, 1, 1);
+                inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
                 // Verifies if Object complies with Versionable concept.
                 //typedef Object   I; // Interface type.
                 //typedef Object IRO; // Read only interface type.
@@ -206,7 +206,7 @@ namespace pensar_digital
                         throw std::runtime_error("Invalid class name: " + pd::class_name<Object>());
                     ObjectFactory::P ptr = get(j.at("id"));
 
-                    VersionPtr v = versionf.get(j["VERSION"]);
+                    VersionPtr v = Version::get(j["VERSION"]);
 
                     if (*(ptr->VERSION) != *v)
                         throw std::runtime_error("ObjectFactory::parse_json: version mismatch.");
@@ -219,7 +219,7 @@ namespace pensar_digital
                     Json j;
                     ObjectFactory::P ptr = get(pd::get_id<Object>(sjson, &j));
 
-                    VersionPtr v = versionf.get(j);
+                    VersionPtr v = Version::get(j);
 
                     // todo: check version compatibility.
                     if (*(ptr->VERSION) != *v)

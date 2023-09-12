@@ -12,26 +12,20 @@ namespace pensar_digital
 	namespace cpplib
 	{
 
-		// Versionable concept requires a inline static const Version public member named VERSION convertible to VersionPtr.
-		template <typename T>
-		concept Versionable = requires (T t)
-		{
-			{t.VERSION} noexcept -> std::convertible_to<VersionPtr>;
-		};
 
 		typedef Factory<Version, const VersionInt&,
 								 const VersionInt&,
 								 const VersionInt&,
 								 const Id&> VersionFactoryBase;
 
-		class VersionFactory : public VersionFactoryBase
+		class VersionFactory2 : public VersionFactoryBase
 		{
 		public:
-			VersionFactory(const VersionInt& pub = Version::NULL_VERSION, 
+			VersionFactory2(const VersionInt& pub = Version::NULL_VERSION, 
 													const VersionInt& pro = Version::NULL_VERSION, 
 													const VersionInt& pri = Version::NULL_VERSION,
 													const Id& aid = NULL_ID) : VersionFactoryBase (3, 10, pub, pro, pri, aid) { };
-			virtual ~VersionFactory() { };
+			virtual ~VersionFactory2 () { };
 			using P = VersionFactoryBase::P;
 			virtual P get (const VersionInt& pub = pd::Version::NULL_VERSION,
 						   const VersionInt& pro = Version::NULL_VERSION,
@@ -73,7 +67,7 @@ namespace pensar_digital
 			};
 		};
 
-		inline static VersionFactory versionf;
+		inline static VersionFactory2 versionf;
 	} // namespace cpplib	
 } // namespace pensar_digital
 

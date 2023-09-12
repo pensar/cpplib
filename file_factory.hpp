@@ -6,7 +6,7 @@
 
 #include "factory.hpp"
 #include "io_util.hpp"
-#include "version_factory.hpp"	
+#include "version.hpp"	
 #include "json_util.hpp"
 
 
@@ -18,7 +18,7 @@ namespace pensar_digital
 		class FileFactory : public FileFactoryBase
 		{
 		public:
-			inline static const VersionPtr VERSION = pd::versionf.get(1, 1, 1);
+			inline static const VersionPtr VERSION = pd::Version::get(1, 1, 1);
 			FileFactory(const Path& afull_path = ".", const std::ios_base::openmode amode = File::IN_OUT_ATE_BIN_MODE, const Id aid = NULL_ID) : FileFactoryBase(3, 10, afull_path, amode, aid) { };
 			virtual ~FileFactory() { };
 			using P = FileFactoryBase::P;

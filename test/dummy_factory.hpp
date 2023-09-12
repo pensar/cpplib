@@ -14,7 +14,7 @@ namespace pensar_digital
 		class DummyFactory2 : public Factory<Dummy, Id, String>
 		{
 		public:
-			inline static const VersionPtr VERSION = pd::versionf.get (1, 1, 1);
+			inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
 			DummyFactory2(const Id& aid = NULL_ID, const String& aname = "") : Factory<Dummy, Id, String>(3, 10, aid, aname) { };
 			virtual ~DummyFactory2() { };
 			using P = Factory<Dummy, Id, String>::P;
@@ -34,7 +34,7 @@ namespace pensar_digital
 				Json j;
 				P ptr = get(pd::get_id<Dummy>(sjson, &j));
 				ptr->set_name (j.at("name"));
-				VersionPtr v = versionf.get(j);
+				VersionPtr v = Version::get(j);
 
 				// todo: check version compatibility.
 				if (*(ptr->VERSION) != *v)

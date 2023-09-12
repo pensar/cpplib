@@ -62,7 +62,7 @@ namespace pensar_digital
       class Generator : public virtual Object//, public virtual IGenerator<T>
       {
         public:
-            inline static const VersionPtr VERSION = pd::versionf.get (1, 1, 1);
+            inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
 
             typedef IGenerator<T>     I; // Interface type.
             typedef IGeneratorRO<T> IRO; // Read only interface type.

@@ -34,7 +34,7 @@ typedef std::shared_ptr<Dummy> DummyPtr;
                 String name;
             public:
                 inline static DummyFactory factory = {3, 10, NULL_ID, ""};
-                inline static const VersionPtr VERSION = pd::versionf.get (1, 1, 1);
+                inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
 
                 Dummy(const Id& id = NULL_ID, const String& aname = "") : Object(id), name(aname) {}
                 Dummy(const Dummy& d) : Object(d) { name = d.name; }
@@ -56,7 +56,7 @@ typedef std::shared_ptr<Dummy> DummyPtr;
                     Json j;
                     DummyFactory::P ptr = get(pd::get_id<Dummy>(sjson, &j));
                     ptr->set_name(j.at("name"));
-                    VersionPtr v = versionf.get(j);
+                    VersionPtr v = Version::get(j);
 
                     // todo: check version compatibility.
                     if (*(ptr->VERSION) != *v)

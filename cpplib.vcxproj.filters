@@ -194,9 +194,6 @@
     <ClInclude Include="type_util.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="version_factory.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="file_factory.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>

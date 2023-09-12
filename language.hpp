@@ -17,7 +17,7 @@ namespace pensar_digital
         class Language : public virtual Object
         {
             public:
-                inline static const VersionPtr VERSION = pd::versionf.get (1, 1, 1);
+                inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
                 /// \brief Default constructor.
                 Language(Id aid = NULL_ID) : Object(aid) {}// == NULL_ID ? generator.get() : aid){}
                 /** Default destructor */
