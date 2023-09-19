@@ -1,9 +1,13 @@
+// license: MIT (https://opensource.org/licenses/MIT)
+
+#ifndef PATH_HPP
+#define PATH_HPP
+
 #include "object.hpp"
 #include "string_def.hpp"
 #include "memory.hpp"
 #include "constant.hpp"
-#include "ipath.hpp"
-#include "version_factory.hpp"
+#include "version.hpp"
 #include "concept.hpp"
 #include "json_util.hpp"
 #include "io_util.hpp"
@@ -22,19 +26,25 @@ namespace pensar_digital
 {
     namespace cpplib
     {
+        namespace fs = std::filesystem;
+        namespace pd = pensar_digital::cpplib;  
+
         class Path;
         typedef std::shared_ptr<Path> PathPtr;
-        // Path class represents a path in the file system. It inherits from fs::path adding implicit conversion to std::string.
-        class Path : public fs::path, public Object, public Path
-        {
-        public:
-            inline static const VersionPtr VERSION = pd::versionf.get(1, 1, 1);
-            typedef Path    I;  // Interface type.
-            typedef PathRO IRO; // Read only interface type.
+        typedef Factory<Path, fs::path, Id> PathFactory;
 
-            Path(const fs::path& p = ".", const Id& aid = NULL_ID) : Object(aid), fs::path(p) {}
-            Path(const std::string& s = ".", const Id& aid = NULL_ID) : Object(aid), fs::path(s) {}
-            Path(const char* s = ".", const Id& aid = NULL_ID) : Object(aid), fs::path(s) {}
+        // Path class represents a path in the file system. It inherits from fs::path adding implicit conversion to std::string.
+        class Path : public fs::path, public Object
+        {
+            private:
+                static inline fs::path CURRENT_DIR = ".";
+                inline static PathFactory mfactory = { 3, 10, CURRENT_DIR, NULL_ID };
+            public:
+                inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
+
+            Path(const fs::path& p = ".", const Id& id = NULL_ID) : Object(id), fs::path(p) {}
+            Path(const std::string& s, const Id& id = NULL_ID) : Object(id), fs::path(s) {}
+            Path(const char* s, const Id& id = NULL_ID) : Object(id), fs::path(s) {}
 
             // Copy constructor.
             Path(const Path& p, const Id& aid = NULL_ID) noexcept : Object(aid), fs::path(p) {}
@@ -44,35 +54,119 @@ namespace pensar_digital
 
             // virtual destructor.
             virtual ~Path() noexcept = default;
-            inline fs::path path() const noexcept { return static_cast<const fs::path&>(*this);}
-            bool remove() const noexcept override;
-            bool exists() const noexcept override;
-			bool is_directory() const noexcept override;
-            bool is_regular_file() const noexcept override;
-            bool is_symlink() const noexcept override;
-            bool is_empty() const noexcept override;
-            Path& absolute() const noexcept override;
-            Path& canonical() const noexcept override;
-            Path& relative() const noexcept override;
-            Path& parent_path() const noexcept override;
-            Path& filename() const noexcept override;
-            Path& stem() const noexcept override;
-            Path& extension() const noexcept override;
-            Path& replace_extension (const std::string& s) noexcept override;
-            Path& replace_extension (const Path& p) override;
-            Path& make_preferred() noexcept override;
-            Path& remove_filename() noexcept override;
-            Path& remove_trailing_separator() noexcept override;
+            static PathFactory::P get(const fs::path& p = ".", const Id& aid = NULL_ID)
+            {
+                return mfactory.get (p, aid);
+            };
+
+            PathFactory::P clone(const Path& apath)
+            {
+                return get(apath.std_path(), apath.get_id());
+            };
+
+            PathFactory::P clone(const PathPtr& ptr) { return clone(*ptr); }
+           
+            PathFactory::P parse_json(const String& sjson)
+            {
+                auto j = Json::parse(sjson);
+                String json_class = j.at("class");
+                if (json_class != pd::class_name<Path>())
+                    throw std::runtime_error("Invalid class name: " + pd::class_name<Path>());
+                Id id;
+                VersionPtr v;
+                Path p;
+                pd::read_json<Path>(sjson, p, &id, &v, &j);
+				set_id(id);
+
+                return clone(p);
+            };
+
+            bool remove() const noexcept
+            {
+                if (exists())
+                {
+                    return fs::remove(*this);
+                }
+                return true;
+            }
+
+            bool exists() const noexcept
+            {
+                return fs::exists(*this);
+            }
+
+            Path absolute() const noexcept
+            {
+                return fs::absolute(*this);
+            }
+
+            Path canonical() const noexcept
+            {
+                return fs::canonical(*this);
+            }
+
+            Path relative() const noexcept
+            {
+                return fs::relative(*this);
+            }
+
+            Path parent_path() const noexcept
+            {
+                return fs::path::parent_path();
+            }
+
+            Path filename() const noexcept
+            {
+                return fs::path::filename();
+            }
+
+            Path stem() const noexcept
+            {
+                return fs::path::stem();
+            }
+
+            Path extension() const noexcept
+            {
+                return fs::path::extension();
+            }
+
+            Path& replace_extension(const std::string& s) noexcept
+            {
+                fs::path::replace_extension(s);
+                return *this;
+            }
+
+            Path& replace_extension(const Path& p) noexcept
+            {
+                fs::path::replace_extension(p);
+                return *this;
+            }
+
+            Path& make_preferred() noexcept
+            {
+                fs::path::make_preferred();
+                return *this;
+            }
+
+            Path& remove_filename() noexcept
+            {
+                fs::path::remove_filename();
+                return *this;
+            }
+
+            Path& remove_trailing_separator() noexcept
+            {
+                //fs::path::remove_trailing_separator (); // todo.
+                return *this;
+            }
 
             // Implements initialize method from Initializable concept.
-            virtual bool initialize (const fs::path& p, const Id& aid = NULL_ID) noexcept
+            virtual bool initialize(const fs::path& p, const Id& aid = NULL_ID) noexcept
             {
                 fs::path::operator = (p);
                 Object::set_id(aid);
                 return true;
             }
-
-            PathPtr clone() const  noexcept { return pd::clone<Path, const fs::path&, const Id&> (*this, static_cast<const fs::path&>(*this), get_id()); }
 
             // Conversion to json string.
             virtual String json() const noexcept
@@ -82,7 +176,7 @@ namespace pensar_digital
                 return ss.str();
             }
 
-            virtual std::istream& read(std::istream& is, const IO_Mode& amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN)
+            virtual std::istream& read(std::istream& is, const IO_Mode amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN)
             {
                 if (amode == BINARY)
                 {
@@ -102,7 +196,7 @@ namespace pensar_digital
                 return is;
             };
 
-            virtual std::ostream& write(std::ostream& os, const IO_Mode& amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN) const
+            virtual std::ostream& write(std::ostream& os, const IO_Mode amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN) const
             {
                 if (amode == BINARY)
                 {
@@ -110,8 +204,9 @@ namespace pensar_digital
                 }
                 else // json format
                 {
-                    return os << json();
+                    os << json();
                 }
+                return os;
             };
 
             // Convertion to xml string.
@@ -148,7 +243,7 @@ namespace pensar_digital
             void create_dir_if_does_not_exist() const noexcept
             {
                 Path dir = *this;
-                if (fs::path::has_filename())
+                if (has_filename())
                     dir = parent_path();
                 if (!dir.exists())
                 {
@@ -156,10 +251,10 @@ namespace pensar_digital
                 }
             }
 
-            inline fs::path to_std_path() const noexcept override { return static_cast<const fs::path&>(*this); }
+            inline fs::path std_path() const noexcept { return static_cast<const fs::path&>(*this); }
 
             // Implicit conversion to fs::path.
-            operator fs::path() const noexcept { return to_std_path(); }
+            operator fs::path() const noexcept { return std_path(); }
 
             // Implicit conversion to std::string.
             operator std::string() const noexcept { return fs::path::string(); }
@@ -167,9 +262,6 @@ namespace pensar_digital
             // Implicit conversion to const char* returning a value allocated in the heap using _strdup.
             operator const char* () const { return _strdup(fs::path::string().c_str()); }
 
-            // / operator for std::string.
-            Path operator / (const std::string& s) const { Path p = *this; p /= s; p; }
-            
             // /= operator for std::string.
             Path& operator /= (const std::string& s) { fs::path::operator /= (s); return *this; }
 
@@ -194,44 +286,11 @@ namespace pensar_digital
             friend void from_json(const Json& j, Path& d);
 
             // Inherited via Object
-            inline void set_id(const Id& value) override { Object::set_id(value); }
-
-            friend extern void to_json   (      Json& j, const Path& p);
-            friend extern void from_json (const Json& j,       Path& p);
-
-
-            // Inherited via Path
-            bool is_absolute() const noexcept override;
-
-            bool is_relative() const noexcept override;
-
-            bool is_root() const noexcept override;
-
-            bool is_root_directory() const noexcept override;
-
-            bool is_root_path() const noexcept override;
-
-
-            // Inherited via Path
-            bool has_root_path() const noexcept override;
-
-            bool has_root_name() const noexcept override;
-
-            bool has_root_directory() const noexcept override;
-
-            bool has_relative_path() const noexcept override;
-
-            bool has_parent_path() const noexcept override;
-
-            bool has_filename() const noexcept override;
-
-            bool has_stem() const noexcept override;
-
-            bool has_extension() const noexcept override;
-
-};  // class Path
+            inline void set_id(const Id& value) { Object::set_id(value); }
+        };  // class Path
         // Json conversion.
         extern void to_json   (      Json& j, const Path& p);
         extern void from_json (const Json& j,       Path& p);
     } // namespace cpplib
 } // namespace pensar_digital
+#endif  

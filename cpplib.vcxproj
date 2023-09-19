@@ -145,6 +145,7 @@
     <ClCompile Include="constants.cpp" />
     <ClCompile Include="constraint.cpp" />
     <ClCompile Include="cpp_lib\xmlParser.cpp" />
+    <ClCompile Include="file.cpp" />
     <ClCompile Include="generator.cpp" />
     <ClCompile Include="io_util.cpp" />
     <ClCompile Include="language.cpp" />
@@ -153,6 +154,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="memory.cpp" />
     <ClCompile Include="object.cpp" />
+    <ClCompile Include="path.cpp" />
     <ClCompile Include="random_util.cpp" />
     <ClCompile Include="error.cpp" />
     <ClCompile Include="name.cpp" />
@@ -179,6 +181,7 @@
     <ClInclude Include="error.hpp" />
     <ClInclude Include="factory.hpp" />
     <ClInclude Include="field.hpp" />
+    <ClInclude Include="file.hpp" />
     <ClInclude Include="generator.hpp" />
     <ClInclude Include="clone_util.hpp" />
     <ClInclude Include="header_lib\json.hpp" />
@@ -191,6 +194,7 @@
     <ClInclude Include="mg.hpp" />
     <ClInclude Include="name.hpp" />
     <ClInclude Include="object.hpp" />
+    <ClInclude Include="path.hpp" />
     <ClInclude Include="random_util.hpp" />
     <ClInclude Include="stop_watch.hpp" />
     <ClInclude Include="string_def.hpp" />

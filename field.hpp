@@ -15,29 +15,30 @@ namespace pensar_digital
 		class Field : public virtual Object
 		{
 			private:
-			T value;
-			bool isnull;
-			String name;
-			String display_name;
-			String description;
-			static Generator<Field<T>> generator;
+			T mvalue;
+			bool misnull;
+			String mname;
+			String mdisplay_name;
+			String mdescription;
+			static Generator<Field<T>> mgenerator;
 
 			public:
 				inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
 
-				Field(String name, String adisplay_name, String adescription, bool aisnull = true, Id id = NULL_ID) : Object(id == NULL_ID ? generator.get() : id)
+			Field(String name, String display_name, String description, bool isnull = true, Id id = NULL_ID) 
+				: Object (id == NULL_ID ? mgenerator.get () : id),
+				  mname         (name        ),
+				  mdisplay_name (display_name),
+				  mdescription  (description ),
+				  misnull       (isnull      )
 			{
-				name = aname;
-				display_name = adisplay_name;
-				description = adescription;
-				isnull = aisnull;
 			}
 
-			Field(String aname, String adisplay_name, String adescription, T avalue, bool ais_null = false) :
-				Field(aname, adisplay_name, adescription, ais_null),
-				Object()
+			Field(String name, String display_name, String description, T value, bool is_null = false) :
+				Object (),
+				Field  (name, display_name, description, is_null),
+				mvalue (value)
 			{
-				value = avalue;
 			}
 			
 			/// Copy constructor.
@@ -57,11 +58,11 @@ namespace pensar_digital
 				if (this != &other)
 				{
 					Object::operator=(other);
-					value = other.value;
-					isnull = other.isnull;
-					name = other.name;
-					display_name = other.display_name;
-					description = other.description;
+					mvalue        = other.value;
+					misnull       = other.misnull;
+					mname         = other.name;
+					mdisplay_name = other.display_name;
+					mdescription = other.description;
 				}
 				return *this;
 			}
@@ -75,12 +76,12 @@ namespace pensar_digital
 			{
 				if (this != &other)
 				{
-					Object::operator=(std::move(other));
-					value = std::move(other.value);
-					isnull = std::move(other.isnull);
-					name = std::move(other.name);
-					display_name = std::move(other.display_name);
-					description = std::move(other.description);
+					Object::operator=(std::move (other)            );
+					mvalue          = std::move (other.value       );
+					misnull         = std::move (other.misnull     );
+					mname           = std::move (other.name        );
+					mdisplay_name   = std::move (other.display_name);
+					mdescription    = std::move (other.description );
 				}
 				return *this;
 			}
@@ -97,38 +98,38 @@ namespace pensar_digital
 
 			virtual T value() const { return value; }
 
-			virtual void set_value(const T& value) { this->value = value; }
+			virtual void set_value(const T& value) { this->mvalue = value; }
 
-			virtual bool is_null() const { return isnull; }
+			virtual bool is_null() const { return misnull; }
 
 			// Implicit conversion to T
 			operator T() const { return value; }
 
-			virtual String name() const { return name; }
+			virtual String name() const { return mname; }
 
-			virtual String display_name() const { return display_name; }
+			virtual String display_name() const { return mdisplay_name; }
 
-			virtual String description() const { return description; }
+			virtual String description() const { return mdescription; }
 
 			virtual String to_string() const noexcept { return value.to_string(); }
 
 			// Implicit conversion to String
 			operator String() const { return to_string(); }
 
-			virtual bool operator==(const Field& other) const { return value == other.value; }
+			virtual bool operator==(const Field& other) const { return mvalue == other.mvalue; }
 
-			virtual bool operator!=(const Field& other) const { return value != other.value; }
+			virtual bool operator!=(const Field& other) const { return mvalue != other.mvalue; }
 
-			virtual bool operator<(const Field& other) const { return value < other.value; }	
+			virtual bool operator<(const Field& other) const { return mvalue < other.mvalue; }	
 
-			virtual bool operator<=(const Field& other) const { return value <= other.value; }
+			virtual bool operator<=(const Field& other) const { return mvalue <= other.mvalue; }
 
-			virtual bool operator>(const Field& other) const { return value > other.value; }
+			virtual bool operator>(const Field& other) const { return mvalue > other.mvalue; }
 			
-			virtual bool operator>=(const Field& other) const { return value >= other.value; }
+			virtual bool operator>=(const Field& other) const { return mvalue >= other.mvalue; }
 
 			// Implicit conversion from value type.
-			Field& operator=(const T& value) { this->value = value; return *this; }
+			Field& operator=(const T& value) { this->mvalue = value; return *this; }
 		};
 
 		class StringField : public virtual Field<String>

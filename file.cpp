@@ -9,20 +9,6 @@ namespace pensar_digital
         std::istream& operator >> (std::istream& is,       File& file) { return file.read  (is); }
         std::ostream& operator << (std::ostream& os, const File& file) { return file.write (os); }
 
-        fs::path File::get_full_path() const noexcept
-        {
-            return fs::path();
-        }
-
-        void File::set_id(const Id& value)
-        {
-            Object::set_id(value);
-        }
-
-        void File::set_name(const String& name) noexcept
-        {
-        }
-
         void to_json(Json& j, const File& f)
          {
              j["class"] = f.class_name();
@@ -30,7 +16,7 @@ namespace pensar_digital
              j["mpublic"] = f.VERSION->get_public();
              j["mprotected"] = f.VERSION->get_protected();
              j["mprivate"] = f.VERSION->get_private();
-             j["path"] = f.full_path;
+             j["path"] = f.fullpath ();
              j["mode"] = f.is_binary() ? "BINARY" : "TEXT";
          }
 
@@ -40,8 +26,8 @@ namespace pensar_digital
              String json_class = j.at("class");
              if (class_name == json_class)
              {
-                 f.Object::set_id(j.at("id"));
-                 f.full_path = j.at("full_path");
+                 f.set_id(j.at("id"));
+                 f.mfullpath = j.at("mfullpath");
                  if (j.at("mode") == "BINARY")
                  {
                      f.set_binary_mode ();

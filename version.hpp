@@ -41,7 +41,7 @@ namespace pensar_digital
                 VersionInt mprotected;
                 VersionInt mprivate;
         	    Id         mid;
-
+                
                 // Setters.
                 void set_public    (VersionInt v) noexcept { mpublic    = v; }
                 void set_protected (VersionInt v) noexcept { mprotected = v; }
@@ -49,10 +49,9 @@ namespace pensar_digital
 
             public:
                 inline static const VersionInt NULL_VERSION = -1;
-                typedef Version    I;  // Interface type.
-                typedef Version IRO; // Read only interface type.
                 Version(const VersionInt& pub = NULL_VERSION, const VersionInt& prot = NULL_VERSION, const VersionInt& priv = NULL_VERSION, const Id& aid = NULL_ID)
-                    : mpublic(pub), mprotected(prot), mprivate(priv), mid (aid) {}
+                    : mpublic(pub), mprotected(prot), mprivate(priv), 
+                      mid (aid) {}
 
                 inline static VersionFactory::P get(const VersionInt& pub = pd::Version::NULL_VERSION,
                     const VersionInt& pro = Version::NULL_VERSION,

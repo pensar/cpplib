@@ -7,6 +7,7 @@
 #include "../object.hpp"
 #include "../io_util.hpp"
 #include "../sys_user_info.hpp"
+#include "../file.hpp"
 
 #include <memory>
 

@@ -7,6 +7,7 @@
 #include "../object.hpp"
 #include "dummy_factory.hpp"
 #include "../io_util.hpp"
+#include "../file.hpp"
 #include <memory>
 
 #ifdef _MSC_VER

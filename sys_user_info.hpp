@@ -6,6 +6,7 @@
 
 #include "string_def.hpp"
 #include "io_util.hpp"
+#include "path.hpp"
 
 namespace pensar_digital
 {

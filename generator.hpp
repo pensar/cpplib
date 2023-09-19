@@ -5,7 +5,6 @@
 #define GENERATOR_HPP_INCLUDED
 
 #include "object.hpp"
-#include "igenerator.hpp"
 #include "constant.hpp"
 #include "json_util.hpp"
 
@@ -16,18 +15,18 @@ namespace pensar_digital
         template <class T> class Generator;
         
         /// Makes Generator Streamable.
-        template <class T> std::ostream& operator << (std::ostream& os, const IGenerator<T>& g) { return g.write(os); }
-        template <class T> std::istream& operator >> (std::istream& is, IGenerator<T>& g) { return g.read(is); }
+        template <class T> std::ostream& operator << (std::ostream& os, const Generator<T>& g) { return g.write(os); }
+        template <class T> std::istream& operator >> (std::istream& is, Generator<T>& g) { return g.read(is); }
 
-        /*
         template <class T>
-        void to_json(Json& j, const IGenerator<T>& g)
+        void to_json(Json& j, const Generator<T>& g)
         {
             j["class"     ] = g.class_name();
             j["id"        ] = g.get_id();
-            j["mprivate"  ] = g.VERSION->get_private();
-            j["mprotected"] = g.VERSION->get_protected();
-            j["mpublic"   ] = g.VERSION->get_public();
+            j["mvalue"    ] = g.get_current();
+            j["mstep"     ] = g.mstep;
+
+            to_json (j, *(g.VERSION));
         }
 
         template <class T>
@@ -38,11 +37,12 @@ namespace pensar_digital
             if (class_name == json_class)
             {
                 g.Object::set_id(j.at("id"));
-                //g.name = j.at("name");
+                g.mvalue = j["mvalue"];
+                g.mstep  = j["mstep"];
+                g.VERSION->from_json(j);
             }
-            else throw new std::runtime_error("Object expected class = " + class_name + " but json has " + json_class);
+            else throw new std::runtime_error("Generator expected class = " + class_name + " but json has " + json_class);
         }
-        */
 
       /// Generator is meant to be used as unique identifier generator for other classes.
       ///
@@ -59,7 +59,7 @@ namespace pensar_digital
       ///  };
       /// \endcode
       template <class T>
-      class Generator : public virtual Object//, public virtual IGenerator<T>
+      class Generator : public Object     
       {
         public:
             inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
@@ -70,35 +70,36 @@ namespace pensar_digital
             /// \brief Constructs a Generator.
             /// \param [in] initial_value Initial value for the generator, defaults to 0.
             /// \param [in] astep Step to be used when incrementing the generator, defaults to 1.
-            Generator(Id aid = NULL_ID, Id initial_value = 0, Id step = 1) : Object(aid), mvalue(initial_value), mstep(step) {};
+            Generator (Id aid = NULL_ID, Id initial_value = 0, Id step = 1) : Object(aid), mvalue(initial_value), mstep(step) {};
 
             virtual ~Generator () = default;
 
             /// \brief Increments value and return the new value.
             /// \return The new value.
-            virtual const Id get() { mvalue += mstep; return mvalue; }
+            inline virtual const Id get() { mvalue += mstep; return mvalue; }
 
             /// \brief Gets the next value without incrementing the current one.
             /// \return The next value.
-            virtual const Id get_next() { return (mvalue + mstep); }
+            inline virtual const Id get_next() { return (mvalue + mstep); }
 
             /// \brief Gets the current value.
             /// \return The current value.
-            virtual const Id get_current () const { return mvalue; }
+            inline virtual const Id get_current () const { return mvalue; }
 
             /// \brief Set value. Next call to get will get value + 1.
             /// \param val New value to set
-            virtual void set_value(Id val) { mvalue = val; }
+            inline virtual void set_value(Id val) { mvalue = val; }
 
             // Conversion to json string.
-            virtual String json() const noexcept
+            inline virtual String json() const noexcept
             {
-                std::stringstream ss (pd::json<Generator<T>>(*this));
-                ss << ", \"mvalue\": " << mvalue << ", \"mstep\": " << mstep << "}";
+                std::stringstream ss;
+                ss << pd::json<Generator<T>>(*this);
+                ss << ", \"mvalue\" : " << mvalue << ", \"mstep\" : " << mstep << ", " << *VERSION << "}";
                 return ss.str();
             }
 
-            virtual std::istream& read (std::istream& is, const IO_Mode amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN)
+            virtual std::istream& read(std::istream& is, const IO_Mode amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN)
             {
                 if (amode == BINARY)
                 {
@@ -114,19 +115,22 @@ namespace pensar_digital
                 return is;
             };
 
-            virtual std::ostream& write (std::ostream& os, const IO_Mode amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN) const
+            virtual std::ostream& write(std::ostream& os, const IO_Mode amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN) const
             {
                 if (amode == BINARY)
                 {
-                    // todo: implement binary write.
+                    Object::write(os, amode, abyte_order);
+                    //binary_write<decltype (mvalue)>(os, mvalue, abyte_order);
+                    //binary_write<decltype (mstep)>(os, mstep, abyte_order);
+                    VERSION->write(os, amode, abyte_order);
                 }
                 else // json format
                 {
-                    os << json ();
+                    os << json();
                 }
                 return os;
             };
-            
+
             //friend void from_json<T>(const Json& j, Generator<T>& g);
             
             void set_id (const Id& aid) { Object::set_id (aid); }
