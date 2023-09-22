@@ -33,7 +33,7 @@ namespace pensar_digital
             DummyPtr d1 = d->clone();
             static_assert(OutputStreamable<Dummy>);
             CHECK_EQ(Dummy, *d1, *d, "1. d != d1");
-            TEST_END(ObjectClone)
+        TEST_END(ObjectClone)
 
         TEST(ObjectStreaming, true)
             ObjectPtr o = pd::Object::get(42);

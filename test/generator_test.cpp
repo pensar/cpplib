@@ -1,75 +1,61 @@
-// $Id
+// author : Mauricio Gomes
+// license: MIT (https://opensource.org/licenses/MIT)
 
-#define BOOST_TEST_MODULE addres_book_test_module
-#include <boost/test/included/unit_test.hpp>
-#include <boost/lexical_cast.hpp>
+#include "../../unit-test/test.hpp"
+#include "generator.hpp"
 
-#include "my_boost.hpp"
-#include "Generator.hpp"
-
-namespace pd  = pensar_digital;
-
-// If I do not define this BOOST_CHECK_EQUAL_COLLECTIONS fails to compile with vector<wstring> !
-namespace std
+namespace pensar_digital
 {
-    ostream& operator << (ostream& ostr, wstring const& str)
+    namespace test = pensar_digital::unit_test;
+    using namespace pensar_digital::unit_test;
+    namespace cpplib
     {
-       ostr << boost::lexical_cast<wstring>(str);
-       return ostr;
+        TEST(Get, true)
+            Generator<int> g;
+            int expected = 1;
+            CHECK_EQ(int, g.get(), expected++, "0");
+            CHECK_EQ(int, g.get(), expected++, "1");
+
+            Generator<> g2(1, 1, 2);
+            expected = 3;
+            CHECK_EQ(Id, g2.get(), expected, "2");
+            expected = 5;
+            CHECK_EQ(Id, g2.get(), expected, "3");
+        TEST_END(Get)
+
+        TEST(GetNext, true)
+            Generator<int> g;
+            int expected = 1;
+            CHECK_EQ(int, g.get_next(), expected, "0");
+            CHECK_EQ(int, g.get_next(), expected, "1");
+
+            Generator<> g2(1, 1, 2);
+            expected = 3;
+            CHECK_EQ(Id, g2.get_next(), expected, "2");
+            CHECK_EQ(Id, g2.get_next(), expected, "3");
+        TEST_END(GetNext)
+
+        TEST(GetCurrent, true)
+            Generator<int> g;
+            int expected = 0;
+            CHECK_EQ(int, g.get_current(),   expected, "0");
+            CHECK_EQ(int, g.get()        , ++expected, "1");
+            CHECK_EQ(int, g.get_current(),   expected, "2");
+
+            Generator<> g2(1, 1, 2);
+            expected = 1;
+            CHECK_EQ(Id, g2.get_current(), expected, "4");
+            CHECK_EQ(Id, g2.get()        ,        3, "5");
+            CHECK_EQ(Id, g2.get_current(),        3, "6");
+        TEST_END(GetCurrent)
+        
+
+        TEST(SetValue, true)
+            Generator<int> g;
+            g.set_value(10);
+            int expected = 10;
+            CHECK_EQ(int, g.get_current(),         10, "0");
+            CHECK_EQ(int, g.get()        , ++expected, "1");
+        TEST_END(SetValue)
     }
 }
-
-BOOST_AUTO_TEST_SUITE(Generator_suite)
-
-BOOST_AUTO_TEST_CASE(get_test)
-{
-    pd::Generator<int> g;
-    int expected = 1;
-    BOOST_CHECK_EQUAL (g.get (), expected++);
-    BOOST_CHECK_EQUAL (g.get (), expected++);
-
-    pd::Generator<> g2(1, 2);
-    expected = 3;
-    BOOST_CHECK_EQUAL (g2.get (), expected);
-    expected = 5;
-    BOOST_CHECK_EQUAL (g2.get (), expected);
-}
-
-BOOST_AUTO_TEST_CASE(get_next_test)
-{
-    pd::Generator<int> g;
-    int expected = 1;
-    BOOST_CHECK_EQUAL (g.get_next (), expected);
-    BOOST_CHECK_EQUAL (g.get_next (), expected);
-
-    pd::Generator<> g2(1, 2);
-    expected = 3;
-    BOOST_CHECK_EQUAL (g2.get_next (), expected);
-    BOOST_CHECK_EQUAL (g2.get_next (), expected);
-}
-
-BOOST_AUTO_TEST_CASE(get_current_test)
-{
-    pd::Generator<int> g;
-    int expected = 0;
-    BOOST_CHECK_EQUAL (g.get_current (), expected);
-    BOOST_CHECK_EQUAL (g.get (), ++expected);
-    BOOST_CHECK_EQUAL (g.get_current (), expected);
-
-    pd::Generator<> g2(1, 2);
-    expected = 1;
-    BOOST_CHECK_EQUAL (g2.get_current (), expected);
-    BOOST_CHECK_EQUAL (g2.get (), 3);
-    BOOST_CHECK_EQUAL (g2.get_current (), 3);
-}
-
-BOOST_AUTO_TEST_CASE(set_value_test)
-{
-    pd::Generator<int> g;
-    g.set_value (10);
-    int expected = 10;
-    BOOST_CHECK_EQUAL (g.get_current (), 10);
-    BOOST_CHECK_EQUAL (g.get (), ++expected);
-}
-
-BOOST_AUTO_TEST_SUITE_END()

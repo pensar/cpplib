@@ -48,21 +48,31 @@ namespace pensar_digital
             return *this;
         }
         
+        void Object::read_bin_obj(std::istream& is, const pensar_digital::cpplib::ByteOrder& abyte_order)
+        {
+            String sclass_name;
+            binary_read(is, sclass_name, abyte_order);
+            if (sclass_name != class_name())
+                throw new std::runtime_error("Object::read: class name mismatch.");
+            binary_read<Id>(is, mid, abyte_order);
+        }
+
+        void Object::read_bin_version(std::istream& is, const pensar_digital::cpplib::ByteOrder& abyte_order)
+        {
+            Version v;
+            v.read(is, BINARY, abyte_order);
+            if (*VERSION != v)
+                throw new std::runtime_error("Version mismatch.");
+        }
+
         // implements input stream member virtual std::istream& Object::read(std::istream& is)
         std::istream& Object::read(std::istream& is, const IO_Mode amode, const ByteOrder& abyte_order)
         {
             if (amode == BINARY)
             {
-                String sclass_name;
-                binary_read (is, sclass_name, abyte_order);
-                if (sclass_name != class_name())
-					throw new std::runtime_error("Object::read: class name mismatch.");
-                binary_read<Id>(is, mid, abyte_order);
+                read_bin_obj(is, abyte_order);
 
-                Version v;
-                v.read (is, amode, abyte_order);
-                if (*VERSION != v)
-					throw new std::runtime_error("Object::read: version mismatch.");
+                read_bin_version(is, abyte_order);
             }
             else // json format
             {

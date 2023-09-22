@@ -312,24 +312,24 @@ namespace pensar_digital
 		{
 			private:
 				typedef Constraint<RangeConstraint<T>> Base;
-				const T min;
-				const T max;
+				const T mmin;
+				const T mmax;
 
 			public:
 				inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
 
 				/// Default constructor
 				RangeConstraint (const T& amin, const T& amax, const Id aid = NULL_ID, const String& aname = "") 
-					: Base(aid, aname), min (amin), max (amax) { }
+					: Base(aid, aname), mmin (amin), mmax (amax) { }
 
 				RangeConstraint (const T& avalue, const Id aid = NULL_ID, const String& aname = "") 
-					: Base(aid, aname), min (avalue), max (avalue) { }	
+					: Base(aid, aname), mmin (avalue), mmax (avalue) { }	
 
 				virtual ~RangeConstraint() {}
 
 				bool ok(const T& t = 0) const noexcept
 				{
-					return (t >= min) && (t <= max);
+					return (t >= mmin) && (t <= mmax);
 				};
 
 		};	// class RangeConstraint

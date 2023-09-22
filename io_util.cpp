@@ -10,7 +10,6 @@
 #endif
 
 #include "io_util.hpp"
-#include "file.hpp"
 
 #include <sstream>
 //#include <ctwime>
@@ -68,14 +67,13 @@ namespace pensar_digital
         */
 
         // Create an empty file.
-        void create_empty_file(const Path& file_full_path)
+        void create_empty_file(const char* file_full_path)
         {
-			std::ofstream fs(static_cast<const char*>(file_full_path), std::ios::out);
+			std::ofstream fs(file_full_path, std::ios::out);
             if (!fs.is_open())
             {
                 String serror = "create_file: It was not possible to create file.";
-                const char* c = file_full_path;
-                throw std::runtime_error(serror + c);
+                throw std::runtime_error(serror + file_full_path);
                 fs.close();
             }
 		}

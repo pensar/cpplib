@@ -126,6 +126,10 @@ namespace pensar_digital
                     return pd::json<Object> (*this) + " }";
                 }
 
+                virtual void read_bin_obj(std::istream& is, const pensar_digital::cpplib::ByteOrder& abyte_order);
+
+                void read_bin_version(std::istream& is, const pensar_digital::cpplib::ByteOrder& abyte_order);
+
                 virtual std::istream& read (std::istream& is, const IO_Mode amode = BINARY, const ByteOrder& abyte_order = LITTLE_ENDIAN);
 
                 virtual std::ostream& write (std::ostream& os, const IO_Mode amode = BINARY, const ByteOrder& abyte_order = LITTLE_ENDIAN) const;

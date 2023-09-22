@@ -165,6 +165,7 @@
     <ClCompile Include="test\constraint_test.cpp" />
     <ClCompile Include="test\dummy.cpp" />
     <ClCompile Include="test\factory_test.cpp" />
+    <ClCompile Include="test\generator_test.cpp" />
     <ClCompile Include="test\io_util_test.cpp" />
     <ClCompile Include="test\object_test.cpp" />
     <ClCompile Include="test\stop_watch_test.cpp" />
