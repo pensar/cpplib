@@ -4,6 +4,8 @@
 #include "../../unit-test/test.hpp"
 #include "generator.hpp"
 
+#include <sstream>
+
 namespace pensar_digital
 {
     namespace test = pensar_digital::unit_test;
@@ -57,5 +59,44 @@ namespace pensar_digital
             CHECK_EQ(int, g.get_current(),         10, "0");
             CHECK_EQ(int, g.get()        , ++expected, "1");
         TEST_END(SetValue)
+
+		TEST(SetStep, true)
+            Generator<int> g (1, 0, 2);
+            int expected = 0;
+            CHECK_EQ(int, g.get_current(),   expected, "0");
+            CHECK_EQ(int, g.get()        ,          2, "1");
+            CHECK_EQ(int, g.get()        ,          4, "2");
+        TEST_END(SetStep)
+
+        TEST(JsonConversion, true)
+            Generator<int> g;
+			Id id = g.get();
+			CHECK_EQ(String, g.json(), "{ \"class\" : \"pensar_digital::cpplib::Generator<int,__int64>\", \"id\" : 0, \"VERSION\": { \"class\" : \"pensar_digital::cpplib::Version\" , \"id\" : 0, \"mpublic\" : 1, \"mprotected\" : 1, \"mprivate\" : 1 }, \"mvalue\" : 1, \"mstep\" : 1 }", "0");
+			id = g.get();
+			CHECK_EQ(String, g.json(), "{ \"class\" : \"pensar_digital::cpplib::Generator<int,__int64>\", \"id\" : 0, \"VERSION\": { \"class\" : \"pensar_digital::cpplib::Version\" , \"id\" : 0, \"mpublic\" : 1, \"mprotected\" : 1, \"mprivate\" : 1 }, \"mvalue\" : 2, \"mstep\" : 1 }", "1");
+        TEST_END(JsonConversion)
+
+        TEST(TextStreaming, true)
+            Generator<int> g;
+			std::stringstream ss;
+            Id id = g.get();
+			ss << g;
+			CHECK_EQ(String, ss.str(), "{ \"class\" : \"pensar_digital::cpplib::Generator<int,__int64>\", \"id\" : 0, \"VERSION\": { \"class\" : \"pensar_digital::cpplib::Version\" , \"id\" : 0, \"mpublic\" : 1, \"mprotected\" : 1, \"mprivate\" : 1 }, \"mvalue\" : 1, \"mstep\" : 1 }", "0");
+            id = g.get();
+            ss.str ("");
+			ss << g;
+			CHECK_EQ(String, ss.str(), "{ \"class\" : \"pensar_digital::cpplib::Generator<int,__int64>\", \"id\" : 0, \"VERSION\": { \"class\" : \"pensar_digital::cpplib::Version\" , \"id\" : 0, \"mpublic\" : 1, \"mprotected\" : 1, \"mprivate\" : 1 }, \"mvalue\" : 2, \"mstep\" : 1 }", "1");
+            Generator<int> g2;
+            std::stringstream ss2;
+            ss2 << g.json();
+            ss2 >> g2;
+            CHECK_EQ(Generator<int>, g2, g, "2");
+            TEST_END(TextStreaming)
+
+		TEST(BinaryStreaming, false)
+			Generator<int> g;
+            std::stringstream ss(std::ios_base::out | std::ios_base::in | std::ios_base::binary);
+            
+        TEST_END(BinaryStreaming)
     }
 }

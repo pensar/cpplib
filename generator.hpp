@@ -13,37 +13,6 @@ namespace pensar_digital
 {
     namespace cpplib
     {
-        template <class Type, typename T> class Generator;
-        
-        /// Makes Generator Streamable.
-        template <class Type, typename T> std::ostream& operator << (std::ostream& os, const Generator<Type, T>& g) { return g.write(os); }
-        template <class Type, typename T> std::istream& operator >> (std::istream& is, Generator<Type, T>& g) { return g.read(is); }
-
-        template <class Type, typename T>
-        void to_json(Json& j, const Generator<Type, T>& g)
-        {
-            j["class"     ] = g.class_name();
-            j["id"        ] = g.get_id();
-            j["mvalue"    ] = g.get_current();
-            j["mstep"     ] = g.mstep;
-
-            to_json (j, *(g.VERSION));
-        }
-
-        template <class Type, typename T>
-        void from_json(const Json& j, Generator<Type, T>& g)
-        {
-            String class_name = g.class_name();
-            String json_class = j.at("class");
-            if (class_name == json_class)
-            {
-                g.Object::set_id(j.at("id"));
-                g.mvalue = j["mvalue"];
-                g.mstep  = j["mstep"];
-                g.VERSION->from_json(j);
-            }
-            else throw new std::runtime_error("Generator expected class = " + class_name + " but json has " + json_class);
-        }
 
       /// Generator is meant to be used as unique identifier generator for other classes.
       ///
@@ -93,7 +62,7 @@ namespace pensar_digital
             {
                 std::stringstream ss;
                 ss << pd::json<Generator<Type, T>>(*this);
-                ss << ", \"mvalue\" : " << mvalue << ", \"mstep\" : " << mstep << ", " << *VERSION << "}";
+                ss << ", \"mvalue\" : " << mvalue << ", \"mstep\" : " << mstep << " }";
                 return ss.str();
             }
 
@@ -112,6 +81,8 @@ namespace pensar_digital
                     T id;
                     VersionPtr v;
                     read_json<Generator<Type, T>>(is, *this, &id, &v, &j);
+                    mvalue = j["mvalue"];
+                    mstep  = j["mstep"];
                 }
                 return is;
             };
@@ -132,8 +103,6 @@ namespace pensar_digital
                 return os;
             };
 
-            //friend voT from_json<T>(const Json& j, Generator<T>& g);
-            
             void set_id (const T& aid) { Object::set_id (aid); }
 
             // Convertion to xml string.
@@ -161,11 +130,59 @@ namespace pensar_digital
                     mstep = atoi (n.getText());
             }
 
+            Generator<Type, T>& parse_json(const String& s)
+			{
+				Json j = Json::parse(s);
+				from_json<Type, T>(j, *this);
+				return *this;
+			}   
+
+            friend void from_json(const Json& j, Generator<Type, T>& g);
+        protected:
+            bool _equals(const Object& other) const noexcept override
+			{
+				const Generator<Type, T>* pother = dynamic_cast<const Generator<Type, T>*>(&other);
+				if (pother == nullptr)
+					return false;
+				return (mvalue == pother->mvalue && mstep == pother->mstep);
+			}
         private:
             T mvalue; //!< Member variable "id"
             T mstep;  //!< Step to increment value.
       }; // class Generator
-    } // namespace cpplib
+
+      /// Makes Generator Streamable.
+      template <class Type, typename T> std::ostream& operator << (std::ostream& os, const Generator<Type, T>& g) { return g.write(os); }
+      template <class Type, typename T> std::istream& operator >> (std::istream& is, Generator<Type, T>& g) { return g.read(is); }
+
+      template <class Type, typename T>
+      void to_json(Json& j, const Generator<Type, T>& g)
+      {
+          j["class"] = g.class_name();
+          j["id"] = g.get_id();
+          j["mvalue"] = g.get_current();
+          j["mstep"] = g.mstep;
+
+          to_json(j, *(g.VERSION));
+      }
+
+      template <class Type, typename T>
+      void from_json(const Json& j, Generator<Type, T>& g)
+      {
+          String class_name = g.class_name();
+          String json_class = j.at("class");
+          if (class_name == json_class)
+          {
+              g.Object::set_id(j.at("id"));
+              g.mvalue = j["mvalue"];
+              g.mstep = j["mstep"];
+              g.VERSION->from_json(j);
+          }
+          else throw new std::runtime_error("Generator expected class = " + class_name + " but json has " + json_class);
+      }
+
+    } // namespace cpplib;
+
 } // namespace pensar_digital
 /// \example GeneratorTest.cpp
 
