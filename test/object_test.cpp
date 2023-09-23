@@ -95,7 +95,7 @@ namespace pensar_digital
             CHECK(*d == *d1, "4. d != d1");
             TEST_END(ObjectXMLConversion) 
 
-            TEST(ObjectTextStreaming, true)
+            TEST(ObjectJsonString, true)
                 // Creates a vector with 1000 objects
                 std::vector<ObjectPtr> objects;
                 for (Id i = 0; i < 1000; i++)
@@ -110,9 +110,9 @@ namespace pensar_digital
                     expected += ", \"VERSION\": { \"class\" : \"pensar_digital::cpplib::Version\" , \"id\" : 0, \"mpublic\" : 1, \"mprotected\" : 1, \"mprivate\" : 1 } }";
                     CHECK_EQ(String, o->json(), expected, si);
                 }
-            TEST_END(ObjectTextStreaming)
+            TEST_END(ObjectJsonString)
 
-            TEST(ObjectTextStreaming2, true)
+            TEST(ObjectTextFileStreaming, true)
                 // Creates a vector with 1000 objects
                 std::vector<ObjectPtr> objects;
                 for (Id i = 0; i < 1000; i++)
@@ -147,9 +147,9 @@ namespace pensar_digital
                     ++i;
                 }
 
-                TEST_END(ObjectTextStreaming2)
+                TEST_END(ObjectTextFileStreaming)
                 
-            TEST(ObjectBinaryStreaming, true)
+            TEST(ObjectBinaryFileStreaming, true)
 				// Creates a vector with 1000 objects
 				std::vector<ObjectPtr> objects;
                 for (Id i = 0; i < 1000; i++)
@@ -171,7 +171,7 @@ namespace pensar_digital
                     ObjectPtr o1 = pd::Object::get(i);
                     CHECK_EQ(Object, *o, *o1, pd::to_string(i));
                 }
-             TEST_END(ObjectBinaryStreaming)
+             TEST_END(ObjectBinaryFileStreaming)
 
 
     }

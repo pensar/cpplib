@@ -120,6 +120,12 @@ namespace pensar_digital
 			{ reinterpret_cast<char*>(*t) } -> std::same_as<char*>;
 		};
 
+		// A concept requiring a type that is castable to std::byte.
+		template <typename T>
+		concept ByteCastable = requires(T * t) {
+			{ reinterpret_cast<std::byte*>(*t) } -> std::same_as<std::byte*>;
+		};	
+
 		// SizeableType, a concept requiring a type that supports sizeof(t).
 		template <typename T>
 		concept SizeableType = requires(T t)
