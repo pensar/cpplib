@@ -66,7 +66,7 @@ namespace pensar_digital
                     return ss.str();
                 }
 
-                virtual std::istream& read (std::istream& is, const IO_Mode amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN)
+                virtual std::istream& read (std::istream& is, const IO_Mode amode = TEXT, const std::endian& byte_order = std::endian::native)
                 {
                     if (amode == BINARY)
                     {
@@ -91,7 +91,7 @@ namespace pensar_digital
                     return is;
                 };
 
-                virtual std::ostream& write (std::ostream& os, const IO_Mode amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN) const
+                virtual std::ostream& write (std::ostream& os, const IO_Mode amode = TEXT, const std::endian& byte_order = std::endian::native) const
                 {
                     if (amode == BINARY)
                     {

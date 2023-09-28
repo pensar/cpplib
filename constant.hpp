@@ -11,13 +11,17 @@ namespace pensar_digital
 {
     namespace cpplib
     {
-        using Id         = int64_t; // istream >> unsigned long was not compiling.
-        using Hash       = int64_t;
-        using VersionInt = int16_t;
-        using FileSize   = int64_t;
-        extern String DOUBLE_QUOTES;
-        extern const Id NULL_ID;
-        enum ByteOrder : uint8_t { LITTLE_ENDIAN = 0, BIG_ENDIAN = 1, MIXED = 3 };
+        using Id         = int_fast64_t; // istream >> unsigned long was not compiling.
+        using Hash       = int_fast64_t;
+        using VersionInt = int_fast16_t;
+        using FileSize   = int_fast64_t;
+        
+        extern       String DOUBLE_QUOTES;
+        extern const     Id NULL_ID;
+        
+        
+        enum Alignment : int_fast16_t { NULL_ALIGNMENT = -1, BIT8 = 8, BIT16 = 16, BIT32 = 32, BIT64 = 64, BIT128 = 128, BIT256 = 256, BIT512 = 512, BIT1024 = 1024 };
+        
         enum IO_Mode : bool { BINARY = true, TEXT = false};
 
     }   // namespace cpplib

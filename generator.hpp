@@ -66,14 +66,14 @@ namespace pensar_digital
                 return ss.str();
             }
 
-            virtual std::istream& read(std::istream& is, const IO_Mode amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN)
+            virtual std::istream& read(std::istream& is, const IO_Mode amode = TEXT, const std::endian& byte_order = std::endian::native)
             {
                 if (amode == BINARY)
                 {
-                    read_bin_obj (is, abyte_order);
-                    read_bin_version (is, abyte_order);
-                    binary_read<decltype (mvalue)> (is, mvalue, abyte_order);   
-                    binary_read<decltype (mstep )> (is, mstep , abyte_order);   
+                    read_bin_obj (is, byte_order);
+                    read_bin_version (is, byte_order);
+                    binary_read<decltype (mvalue)> (is, mvalue, byte_order);   
+                    binary_read<decltype (mstep )> (is, mstep , byte_order);   
                 }
                 else // json format
                 {
@@ -87,14 +87,14 @@ namespace pensar_digital
                 return is;
             };
 
-            virtual std::ostream& write(std::ostream& os, const IO_Mode amode = TEXT, const ByteOrder& abyte_order = LITTLE_ENDIAN) const
+            virtual std::ostream& write(std::ostream& os, const IO_Mode amode = TEXT, const std::endian& byte_order = std::endian::native) const
             {
                 if (amode == BINARY)
                 {
-                    Object::write(os, amode, abyte_order);
-                    binary_write<decltype (mvalue)> (os, mvalue, abyte_order);
-                    binary_write<decltype (mstep )> (os, mstep , abyte_order);
-                    VERSION->write(os, amode, abyte_order);
+                    Object::write(os, amode, byte_order);
+                    binary_write<decltype (mvalue)> (os, mvalue, byte_order);
+                    binary_write<decltype (mstep )> (os, mstep , byte_order);
+                    VERSION->write(os, amode, byte_order);
                 }
                 else // json format
                 {

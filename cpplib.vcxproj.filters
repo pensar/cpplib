@@ -206,6 +206,12 @@
     <ClInclude Include="path.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="memory_buffer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="byte_order.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

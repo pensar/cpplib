@@ -80,7 +80,7 @@ namespace pensar_digital
         }
 
         template <typename T>
-        void binary_write(std::ostream& os, const T& t, const size_t& size, const ByteOrder& byte_order = LITTLE_ENDIAN)
+        void binary_write(std::ostream& os, const T& t, const size_t& size, const std::endian& byte_order = std::endian::native)
         {
             os.write((char*)&size, sizeof(size));
             os.write((char*)&t, size);
@@ -108,14 +108,14 @@ namespace pensar_digital
         */
 
         template <SizeableType T>
-        void binary_write (std::ostream& os, const T& t, const ByteOrder& byte_order = LITTLE_ENDIAN)
+        void binary_write (std::ostream& os, const T& t, const std::endian& byte_order = std::endian::native)
         {
             os.write ((char*)&t, sizeof(t));
 		}
 
         // binary_write for std::basic_string.
         template <typename CharType>
-		void binary_write (std::ostream& os, const std::basic_string<CharType>& s, const ByteOrder& byte_order = LITTLE_ENDIAN)
+		void binary_write (std::ostream& os, const std::basic_string<CharType>& s, const std::endian& byte_order = std::endian::native)
 		{
 			binary_write<size_t> (os, s.size(), byte_order);
 			for (auto&& c : s) {
@@ -124,13 +124,13 @@ namespace pensar_digital
 		}  
 
         // binary_write for String.
-        inline void binary_write (std::ostream& os, const String& s, const ByteOrder& byte_order = LITTLE_ENDIAN)
+        inline void binary_write (std::ostream& os, const String& s, const std::endian& byte_order = std::endian::native)
         {
             binary_write<String::value_type> (os, s, byte_order);
 		}
 
         template <typename T>
-        void binary_read (std::istream& is, T& t, const size_t& size, const ByteOrder& byte_order = LITTLE_ENDIAN)
+        void binary_read (std::istream& is, T& t, const size_t& size, const std::endian& byte_order = std::endian::native)
 		{
             is.read ((char*)(&size), sizeof(size));
             //str.resize(size);
@@ -155,13 +155,13 @@ namespace pensar_digital
         }
 
         template <Sizeable T>
-        void binary_read (std::istream& is, T& t, const ByteOrder& byte_order = LITTLE_ENDIAN)
+        void binary_read (std::istream& is, T& t, const std::endian& byte_order = std::endian::native)
         {
             is.read ((char*)(&t), sizeof(t));
         }
 
         template <typename CharType>
-        void binary_read (std::istream& is, std::basic_string<CharType>& s, const ByteOrder& byte_order = LITTLE_ENDIAN)
+        void binary_read (std::istream& is, std::basic_string<CharType>& s, const std::endian& byte_order = std::endian::native)
 		{
 			size_t size;
 			binary_read<size_t> (is, size, byte_order);
@@ -174,7 +174,7 @@ namespace pensar_digital
 			}
 		}
 
-        inline void binary_read (std::istream& is, String& s, const ByteOrder& byte_order = LITTLE_ENDIAN)
+        inline void binary_read (std::istream& is, String& s, const std::endian& byte_order = std::endian::native)
 		{
 			binary_read<String::value_type> (is, s, byte_order);
 		}

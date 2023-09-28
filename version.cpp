@@ -118,18 +118,18 @@ namespace pensar_digital
 			return ss.str();
 		}
 	
-		std::istream& Version::read (std::istream& is, const IO_Mode amode, const ByteOrder& abyte_order)
+		std::istream& Version::read (std::istream& is, const IO_Mode amode, const std::endian& byte_order)
 		{
 			if (amode == BINARY)
 			{
 				String sclass_name;
-				binary_read(is, sclass_name, abyte_order);
+				binary_read(is, sclass_name, byte_order);
 				if (sclass_name != class_name())
 					throw new std::runtime_error("Version::read: class name mismatch.");
-				binary_read<Id>        (is, mid, abyte_order);
-				binary_read<VersionInt>(is, mpublic, abyte_order);
-				binary_read<VersionInt>(is, mprotected, abyte_order);
-				binary_read<VersionInt>(is, mprivate, abyte_order);
+				binary_read<Id>        (is, mid, byte_order);
+				binary_read<VersionInt>(is, mpublic, byte_order);
+				binary_read<VersionInt>(is, mprotected, byte_order);
+				binary_read<VersionInt>(is, mprivate, byte_order);
 			}
 			else // json format
 			{
@@ -147,12 +147,12 @@ namespace pensar_digital
 			return is;
 		}
 
-		std::ostream& Version::write(std::ostream& os, const IO_Mode amode, const ByteOrder& abyte_order) const
+		std::ostream& Version::write(std::ostream& os, const IO_Mode amode, const std::endian& byte_order) const
 		{
 			if (amode == BINARY)
 			{
-				binary_write (os, class_name (), abyte_order);
-				binary_write<Id> (os, mid, abyte_order);
+				binary_write (os, class_name (), byte_order);
+				binary_write<Id> (os, mid, byte_order);
 				binary_write<VersionInt>(os, mpublic);	
 				binary_write<VersionInt>(os, mprotected);
 				binary_write<VersionInt>(os, mprivate);	

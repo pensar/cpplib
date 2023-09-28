@@ -48,31 +48,31 @@ namespace pensar_digital
             return *this;
         }
         
-        void Object::read_bin_obj(std::istream& is, const pensar_digital::cpplib::ByteOrder& abyte_order)
+        void Object::read_bin_obj(std::istream& is, const std::endian& byte_order)
         {
             String sclass_name;
-            binary_read(is, sclass_name, abyte_order);
+            binary_read(is, sclass_name, byte_order);
             if (sclass_name != class_name())
                 throw new std::runtime_error("Object::read: class name mismatch.");
-            binary_read<Id>(is, mid, abyte_order);
+            binary_read<Id>(is, mid, byte_order);
         }
 
-        void Object::read_bin_version(std::istream& is, const pensar_digital::cpplib::ByteOrder& abyte_order)
+        void Object::read_bin_version(std::istream& is, const std::endian& byte_order)
         {
             Version v;
-            v.read(is, BINARY, abyte_order);
+            v.read(is, BINARY, byte_order);
             if (*VERSION != v)
                 throw new std::runtime_error("Version mismatch.");
         }
 
         // implements input stream member virtual std::istream& Object::read(std::istream& is)
-        std::istream& Object::read(std::istream& is, const IO_Mode amode, const ByteOrder& abyte_order)
+        std::istream& Object::read(std::istream& is, const IO_Mode amode, const std::endian& byte_order)
         {
             if (amode == BINARY)
             {
-                read_bin_obj(is, abyte_order);
+                read_bin_obj(is, byte_order);
 
-                read_bin_version(is, abyte_order);
+                read_bin_version(is, byte_order);
             }
             else // json format
             {
@@ -88,14 +88,14 @@ namespace pensar_digital
             return is;
         };
 
-        std::ostream& Object::write (std::ostream& os, const IO_Mode amode, const ByteOrder& abyte_order) const
+        std::ostream& Object::write (std::ostream& os, const IO_Mode amode, const std::endian& byte_order) const
         {
             if (amode == BINARY)
             {
-                binary_write     (os, class_name(), abyte_order);
-                binary_write<Id> (os,           mid, abyte_order);
+                binary_write     (os, class_name(), byte_order);
+                binary_write<Id> (os,           mid, byte_order);
 
-                VERSION->write   (os, amode, abyte_order);  
+                VERSION->write   (os, amode, byte_order);  
             }
             else // json format
             {

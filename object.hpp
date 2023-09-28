@@ -4,6 +4,7 @@
 #ifndef OBJECT_HPP
 #define OBJECT_HPP
 
+#include "constant.hpp"
 #include "concept.hpp"
 #include "string_util.hpp"
 #include "header_lib/xmlParser.h"
@@ -126,13 +127,13 @@ namespace pensar_digital
                     return pd::json<Object> (*this) + " }";
                 }
 
-                virtual void read_bin_obj(std::istream& is, const pensar_digital::cpplib::ByteOrder& abyte_order);
+                virtual void read_bin_obj(std::istream& is, const std::endian& byte_order = std::endian::native);
 
-                void read_bin_version(std::istream& is, const pensar_digital::cpplib::ByteOrder& abyte_order);
+                void read_bin_version(std::istream& is, const std::endian& byte_order = std::endian::native);
 
-                virtual std::istream& read (std::istream& is, const IO_Mode amode = BINARY, const ByteOrder& abyte_order = LITTLE_ENDIAN);
+                virtual std::istream& read (std::istream& is, const IO_Mode amode = BINARY, const std::endian& byte_order = std::endian::native);
 
-                virtual std::ostream& write (std::ostream& os, const IO_Mode amode = BINARY, const ByteOrder& abyte_order = LITTLE_ENDIAN) const;
+                virtual std::ostream& write (std::ostream& os, const IO_Mode amode = BINARY, const std::endian& byte_order = std::endian::native) const;
 
                 // Conversion to xml string.
                 virtual String xml() const noexcept { return ObjXMLPrefix() + "/>"; }
