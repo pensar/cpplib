@@ -142,6 +142,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\unit-test\test.cpp" />
+    <ClCompile Include="byte_order.cpp" />
     <ClCompile Include="constants.cpp" />
     <ClCompile Include="constraint.cpp" />
     <ClCompile Include="cpp_lib\xmlParser.cpp" />
@@ -161,6 +162,7 @@
     <ClCompile Include="string_util.cpp" />
     <ClCompile Include="system.cpp" />
     <ClCompile Include="sys_user_info.cpp" />
+    <ClCompile Include="test\byte_order_test.cpp" />
     <ClCompile Include="test\concept_test.cpp" />
     <ClCompile Include="test\constraint_test.cpp" />
     <ClCompile Include="test\dummy.cpp" />
@@ -202,6 +204,7 @@
     <ClInclude Include="stop_watch.hpp" />
     <ClInclude Include="string_def.hpp" />
     <ClInclude Include="string_util.hpp" />
+    <ClInclude Include="system.hpp" />
     <ClInclude Include="sys_user_info.hpp" />
     <ClInclude Include="test\dummy.hpp" />
     <ClInclude Include="type_util.hpp" />
