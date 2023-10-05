@@ -10,7 +10,6 @@ namespace pensar_digital
 	namespace cpplib
 	{
 		// Assignable concept. Requires a member function T& assign(const T&).
-
 		template <typename T>
 		concept Assignable = requires (T t)
 		{
@@ -53,7 +52,7 @@ namespace pensar_digital
 		{
 			{T::get(args ...)} noexcept -> std::convertible_to<T&>;
 		};
-
+	
 		// FactoryCloneable concept requires Assignable and FactoryConstructible.
 		template <typename T, typename... Args>
 		concept FactoryCloneable = Assignable<T> && FactoryConstructible<T, Args...>;
@@ -65,7 +64,25 @@ namespace pensar_digital
 		{
 			{t.get(args ...)} noexcept -> std::convertible_to<std::shared_ptr<T>>;
 		};
+
+		// Container concept. Requires T to be a container with a public T::value_type defined and with a public method at(size_t i) and an operator[size_t i] returning something convertible to T::value_type&. And a size () returning something convertible to size_t.
+		template <typename T>
+		concept Container = requires (T t, size_t i)
+		{
+			typename T::value_type;
+			{ t.at(i) } -> std::convertible_to<typename T::value_type&>;
+			{ t[i] } -> std::convertible_to<typename T::value_type&>;
+			{ t.size() } -> std::convertible_to<size_t>;
+		};
+
+		// ContainerV is a concept requiring Container<T> and T::value_type to be of type V.
+		template <typename T, typename V>
+		concept ContainerV = Container<T> && std::is_same<typename T::value_type, V>::value;
+
+
+
 		
+
 		// Interfaceable concept two public typedefs named i_type and i_type_ro.
 		template <typename T>
 		concept Interfaceable = requires

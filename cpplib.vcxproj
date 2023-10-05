@@ -176,6 +176,7 @@
   <ItemGroup>
     <ClInclude Include="..\unit-test\test.hpp" />
     <ClInclude Include="algorithm_util.hpp" />
+    <ClInclude Include="array.hpp" />
     <ClInclude Include="byte_order.hpp" />
     <ClInclude Include="constant.hpp" />
     <ClInclude Include="constraint.hpp" />
