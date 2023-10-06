@@ -21,12 +21,14 @@ namespace pensar_digital
             Array (size_t size): msize(size) { marray = new T[size]; }
             ~Array () { delete[] marray; }
 
-            T& operator[] (size_t index) { return marray[index]; }
-            T& at (size_t index) { return marray[index]; }
+            //T& operator[] (const size_t index) const { return marray[index]; }
+            //T& at (const size_t index) const { return marray[index]; }
+            constexpr T& operator[] (const size_t index) const { return marray[index]; }
+            constexpr T& at(const size_t index) const { return marray[index]; }
 
-            T* data () const noexcept { return marray; }
+            [[nodiscard]] constexpr T* data () const noexcept { return marray; }
 
-            size_t size () const noexcept { return msize; }
+            [[nodiscard]] constexpr size_t size () const noexcept { return msize; }
         };
     }
 }

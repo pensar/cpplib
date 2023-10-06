@@ -30,36 +30,40 @@ namespace pensar_digital
             auto size = sizeof(U);
             pd::convert<>(b, size, pd::native_byte_order, pd::big_address_8_byte_order);
 
-            if ((sizeof(T) == sizeof(U)) && (sizeof(T) > sizeof(std::byte)))
+            if (sizeof(U) > sizeof(std::byte))
             {
-                Array<T> c (expected.size());
-                std::memcpy(c.data (), b.data(), b.size());
-                std::vector<T> a3(c.data(), c.data() + c.size());
-                
-                static_assert (ContainerV<pd::Array<T>, T>);
-                static_assert (ContainerV<std::vector<T>, T>);
+                if ((sizeof(T) == sizeof(U)))
+                {
+                    Array<T> c(expected.size());
+                    std::memcpy(c.data(), b.data(), b.size());
+                    std::vector<T> a3(c.data(), c.data() + c.size());
 
-                t.check<std::vector<T>, std::vector<T>>(a3, expected, pd::to_string<decltype(count)>(count++) + ".", __FILE__, __LINE__);
+                    static_assert (ContainerV<pd::Array<T>, T>);
+                    static_assert (ContainerV<std::vector<T>, T>);
 
-                pd::convert<>(b, size, pd::big_address_8_byte_order, pd::native_byte_order);
-                std::memcpy(c.data (), b.data(), b.size());
-                std::vector<T> a5(c.data (), c.data () + c.size());
-                t.check<std::vector<T>, std::vector<T>>(a5, a6, pd::to_string<decltype(count)>(count++) + ".", __FILE__, __LINE__);
+                    t.check<std::vector<T>, std::vector<T>>(a3, expected, pd::to_string<decltype(count)>(count++) + ".", __FILE__, __LINE__);
+
+                    pd::convert<>(b, size, pd::big_address_8_byte_order, pd::native_byte_order);
+                    std::memcpy(c.data(), b.data(), b.size());
+                    std::vector<T> a5(c.data(), c.data() + c.size());
+                    t.check<std::vector<T>, std::vector<T>>(a5, a6, pd::to_string<decltype(count)>(count++) + ".", __FILE__, __LINE__);
+                }
+                else
+                {
+                    pd::Array<T> c(a.size());
+                    std::memcpy(c.data(), 0x00, c.size()); // zero out the array
+                    std::memcpy(c.data() + sizeof(T) - sizeof(U), b.data(), b.size());
+                    //std::vector<T> a3(c.data(), c.data() + c.size());
+                    t.check<pd::Array<T>, std::vector<T>>(c, expected, pd::to_string<decltype (count)>(count++) + ".", __FILE__, __LINE__);
+
+                    /*
+                    Array<U> d (a.size());
+                    pd::convert<> (b, size, pd::big_address_8_byte_order, pd::native_byte_order);
+                    std::memcpy (d.data (), b.data (), b.size ());
+                    t.check<Array<U>, std::vector<T>> (d, a6, pd::to_string<decltype(count)>(count++) + ".", __FILE__, __LINE__);
+                    */
+                }
             }
-			else
-			{
-                pd::Array<T> c(a.size());
-                std::memcpy (c.data (), 0x00, c.size()); // zero out the array
-                std::memcpy (c.data () + sizeof (T) - sizeof (U), b.data (), b.size ());
-                t.check<pd::Array<U>, std::vector<T>> (c, expected, pd::to_string<decltype (count)> (count++) + ".", __FILE__, __LINE__);
-
-                /*
-                Array<U> d (a.size());
-                pd::convert<> (b, size, pd::big_address_8_byte_order, pd::native_byte_order);
-				std::memcpy (d.data (), b.data (), b.size ());
-				t.check<Array<U>, std::vector<T>> (d, a6, pd::to_string<decltype(count)>(count++) + ".", __FILE__, __LINE__);
-                */
-			}
         };
 
         TEST(ByteOrder, true)
