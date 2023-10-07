@@ -50,18 +50,27 @@ namespace pensar_digital
                 }
                 else
                 {
-                    pd::Array<T> c(a.size());
-                    std::memcpy(c.data(), 0x00, c.size()); // zero out the array
-                    std::memcpy(c.data() + sizeof(T) - sizeof(U), b.data(), b.size());
-                    //std::vector<T> a3(c.data(), c.data() + c.size());
-                    t.check<pd::Array<T>, std::vector<T>>(c, expected, pd::to_string<decltype (count)>(count++) + ".", __FILE__, __LINE__);
+                    if (sizeof(T) > sizeof(U))
+                    {
+                        size_t diff = sizeof(T) - sizeof(U);
+                        Array<T> c(expected.size());
+                        // Fill the array with the bytes.
+                        for (auto i = 0; i < expected.size(); i++)
+                        {
+                            c[i] = 0x00000000;
+                            std::byte* p = (std::byte*)(&c[i]) + i * sizeof(U);
+                            *p = b[i];
+                            *(p + 1) = b[i + 1];
+                        }
+                        t.check<pd::Array<T>, std::vector<T>>(c, expected, pd::to_string<decltype (count)>(count++) + ".", __FILE__, __LINE__);
 
-                    /*
-                    Array<U> d (a.size());
-                    pd::convert<> (b, size, pd::big_address_8_byte_order, pd::native_byte_order);
-                    std::memcpy (d.data (), b.data (), b.size ());
-                    t.check<Array<U>, std::vector<T>> (d, a6, pd::to_string<decltype(count)>(count++) + ".", __FILE__, __LINE__);
-                    */
+                        /*
+                        Array<U> d(a.size());
+                        pd::convert<>(b, size, pd::big_address_8_byte_order, pd::native_byte_order);
+                        std::memcpy(d.data(), b.data(), b.size());
+                        t.check<Array<U>, std::vector<T>>(d, a6, pd::to_string<decltype(count)>(count++) + ".", __FILE__, __LINE__);
+                        */
+                    }
                 }
             }
         };
@@ -87,11 +96,13 @@ namespace pensar_digital
             std::vector<int8_t> a10 = { -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2 ,3, 4, 5, 6, 7, 8 };
             test_byte_order_conversion<int8_t >(*this, a9, a10, 4);
 
-            /*
-            std::vector<int16_t> a11 = { -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8 };
-            std::vector<int32_t> a12 = { 0xf8ff, 0xf9ff, 0xfaff, 0xfbff, 0xfcff, 0xfdff, 0xfeff, 0xffff, 0, 1, 2 ,3, 4, 5, 6, 7, 8 };
-            test_byte_order_conversion<int16_t, int32_t>(*this, a11, a12, 5);
-            */
+            std::vector<int16_t > a11 = { -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8 };
+            std::vector<uint16_t> a12 = { 0xf8ff, 0xf9ff, 0xfaff, 0xfbff, 0xfcff, 0xfdff, 0xfeff, 0xffff, 0x0000, 0x0100, 0x0200 ,0x0300, 0x0400, 0x0500, 0x0600, 0x0700, 0x0800 };
+            test_byte_order_conversion<int16_t, uint16_t>(*this, a11, a12, 5);
+            
+            std::vector<int32_t > a13 = { -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8 };
+            std::vector<uint32_t> a14 = { 0xf8ff, 0xf9ff, 0xfaff, 0xfbff, 0xfcff, 0xfdff, 0xfeff, 0xffff, 0x0000, 0x0100, 0x0200 ,0x0300, 0x0400, 0x0500, 0x0600, 0x0700, 0x0800 };
+            //test_byte_order_conversion<int32_t, uint32_t>(*this, a13, a14, 6);
             TEST_END(ByteOrder)
     }
 }
