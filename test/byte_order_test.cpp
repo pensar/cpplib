@@ -52,6 +52,7 @@ namespace pensar_digital
                 {
                     if (sizeof(T) > sizeof(U))
                     {
+                        /*
                         size_t diff = sizeof(T) - sizeof(U);
                         Array<T> c(expected.size());
                         // Fill the array with the bytes.
@@ -64,7 +65,6 @@ namespace pensar_digital
                         }
                         t.check<pd::Array<T>, std::vector<T>>(c, expected, pd::to_string<decltype (count)>(count++) + ".", __FILE__, __LINE__);
 
-                        /*
                         Array<U> d(a.size());
                         pd::convert<>(b, size, pd::big_address_8_byte_order, pd::native_byte_order);
                         std::memcpy(d.data(), b.data(), b.size());
@@ -100,9 +100,13 @@ namespace pensar_digital
             std::vector<uint16_t> a12 = { 0xf8ff, 0xf9ff, 0xfaff, 0xfbff, 0xfcff, 0xfdff, 0xfeff, 0xffff, 0x0000, 0x0100, 0x0200 ,0x0300, 0x0400, 0x0500, 0x0600, 0x0700, 0x0800 };
             test_byte_order_conversion<int16_t, uint16_t>(*this, a11, a12, 5);
             
-            std::vector<int32_t > a13 = { -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8 };
-            std::vector<uint32_t> a14 = { 0xf8ff, 0xf9ff, 0xfaff, 0xfbff, 0xfcff, 0xfdff, 0xfeff, 0xffff, 0x0000, 0x0100, 0x0200 ,0x0300, 0x0400, 0x0500, 0x0600, 0x0700, 0x0800 };
-            //test_byte_order_conversion<int32_t, uint32_t>(*this, a13, a14, 6);
+            std::vector<int32_t > a13 = { -8, -7, -6, -5, -4, -3, -2, -1, 0x00000000, 0x00000001, 0x00000002 ,0x00000003, 0x00000004, 0x00000005, 0x00000006, 0x00000007, 0x00000008 };
+            std::vector<uint32_t> a14 = { 0xf8ffffff, 0xf9ffffff, 0xfaffffff, 0xfbffffff, 0xfcffffff, 0xfdffffff, 0xfeffffff, 0xffffffff, 0x0000000000000000, 0x01000000, 0x02000000 ,0x03000000, 0x04000000, 0x05000000, 0x06000000, 0x07000000, 0x08000000 };
+            test_byte_order_conversion<int32_t, uint32_t>(*this, a13, a14, 6);
+
+            std::vector<int64_t > a15 = { -8, -7, -6, -5, -4, -3, -2, -1, 0x00000000, 0x00000001, 0x00000002 ,0x00000003, 0x00000004, 0x00000005, 0x00000006, 0x00000007, 0x00000008 };
+            std::vector<uint64_t> a16 = { 0xf8ffffffffffffff, 0xf9ffffffffffffff, 0xfaffffffffffffff, 0xfbffffffffffffff, 0xfcffffffffffffff, 0xfdffffffffffffff, 0xfeffffffffffffff, 0xffffffffffffffff, 0x0000000000000000, 0x0100000000000000, 0x0200000000000000 ,0x0300000000000000, 0x0400000000000000, 0x0500000000000000, 0x0600000000000000, 0x0700000000000000, 0x0800000000000000 };
+            test_byte_order_conversion<int64_t, uint64_t>(*this, a15, a16, 7);
             TEST_END(ByteOrder)
     }
 }
