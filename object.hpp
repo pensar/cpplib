@@ -56,11 +56,6 @@ namespace pensar_digital
 
             public:
                 inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
-                // Verifies if Object complies with Versionable concept.
-                //typedef Object   I; // Interface type.
-                //typedef Object IRO; // Read only interface type.
-
-                // Constructors. 
                 
                 /// Default constructor.
                 Object (const Id& id = NULL_ID, const IO_Mode mode = BINARY) noexcept : mid(id), mmode(mode)
