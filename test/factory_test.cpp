@@ -71,17 +71,17 @@ namespace pensar_digital
 
             CHECK(factory.get_available_count() == 3, "1. available_count should be 3 but is " + pd::to_string((int)factory.get_available_count ()));
 			ObjectPtr o  = factory.get (1);
-            CHECK(o->get_id () == 1, "0. o->get_id () should be 1 but is " + pd::to_string((int)o->get_id ()))
+            CHECK(o->id () == 1, "0. o->id () should be 1 but is " + pd::to_string((int)o->id ()))
             CHECK(factory.get_available_count() == 2, "2. available_count should be 2.");   
 			ObjectPtr o1 = factory.get (2);
-            CHECK(o1->get_id() == 2, "3. o1->get_id () should be 2 but is " + pd::to_string((int)o->get_id()))
+            CHECK(o1->id() == 2, "3. o1->id () should be 2 but is " + pd::to_string((int)o->id()))
             CHECK(factory.get_available_count() == 1, "4. available_count should be 1.");
             ObjectPtr o2 = factory.get (3);
-            CHECK(o2->get_id() == 3, "5. o2->get_id () should be 3 but is " + pd::to_string((int)o->get_id()))
+            CHECK(o2->id() == 3, "5. o2->id () should be 3 but is " + pd::to_string((int)o->id()))
             CHECK(factory.get_available_count() == 0, "6. available_count should be 0.");
             ObjectPtr o3 = factory.get (4);
             CHECK(factory.get_available_count() == 9, "7. available_count should be 9 but is " + pd::to_string((int)factory.get_available_count()));
-            CHECK(o3->get_id() == 4, "8. o3->get_id () should be 4 but is " + pd::to_string((int)o->get_id()))
+            CHECK(o3->id() == 4, "8. o3->id () should be 4 but is " + pd::to_string((int)o->id()))
             CHECK(*o != *o1, "9. *o != *o1 should be true.");
 			o.reset();
 			CHECK(o.get () == nullptr, "10. managed object should have been deleted and assigned to nullptr.");

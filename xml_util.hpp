@@ -14,19 +14,19 @@ namespace pensar_digital
 {
     namespace cpplib
     {
-        // Concept requiring a class_name() method returning something convertible to String and a get_id() method returning something convertible to Id.
+        // Concept requiring a class_name() method returning something convertible to String and a id() method returning something convertible to Id.
         template <class T>
         concept Objectable = requires (T t)    
         {
             { t.class_name() } -> std::convertible_to<String>;
-            { t.get_id() } -> std::convertible_to<Id>;
+            { t.id() } -> std::convertible_to<Id>;
         };
 
 
         template<Objectable T>
         String ObjXMLPrefix (const T& o) noexcept
         { 
-            return "<object class_name = \"" + o.class_name() + "\" id = \"" + std::to_string (o.get_id ()) + "\""; 
+            return "<object class_name = \"" + o.class_name() + "\" id = \"" + std::to_string (o.id ()) + "\""; 
         }
 
         template <class T>

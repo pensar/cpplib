@@ -3,6 +3,7 @@
 
 #include "../../unit-test/test.hpp"
 #include "generator.hpp"
+#include "memory_buffer.hpp"
 
 #include <sstream>
 
@@ -14,9 +15,9 @@ namespace pensar_digital
     {
         TEST(Get, true)
             Generator<int> g;
-            int expected = 1;
-            CHECK_EQ(int, g.get(), expected++, "0");
-            CHECK_EQ(int, g.get(), expected++, "1");
+            Id expected = 1;
+            CHECK_EQ(Id, g.get(), expected++, "0");
+            CHECK_EQ(Id, g.get(), expected++, "1");
 
             Generator<> g2(1, 1, 2);
             expected = 3;
@@ -27,9 +28,9 @@ namespace pensar_digital
 
         TEST(GetNext, true)
             Generator<int> g;
-            int expected = 1;
-            CHECK_EQ(int, g.get_next(), expected, "0");
-            CHECK_EQ(int, g.get_next(), expected, "1");
+            Id expected = 1;
+            CHECK_EQ(Id, g.get_next(), expected, "0");
+            CHECK_EQ(Id, g.get_next(), expected, "1");
 
             Generator<> g2(1, 1, 2);
             expected = 3;
@@ -39,10 +40,10 @@ namespace pensar_digital
 
         TEST(GetCurrent, true)
             Generator<int> g;
-            int expected = 0;
-            CHECK_EQ(int, g.get_current(),   expected, "0");
-            CHECK_EQ(int, g.get()        , ++expected, "1");
-            CHECK_EQ(int, g.get_current(),   expected, "2");
+            Id expected = 0;
+            CHECK_EQ(Id, g.get_current(),   expected, "0");
+            CHECK_EQ(Id, g.get()        , ++expected, "1");
+            CHECK_EQ(Id, g.get_current(),   expected, "2");
 
             Generator<> g2(1, 1, 2);
             expected = 1;
@@ -55,17 +56,17 @@ namespace pensar_digital
         TEST(SetValue, true)
             Generator<int> g;
             g.set_value(10);
-            int expected = 10;
-            CHECK_EQ(int, g.get_current(),         10, "0");
-            CHECK_EQ(int, g.get()        , ++expected, "1");
+            Id expected = 10;
+            CHECK_EQ(Id, g.get_current(),         10, "0");
+            CHECK_EQ(Id, g.get()        , ++expected, "1");
         TEST_END(SetValue)
 
 		TEST(SetStep, true)
             Generator<int> g (1, 0, 2);
-            int expected = 0;
-            CHECK_EQ(int, g.get_current(),   expected, "0");
-            CHECK_EQ(int, g.get()        ,          2, "1");
-            CHECK_EQ(int, g.get()        ,          4, "2");
+            Id expected = 0;
+            CHECK_EQ(Id, g.get_current(),   expected, "0");
+            CHECK_EQ(Id, g.get()        ,          2, "1");
+            CHECK_EQ(Id, g.get()        ,          4, "2");
         TEST_END(SetStep)
 
         TEST(JsonConversion, true)
@@ -93,9 +94,11 @@ namespace pensar_digital
             CHECK_EQ(Generator<int>, g2, g, "2");
             TEST_END(TextStreaming)
 
-		TEST(BinaryStreaming, false)
-			Generator<int> g;
-            std::stringstream ss(std::ios_base::out | std::ios_base::in | std::ios_base::binary);
+		TEST(BinaryStreaming, true)
+			Generator<std::span<std::byte>> g;
+            MemoryBuffer buffer;
+            buffer.write< Generator<std::span<std::byte>>> (g);
+            
             
         TEST_END(BinaryStreaming)
     }

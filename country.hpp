@@ -33,7 +33,7 @@ namespace pensar_digital
              *  \param other Object to assign from
              *  \return A reference to this
              */
-            Country& operator=(const Country& other) { Object::set_id(other.get_id()); }
+            Country& operator=(const Country& other) { Object::set_id(other.id()); }
         protected:
         private:
             static Generator<Country> generator;

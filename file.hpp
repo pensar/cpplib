@@ -98,7 +98,7 @@ namespace pensar_digital
 
             FileFactory::P clone(const File& afile)
             {
-                return get (afile.fullpath (), afile.get_mode (), afile.get_id ());
+                return get (afile.fullpath (), afile.get_mode (), afile.id ());
             }
 
             FileFactory::P clone(const FilePtr& ptr) { return clone(*ptr); }
@@ -210,7 +210,7 @@ namespace pensar_digital
                 return true;
             }
 
-            FilePtr clone() const  noexcept { return pd::clone<File>(*this, mfullpath, mode, get_id()); }
+            FilePtr clone() const  noexcept { return pd::clone<File>(*this, mfullpath, mode, id()); }
 
             // Conversion to json string.
             virtual String json() const noexcept

@@ -159,7 +159,7 @@ namespace pensar_digital
       void to_json(Json& j, const Generator<Type, T>& g)
       {
           j["class"] = g.class_name();
-          j["id"] = g.get_id();
+          j["id"] = g.id();
           j["mvalue"] = g.get_current();
           j["mstep"] = g.mstep;
 

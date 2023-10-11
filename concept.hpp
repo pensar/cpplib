@@ -4,6 +4,12 @@
 #include "constant.hpp"
 #include <concepts>
 #include <iostream>
+#include <memory> // for std::shared_ptr
+#include <type_traits> // for std::is_same
+#include <span>
+#include <cstddef> // for std::byte
+
+
 
 namespace pensar_digital
 {
@@ -50,7 +56,7 @@ namespace pensar_digital
 		template <typename T, typename... Args>
 		concept FactoryConstructible = Initializable<T, Args...>&& requires (Args... args)
 		{
-			{T::get(args ...)} noexcept -> std::convertible_to<T&>;
+			{T::get (args ...)} noexcept -> std::convertible_to<T&>;
 		};
 	
 		// FactoryCloneable concept requires Assignable and FactoryConstructible.
@@ -149,6 +155,14 @@ namespace pensar_digital
 		{
 			{ sizeof(t) } -> std::same_as<size_t>;
 		};
+		
+		// Identifiable concept requires a public id () method returning something convertible to Id type.
+		template <typename T>
+		concept Identifiable = requires(T t) { { t.id() } -> std::convertible_to<Id>; };	
+
+		// SizeableIdentifiable concept requires Identifiable and SizeableType.	
+		template <typename T>
+		concept SizeableIdentifiable = Identifiable<T> && SizeableType<T>;	
 
 		// SizeableObject requires a public size () method returning something convertible to size_t .
 		template <typename T>
@@ -156,18 +170,45 @@ namespace pensar_digital
 
 		// Sizeable, requires SizeableType or SizeableObject.
 		template <typename T>
-			concept Sizeable = SizeableType<T> || SizeableObject<T>;
+		concept Sizeable = SizeableType<T> || SizeableObject<T>;
 
 		// BinaryStreamable concept requires CharCastable, Sizeable and Streamable.
 		template <typename T>
 		concept BinaryStreamable = CharCastable<T> && Sizeable<T> && Streamable<T>;
 
-		// BinaryConvertible concept requires SizeableObject and a public method to_binary() returning something convertible to char *.
+		// BinaryConvertible concept requires a public method bytes() returning something convertible to std::span<std::byte>&.
 		template <typename T>
-		concept BinaryConvertible = requires(T t) { { t.to_binary () } -> std::convertible_to<char*>; } && SizeableObject<T>;
+		concept BinaryConvertible = requires(T t) { { t.bytes () } -> std::convertible_to<std::span<std::byte>>; };
+		
+		// BinaryOutputtableObject concept requires BinaryConvertible and SizeableIdentifiable.
+		template <class T>
+		concept BinaryOutputtableObject = BinaryConvertible<T> && SizeableIdentifiable<T>;
 
 		template <typename T>
 		concept BinaryStreamableObject = BinaryConvertible<T> && Streamable<T>;
+
+		// BinaryOutputtable concept requires a public method write (std::span<std::byte>& bytes) returning something convertible to T&.
+		template <typename T>
+		concept BinaryOutputtable = requires(T t, std::span<std::byte>& bytes) { { t.write (bytes) } -> std::convertible_to<T&>; };
+
+		// ObjectBinaryOutputtable concept requires a type T with a public method write<Obj> (const Obj& object) returning something convertible to T&. Where Obj must comply with BinaryOutputtableObject.
+		template <typename T, typename Obj>
+		concept ObjectBinaryOutputtable = requires(T t, Obj object) 
+		{ 
+			{ t.write (object) } -> std::convertible_to<T&>; 
+		} && BinaryOutputtableObject<Obj>;
+
+		// BinaryInputtable concept requires a public method read (std::span<std::byte>& bytes) returning something convertible to T&.
+		template <typename T>
+		concept BinaryInputtable = requires(T t, std::span<std::byte>& bytes) { { t.read (bytes) } -> std::convertible_to<T&>; };
+
+		// ObjectBinaryInputtable concept requires a type T with a public method read (U& source) returning something convertible to std::shared_ptr<T>. Where U must comply with BinaryInputtable.
+		template <typename T, typename U, typename... Args>
+		concept ObjectBinaryInputtable = requires(T t, U& source) 
+		{ 
+			{ t.read (source) } -> std::convertible_to<std::shared_ptr<T>>; 
+		} && BinaryInputtable<T> && FactoryConstructible<U, Args ...>;
+
 
 
 	} // namespace cpplib

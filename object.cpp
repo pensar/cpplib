@@ -109,7 +109,7 @@ namespace pensar_digital
         void to_json(Json& j, const Object& o)
         {
             j["class"                      ] = o.class_name();
-            j["id"                         ] = o.get_id();
+            j["id"                         ] = o.id();
             to_json (j, *o.VERSION);
         };
 

@@ -24,7 +24,7 @@ namespace pensar_digital
         void to_json(Json& j, const Path& p)
         {
             j["class"] = p.class_name();
-            j["id"] = p.get_id();
+            j["id"] = p.id();
             j["VERSION"] = *p.VERSION;
             j["path"] = p;
         }

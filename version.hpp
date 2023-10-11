@@ -136,7 +136,7 @@ namespace pensar_digital
                 // Inherited via Object
                 String class_name() const;
                 String debug_string() const noexcept;
-                inline const Id get_id() const noexcept { return mid; }
+                inline const Id id() const noexcept { return mid; }
                 const Hash get_hash() const noexcept;
                 String json() const noexcept;
                 std::ostream& write (std::ostream& os, const IO_Mode amode = TEXT, const std::endian& byte_order = std::endian::native) const;

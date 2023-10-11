@@ -47,14 +47,14 @@ typedef std::shared_ptr<Dummy> DummyPtr;
 
                 inline DummyFactory::P clone ()
                 {
-                    return get(get_id  (), get_name ());
+                    return get(id  (), get_name ());
                 };
                 inline DummyFactory::P clone(const DummyPtr& ptr) { return ptr->clone (); }
 
                 inline static DummyFactory::P parse_json(const String& sjson)
                 {
                     Json j;
-                    DummyFactory::P ptr = get(pd::get_id<Dummy>(sjson, &j));
+                    DummyFactory::P ptr = get(pd::id<Dummy>(sjson, &j));
                     ptr->set_name(j.at("name"));
                     VersionPtr v = Version::get(j);
 
@@ -84,7 +84,7 @@ typedef std::shared_ptr<Dummy> DummyPtr;
                     return true;
                 }
 
-                DummyPtr clone() const  noexcept { return pd::clone<Dummy>(*this, get_id (), name); }
+                DummyPtr clone() const  noexcept { return pd::clone<Dummy>(*this, id (), name); }
 
                 // Conversion to json string.
                 virtual String json() const noexcept

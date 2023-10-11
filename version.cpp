@@ -15,7 +15,7 @@ namespace pensar_digital
 		void to_json(Json& j, const Version& v)
 		{
 			j["class"] = v.class_name();
-			j["id"] = v.get_id();
+			j["id"] = v.id();
 			j["mpublic"] = v.get_public();
 			j["mprotected"] = v.get_protected();
 			j["mprivate"] = v.get_private();
@@ -78,7 +78,7 @@ namespace pensar_digital
 		
 		bool Version::equals(const Version& v) const noexcept
 		{
-			return (v.get_id () == get_id ()) && (v.mprivate == mprivate) && (v.mprotected == mprotected) && (v.mpublic == mpublic);
+			return (v.id () == id ()) && (v.mprivate == mprivate) && (v.mprotected == mprotected) && (v.mpublic == mpublic);
 		}
 
 		void Version::from_xml (const String& sxml)
@@ -114,7 +114,7 @@ namespace pensar_digital
 		String Version::json() const noexcept
 		{
 			std::stringstream ss;
-			ss << "{ \"class\" : \"" << pd::class_name<Version>() << "\" , \"id\" : " << get_id() << ", \"mpublic\" : " << mpublic << ", \"mprotected\" : " << mprotected << ", \"mprivate\" : " << mprivate << " }";
+			ss << "{ \"class\" : \"" << pd::class_name<Version>() << "\" , \"id\" : " << id() << ", \"mpublic\" : " << mpublic << ", \"mprotected\" : " << mprotected << ", \"mprivate\" : " << mprivate << " }";
 			return ss.str();
 		}
 	

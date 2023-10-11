@@ -13,6 +13,7 @@
 #include "json_util.hpp"
 #include "factory.hpp"
 
+
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -23,6 +24,7 @@
 #include <typeinfo> // for typeid
 #include <string.h>
 #include <utility> // for std::move
+#include <span>
 
 namespace pensar_digital
 {
@@ -37,7 +39,6 @@ namespace pensar_digital
             private:
                 inline static ObjectFactory mfactory = { 3, 10, NULL_ID }; //!< Member variable "factory"
                 Id mid; //!< Member variable "id"
-                IO_Mode mmode;
             protected:
 
                 /// Set id
@@ -56,9 +57,9 @@ namespace pensar_digital
 
             public:
                 inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
-                
+                typedef ObjectFactory FactoryType;
                 /// Default constructor.
-                Object (const Id& id = NULL_ID, const IO_Mode mode = BINARY) noexcept : mid(id), mmode(mode)
+                Object (const Id& id = NULL_ID, const IO_Mode mode = BINARY) noexcept : mid(id)
                 {
                 };
 
@@ -72,7 +73,9 @@ namespace pensar_digital
                 /** Default destructor */
                 virtual ~Object() {}
 
-                Object& assign(const Object& o) noexcept { mid = o.mid; mmode = o.mmode; return *this; }
+                Object& assign(const Object& o) noexcept { mid = o.mid; return *this; }
+
+                virtual std::span<std::byte> bytes() noexcept { return std::as_writable_bytes (std::span {this, this + sizeof(*this)}); }
 
                 virtual String class_name() const { String c = typeid(*this).name(); c.erase(0, sizeof("class ") - 1); return c; }
 
@@ -89,19 +92,7 @@ namespace pensar_digital
                 /// Access object id
                 /// \return The current value of id
                 ///
-                virtual const Id get_id() const noexcept { return mid; };
-
-                /// <summary>
-                ///  Sets io mode.
-                /// </summary>
-                /// <returns></returns>
-                void set_mode(const IO_Mode& mode) noexcept { mmode = mode; }
-
-                /// <summary>
-                ///  Gets io mode.
-                /// </summary>
-                /// <returns>IO_Mode</returns>
-                const IO_Mode get_mode() const noexcept { return mmode; }
+                virtual const Id id() const noexcept { return mid; };
 
                 /// \brief Access hash
                 ///
@@ -109,10 +100,9 @@ namespace pensar_digital
                 virtual const Hash get_hash() const noexcept { return mid; };
 
                 // Implements initialize method from Initializable concept.
-                virtual bool initialize(const Id& id = NULL_ID, const IO_Mode mode = BINARY) noexcept 
+                virtual bool initialize(const Id& id = NULL_ID) noexcept 
                 { 
                     mid = id; 
-                    mmode = mode; 
                     return true; 
                 }
 
@@ -217,7 +207,7 @@ namespace pensar_digital
                 inline static ObjectFactory::P get (const String& sjson)
                 {
                     Json j;
-                    ObjectFactory::P ptr = get(pd::get_id<Object>(sjson, &j));
+                    ObjectFactory::P ptr = get(pd::id<Object>(sjson, &j));
 
                     VersionPtr v = Version::get(j);
 
@@ -233,28 +223,15 @@ namespace pensar_digital
 
             inline std::istream& operator >> (std::istream& is, Object& o) 
             { 
-                // if is is a stringstream, then calls read with TEXT mode.
-                if (typeid(is) == typeid(std::stringstream))
-					return o.read(is, TEXT);
-				else
-                    return o.read  (is) ; 
+				return o.read(is, TEXT);
             }
     
             inline std::ostream& operator << (std::ostream& os, const Object& o) 
             { 
-                // if os is a stringstream, then calls write with TEXT mode.
-                if (typeid(os) == typeid(std::stringstream))
-                    const_cast<Object&>(o).set_mode (TEXT); 
-                
-                return o.write (os, o.get_mode ());
+                return o.write (os, TEXT);
             }
 
-            //inline std::stringstream& operator >> (std::stringstream& ss, Object& o) { o.read  (ss, TEXT); return ss; }
-            //inline std::stringstream& operator << (std::stringstream& ss, Object& o) { o.write (ss, TEXT); return ss; }
-            //inline std::stringstream& operator >> (std::stringstream& ss, ObjectPtr o) { o->read(ss, TEXT); return ss; }
-            //inline std::stringstream& operator << (std::stringstream& ss, ObjectPtr o) { o->write(ss, TEXT); return ss; }
-
-            inline       Object& operator >> (const String& sjson      , Object& o) { return o.from_json(sjson); }
+            inline Object& operator >> (const String& sjson, Object& o) { return o.from_json(sjson); }
 
             inline std::istream& operator >> (std::istream& is,       ObjectPtr o) { return is >> *o    ; }
             inline std::ostream& operator << (std::ostream& os, const ObjectPtr o) { return os << *o    ; }

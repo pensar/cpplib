@@ -26,7 +26,7 @@ namespace pensar_digital
         };
 
         template<class T>
-        Id get_id(const String& sjson, Json* j)
+        Id id(const String& sjson, Json* j)
         {
             if (j == nullptr)
             {
@@ -49,7 +49,7 @@ namespace pensar_digital
         template <class T>
         T& read_json(const String& sjson, T& o, Id* out_id, VersionPtr* out_v, Json* out_j = nullptr)
         {
-            *out_id = (get_id<T>(sjson, out_j));
+            *out_id = (id<T>(sjson, out_j));
             *out_v = Version::get(*out_j);
             return o;
         }
@@ -67,7 +67,7 @@ namespace pensar_digital
         {
             std::stringstream ss;
             ss << "{ \"class\" : \"" << o.class_name();
-            ss << "\", \"id\" : " << o.get_id() << ", \"VERSION\": ";
+            ss << "\", \"id\" : " << o.id() << ", \"VERSION\": ";
             ss << *(o.VERSION);
             return ss.str();
         }

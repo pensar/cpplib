@@ -61,7 +61,7 @@ namespace pensar_digital
 
             PathFactory::P clone(const Path& apath)
             {
-                return get(apath.std_path(), apath.get_id());
+                return get(apath.std_path(), apath.id());
             };
 
             PathFactory::P clone(const PathPtr& ptr) { return clone(*ptr); }

@@ -37,7 +37,7 @@ namespace pensar_digital
         void to_json(Json& j, const File& f)
         {
             j["class"] = f.class_name();
-            j["id"] = f.get_id();
+            j["id"] = f.id();
             j["mpublic"] = f.VERSION->get_public();
             j["mprotected"] = f.VERSION->get_protected();
             j["mprivate"] = f.VERSION->get_private();

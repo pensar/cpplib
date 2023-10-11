@@ -25,14 +25,14 @@ namespace pensar_digital
 
 			P clone (const Dummy& adummy)
 			{
-				return get (adummy.get_id (), adummy.get_name ());
+				return get (adummy.id (), adummy.get_name ());
 			};
 			P clone(const DummyPtr& ptr) { return clone (*ptr);}
 
 			P parse_json (const String& sjson)
 			{
 				Json j;
-				P ptr = get(pd::get_id<Dummy>(sjson, &j));
+				P ptr = get(pd::id<Dummy>(sjson, &j));
 				ptr->set_name (j.at("name"));
 				VersionPtr v = Version::get(j);
 

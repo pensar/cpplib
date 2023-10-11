@@ -118,7 +118,6 @@ namespace pensar_digital
                 for (Id i = 0; i < 1000; i++)
                 {
                     ObjectPtr p = pd::Object::get(i);
-                    p->set_mode(TEXT);
                     objects.push_back(p);
                 }
                 //pd::TextFile f("c:\\tmp\\test\\ObjectTextStreaming\\test.txt", "blah");
@@ -160,14 +159,14 @@ namespace pensar_digital
 
                 for (Id i = 0; i < 1000; i++)
                 {
-                    out << objects[i];    
+                    objects[i]->write (out) ;    
                 }
 				out.close();
                 std::ifstream in ("c:\\tmp\\test\\ObjectBinaryStreaming\\test.bin", std::ios::binary);
                 for (Id i = 0; i < 1000; i++)
                 {
 					ObjectPtr o = pd::Object::get();
-					in >> o;
+					o->read (in);
                     ObjectPtr o1 = pd::Object::get(i);
                     CHECK_EQ(Object, *o, *o1, pd::to_string(i));
                 }

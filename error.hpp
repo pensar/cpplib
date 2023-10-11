@@ -45,7 +45,7 @@ namespace pensar_digital
 
             virtual std::ostream& WriteToStream (std::ostream& os) const
             {
-                os << error_message << get_id ();
+                os << error_message << id ();
                 return os;
             };
 
