@@ -53,10 +53,10 @@ namespace pensar_digital
 		};
 
 		// FactoryConstructible concept. Requires Initializable and a static factory method named get returning something convertible to T&.
-		template <typename T, typename... Args>
+		template <class T, class FactoryReturnType = std::shared_ptr<T>, typename... Args>
 		concept FactoryConstructible = Initializable<T, Args...>&& requires (Args... args)
 		{
-			{T::get (args ...)} noexcept -> std::convertible_to<T&>;
+			{T::get (args ...)} noexcept -> std::convertible_to<FactoryReturnType>;
 		};
 	
 		// FactoryCloneable concept requires Assignable and FactoryConstructible.
@@ -209,7 +209,13 @@ namespace pensar_digital
 			{ t.read (source) } -> std::convertible_to<std::shared_ptr<T>>; 
 		} && BinaryInputtable<T> && FactoryConstructible<U, Args ...>;
 
-
+		// Pointable concept requires a type T that supports operator-> returning something convertible to T* and supports *T returning something convertible to T&.
+		template<typename T>
+		concept Pointable = requires(T t) 
+		{ 
+			{ t.operator->() } -> std::convertible_to<T*>; 
+			{ *t             } -> std::convertible_to<T&>; 
+		};
 
 	} // namespace cpplib
 } // namespace pensar_digital	

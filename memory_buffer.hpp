@@ -164,7 +164,7 @@ namespace pensar_digital
                     return write (((T&)obj).bytes ());
 				}
 
-                MemoryBuffer& read (std::span<std::byte>& dest) noexcept
+                MemoryBuffer& read (std::span<std::byte> dest) 
 				{
 					// Check if there is enough data in the buffer.
 					if (ravailable() < dest.size())
@@ -181,14 +181,41 @@ namespace pensar_digital
 					return *this;
 				}
 
+                template <class T>
+                void assign_dest (std::shared_ptr<T>* r, T** dest) noexcept
+				{
+                    *dest = &(**r);
+				}
+                
+                template <class T>
+                void assign_dest(T* r, T** dest) noexcept
+                {
+                    *dest = &(*r);
+                }
+
                 /// \brief Gets data from the buffer. 
-                template <class T, typename... Args> requires FactoryConstructible<T, Args...>
-                const std::shared_ptr<T> read (Args... args) const noexcept
+                template <class T, class FactoryReturnType = std::shared<T>, typename... Args>
+                requires FactoryConstructible<T, FactoryReturnType, Args...>
+                FactoryReturnType fread (Args... args) 
                 {
 					// Get the data.
-                    std::shared_ptr<T> ptr = T::get (args ...);
-                    read (ptr->bytes ());
-					return ptr;                              
+                    FactoryReturnType r = T::get (args ...);
+                    T* dest = &(*r);
+                    
+                    //assign_dest<FactoryReturnType>(&dest, &r);
+
+                    // Check if there is enough data in the buffer.
+                    if (ravailable() < sizeof (T))
+                    {
+                        throw std::runtime_error("MemoryBuffer::read: not enough data in the buffer.");
+                    }
+
+                    // Copy the data from the buffer.
+                    memcpy(dest, mbuffer.data() + mread_offset, sizeof (T));
+
+                    // Update the offset.
+                    mread_offset += sizeof (T);
+                    return r;
                 }
         }; // MemoryBuffer
     } // namespace cpplib
