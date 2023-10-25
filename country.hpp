@@ -21,7 +21,7 @@ namespace pensar_digital
         public:
             inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
             /// \brief Default constructor.
-            Country(Id aid = NULL_ID) : Object(aid == NULL_ID ? generator.value() : aid) {}
+            Country(Id aid = NULL_ID) : Object(aid == NULL_ID ? generator.get_id () : aid) {}
             /** Default destructor */
             virtual ~Country() {};
             /** Copy constructor

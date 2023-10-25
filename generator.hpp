@@ -22,7 +22,7 @@ namespace pensar_digital
       ///  template <class String = std::wstring, class T = int> class Person : public Name<String>, public Id<T>
       ///  {
       ///    public:
-      ///      Person(const String& aname = L"", const T aid = -1): Name<String>(aname), Id<T>((aid == -1) ? generator.value() : aid){};
+      ///      Person(const String& aname = L"", const T aid = -1): Name<String>(aname), Id<T>((aid == -1) ? generator.get_id () : aid){};
       ///      virtual ~Person(){};
       ///
       ///    static Generator<T> generator;
@@ -37,9 +37,9 @@ namespace pensar_digital
             typedef    T     IdType;
 
             typedef std::shared_ptr<Generator<Type, T>> GeneratorPtr;
-            typedef Factory<Generator<Type, T>, T, T, T> GeneratorFactory;
+            typedef pd::Factory<Generator<Type, T>, T, T, T> Factory;
 
-            inline static GeneratorFactory mfactory = { 3, 10, NULL_ID, 0, 1 }; //!< Member variable "factory"
+            inline static Factory mfactory = { 3, 10, NULL_ID, 0, 1 }; //!< Member variable "factory"
             inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
 
             /// \brief Constructs a Generator.
@@ -51,7 +51,7 @@ namespace pensar_digital
 
             /// \brief Increments value and return the new value.
             /// \return The new value.
-            inline virtual const T value() { mvalue += mstep; return mvalue; }
+            inline virtual const T get_id () { mvalue += mstep; return mvalue; }
 
             /// \brief Gets the next value without incrementing the current one.
             /// \return The next value.
@@ -168,45 +168,45 @@ namespace pensar_digital
 				return *this;
 			}   
             
-            static inline GeneratorFactory::P  get (T aid = NULL_ID, T initial_value = 0, T step = 1) noexcept
+            static inline Factory::P  get (T aid = NULL_ID, T initial_value = 0, T step = 1) noexcept
             {
                 return mfactory.get (aid, initial_value, step);
             };
 
-            GeneratorFactory::P clone()
+            Factory::P clone()
             {
                 return get (mid, minitial_value, mstep);
             };
 
-            inline static GeneratorFactory::P get(const Json& j)
+            inline static Factory::P get(const Json& j)
             {
                 String json_class = j.at("class");
                 if (json_class != pd::class_name<Generator<Type, T>>())
                     throw std::runtime_error("Invalid class name: " + pd::class_name<Generator<Type, T>>());
 
-                typename GeneratorFactory::P ptr = get (j.at("mid"), j.at("minitial_value"), j.at("mstep"));
+                typename Factory::P ptr = get (j.at("mid"), j.at("minitial_value"), j.at("mstep"));
 
                 VersionPtr v = Version::get(j["VERSION"]);
 
                 if (*(ptr->VERSION) != *v)
-                    throw std::runtime_error("Generator::GeneratorFactory::parse_json: version mismatch.");
+                    throw std::runtime_error("Generator::Factory::parse_json: version mismatch.");
 
                 return ptr;
             }
 
-            inline static GeneratorFactory::P get(const String& sjson)
+            inline static Factory::P get(const String& sjson)
             {
                 Json j;
                 T id = pd::id<Generator<Type, Id>>(sjson, &j);
                 T initial_value = j.at("minitial_value");
                 T step          = j.at("mstep"         );
-                typename GeneratorFactory::P ptr = get (id, initial_value, step);
+                typename Factory::P ptr = get (id, initial_value, step);
 
                 VersionPtr v = Version::get(j);
 
                 // todo: check version compatibility.
                 if (*(ptr->VERSION) != *v)
-                    throw std::runtime_error("GeneratorFactory::parse_json: version mismatch.");
+                    throw std::runtime_error("Factory::parse_json: version mismatch.");
                 return ptr;
             } // parse_json
 

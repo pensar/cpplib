@@ -83,7 +83,19 @@ namespace pensar_digital
                 size_t mwrite_offset; //!< Member variable "offset"
                 size_t mread_offset; //!< Member variable "offset"
                 std::unordered_map<MemoryBufferKey, MemoryBufferValue> mindex; //!< Member variable "index"
-            public:
+
+                template <Factorable F>
+                void assign_dest(typename F::Factory::P* r, F** dest) noexcept
+                {
+                    *dest = &(**r);
+                }
+
+                template <class T>
+                void assign_dest(T* r, T** dest) noexcept
+                {
+                    *dest = &(*r);
+                }
+        public:
                 /// Default constructor.
                 MemoryBuffer (size_t initial_size = 10000) : mwrite_offset(0)
                 {
@@ -181,26 +193,16 @@ namespace pensar_digital
 					return *this;
 				}
 
-                template <class T>
-                void assign_dest (std::shared_ptr<T>* r, T** dest) noexcept
-				{
-                    *dest = &(**r);
-				}
-                
-                template <class T>
-                void assign_dest(T* r, T** dest) noexcept
-                {
-                    *dest = &(*r);
-                }
-
                 /// \brief Gets data from the buffer. 
-                template <class T, class FactoryReturnType = std::shared<T>, typename... Args>
-                requires FactoryConstructible<T, FactoryReturnType, Args...>
-                FactoryReturnType fread (Args... args) 
+                template <class T, typename... Args>
+                requires FactoryConstructible<T, Args...>
+                typename T::Factory::P read (Args... args)
                 {
 					// Get the data.
-                    FactoryReturnType r = T::get (args ...);
-                    T* dest = &(*r);
+                    typename T::Factory::P r = T::get (args ...);
+                    T* dest;
+                    assign_dest<T>(&r , &dest);
+                    //T* dest = &(*r);
                     
                     //assign_dest<FactoryReturnType>(&dest, &r);
 

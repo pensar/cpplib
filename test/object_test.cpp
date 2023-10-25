@@ -25,8 +25,8 @@ namespace pensar_digital
         static_assert(Assignable<Dummy>);
 
         TEST(ObjectClone, true)
-            ObjectFactory::P o = pd::Object::get(42);
-            ObjectFactory::P o1 = o->clone ();
+            Factory::P o = pd::Object::get(42);
+            Factory::P o1 = o->clone ();
             CHECK(*o == *o1, "0. o == o1 should be true");
 
             DummyPtr d = Dummy::get (42, "d");

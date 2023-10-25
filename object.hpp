@@ -33,11 +33,12 @@ namespace pensar_digital
         namespace pd = pensar_digital::cpplib;
         class Object;
         typedef std::shared_ptr<Object> ObjectPtr;
-        typedef Factory<Object, Id> ObjectFactory;  
         class Object 
         {
+            public:
+                typedef pd::Factory<Object, Id> Factory;
             private:
-                inline static ObjectFactory mfactory = { 3, 10, NULL_ID }; //!< Member variable "factory"
+                inline static Factory mfactory = { 3, 10, NULL_ID }; //!< Member variable "factory"
                 Id mid; //!< Member variable "id"
             protected:
 
@@ -57,7 +58,7 @@ namespace pensar_digital
 
             public:
                 inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
-                typedef ObjectFactory FactoryType;
+                typedef Factory FactoryType;
                 /// Default constructor.
                 Object (const Id& id = NULL_ID, const IO_Mode mode = BINARY) noexcept : mid(id)
                 {
@@ -179,41 +180,41 @@ namespace pensar_digital
 
                 friend void from_json(const Json& j, Object& o);
                 
-                static inline ObjectFactory::P  get(const Id& aid = NULL_ID)
+                static inline Factory::P  get(const Id& aid = NULL_ID)
                 {
                     return mfactory.get(aid);
                 };
 
-                ObjectFactory::P clone ()
+                Factory::P clone ()
                 {
                     return get (mid);
                 };
 
-                inline static ObjectFactory::P get (const Json& j)
+                inline static Factory::P get (const Json& j)
                 {
                     String json_class = j.at("class");
                     if (json_class != pd::class_name<Object>())
                         throw std::runtime_error("Invalid class name: " + pd::class_name<Object>());
-                    ObjectFactory::P ptr = get(j.at("id"));
+                    Factory::P ptr = get(j.at("id"));
 
                     VersionPtr v = Version::get(j["VERSION"]);
 
                     if (*(ptr->VERSION) != *v)
-                        throw std::runtime_error("ObjectFactory::parse_json: version mismatch.");
+                        throw std::runtime_error("Factory::parse_json: version mismatch.");
 
                     return ptr;
                 }
 
-                inline static ObjectFactory::P get (const String& sjson)
+                inline static Factory::P get (const String& sjson)
                 {
                     Json j;
-                    ObjectFactory::P ptr = get(pd::id<Object>(sjson, &j));
+                    Factory::P ptr = get(pd::id<Object>(sjson, &j));
 
                     VersionPtr v = Version::get(j);
 
                     // todo: check version compatibility.
                     if (*(ptr->VERSION) != *v)
-                        throw std::runtime_error("ObjectFactory::parse_json: version mismatch.");
+                        throw std::runtime_error("Factory::parse_json: version mismatch.");
                     return ptr;
                 } // parse_json
         }; // Object

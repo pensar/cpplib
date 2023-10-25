@@ -16,14 +16,14 @@ namespace pensar_digital
         TEST(Get, true)
             Generator<int> g;
             Id expected = 1;
-            CHECK_EQ(Id, g.value(), expected++, "0");
-            CHECK_EQ(Id, g.value(), expected++, "1");
+            CHECK_EQ(Id, g.get_id (), expected++, "0");
+            CHECK_EQ(Id, g.get_id (), expected++, "1");
 
             Generator<> g2(1, 1, 2);
             expected = 3;
-            CHECK_EQ(Id, g2.value(), expected, "2");
+            CHECK_EQ(Id, g2.get_id (), expected, "2");
             expected = 5;
-            CHECK_EQ(Id, g2.value(), expected, "3");
+            CHECK_EQ(Id, g2.get_id (), expected, "3");
         TEST_END(Get)
 
         TEST(GetNext, true)
@@ -42,13 +42,13 @@ namespace pensar_digital
             Generator<int> g;
             Id expected = 0;
             CHECK_EQ(Id, g.current(),   expected, "0");
-            CHECK_EQ(Id, g.value()        , ++expected, "1");
+            CHECK_EQ(Id, g.get_id ()        , ++expected, "1");
             CHECK_EQ(Id, g.current(),   expected, "2");
 
             Generator<> g2(1, 1, 2);
             expected = 1;
             CHECK_EQ(Id, g2.current(), expected, "4");
-            CHECK_EQ(Id, g2.value()        ,        3, "5");
+            CHECK_EQ(Id, g2.get_id ()        ,        3, "5");
             CHECK_EQ(Id, g2.current(),        3, "6");
         TEST_END(GetCurrent)
         
@@ -58,32 +58,32 @@ namespace pensar_digital
             g.set_value (10);
             Id expected = 10;
             CHECK_EQ(Id, g.current (),         10, "0");
-            CHECK_EQ(Id, g.value ()        , ++expected, "1");
+            CHECK_EQ(Id, g.get_id ()        , ++expected, "1");
         TEST_END(SetValue)
 
 		TEST(SetStep, true)
             Generator<int> g (1, 0, 2);
             Id expected = 0;
             CHECK_EQ(Id, g.current (),   expected, "0");
-            CHECK_EQ(Id, g.value ()        ,          2, "1");
-            CHECK_EQ(Id, g.value ()        ,          4, "2");
+            CHECK_EQ(Id, g.get_id ()        ,          2, "1");
+            CHECK_EQ(Id, g.get_id ()        ,          4, "2");
         TEST_END(SetStep)
 
         TEST(JsonConversion, true)
             Generator<int> g;
-			Id id = g.value();
+			Id id = g.get_id ();
 			CHECK_EQ(String, g.json(), "{ \"class\" : \"pensar_digital::cpplib::Generator<int,__int64>\", \"id\" : 0, \"VERSION\": { \"class\" : \"pensar_digital::cpplib::Version\" , \"id\" : 0, \"mpublic\" : 1, \"mprotected\" : 1, \"mprivate\" : 1 }, \"minitial_value\" : 0, \"mvalue\" : 1, \"mstep\" : 1 }", "0");
-			id = g.value();
+			id = g.get_id ();
 			CHECK_EQ(String, g.json(), "{ \"class\" : \"pensar_digital::cpplib::Generator<int,__int64>\", \"id\" : 0, \"VERSION\": { \"class\" : \"pensar_digital::cpplib::Version\" , \"id\" : 0, \"mpublic\" : 1, \"mprotected\" : 1, \"mprivate\" : 1 }, \"minitial_value\" : 0, \"mvalue\" : 2, \"mstep\" : 1 }", "1");
         TEST_END(JsonConversion)
 
         TEST(TextStreaming, true)
             Generator<int> g;
 			std::stringstream ss;
-            Id id = g.value();
+            Id id = g.get_id ();
 			ss << g;
 			CHECK_EQ(String, ss.str(), "{ \"class\" : \"pensar_digital::cpplib::Generator<int,__int64>\", \"id\" : 0, \"VERSION\": { \"class\" : \"pensar_digital::cpplib::Version\" , \"id\" : 0, \"mpublic\" : 1, \"mprotected\" : 1, \"mprivate\" : 1 }, \"minitial_value\" : 0, \"mvalue\" : 1, \"mstep\" : 1 }", "0");
-            id = g.value();
+            id = g.get_id ();
             ss.str ("");
 			ss << g;
 			CHECK_EQ(String, ss.str(), "{ \"class\" : \"pensar_digital::cpplib::Generator<int,__int64>\", \"id\" : 0, \"VERSION\": { \"class\" : \"pensar_digital::cpplib::Version\" , \"id\" : 0, \"mpublic\" : 1, \"mprotected\" : 1, \"mprivate\" : 1 }, \"minitial_value\" : 0, \"mvalue\" : 2, \"mstep\" : 1 }", "1");
@@ -98,13 +98,22 @@ namespace pensar_digital
             typedef Generator<std::span<std::byte>> G;
             static_assert (BinaryOutputtableObject<G>);
             G g;
+            Id id = g.get_id ();
             MemoryBuffer buffer;
             buffer.write<G> (g);
             
-            static_assert (FactoryConstructible<G, G::GeneratorFactory::P, G::IdType, G::IdType, G::IdType>);
-            G g2; 
-            G::GeneratorFactory::P ptr = buffer.fread<G, G::GeneratorFactory::P, G::IdType, G::IdType, G::IdType> (NULL_ID, 0, 1);
-            CHECK_EQ(G, g2, g, "0");  
+            static_assert (FactoryConstructible<G, G::IdType, G::IdType, G::IdType>);
+            static_assert (ObjectBinaryOutputtable<MemoryBuffer, G, G::IdType, G::IdType, G::IdType>);
+            static_assert (BinaryInputtable<MemoryBuffer>);
+            //static_assert (ObjectBinaryInputtable<MemoryBuffer, G, G::IdType, G::IdType, G::IdType>);
+
+            //G::Factory::P ptr = buffer.fread<G, G::IdType, G::IdType, G::IdType>(NULL_ID, 0, 1);
+
+            G::Factory::P ptr = buffer.read<G> ();
+            G g2;
+
+            CHECK_NOT_EQ(G, g2, g, "0");
+            CHECK_EQ(G, *ptr, g, "1");  
         TEST_END(BinaryStreaming)
     }
 }

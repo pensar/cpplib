@@ -1,7 +1,6 @@
 #ifndef FACTORY_HPP_INCLUDED
 #define FACTORY_HPP_INCLUDED
 
-#include "concept.hpp"
 #include <memory>
 #include <type_traits>
 #include <vector>

@@ -38,7 +38,7 @@ namespace pensar_digital
 
 				// todo: check version compatibility.
 				if (*(ptr->VERSION) != *v)
-					throw std::runtime_error("DummyFactory::parse_json: version mismatch.");
+					throw std::runtime_error("Factory::parse_json: version mismatch.");
 
 				return ptr;
 			};

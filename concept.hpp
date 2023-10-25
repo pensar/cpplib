@@ -2,6 +2,8 @@
 #define CONCEPT
 
 #include "constant.hpp"
+#include "factory.hpp" // for NewFactory
+
 #include <concepts>
 #include <iostream>
 #include <memory> // for std::shared_ptr
@@ -52,12 +54,21 @@ namespace pensar_digital
 			{t.initialize(std::forward<Args>(args) ...)} noexcept -> std::convertible_to<bool>;
 		};
 
+		// Factorable concept requires a public type defined named Factory and a descendent of NewFactory.
+		template <typename T>
+		concept Factorable = requires
+		{
+			typename T::Factory;
+			std::derived_from<typename T::Factory, NewFactory<T>>;
+		};
+
+
 		// FactoryConstructible concept. Requires Initializable and a static factory method named get returning something convertible to T&.
-		template <class T, class FactoryReturnType = std::shared_ptr<T>, typename... Args>
+		template <class T, typename... Args>
 		concept FactoryConstructible = Initializable<T, Args...>&& requires (Args... args)
 		{
-			{T::get (args ...)} noexcept -> std::convertible_to<FactoryReturnType>;
-		};
+			{T::get(args ...)} noexcept -> std::convertible_to<typename T::Factory::P>;
+		} && Factorable<T>;
 	
 		// FactoryCloneable concept requires Assignable and FactoryConstructible.
 		template <typename T, typename... Args>
@@ -192,11 +203,11 @@ namespace pensar_digital
 		concept BinaryOutputtable = requires(T t, std::span<std::byte>& bytes) { { t.write (bytes) } -> std::convertible_to<T&>; };
 
 		// ObjectBinaryOutputtable concept requires a type T with a public method write<Obj> (const Obj& object) returning something convertible to T&. Where Obj must comply with BinaryOutputtableObject.
-		template <typename T, typename Obj>
-		concept ObjectBinaryOutputtable = requires(T t, Obj object) 
+		template <typename T, typename Obj, typename... Args>
+		concept ObjectBinaryOutputtable = requires(T t,const Obj& object) 
 		{ 
 			{ t.write (object) } -> std::convertible_to<T&>; 
-		} && BinaryOutputtableObject<Obj>;
+		} && BinaryOutputtableObject<Obj>&& FactoryConstructible<Obj, Args ...>;
 
 		// BinaryInputtable concept requires a public method read (std::span<std::byte>& bytes) returning something convertible to T&.
 		template <typename T>
@@ -204,9 +215,9 @@ namespace pensar_digital
 
 		// ObjectBinaryInputtable concept requires a type T with a public method read (U& source) returning something convertible to std::shared_ptr<T>. Where U must comply with BinaryInputtable.
 		template <typename T, typename U, typename... Args>
-		concept ObjectBinaryInputtable = requires(T t, U& source) 
+		concept ObjectBinaryInputtable = requires(T t, Args... args)
 		{ 
-			{ t.read (source) } -> std::convertible_to<std::shared_ptr<T>>; 
+			{ t.read (std::forward<Args>(args) ...) } -> std::convertible_to<typename U::Factory::P>;
 		} && BinaryInputtable<T> && FactoryConstructible<U, Args ...>;
 
 		// Pointable concept requires a type T that supports operator-> returning something convertible to T* and supports *T returning something convertible to T&.
