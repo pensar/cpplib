@@ -217,7 +217,7 @@ namespace pensar_digital
 		template <typename T, typename U, typename... Args>
 		concept ObjectBinaryInputtable = requires(T t, Args... args)
 		{ 
-			{ t.read (std::forward<Args>(args) ...) } -> std::convertible_to<typename U::Factory::P>;
+			{ t.read(args ...) } -> std::convertible_to<typename U::Factory::P>;
 		} && BinaryInputtable<T> && FactoryConstructible<U, Args ...>;
 
 		// Pointable concept requires a type T that supports operator-> returning something convertible to T* and supports *T returning something convertible to T&.

@@ -107,7 +107,7 @@ namespace pensar_digital
             static_assert (BinaryInputtable<MemoryBuffer>);
             //static_assert (ObjectBinaryInputtable<MemoryBuffer, G, G::IdType, G::IdType, G::IdType>);
 
-            //G::Factory::P ptr = buffer.fread<G, G::IdType, G::IdType, G::IdType>(NULL_ID, 0, 1);
+            //G::Factory::P ptr = buffer.read<G, G::IdType, G::IdType, G::IdType>(NULL_ID, 0, 1);
 
             G::Factory::P ptr = buffer.read<G> ();
             G g2;
