@@ -97,7 +97,7 @@ namespace pensar_digital
                 }
         public:
                 /// Default constructor.
-                MemoryBuffer (size_t initial_size = 10000) : mwrite_offset(0)
+                MemoryBuffer (size_t initial_size = 10000) : mread_offset(0), mwrite_offset(0)
                 {
                     // Allocate memory.
                     mbuffer = std::span<std::byte>(new std::byte[initial_size], initial_size);
@@ -150,7 +150,7 @@ namespace pensar_digital
                 }
 
                 /// \brief Adds data to the buffer. 
-                template <BinaryOutputtableObject T>
+                template <BinaryWriteableObject T>
                 MemoryBuffer& write (const T& obj) noexcept
 				{
                     // Check if the id already exists.

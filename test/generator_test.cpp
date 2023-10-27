@@ -95,17 +95,17 @@ namespace pensar_digital
             TEST_END(TextStreaming)
 
 		TEST(BinaryStreaming, true)
-            typedef Generator<std::span<std::byte>> G;
-            static_assert (BinaryOutputtableObject<G>);
+            typedef Generator<Object> G;
+            static_assert (BinaryWriteableObject<G>);
             G g;
             Id id = g.get_id ();
             MemoryBuffer buffer;
             buffer.write<G> (g);
             
-            static_assert (FactoryConstructible<G, G::IdType, G::IdType, G::IdType>);
-            static_assert (ObjectBinaryOutputtable<MemoryBuffer, G, G::IdType, G::IdType, G::IdType>);
-            static_assert (BinaryInputtable<MemoryBuffer>);
-            //static_assert (ObjectBinaryInputtable<MemoryBuffer, G, G::IdType, G::IdType, G::IdType>);
+            static_assert (FactoryConstructible<G, G::IdType>);
+            static_assert (ObjectBinaryWriteable<MemoryBuffer, G>);
+            static_assert (BinaryReadable<MemoryBuffer>);
+            static_assert (ObjectBinaryReadable<MemoryBuffer, G>);
 
             //G::Factory::P ptr = buffer.read<G, G::IdType, G::IdType, G::IdType>(NULL_ID, 0, 1);
 
