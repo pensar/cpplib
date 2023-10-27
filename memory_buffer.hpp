@@ -193,30 +193,35 @@ namespace pensar_digital
 					return *this;
 				}
 
-                /// \brief Gets data from the buffer. 
-                template <class T, typename... Args>
-                requires FactoryConstructible<T, Args...>
-                typename T::Factory::P read (Args... args)
+                /// \brief Gets data from the buffer into the passed object pointer. 
+                template <class T>
+                void read (T* p)
                 {
-					// Get the data.
-                    typename T::Factory::P r = T::get (args ...);
-                    T* dest;
-                    assign_dest<T>(&r , &dest);
-                    //T* dest = &(*r);
-                    
-                    //assign_dest<FactoryReturnType>(&dest, &r);
-
                     // Check if there is enough data in the buffer.
-                    if (ravailable() < sizeof (T))
+                    if (ravailable() < sizeof(T))
                     {
                         throw std::runtime_error("MemoryBuffer::read: not enough data in the buffer.");
                     }
 
                     // Copy the data from the buffer.
-                    memcpy(dest, mbuffer.data() + mread_offset, sizeof (T));
+                    memcpy(p, mbuffer.data() + mread_offset, sizeof(T));
 
                     // Update the offset.
-                    mread_offset += sizeof (T);
+                    mread_offset += sizeof(T);
+                }
+
+
+                /// \brief Gets data from the buffer into a factory constructed object. 
+                template <class T, typename... Args>
+                requires FactoryConstructible<T, Args...>
+                typename T::Factory::P read (Args... args)
+                {
+                    typename T::Factory::P r = T::get (args ...); // Create an object using its factory.
+                    
+                    T* dest;
+                    assign_dest<T>(&r , &dest);
+                    read (dest);
+                    
                     return r;
                 }
         }; // MemoryBuffer
