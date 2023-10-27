@@ -106,6 +106,7 @@ namespace pensar_digital
             static_assert (ObjectBinaryWriteable<MemoryBuffer, G>);
             static_assert (BinaryReadable<MemoryBuffer>);
             static_assert (ObjectBinaryReadable<MemoryBuffer, G>);
+            static_assert (FactoryObjBinaryReadable<MemoryBuffer, G>);
 
             //G::Factory::P ptr = buffer.read<G, G::IdType, G::IdType, G::IdType>(NULL_ID, 0, 1);
 

@@ -125,7 +125,7 @@ namespace pensar_digital
                 /// \brief Available data to read from the buffer.
                 const size_t ravailable() const noexcept { return mwrite_offset - mread_offset; }
 
-                MemoryBuffer& write(const std::span<std::byte>& data) noexcept
+                void write(const std::span<std::byte>& data) noexcept
                 {
                     // Check if there is enough space in the buffer.
                     if (wavailable() < data.size())
@@ -145,13 +145,11 @@ namespace pensar_digital
 
                     // Update the offset.
                     mwrite_offset += data.size();
-
-                    return *this;
                 }
 
                 /// \brief Adds data to the buffer. 
                 template <BinaryWriteableObject T>
-                MemoryBuffer& write (const T& obj) noexcept
+                void write (const T& obj) noexcept
 				{
                     // Check if the id already exists.
                     auto it = mindex.find (MemoryBufferKey (typeid(T), obj.id ()));
@@ -161,7 +159,6 @@ namespace pensar_digital
 					    {
 					        // Update the data.
 					        memcpy (mbuffer.data() + it->second.offset, &(*((T&)obj).bytes ().begin ()), sizeof(T));
-					        return *this;
 					    }
 					    else
 					    {
@@ -173,10 +170,10 @@ namespace pensar_digital
                     // Add index information.
                     mindex.insert (std::make_pair (MemoryBufferKey (typeid(T), obj.id ()), MemoryBufferValue (mwrite_offset, sizeof(T))));
 
-                    return write (((T&)obj).bytes ());
+                    write (((T&)obj).bytes ());
 				}
 
-                MemoryBuffer& read (std::span<std::byte> dest) 
+                void read (std::span<std::byte> dest) 
 				{
 					// Check if there is enough data in the buffer.
 					if (ravailable() < dest.size())
@@ -189,14 +186,13 @@ namespace pensar_digital
 
 					// Update the offset.
 					mread_offset += dest.size();
-
-					return *this;
 				}
 
                 /// \brief Gets data from the buffer into the passed object pointer. 
-                template <class T>
+                template <Sizeable T>
                 void read (T* p)
                 {
+                    //read (p->bytes ());
                     // Check if there is enough data in the buffer.
                     if (ravailable() < sizeof(T))
                     {
@@ -208,6 +204,7 @@ namespace pensar_digital
 
                     // Update the offset.
                     mread_offset += sizeof(T);
+                    
                 }
 
 

@@ -193,32 +193,39 @@ namespace pensar_digital
 		
 		// BinaryOutputtableObject concept requires BinaryConvertible and SizeableIdentifiable.
 		template <class T>
-		concept BinaryWriteableObject = BinaryConvertible<T> && SizeableIdentifiable<T>;
+		concept BinaryWriteableObject = BinaryConvertible<T> && Sizeable<T>;
 
 		template <typename T>
 		concept BinaryStreamableObject = BinaryConvertible<T> && Streamable<T>;
 
-		// BinaryOutputtable concept requires a public method write (std::span<std::byte>& bytes) returning something convertible to T&.
+		// BinaryWriteable concept requires a public method write (std::span<std::byte>& bytes).
 		template <typename T>
-		concept BinaryWriteable = requires(T t, std::span<std::byte>& bytes) { { t.write (bytes) } -> std::convertible_to<T&>; };
+		concept BinaryWriteable = requires(T t, std::span<std::byte>& bytes) { { t.write (bytes) } -> std::convertible_to<void>; };
 
-		// ObjectBinaryWriteable concept requires a type T with a public method write<Obj> (const Obj& object) returning something convertible to T&. Where Obj must comply with BinaryOutputtableObject.
+		// ObjectBinaryWriteable concept requires a type T with a public method write<Obj> (const Obj& object). Where Obj must comply with BinaryOutputtableObject.
 		template <typename T, typename Obj, typename... Args>
 		concept ObjectBinaryWriteable = requires(T t,const Obj& object)
 		{ 
-			{ t.write (object) } -> std::convertible_to<T&>; 
+			{ t.write (object) } -> std::convertible_to<void>;
 		} && BinaryWriteableObject<Obj>&& FactoryConstructible<Obj, Args ...>;
 
-		// BinaryInputtable concept requires a public method read (std::span<std::byte>& bytes) returning something convertible to T&.
+		// BinaryReadable concept requires a public method read (std::span<std::byte>& bytes) returning something convertible to T&.
 		template <typename T>
-		concept BinaryReadable = requires(T t, std::span<std::byte>& bytes) { { t.read (bytes) } -> std::convertible_to<T&>; };
+		concept BinaryReadable = requires(T t, std::span<std::byte>& bytes) { { t.read (bytes) } -> std::convertible_to<void>; };
 
-		// ObjectBinaryInputtable concept requires a type T reader of U objects. T must have a public method read with signature: U::Factory::P read<U, Args...> () . U must comply with BinaryInputtable && FactoryConstructible.
-		template <typename T, typename U, typename... Args>
-		concept ObjectBinaryReadable = requires(T t)
+		// ObjectBinaryReadable concept requires a type T with a public method template <class Obj> void read(Obj* p). Where Obj must comply with BinaryReadable.
+		template <typename T, typename Obj>
+		concept ObjectBinaryReadable = requires(T t, Obj* p)
 		{
-			{ t.template read<U, Args...> () } -> std::convertible_to<typename U::Factory::P>; 
-		} && BinaryReadable<T>&& FactoryConstructible<U, Args ...>;
+			{ t.template read<Obj> (p) } -> std::convertible_to<void>;
+		} && BinaryReadable<T>;
+
+		// FactoryObjBinaryReadable concept requires a type T reader of U objects. T must have a public method read with signature: U::Factory::P read<U, Args...> () . U must comply with BinaryInputtable && FactoryConstructible.
+		template <typename T, typename Obj, typename... Args>
+		concept FactoryObjBinaryReadable = requires(T t)
+		{
+			{ t.template read<Obj, Args...> () } -> std::convertible_to<typename Obj::Factory::P>;
+		} && ObjectBinaryReadable<T, Obj>&& FactoryConstructible<Obj, Args ...>;
 		
 		// Pointable concept requires a type T that supports operator-> returning something convertible to T* and supports *T returning something convertible to T&.
 		template<typename T>
