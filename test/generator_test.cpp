@@ -97,12 +97,14 @@ namespace pensar_digital
 		TEST(BinaryStreaming, true)
             typedef Generator<Object> G;
             static_assert (BinaryWriteableObject<G>);
-            G g;
-            Id id = g.get_id ();
+            static_assert (FactoryConstructible<G, G::IdType, G::IdType, G::IdType>);
+            
             MemoryBuffer buffer;
+            //G::Factory::P p = G::get (1, 0, 1);
+            G g(1);
+            Id id = g.get_id ();
             buffer.write<G> (g);
             
-            static_assert (FactoryConstructible<G, G::IdType>);
             static_assert (ObjectBinaryWriteable<MemoryBuffer, G>);
             static_assert (BinaryReadable<MemoryBuffer>);
             static_assert (ObjectBinaryReadable<MemoryBuffer, G>);
@@ -110,11 +112,16 @@ namespace pensar_digital
 
             //G::Factory::P ptr = buffer.read<G, G::IdType, G::IdType, G::IdType>(NULL_ID, 0, 1);
 
-            G::Factory::P ptr = buffer.read<G> ();
-            G g2;
+            G::Factory::P p2 = buffer.read<G> (1);
+            G g2(1);
 
             CHECK_NOT_EQ(G, g2, g, "0");
-            CHECK_EQ(G, *ptr, g, "1");  
+            CHECK_EQ(G, *p2, g, "1");
+            
+            
+            G::Factory::P p3 = buffer.write<G>(3, 2, 1);
+            G::Factory::P p4 = buffer.read<G> (3);
+            CHECK_EQ(G, *p4, *p3, "2");
         TEST_END(BinaryStreaming)
     }
 }

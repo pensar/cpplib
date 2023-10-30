@@ -22,7 +22,7 @@ namespace pensar_digital
       ///  template <class String = std::wstring, class T = int> class Person : public Name<String>, public Id<T>
       ///  {
       ///    public:
-      ///      Person(const String& aname = L"", const T aid = -1): Name<String>(aname), Id<T>((aid == -1) ? generator.get_id () : aid){};
+      ///      Person(const String& aname = L"", const T aid = -1): Name<String>(aname), Id<T>((aid == NULL_ID) ? generator.get_id () : aid){};
       ///      virtual ~Person(){};
       ///
       ///    static Generator<T> generator;
@@ -227,6 +227,7 @@ namespace pensar_digital
             T minitial_value; //!< Generator initial_value.
             T mvalue        ; //!< Generator current value.
             T mstep         ; //!< Step to increment value.
+            //static Generator<Generator<Type, T>> generator;
       }; // class Generator
 
       /// Makes Generator Streamable.

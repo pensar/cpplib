@@ -88,7 +88,13 @@ namespace pensar_digital
                 /// _equals is called from template method equals and should only implement the specific comparison.
                 /// \see _equals
                 /// \return true if objects have the same id, false otherwise.
-                bool equals(const Object& o) const noexcept { return (get_hash() != o.get_hash() ? false : _equals(o)); }
+                bool equals(const Object& o) const noexcept
+                {
+                    if (get_hash() != 
+                        o.get_hash())
+                        return false;
+                        return _equals(o);
+                }
 
                 /// Access object id
                 /// \return The current value of id

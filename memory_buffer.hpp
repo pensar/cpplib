@@ -159,6 +159,7 @@ namespace pensar_digital
 					    {
 					        // Update the data.
 					        memcpy (mbuffer.data() + it->second.offset, &(*((T&)obj).bytes ().begin ()), sizeof(T));
+                            return;
 					    }
 					    else
 					    {
@@ -172,6 +173,17 @@ namespace pensar_digital
 
                     write (((T&)obj).bytes ());
 				}
+                template <BinaryWriteableObject T, typename... Args>
+                requires FactoryConstructible<T, Args...>   
+                T::Factory::P write (Args&&... args) noexcept
+                {
+                    typename T::Factory::P p = T::get (std::forward<Args>(args)...);
+                    T* dest;
+                    assign_dest<T>(&p, &dest);
+                    write(*dest);
+
+                    return p;
+                }
 
                 void read (std::span<std::byte> dest) 
 				{
@@ -199,11 +211,29 @@ namespace pensar_digital
                         throw std::runtime_error("MemoryBuffer::read: not enough data in the buffer.");
                     }
 
+                    auto it = mindex.find(MemoryBufferKey(typeid(T), p->id()));
+                    if (it != mindex.end())
+                    {
+                        if (it->second.size == sizeof(T))
+                        {
+                            // Copy the data from the buffer.
+                            memcpy(p, mbuffer.data() + it->second.offset, sizeof(T));
+                            return;
+                        }
+                        else
+                        {
+                            throw std::runtime_error("MemoryBuffer::read: Invalid object size.");
+                        }
+                    }
+					else
+					{
+						throw std::runtime_error("MemoryBuffer::read: Object not found.");
+					}
                     // Copy the data from the buffer.
-                    memcpy(p, mbuffer.data() + mread_offset, sizeof(T));
+                    //memcpy(p, mbuffer.data() + mread_offset, sizeof(T));
 
                     // Update the offset.
-                    mread_offset += sizeof(T);
+                    //mread_offset += sizeof(T);
                     
                 }
 
@@ -215,7 +245,7 @@ namespace pensar_digital
                 {
                     typename T::Factory::P r = T::get (args ...); // Create an object using its factory.
                     
-                    T* dest;
+                    T* dest = 0;
                     assign_dest<T>(&r , &dest);
                     read (dest);
                     
