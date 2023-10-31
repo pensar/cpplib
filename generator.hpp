@@ -227,7 +227,6 @@ namespace pensar_digital
             T minitial_value; //!< Generator initial_value.
             T mvalue        ; //!< Generator current value.
             T mstep         ; //!< Step to increment value.
-            //static Generator<Generator<Type, T>> generator;
       }; // class Generator
 
       /// Makes Generator Streamable.

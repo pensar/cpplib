@@ -160,9 +160,9 @@ namespace pensar_digital
 			{ reinterpret_cast<std::byte*>(*t) } -> std::same_as<std::byte*>;
 		};	
 
-		// SizeableType, a concept requiring a type that supports sizeof(t).
+		// Sizeofable, a concept requiring a type that supports sizeof(t).
 		template <typename T>
-		concept SizeableType = requires(T t)
+		concept Sizeofable = requires(T t)
 		{
 			{ sizeof(t) } -> std::same_as<size_t>;
 		};
@@ -173,19 +173,19 @@ namespace pensar_digital
 
 		// SizeableIdentifiable concept requires Identifiable and SizeableType.	
 		template <typename T>
-		concept SizeableIdentifiable = Identifiable<T> && SizeableType<T>;	
+		concept SizeableIdentifiable = Identifiable<T> && Sizeofable<T>;
 
-		// SizeableObject requires a public size () method returning something convertible to size_t .
+		// Countable requires a public count () method returning something convertible to size_t .
 		template <typename T>
-		concept SizeableObject = requires(T t) { { t.size() } -> std::convertible_to<size_t>; };
+		concept Countable = requires(T t) { { t.count() } -> std::convertible_to<size_t>; };
 
 		// Sizeable, requires SizeableType or SizeableObject.
 		template <typename T>
-		concept Sizeable = SizeableType<T> || SizeableObject<T>;
+		concept Sizeable = requires(T t) { { t.size() } -> std::convertible_to<size_t>; };
 
 		// BinaryStreamable concept requires CharCastable, Sizeable and Streamable.
 		template <typename T>
-		concept BinaryStreamable = CharCastable<T> && Sizeable<T> && Streamable<T>;
+		concept BinaryStreamable = CharCastable<T> && Sizeofable<T> && Streamable<T>;
 
 		// BinaryConvertible concept requires a public method bytes() returning something convertible to std::span<std::byte>&.
 		template <typename T>
@@ -193,7 +193,7 @@ namespace pensar_digital
 		
 		// BinaryOutputtableObject concept requires BinaryConvertible and SizeableIdentifiable.
 		template <class T>
-		concept BinaryWriteableObject = BinaryConvertible<T> && Sizeable<T>;
+		concept BinaryWriteableObject = BinaryConvertible<T> && Sizeofable<T>;
 
 		template <typename T>
 		concept BinaryStreamableObject = BinaryConvertible<T> && Streamable<T>;
@@ -202,12 +202,19 @@ namespace pensar_digital
 		template <typename T>
 		concept BinaryWriteable = requires(T t, std::span<std::byte>& bytes) { { t.write (bytes) } -> std::convertible_to<void>; };
 
-		// ObjectBinaryWriteable concept requires a type T with a public method write<Obj> (const Obj& object). Where Obj must comply with BinaryOutputtableObject.
+		// ObjectBinaryWriteable concept requires a type T with a public method write<Obj> (const Obj& object). Where Obj must comply with BinaryWriteableObject.
+		template <typename T, typename Obj>
+		concept ObjectBinaryWriteable = requires(T t, const Obj & object)
+		{
+			{ t.template write<Obj>(object) } -> std::convertible_to<void>;
+		}&& BinaryWriteableObject<Obj>;
+
+		// FactoryObjectBinaryWriteable concept requires a type T with a public method write<Obj> (const Obj& object). Where Obj must comply with BinaryOutputtableObject.
 		template <typename T, typename Obj, typename... Args>
-		concept ObjectBinaryWriteable = requires(T t,const Obj& object)
+		concept FactoryObjectBinaryWriteable = requires(T t,const Obj& object)
 		{ 
-			{ t.write (object) } -> std::convertible_to<void>;
-		} && BinaryWriteableObject<Obj>&& FactoryConstructible<Obj, Args ...>;
+			{ t.template write<Obj, Args...> (object) } -> std::convertible_to<void>;
+		} && ObjectBinaryWriteable<T, Obj> && FactoryConstructible<Obj, Args ...>;
 
 		// BinaryReadable concept requires a public method read (std::span<std::byte>& bytes) returning something convertible to T&.
 		template <typename T>

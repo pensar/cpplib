@@ -201,7 +201,7 @@ namespace pensar_digital
 				}
 
                 /// \brief Gets data from the buffer into the passed object pointer. 
-                template <Sizeable T>
+                template <Sizeofable T>
                 void read (T* p)
                 {
                     //read (p->bytes ());

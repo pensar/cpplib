@@ -4,6 +4,7 @@
 #include "../../unit-test/test.hpp"
 #include "generator.hpp"
 #include "memory_buffer.hpp"
+#include "concept.hpp"
 
 #include <sstream>
 
@@ -107,6 +108,7 @@ namespace pensar_digital
             
             static_assert (ObjectBinaryWriteable<MemoryBuffer, G>);
             static_assert (BinaryReadable<MemoryBuffer>);
+            static_assert (Sizeofable<G>);
             static_assert (ObjectBinaryReadable<MemoryBuffer, G>);
             static_assert (FactoryObjBinaryReadable<MemoryBuffer, G>);
 

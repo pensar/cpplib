@@ -107,7 +107,7 @@ namespace pensar_digital
         }
         */
 
-        template <SizeableType T>
+        template <Sizeofable T>
         void binary_write (std::ostream& os, const T& t, const std::endian& byte_order = std::endian::native)
         {
             os.write ((char*)&t, sizeof(t));
@@ -154,7 +154,7 @@ namespace pensar_digital
             */
         }
 
-        template <Sizeable T>
+        template <Sizeofable T>
         void binary_read (std::istream& is, T& t, const std::endian& byte_order = std::endian::native)
         {
             is.read ((char*)(&t), sizeof(t));
