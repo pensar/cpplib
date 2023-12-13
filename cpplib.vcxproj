@@ -144,6 +144,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\unit-test\test.cpp" />
+    <ClCompile Include="bytes_util.cpp" />
     <ClCompile Include="byte_order.cpp" />
     <ClCompile Include="constants.cpp" />
     <ClCompile Include="constraint.cpp" />
@@ -158,9 +159,11 @@
     <ClCompile Include="memory.cpp" />
     <ClCompile Include="object.cpp" />
     <ClCompile Include="path.cpp" />
+    <ClCompile Include="person.cpp" />
     <ClCompile Include="random_util.cpp" />
     <ClCompile Include="error.cpp" />
     <ClCompile Include="name.cpp" />
+    <ClCompile Include="s.cpp" />
     <ClCompile Include="string_util.cpp" />
     <ClCompile Include="system.cpp" />
     <ClCompile Include="sys_user_info.cpp" />
@@ -173,17 +176,20 @@
     <ClCompile Include="test\io_util_test.cpp" />
     <ClCompile Include="test\object_test.cpp" />
     <ClCompile Include="test\stop_watch_test.cpp" />
+    <ClCompile Include="test\s_test.cpp" />
     <ClCompile Include="version.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\unit-test\test.hpp" />
     <ClInclude Include="algorithm_util.hpp" />
     <ClInclude Include="array.hpp" />
+    <ClInclude Include="bytes_util.hpp" />
     <ClInclude Include="byte_order.hpp" />
     <ClInclude Include="constant.hpp" />
     <ClInclude Include="constraint.hpp" />
     <ClInclude Include="country.hpp" />
     <ClInclude Include="concept.hpp" />
+    <ClInclude Include="date.hpp" />
     <ClInclude Include="distance.hpp" />
     <ClInclude Include="error.hpp" />
     <ClInclude Include="factory.hpp" />
@@ -203,7 +209,9 @@
     <ClInclude Include="name.hpp" />
     <ClInclude Include="object.hpp" />
     <ClInclude Include="path.hpp" />
+    <ClInclude Include="person.hpp" />
     <ClInclude Include="random_util.hpp" />
+    <ClInclude Include="s.hpp" />
     <ClInclude Include="stop_watch.hpp" />
     <ClInclude Include="string_def.hpp" />
     <ClInclude Include="string_util.hpp" />

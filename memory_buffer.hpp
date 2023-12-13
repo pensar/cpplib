@@ -7,6 +7,7 @@
 #include "concept.hpp"
 #include "constant.hpp"
 #include "string_util.hpp"
+#include "bytes_util.hpp"
 
 #include <memory> // for std::shared_ptr
 #include <concepts>
@@ -125,7 +126,7 @@ namespace pensar_digital
                 /// \brief Available data to read from the buffer.
                 const size_t ravailable() const noexcept { return mwrite_offset - mread_offset; }
 
-                void write(const std::span<std::byte>& data) noexcept
+                void write(const Bytes& data) noexcept
                 {
                     // Check if there is enough space in the buffer.
                     if (wavailable() < data.size())
@@ -151,6 +152,9 @@ namespace pensar_digital
                 template <BinaryWriteableObject T>
                 void write (const T& obj) noexcept
 				{
+                    Bytes bytes;
+                    obj.bytes(bytes);
+
                     // Check if the id already exists.
                     auto it = mindex.find (MemoryBufferKey (typeid(T), obj.id ()));
                     if (it != mindex.end ())
@@ -158,7 +162,7 @@ namespace pensar_digital
 					    if (it->second.size == sizeof(T))
 					    {
 					        // Update the data.
-					        memcpy (mbuffer.data() + it->second.offset, &(*((T&)obj).bytes ().begin ()), sizeof(T));
+					        memcpy (mbuffer.data() + it->second.offset, bytes.data (), bytes.size ());
                             return;
 					    }
 					    else
@@ -171,7 +175,7 @@ namespace pensar_digital
                     // Add index information.
                     mindex.insert (std::make_pair (MemoryBufferKey (typeid(T), obj.id ()), MemoryBufferValue (mwrite_offset, sizeof(T))));
 
-                    write (((T&)obj).bytes ());
+                    write (bytes);
 				}
                 template <BinaryWriteableObject T, typename... Args>
                 requires FactoryConstructible<T, Args...>   
@@ -185,7 +189,7 @@ namespace pensar_digital
                     return p;
                 }
 
-                void read (std::span<std::byte> dest) 
+                void read (Bytes dest) 
 				{
 					// Check if there is enough data in the buffer.
 					if (ravailable() < dest.size())
@@ -218,6 +222,8 @@ namespace pensar_digital
                         {
                             // Copy the data from the buffer.
                             memcpy(p, mbuffer.data() + it->second.offset, sizeof(T));
+                            //std::span<std::byte> dest = std::as_writable_bytes(std::span{ this, this + sizeof(*this) });
+                            //memcpy(dest.data(), mbuffer.data() + it->second.offset, sizeof(T));
                             return;
                         }
                         else

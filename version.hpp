@@ -8,6 +8,7 @@
 #include "string_util.hpp"
 #include "header_lib/json.hpp"
 #include "factory.hpp"
+#include "bytes_util.hpp"
 
 #include <iostream> // std::istream, std::ostream
 #include <memory>   // std::shared_ptr
@@ -60,6 +61,13 @@ namespace pensar_digital
                 {
                     return mfactory.get (pub, pro, pri, aid);
                 };
+                    
+                inline virtual ~Version() noexcept = default;
+
+                inline virtual void bytes(std::vector<std::byte> v) const noexcept
+				{
+					;
+				}
 
                 VersionFactory::P clone ()
                 {

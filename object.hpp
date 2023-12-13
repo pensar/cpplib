@@ -24,7 +24,7 @@
 #include <typeinfo> // for typeid
 #include <string.h>
 #include <utility> // for std::move
-#include <span>
+#include <vector>
 
 namespace pensar_digital
 {
@@ -76,7 +76,12 @@ namespace pensar_digital
 
                 Object& assign(const Object& o) noexcept { mid = o.mid; return *this; }
 
-                virtual std::span<std::byte> bytes() noexcept { return std::as_writable_bytes (std::span {this, this + sizeof(*this)}); }
+                inline virtual void bytes (std::vector<std::byte> v) const noexcept
+                {
+                    VERSION->bytes(v);
+                }
+
+                virtual std::span<std::byte> wbytes() noexcept { return std::as_writable_bytes (std::span {this, this + sizeof(*this)}); }
 
                 virtual String class_name() const { String c = typeid(*this).name(); c.erase(0, sizeof("class ") - 1); return c; }
 

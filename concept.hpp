@@ -189,7 +189,7 @@ namespace pensar_digital
 
 		// BinaryConvertible concept requires a public method bytes() returning something convertible to std::span<std::byte>&.
 		template <typename T>
-		concept BinaryConvertible = requires(T t) { { t.bytes () } -> std::convertible_to<std::span<std::byte>>; };
+		concept BinaryConvertible = requires(T t) { { t.wbytes () } -> std::convertible_to<std::span<std::byte>>; };
 		
 		// BinaryOutputtableObject concept requires BinaryConvertible and SizeableIdentifiable.
 		template <class T>
@@ -198,9 +198,9 @@ namespace pensar_digital
 		template <typename T>
 		concept BinaryStreamableObject = BinaryConvertible<T> && Streamable<T>;
 
-		// BinaryWriteable concept requires a public method write (std::span<std::byte>& bytes).
+		// BinaryWriteable concept requires a public method write (std::span<std::byte>& wbytes).
 		template <typename T>
-		concept BinaryWriteable = requires(T t, std::span<std::byte>& bytes) { { t.write (bytes) } -> std::convertible_to<void>; };
+		concept BinaryWriteable = requires(T t, std::span<std::byte>& wbytes) { { t.write (wbytes) } -> std::convertible_to<void>; };
 
 		// ObjectBinaryWriteable concept requires a type T with a public method write<Obj> (const Obj& object). Where Obj must comply with BinaryWriteableObject.
 		template <typename T, typename Obj>
@@ -218,7 +218,7 @@ namespace pensar_digital
 
 		// BinaryReadable concept requires a public method read (std::span<std::byte>& bytes) returning something convertible to T&.
 		template <typename T>
-		concept BinaryReadable = requires(T t, std::span<std::byte>& bytes) { { t.read (bytes) } -> std::convertible_to<void>; };
+		concept BinaryReadable = requires(T t, Bytes& bytes) { { t.read (bytes) } -> std::convertible_to<void>; };
 
 		// ObjectBinaryReadable concept requires a type T with a public method template <class Obj> void read(Obj* p). Where Obj must comply with BinaryReadable.
 		template <typename T, typename Obj>
@@ -241,6 +241,50 @@ namespace pensar_digital
 			{ t.operator->() } -> std::convertible_to<T*>; 
 			{ *t             } -> std::convertible_to<T&>; 
 		};
+
+		// StandardLayout concept requires a type T that is standard layout.
+		template<typename T>
+		concept StandardLayout = std::is_standard_layout_v<T>;
+
+		// TriviallyCopyable concept requires a type T that is trivially copyable.
+		template<typename T>
+		concept TriviallyCopyable = std::is_trivially_copyable_v<T>;
+
+		// StdLayoutTriviallyCopyable concept requires a type T that is standard layout and trivially copyable.
+		template<typename T>
+		concept StdLayoutTriviallyCopyable = StandardLayout<T> && TriviallyCopyable<T>;	
+
+		// TriviallyDestructible concept requires a type T that is trivially destructible.
+		template<typename T>
+		concept TriviallyDestructible = std::is_trivially_destructible_v<T>;
+
+		// TriviallyConstructible concept requires a type T that is trivially constructible.
+		template<typename T>
+		concept TriviallyConstructible = std::is_trivially_constructible_v<T>;
+
+		// TriviallyAssignable concept requires a type T that is trivially assignable.
+		template<typename T, typename U>
+		concept TriviallyAssignable = std::is_trivially_assignable_v<T, U>;
+
+		// TriviallyCopyAssignable concept requires a type T that is trivially copy assignable.
+		template<typename T>
+		concept TriviallyCopyAssignable = std::is_trivially_copy_assignable_v<T>;
+
+		// TriviallyMoveAssignable concept requires a type T that is trivially move assignable.
+		template<typename T>
+		concept TriviallyMoveAssignable = std::is_trivially_move_assignable_v<T>;
+
+		// TriviallyMoveConstructible concept requires a type T that is trivially move constructible.
+		template<typename T>
+		concept TriviallyMoveConstructible = std::is_trivially_move_constructible_v<T>;
+
+		// TriviallyCopyConstructible concept requires a type T that is trivially copy constructible.
+		template<typename T>
+		concept TriviallyCopyConstructible = std::is_trivially_copy_constructible_v<T>;
+
+		// TriviallyMovable concept requires a type T that is trivially movable.
+		template<typename T>
+		concept TriviallyMovable = TriviallyMoveConstructible<T> && TriviallyMoveAssignable<T>;
 
 	} // namespace cpplib
 } // namespace pensar_digital	

@@ -108,6 +108,18 @@
     <ClCompile Include="test\byte_order_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="bytes_util.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="person.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="s.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test\s_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="constant.hpp">
@@ -222,6 +234,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="array.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="person.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bytes_util.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="date.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="s.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
