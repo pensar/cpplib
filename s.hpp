@@ -19,6 +19,14 @@ namespace pensar_digital
         extern void remove_accent (wchar_t* c) noexcept;
 
         template <typename C = char>
+        C remove_accent(const C c) noexcept
+        {
+            C ch = c;
+            remove_accent (&ch);
+            return ch;
+        }
+
+        template <typename C = char>
         bool equal (const C c, const C c2, bool case_sensitive = false, bool accent_sensitive = false) noexcept
         {
             if (case_sensitive)
@@ -29,7 +37,7 @@ namespace pensar_digital
                 }
                 else
                 {
-                    return remove_accent(c) == remove_accent(c2);
+                    return remove_accent<C>(c) == remove_accent<C>(c2);
                 }
             }
             else
@@ -40,7 +48,7 @@ namespace pensar_digital
                 }
                 else
                 {
-                    return std::tolower(remove_accent(c)) == std::tolower(remove_accent(c2));
+                    return std::tolower(remove_accent<C>(c)) == std::tolower(remove_accent<C>(c2));
                 }
             }
         }
@@ -93,7 +101,7 @@ namespace pensar_digital
         template <typename C = char>
         bool greater_equal (const C c, const C c2, bool case_sensitive = false, bool accent_sensitive = false) noexcept
         {
-            return greater (c, c2, case_sensitive, accent_sensitive) || equal(c, c2, case_sensitive, accent_sensitive);
+            return greater (c, c2, case_sensitive, accent_sensitive) || equal (c, c2, case_sensitive, accent_sensitive);
         }
 
         template<int N, typename Char = char> //, typename Encoding = icu::UnicodeString>
@@ -107,8 +115,19 @@ namespace pensar_digital
             // Default constructor
             S()
             {
-                data.fill('\0');
+                data.fill ('\0');
             }
+
+            S (const Char* str)
+			{
+				std::copy (str, str + std::strlen (str), data.begin ());
+			}
+
+            // Converts to Char*. Must be null terminated.
+            operator const Char* () const noexcept
+			{
+				return data.data();
+			}
 
             // Comparison operators
             bool operator== (const S& other) const noexcept
@@ -178,6 +197,8 @@ namespace pensar_digital
         template<int N, int N2, typename Char = char>
         S<N + N2, Char> operator+ (const S<N, Char>& lhs, const S<N2, Char>& rhs) noexcept
 		{
+            static_assert (N > 0, "S<N, Char> operator+ (const S<N, Char>& lhs, const S<N, Char>& rhs) - lhs must be of size N > 0");
+
 			S<N + N2, Char> result;
 			std::copy(lhs.data.begin(), lhs.data.end(), result.data.begin());
 			std::copy(rhs.data.begin(), rhs.data.end(), result.data.begin() + N);
@@ -188,6 +209,8 @@ namespace pensar_digital
 		template<int N, int N2, typename Char = char>
         S<N + N2, Char> operator+ (const S<N, Char>& lhs, const std::basic_string<Char>& rhs)
         {
+            static_assert (N > 0, "S<N, Char> operator+ (const S<N, Char>& lhs, const std::basic_string<Char>& rhs) - lhs must be of size N > 0");
+
             if (rhs.size() != N2)
 			{
 				throw std::runtime_error("S<N, Char> operator+ (const S<N, Char>& lhs, const std::basic_string<Char>& rhs) - rhs must be of size N2");
@@ -200,20 +223,16 @@ namespace pensar_digital
         }
 
         // Concatenates a S object and a null terminated string. Must be of same char type.
-        template<int N, typename Char = char>
-		S<N + 1, Char> operator+ (const S<N, Char>& lhs, const Char* rhs) noexcept
+        template<int N, int N2, typename Char = char>
+		S<N + N2, Char> operator+ (const S<N, Char>& lhs, const Char* rhs)
 		{
-			S<N + 1, Char> result;
-			std::copy(lhs.data.begin(), lhs.data.end(), result.data.begin());
-			std::copy(rhs, rhs + N, result.data.begin() + N);
-			return result;
-		}
+            static_assert (N > 0, "S<N, Char> operator+ (const S<N, Char>& lhs, const Char* rhs) - lhs must be of size N > 0");
 
-		// Concatenates a S object and a null terminated wstring. Must be of same char type.
-		template<int N, typename Char = char>
-		S<N + 1, Char> operator+ (const S<N, Char>& lhs, const wchar_t* rhs) noexcept
-		{
-			S<N + 1, Char> result;
+            if (std::char_traits<Char>::length(rhs) != N2)
+			{
+				throw std::runtime_error("S<N, Char> operator+ (const S<N, Char>& lhs, const Char* rhs) - rhs must be of size N2");
+			}
+			S<N + N2, Char> result;
 			std::copy(lhs.data.begin(), lhs.data.end(), result.data.begin());
 			std::copy(rhs, rhs + N, result.data.begin() + N);
 			return result;
@@ -223,6 +242,9 @@ namespace pensar_digital
 		template<int N, int N2, typename Char = char>
 		S<N + N2, Char> operator+ (const S<N, Char>& lhs, const std::array<Char, N2>& rhs) noexcept
 		{
+            static_assert (N2 > 0, "S<N, Char> operator+ (const S<N, Char>& lhs, const std::array<Char, N2>& rhs) - rhs must be of size > 0");
+            static_assert (N > 0, "S<N, Char> operator+ (const S<N, Char>& lhs, const std::array<Char, N2>& rhs) - lhs must be of size > 0");
+
 			S<N + N2, Char> result;
 			std::copy(lhs.data.begin(), lhs.data.end(), result.data.begin());
 			std::copy(rhs.begin(), rhs.end(), result.data.begin() + N);
@@ -233,36 +255,20 @@ namespace pensar_digital
 		template<int N, typename Char = char>
 		S<N + 1, Char> operator+ (const std::basic_string<Char>& lhs, const S<N, Char>& rhs) noexcept
 		{
+            static_assert (N > 0, "S<N, Char> operator+ (const std::basic_string<Char>& lhs, const S<N, Char>& rhs) - rhs must be of size > 0");
+
 			S<N + 1, Char> result;
 			std::copy(lhs.begin(), lhs.end(), result.data.begin());
 			std::copy(rhs.data.begin(), rhs.data.end(), result.data.begin() + N);
 			return result;
 		}
 
-		// Concatenates a null terminated string and a S object. Must be of same char type.
-		template<int N, typename Char = char>
-        S<N + 1, Char> operator+ (const Char* lhs, const S<N, Char>& rhs) noexcept
-        {
-            S<N + 1, Char> result;
-            std::copy(lhs, lhs + N, result.data.begin());
-            std::copy(rhs.data.begin(), rhs.data.end(), result.data.begin() + N);
-            return result;
-        }
-
-        // Concatenates a null terminated wstring and a S object. Must be of same char type.
-        template<int N, typename Char = char>
-        S<N + 1, Char> operator+ (const wchar_t* lhs, const S<N, Char>& rhs) noexcept
-        {
-            S<N + 1, Char> result;
-            std::copy(lhs, lhs + N, result.data.begin());
-            std::copy(rhs.data.begin(), rhs.data.end(), result.data.begin() + N);
-            return result;
-        }
-
 		// Concatenates a std::array and a S object. Must be of same char type.
         template<int N, int N2, typename Char = char>
         S<N + N2, Char> operator+ (const std::array<Char, N>& lhs, const S<N2, Char>& rhs) noexcept
         {
+            static_assert (N > 0, "S<N, Char> operator+ (const std::array<Char, N>& lhs, const S<N2, Char>& rhs) - lhs must be of size > 0");
+
             S<N + N2, Char> result;
             std::copy(lhs.begin(), lhs.end(), result.data.begin());
             std::copy(rhs.data.begin(), rhs.data.end(), result.data.begin() + N);
@@ -271,39 +277,23 @@ namespace pensar_digital
 
         // Concatenates a S object and a char. Must be of same char type.
         template<int N, typename Char = char>
-        S<N + 1, Char> operator+ (const S<N, Char>& lhs, const Char& rhs) noexcept
+        S<N + sizeof(Char), Char> operator+ (const S<N, Char>& lhs, const Char& rhs) noexcept
         {
-            S<N + 1, Char> result;
-            std::copy(lhs.data.begin(), lhs.data.end(), result.data.begin()); 
-                result.data[N] = rhs;
-            return result;
-        }
+            static_assert (N > 0, "S<N, Char> operator+ (const S<N, Char>& lhs, const Char& rhs) - lhs must be of size > 0");
 
-        // Concatenates a S object and a wchar_t. Must be of same char type.
-        template<int N, typename Char = char>
-        S<N + 1, Char> operator+ (const S<N, Char>& lhs, const wchar_t& rhs) noexcept
-        {
-            S<N + 1, Char> result;
-            std::copy(lhs.data.begin(), lhs.data.end(), result.data.begin());
+            S<N + sizeof(Char), Char> result;
+            std::copy(lhs.data.begin(), lhs.data.end(), result.data.begin()); 
                 result.data[N] = rhs;
             return result;
         }
 
         // Concatenates a char and a S object. Must be of same char type.
         template<int N, typename Char = char>
-        S<N + 1, Char> operator+ (const Char& lhs, const S<N, Char>& rhs) noexcept
+        S<N + sizeof(Char), Char> operator+ (const Char& lhs, const S<N, Char>& rhs) noexcept
         {
-            S<N + 1, Char> result;
-            result.data[0] = lhs;
-            std::copy(rhs.data.begin(), rhs.data.end(), result.data.begin() + 1);
-            return result;
-        }
+            static_assert (N > 0, "S<N, Char> operator+ (const Char& lhs, const S<N, Char>& rhs) - lhs must be of size > 0");
 
-        // Concatenates a wchar_t and a S object. Must be of same char type.
-        template<int N, typename Char = char>
-        S<N + 1, Char> operator+ (const wchar_t& lhs, const S<N, Char>& rhs) noexcept
-        {
-            S<N + 1, Char> result;
+            S<N + sizeof(Char), Char> result;
             result.data[0] = lhs;
             std::copy(rhs.data.begin(), rhs.data.end(), result.data.begin() + 1);
             return result;

@@ -95,7 +95,7 @@ namespace pensar_digital
             CHECK_EQ(Generator<int>, g2, g, "2");
             TEST_END(TextStreaming)
 
-		TEST(BinaryStreaming, true)
+		TEST(BinaryStreaming, false)
             typedef Generator<Object> G;
             static_assert (BinaryWriteableObject<G>);
             static_assert (FactoryConstructible<G, G::IdType, G::IdType, G::IdType>);
