@@ -111,30 +111,98 @@ namespace pensar_digital
             std::array<Char, N> data;
             bool case_sensitive = false;
             bool accent_sensitive = false;
+            static const auto NULL_CHAR = (sizeof (Char) == 1) ? '\0' : L'\0';
+
+            void inline fill (Char c) noexcept
+            {
+				data.fill (c);
+			}   
+
+            void fill_null () noexcept
+            {
+                fill (NULL_CHAR);
+            }
 
             // Default constructor
             S()
             {
-                data.fill ('\0');
+                fill_null ();
             }
+
+            bool is_null_char (size_t index) const noexcept
+            {
+				return (data[index] == NULL_CHAR);
+			}
+
+            size_t length () const noexcept
+            {
+                size_t i = 0;
+                while (! is_null_char (i))
+                {
+					++i;
+				}
+                return i;
+			}
 
             S (const Char* str)
 			{
-				std::copy (str, str + std::strlen (str), data.begin ());
+                auto strlen = std::char_traits<Char>::length (str);
+				std::memcpy (data.data(), str, strlen);
+                data[strlen] = NULL_CHAR;
 			}
 
             // Converts to Char*. Must be null terminated.
-            operator const Char* () const noexcept
+            operator Char* () const noexcept
 			{
-				return data.data();
+                // Allocate memory for the new string.
+                size_t size = length () + 1;
+                Char* c = new Char[size];
+                // Copy the string. With null termination.
+                std::memcpy (c, data.data(), size);
+                return c;
+			}
+
+            // Compare strings length.
+            inline size_t cmp_strlen(const S& other) const noexcept
+            {
+                return length () - other.length ();
+            }
+
+            inline bool eq_strlen(const S& other) const noexcept
+            {
+				return length () == other.length ();
+			}
+
+            inline bool empty () const noexcept
+            {
+				return length () == 0;
+			}
+
+            // operator[]
+            inline Char& operator[] (const size_t index) const noexcept
+            {
+				// Removes const and returns Char&.
+                return const_cast<Char&>(data[index]);
 			}
 
             // Comparison operators
             bool operator== (const S& other) const noexcept
             {
-                return std::equal(data.begin(), data.end(), other.data.begin(),
-                    [&](const Char a, const Char b) { return equal(a, b, case_sensitive, accent_sensitive); }
-                );
+                bool result = eq_strlen(other);
+                if (result)
+                {
+                    auto strlen = length ();
+                    for (size_t i = 0; i < strlen; ++i)
+                    {
+                        if (!equal(data[i], other.data[i], case_sensitive, accent_sensitive))
+                        {
+							result = false;
+							break;
+						}
+					}
+				}   
+                	  
+				return result;  
             }
 
             bool operator!=(const S& other) const noexcept
@@ -144,9 +212,21 @@ namespace pensar_digital
 
             bool operator<(const S& other) const noexcept
             {
-                return std::lexicographical_compare(data.begin(), data.end(), other.data.begin(),
-                    [&](const Char a, const Char b) { return less(a, b, case_sensitive, accent_sensitive); }
-                );
+                bool result = less (data[0], other.data[0], case_sensitive, accent_sensitive);
+                if (result)
+                {
+                    auto strlen = length ();
+                    for (size_t i = 1; i < strlen; ++i)
+                    {
+                        if (!less(data[i], other.data[i], case_sensitive, accent_sensitive))
+                        {
+                            result = false;
+                            break;
+                        }
+                    }
+                }
+
+                return result;
             }
 
             bool operator>(const S& other) const noexcept
@@ -172,16 +252,28 @@ namespace pensar_digital
             }
 
             // Assigns a null terminated string.
-            S& operator= (const Char* str) noexcept
+            S& operator= (const Char* str) 
             {
-                std::copy(str, str + N, data.begin());
+                if (str == nullptr)
+                {
+					fill_null ();
+				}
+                else
+                {
+                    auto strlen = std::char_traits<Char>::length(str);
+                    if (strlen > N)
+                    {
+						throw std::runtime_error ("String is too long. Max = " + std::to_string (N));
+					}
+					std::copy(str, str + strlen, data.begin());
+				}   
                 return *this;
             }
 
             // Assigns a null terminated wstring.
             S& operator= (const wchar_t* str) noexcept
 			{
-				std::copy(str, str + N, data.begin());
+				std::copy(str, str + std::wcslen(str), data.begin());
 				return *this;
 			}
 
@@ -202,7 +294,7 @@ namespace pensar_digital
 			S<N + N2, Char> result;
 			std::copy(lhs.data.begin(), lhs.data.end(), result.data.begin());
 			std::copy(rhs.data.begin(), rhs.data.end(), result.data.begin() + N);
-			return result;
+            return result;
 		}
 
 		// Concatenates a S object and a std::basic_string. Must be of same char type.
@@ -235,7 +327,7 @@ namespace pensar_digital
 			S<N + N2, Char> result;
 			std::copy(lhs.data.begin(), lhs.data.end(), result.data.begin());
 			std::copy(rhs, rhs + N, result.data.begin() + N);
-			return result;
+            return result;
 		}
 
 		// Concatenates a S object and a std::array. Must be of same char type.
@@ -248,7 +340,7 @@ namespace pensar_digital
 			S<N + N2, Char> result;
 			std::copy(lhs.data.begin(), lhs.data.end(), result.data.begin());
 			std::copy(rhs.begin(), rhs.end(), result.data.begin() + N);
-			return result;
+            return result;
 		}
 
 		// Concatenates a std::basic_string and a S object. Must be of same char type.
@@ -260,7 +352,7 @@ namespace pensar_digital
 			S<N + 1, Char> result;
 			std::copy(lhs.begin(), lhs.end(), result.data.begin());
 			std::copy(rhs.data.begin(), rhs.data.end(), result.data.begin() + N);
-			return result;
+            return result;
 		}
 
 		// Concatenates a std::array and a S object. Must be of same char type.

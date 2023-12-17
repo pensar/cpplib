@@ -18,7 +18,10 @@ namespace pensar_digital
             typedef S<10> S2;
             S1 s;
             S1 s1;  
-            CHECK_EQ(S1, s, s1, "0. s and s1 are not equal.");
+            CHECK_EQ(S1, s, s1, "0");
+            s = "abc";
+            CHECK_NOT_EQ(S1, s, s1, "1");
+            CHECK_EQ(S1, s, "abc", "2");
         TEST_END(S)
     }
 }
