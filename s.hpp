@@ -108,11 +108,18 @@ namespace pensar_digital
         class S
         {
         public:
+            typedef Char value_type;
             std::array<Char, N> data;
             bool case_sensitive = false;
             bool accent_sensitive = false;
             static const auto NULL_CHAR = (sizeof (Char) == 1) ? '\0' : L'\0';
 
+            // Returns the size of the string.
+            const constexpr inline size_t size() const noexcept
+            {
+				return N;
+            }
+            
             void inline fill (Char c) noexcept
             {
 				data.fill (c);
@@ -184,6 +191,11 @@ namespace pensar_digital
 				// Removes const and returns Char&.
                 return const_cast<Char&>(data[index]);
 			}
+
+            inline Char& at(const size_t index) const noexcept
+            {
+                return operator[](index);
+            }
 
             // Comparison operators
             bool operator== (const S& other) const noexcept
@@ -270,18 +282,18 @@ namespace pensar_digital
                 return *this;
             }
 
-            // Assigns a null terminated wstring.
-            S& operator= (const wchar_t* str) noexcept
-			{
-				std::copy(str, str + std::wcslen(str), data.begin());
-				return *this;
-			}
-
             // Assigns a std::array.
             S& operator= (const std::array<Char, N>& arr) noexcept
 			{
 				std::copy(arr.begin(), arr.end(), data.begin());
 				return *this;
+			}
+
+            // Makes S compastible with OutuputStreamable concept.
+            std::ostream& operator<< (std::ostream& os) noexcept
+            {
+				os << data.data();
+				return os;
 			}
         };
 
@@ -390,6 +402,7 @@ namespace pensar_digital
             std::copy(rhs.data.begin(), rhs.data.end(), result.data.begin() + 1);
             return result;
         }
+
 
     }   // namespace cpplib
 }       // namespace pensar_digital
