@@ -136,13 +136,29 @@ namespace pensar_digital
 			{t ^ t} noexcept -> std::convertible_to<bool>;
 		};
 
-		// OutputStreamable concept.
+		// NarrowOutputStreamable concept.
 		template<typename T>
-		concept OutputStreamable = requires(T a, std::ostream & os) { { os << a } -> std::same_as<std::ostream&>; };
+		concept NarrowOutputStreamable = requires(T a, std::ostream & os) { { os << a } -> std::same_as<std::ostream&>; };
 
-		// InputStreamable concept.
+		// WideOutputStreamable concept.
 		template<typename T>
-		concept InputStreamable = requires(T a, std::istream & is) 	{ { is >> a } -> std::same_as<std::istream&>; };
+		concept WideOutputStreamable = requires(T a, std::wostream & os) { { os << a } -> std::same_as<std::wostream&>; };
+
+		// OutputStreamable concept. NarrowOutputStreamable or WideOutputStreamable.
+		template<typename T>
+		concept OutputStreamable = NarrowOutputStreamable<T> || WideOutputStreamable<T>;
+
+		// NarrowInputStreamable concept.
+		template<typename T>
+		concept NarrowInputStreamable = requires(T a, std::istream & is) 	{ { is >> a } -> std::same_as<std::istream&>; };
+
+		// WideInputStreamable concept.
+		template<typename T>
+		concept WideInputStreamable = requires(T a, std::wistream & is) { { is >> a } -> std::same_as<std::wistream&>; };
+
+		// InputStreamable concept. NarrowInputStreamable or WideInputStreamable.
+		template<typename T>
+		concept InputStreamable = NarrowInputStreamable<T> || WideInputStreamable<T>;
 
 		// Streamable concept.
 		template<typename T>

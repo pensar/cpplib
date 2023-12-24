@@ -15,6 +15,7 @@ namespace pensar_digital
 {
     namespace cpplib
     {
+
         extern void remove_accent (char* c) noexcept;
         extern void remove_accent (wchar_t* c) noexcept;
 
@@ -107,190 +108,197 @@ namespace pensar_digital
         template<int N, typename Char = char> //, typename Encoding = icu::UnicodeString>
         class S
         {
-        public:
-            typedef Char value_type;
-            std::array<Char, N> data;
-            bool case_sensitive = false;
-            bool accent_sensitive = false;
-            static const auto NULL_CHAR = (sizeof (Char) == sizeof(char)) ? '\0' : L'\0';
+            public:
+                typedef Char value_type;
+                std::array<Char, N> data;
+                bool case_sensitive = false;
+                bool accent_sensitive = false;
+                static const auto NULL_CHAR = (sizeof (Char) == sizeof(char)) ? '\0' : L'\0';
 
-            // Returns the size of the string.
-            const constexpr inline size_t size() const noexcept
-            {
-				return N;
-            }
+                // Returns the size of the string.
+                const constexpr inline size_t size() const noexcept
+                {
+				    return N;
+                }
             
-            void inline fill (Char c) noexcept
-            {
-				data.fill (c);
-			}   
-
-            void fill_null () noexcept
-            {
-                fill (NULL_CHAR);
-            }
-
-            // Default constructor
-            S()
-            {
-                fill_null ();
-            }
-
-            inline bool is_null_char (size_t index) const noexcept
-            {
-				return (data[index] == NULL_CHAR);
-			}
-
-            inline size_t length () const noexcept
-            {
-                return std::char_traits<Char>::length(data.data ());
-			}
-
-            S (const Char* str)
-			{
-                auto strlen = std::char_traits<Char>::length (str);
-				std::memcpy (data.data(), str, strlen);
-                data[strlen] = NULL_CHAR;
-			}
-
-            // Converts to Char*. Must be null terminated.
-            operator Char* () const noexcept
-			{
-                // Allocate memory for the new string.
-                size_t size = length () + 1;
-                Char* c = new Char[size];
-                // Copy the string. With null termination.
-                std::memcpy (c, data.data(), size);
-                return c;
-			}
-
-            // Compare strings length.
-            inline size_t cmp_strlen(const S& other) const noexcept
-            {
-                return length () - other.length ();
-            }
-
-            inline bool eq_strlen(const S& other) const noexcept
-            {
-				return length () == other.length ();
-			}
-
-            inline bool empty () const noexcept
-            {
-				return length () == 0;
-			}
-
-            // operator[]
-            inline Char& operator[] (const size_t index) const noexcept
-            {
-				// Removes const and returns Char&.
-                return const_cast<Char&>(data[index]);
-			}
-
-            inline Char& at(const size_t index) const noexcept
-            {
-                return operator[](index);
-            }
-
-            // Comparison operators
-            bool operator== (const S& other) const noexcept
-            {
-                bool result = eq_strlen(other);
-                if (result)
+                void inline fill (Char c) noexcept
                 {
-                    auto strlen = length ();
-                    for (size_t i = 0; i < strlen; ++i)
-                    {
-                        if (!equal(data[i], other.data[i], case_sensitive, accent_sensitive))
-                        {
-							result = false;
-							break;
-						}
-					}
-				}   
-                	  
-				return result;  
-            }
+				    data.fill (c);
+			    }   
 
-            bool operator!=(const S& other) const noexcept
-            {
-                return !(*this == other);
-            }
-
-            bool operator<(const S& other) const noexcept
-            {
-                bool result = less (data[0], other.data[0], case_sensitive, accent_sensitive);
-                if (result)
+                void fill_null () noexcept
                 {
-                    auto strlen = length ();
-                    for (size_t i = 1; i < strlen; ++i)
-                    {
-                        if (!less(data[i], other.data[i], case_sensitive, accent_sensitive))
-                        {
-                            result = false;
-                            break;
-                        }
-                    }
+                    fill (NULL_CHAR);
                 }
 
-                return result;
-            }
-
-            bool operator>(const S& other) const noexcept
-            {
-                return other < *this;
-            }
-
-            bool operator<=(const S& other) const noexcept
-            {
-                return !(other < *this);
-            }
-
-            bool operator>=(const S& other) const noexcept
-            {
-                return !(*this < other);
-            }
-
-            // Assigns a std::basic_string.
-            S& operator= (const std::basic_string<Char>& str) noexcept
-            {
-                std::copy(str.begin(), str.end(), data.begin());
-                return *this;
-            }
-
-            // Assigns a null terminated string.
-            S& operator= (const Char* str) 
-            {
-                if (str == nullptr)
+                // Default constructor
+                S()
                 {
-					fill_null ();
-				}
-                else
+                    fill_null ();
+                }
+
+                inline bool is_null_char (size_t index) const noexcept
                 {
-                    auto strlen = std::char_traits<Char>::length(str);
-                    if (strlen > N)
+				    return (data[index] == NULL_CHAR);
+			    }
+
+                inline size_t length () const noexcept
+                {
+                    return std::char_traits<Char>::length(data.data ());
+			    }
+
+                S (const Char* str)
+			    {
+                    auto strlen = std::char_traits<Char>::length (str);
+				    std::memcpy (data.data(), str, strlen);
+                    data[strlen] = NULL_CHAR;
+			    }
+
+                // Converts to Char*. Must be null terminated.
+                operator Char* () const noexcept
+			    {
+                    // Allocate memory for the new string.
+                    size_t size = length () + 1;
+                    Char* c = new Char[size];
+                    // Copy the string. With null termination.
+                    std::memcpy (c, data.data(), size);
+                    return c;
+			    }
+
+                // Compare strings length.
+                inline size_t cmp_strlen(const S& other) const noexcept
+                {
+                    return length () - other.length ();
+                }
+
+                inline bool eq_strlen(const S& other) const noexcept
+                {
+				    return length () == other.length ();
+			    }
+
+                inline bool empty () const noexcept
+                {
+				    return length () == 0;
+			    }
+
+                // operator[]
+                inline Char& operator[] (const size_t index) const noexcept
+                {
+				    // Removes const and returns Char&.
+                    return const_cast<Char&>(data[index]);
+			    }
+
+                inline Char& at(const size_t index) const noexcept
+                {
+                    return operator[](index);
+                }
+
+                // Comparison operators
+                bool operator== (const S& other) const noexcept
+                {
+                    bool result = eq_strlen(other);
+                    if (result)
                     {
-						throw std::runtime_error ("String is too long. Max = " + std::to_string (N));
-					}
-					std::copy(str, str + strlen, data.begin());
-				}   
-                return *this;
-            }
+                        auto strlen = length ();
+                        for (size_t i = 0; i < strlen; ++i)
+                        {
+                            if (!equal(data[i], other.data[i], case_sensitive, accent_sensitive))
+                            {
+							    result = false;
+							    break;
+						    }
+					    }
+				    }   
+                	  
+				    return result;  
+                }
 
-            // Assigns a std::array.
-            S& operator= (const std::array<Char, N>& arr) noexcept
-			{
-				std::copy(arr.begin(), arr.end(), data.begin());
-				return *this;
-			}
+                bool operator!=(const S& other) const noexcept
+                {
+                    return !(*this == other);
+                }
 
-            // Makes S compastible with OutuputStreamable concept.
-            std::ostream& operator<< (std::ostream& os) noexcept
-            {
-				os << data.data();
-				return os;
-			}
-        };
+                bool operator<(const S& other) const noexcept
+                {
+                    bool result = less (data[0], other.data[0], case_sensitive, accent_sensitive);
+                    if (result)
+                    {
+                        auto strlen = length ();
+                        for (size_t i = 1; i < strlen; ++i)
+                        {
+                            if (!less(data[i], other.data[i], case_sensitive, accent_sensitive))
+                            {
+                                result = false;
+                                break;
+                            }
+                        }
+                    }
+
+                    return result;
+                }
+
+                bool operator>(const S& other) const noexcept
+                {
+                    return other < *this;
+                }
+
+                bool operator<=(const S& other) const noexcept
+                {
+                    return !(other < *this);
+                }
+
+                bool operator>=(const S& other) const noexcept
+                {
+                    return !(*this < other);
+                }
+
+                // Assigns a std::basic_string.
+                S& operator= (const std::basic_string<Char>& str) noexcept
+                {
+                    std::copy(str.begin(), str.end(), data.begin());
+                    return *this;
+                }
+
+                // Assigns a null terminated string.
+                S& operator= (const Char* str) 
+                {
+                    if (str == nullptr)
+                    {
+					    fill_null ();
+				    }
+                    else
+                    {
+                        auto strlen = std::char_traits<Char>::length(str);
+                        if (strlen > N)
+                        {
+						    throw std::runtime_error ("String is too long. Max = " + std::to_string (N));
+					    }
+					    std::copy(str, str + strlen, data.begin());
+				    }   
+                    return *this;
+                }
+
+                // Assigns a std::array.
+                S& operator= (const std::array<Char, N>& arr) noexcept
+			    {
+				    std::copy(arr.begin(), arr.end(), data.begin());
+				    return *this;
+			    }
+
+                // Makes S compatible with NarrowOutuputStreamable concept.
+                std::ostream& operator<< (std::ostream& os) noexcept
+                {
+				    os << data.data();
+				    return os;
+			    }
+
+                // Makes S compatible with WideOutuputStreamable concept.
+				std::wostream& operator<< (std::wostream& os) noexcept
+				{
+                    os << data.data();
+                    return os;
+                }
+            };
 
         // Concatenates two S objects. Must be of same char type.
         template<int N, int N2, typename Char = char>
@@ -397,8 +405,7 @@ namespace pensar_digital
             std::copy(rhs.data.begin(), rhs.data.end(), result.data.begin() + 1);
             return result;
         }
-
-
+      
     }   // namespace cpplib
 }       // namespace pensar_digital
 #endif  // S_HPP

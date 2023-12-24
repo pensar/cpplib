@@ -83,7 +83,7 @@ namespace pensar_digital
 
                 virtual std::span<std::byte> wbytes() noexcept { return std::as_writable_bytes (std::span {this, this + sizeof(*this)}); }
 
-                virtual String class_name() const { String c = typeid(*this).name(); c.erase(0, sizeof("class ") - 1); return c; }
+                virtual std::string class_name() const { String c = typeid(*this).name(); c.erase(0, sizeof("class ") - 1); return c; }
 
                 // Clone method. 
                 ObjectPtr clone() const noexcept { return pd::clone<Object>(*this, mid); }
@@ -204,8 +204,8 @@ namespace pensar_digital
                 inline static Factory::P get (const Json& j)
                 {
                     String json_class = j.at("class");
-                    if (json_class != pd::class_name<Object>())
-                        throw std::runtime_error("Invalid class name: " + pd::class_name<Object>());
+                    if (json_class != pd::class_name<Object, char>())
+                        throw std::runtime_error("Invalid class name: " + pd::class_name<Object, char>());
                     Factory::P ptr = get(j.at("id"));
 
                     VersionPtr v = Version::get(j["VERSION"]);

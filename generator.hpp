@@ -111,6 +111,11 @@ namespace pensar_digital
                 return is;
             };
 
+            virtual std::wistream& read(std::wistream& is, const IO_Mode amode = TEXT, const std::endian& byte_order = std::endian::native)
+            {
+                return is;
+            }
+
             virtual std::ostream& write(std::ostream& os, const IO_Mode amode = TEXT, const std::endian& byte_order = std::endian::native) const
             {
                 if (amode == BINARY)
@@ -128,6 +133,11 @@ namespace pensar_digital
                 return os;
             };
 
+            virtual std::wostream& write(std::wostream& os, const IO_Mode amode = TEXT, const std::endian& byte_order = std::endian::native) const
+            {
+                return os;
+            }
+
             void set_id (const T& aid) { Object::set_id (aid); }
 
             // Convertion to xml string.
@@ -135,9 +145,9 @@ namespace pensar_digital
             {
                 String xml = ObjXMLPrefix() + ">";
                 //xml += VERSION->xml(); //todo.
-                xml += "<initial_value>" + pd::to_string(minitial_value) + "</initial_value>";
-                xml += "<value>"         + pd::to_string(mvalue        ) + "</value>";
-                xml += "<step>"          + pd::to_string(mstep         ) + "</step>";
+                xml += "<initial_value>" + pd::to_string<Id>(minitial_value, '.') + "</initial_value>";
+                xml += "<value>"         + pd::to_string<Id>(mvalue, '.') + "</value>";
+                xml += "<step>"          + pd::to_string<Id>(mstep, '.') + "</step>";
                 xml += "</object>";
                 return xml;
             }   
@@ -230,8 +240,11 @@ namespace pensar_digital
       }; // class Generator
 
       /// Makes Generator Streamable.
-      template <class Type, typename T> std::ostream& operator << (std::ostream& os, const Generator<Type, T>& g) { return g.write(os); }
-      template <class Type, typename T> std::istream& operator >> (std::istream& is, Generator<Type, T>& g) { return g.read(is); }
+      template <class Type, typename T> std::ostream& operator << (std::ostream& os, const Generator<Type, T>& g) { return g.write (os); }
+      template <class Type, typename T> std::istream& operator >> (std::istream& is,       Generator<Type, T>& g) { return g.read  (is); }
+
+      template <class Type, typename T> std::wostream& operator << (std::wostream& os, const Generator<Type, T>& g) { return g.write (os); }
+      template <class Type, typename T> std::wistream& operator >> (std::wistream& is,       Generator<Type, T>& g) { return g.read  (is); }
 
       template <class Type, typename T>
       void to_json(Json& j, const Generator<Type, T>& g)

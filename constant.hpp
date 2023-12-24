@@ -13,6 +13,11 @@ namespace pensar_digital
 {
     namespace cpplib
     {
+        #define WIDE2(x) L##x
+        #define WIDE1(x) WIDE2(x)
+        #define WFILE WIDE1(__FILE__)
+        #define WLINE WIDE1(__LINE__)
+
         using Id         = int_fast64_t; // istream >> unsigned long was not compiling.
         using Hash       = int_fast64_t;
         using VersionInt = int_fast16_t;

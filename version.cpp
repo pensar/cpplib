@@ -66,10 +66,6 @@ namespace pensar_digital
 			}
 			return os;
 		}
-		String Version::class_name() const
-		{
-			return pd::class_name<Version> ();
-		}
 
 		String Version::debug_string() const noexcept
 		{
@@ -114,7 +110,7 @@ namespace pensar_digital
 		String Version::json() const noexcept
 		{
 			std::stringstream ss;
-			ss << "{ \"class\" : \"" << pd::class_name<Version>() << "\" , \"id\" : " << id() << ", \"mpublic\" : " << mpublic << ", \"mprotected\" : " << mprotected << ", \"mprivate\" : " << mprivate << " }";
+			ss << "{ \"class\" : \"" << pd::class_name<Version, char>() << "\" , \"id\" : " << id() << ", \"mpublic\" : " << mpublic << ", \"mprotected\" : " << mprotected << ", \"mprivate\" : " << mprivate << " }";
 			return ss.str();
 		}
 	
@@ -137,8 +133,8 @@ namespace pensar_digital
 				is >> sjson;
 				auto j = Json::parse(sjson);
 				String json_class = j.at("class");
-				if (json_class != pd::class_name<Version>())
-					throw std::runtime_error("Invalid class name: " + pd::class_name<Version>());
+				if (json_class != pd::class_name<Version, char>())
+					throw std::runtime_error("Invalid class name: " + pd::class_name<Version, char>());
 				mid = j.at("id").get<Id>();
 				mpublic = j.at("mpublic").get<VersionInt>();
 				mprotected = j.at("mprotected").get<VersionInt>();

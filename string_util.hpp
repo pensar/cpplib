@@ -2,8 +2,8 @@
 // license: MIT (https://opensource.org/licenses/MIT)
 
 
-#ifndef string_utilH
-#define string_utilH
+#ifndef STRING_UTIL_HPP
+#define STRING_UTIL_HPP
 
 #ifdef CODE_GEAR
 #include <vcl.h>
@@ -22,6 +22,7 @@
 #include <sstream>
 #include <cassert>
 
+
 #include "log.hpp"
 #include "string_def.hpp"
 
@@ -29,10 +30,16 @@ namespace pensar_digital
 {
     namespace cpplib
     {
+        #define LPREFIX(x) L ## x
+
+        #define L(C, x) std::is_same_v<##C, char> ? ##x : LPREFIX(##x)
+
         extern const bool PAD_RIGHT;
         extern const bool PAD_LEFT ;
         extern const bool TRIM_ELEMENTS;
         extern const bool INCLUDE_EMPTY_FIELDS;
+
+        extern std::wstring to_wstring (const std::string& s);
 
         // Reads all chars from a istream into a string.
         // \param is the input stream.
@@ -460,17 +467,17 @@ namespace pensar_digital
           return replace_substr<wchar_t> (s, std::wstring(o), std::wstring(r));
         }
 
-        template<class String = std::string>
-        String insert_grouping_char (const String& s, typename String::value_type grouping_char = ',')
+        template<typename C = char>
+        std::basic_string<C> insert_grouping_char (const String& s, typename String::value_type grouping_char = L(C, ','))
         {
-            String f; //formatted string.
+            std::basic_string<C> f; //formatted string.
             unsigned primeiro = s.length () % 3;
             if (primeiro == 0)
                 primeiro = 3;
             --primeiro;
             unsigned i = 0;
             unsigned count = 0;
-            for (typename String::const_iterator it = s.begin (); it != s.end (); ++it)
+            for (typename std::basic_string<C>::const_iterator it = s.begin (); it != s.end (); ++it)
             {
                 f += *it;
                 bool last = (++it == s.end ()) ? true : false;
@@ -484,106 +491,107 @@ namespace pensar_digital
             return f;
         }
 
-        template<typename IntType = int, bool use_grouping_char = false>
-        String to_string (IntType number, typename String::value_type grouping_char = ',')
+        template<typename IntType = int, bool use_grouping_char = false, typename C = char>
+        std::basic_string<C> to_string(IntType number, C grouping_char = L(C, ','))
         {
-            std::ostringstream ss;
+            std::basic_ostringstream<C> ss;
             ss << number;
-            String s = ss.str ();
+            std::basic_string<C> s = ss.str ();
+            //if (number < 0) inserts a minus sign at the beginning of the string.
             if (number < 0)
-                s = "-" + s;
-            return use_grouping_char ? insert_grouping_char<String>(s, grouping_char) : s;
+			    s.insert (s.begin (), L(C, '-'));
+
+            return use_grouping_char ? insert_grouping_char<C>(s, grouping_char) : s;
         }
 
-        template<bool use_grouping_char = false>
-        String to_string (int number, typename String::value_type grouping_char = ',')
+        template<bool use_grouping_char = false, typename C = char>
+        std::basic_string<C> to_string(size_t number, typename C grouping_char  = L(C, ','))
         {
-            return to_string <int, use_grouping_char> (number, grouping_char);
+            return to_string <size_t, use_grouping_char, C>(number, grouping_char);
         }
 
-        template<bool use_grouping_char = false>
-        String to_string(long number, typename String::value_type grouping_char = ',')
+        template<bool use_grouping_char = false, typename C = char>
+        std::basic_string<C> to_string (int number, C grouping_char = L(C, ','))
         {
-            return to_string <long, use_grouping_char>(number, grouping_char);
+            return to_string <int, use_grouping_char, C> (number, grouping_char);
         }
 
-        template<bool use_grouping_char = false>
-        String to_string(long long int number, typename String::value_type grouping_char = ',')
+        template<bool use_grouping_char = false, typename C = char>
+        std::basic_string<C> to_string (long number, C grouping_char  = L(C, ','))
         {
-            return to_string <long long int, use_grouping_char>(number, grouping_char);
+            return to_string <long, use_grouping_char, C> (number, grouping_char);
         }
 
-        template<bool use_grouping_char = false>
-        String to_string(unsigned int number, typename String::value_type grouping_char = ',')
+        template<bool use_grouping_char = false, typename C = char>
+        std::basic_string<C> to_string (long long int number, C grouping_char  = L(C, ','))
         {
-            return to_string <unsigned int, use_grouping_char>(number, grouping_char);
+            return to_string <long long int, use_grouping_char, C> (number, grouping_char);
         }
 
-        template<bool use_grouping_char = false>
-        String to_string(unsigned long int number, typename String::value_type grouping_char = ',')
+        template<bool use_grouping_char = false, typename C = char>
+        std::basic_string<C> to_string(unsigned int number, C grouping_char  = L(C, ','))
+        {
+            return to_string <unsigned int, use_grouping_char, C> (number, grouping_char);
+        }
+
+        template<bool use_grouping_char = false, typename C = char>
+        std::basic_string<C> to_string(unsigned long int number, C grouping_char  = L(C, ','))
         {
             return to_string <unsigned long int, use_grouping_char>(number, grouping_char);
         }
 
-        template<bool use_grouping_char = false>
-        String to_string(unsigned long long int number, typename String::value_type grouping_char = ',')
-        {
-            return to_string <unsigned long long int, use_grouping_char>(number, grouping_char);
-        }
+        //template<bool use_grouping_char = false, typename C = char>
+        //std::basic_string<C> to_string(unsigned long long int number, typename String::value_type grouping_char = L(C, ','))
+        //{
+        //    return to_string <unsigned long long int, use_grouping_char>(number, grouping_char);
+       // }
 
         // todo: use use_grouping.
-        template<class String = std::string>
-        String to_string (double number, unsigned num_decimals = 2, bool use_grouping = true, typename String::value_type grouping_char = ',', char decimal_separator = '.')
+        template<typename C = char>
+        std::basic_string<C> to_string (double number, unsigned num_decimals /*= 2*/, bool use_grouping/* = true*/, C grouping_char  = L(C, ','), C decimal_separator  = L(C, ','))
         {
-            typedef typename String::value_type CharT;
             int integer_part = trunc (number);
-            String s = to_string<String> (integer_part);
-            std::ostringstream ss;
+            std::basic_string<C> s = to_string<C> (integer_part);
+            std::basic_ostringstream<C> ss;
             ss << std::fixed << std::setprecision(num_decimals) << number;
-            String s1 = ss.str ();
-            typename String::size_type pos = s1.find (decimal_separator);
-            String decimal_part = ".00";
-            if (pos != std::string::npos)
+            std::basic_string<C> s1 = ss.str ();
+            typename std::basic_string<C>::size_type pos = s1.find (decimal_separator);
+            std::basic_string<C> decimal_part = L(C, ".00");
+            if (pos != std::basic_string<C>::npos)
             {
                 unsigned n = (num_decimals + pos) < s1.length () ? num_decimals : s1.length ();
                 decimal_part = s1.substr (pos, n + 1);
             }
-            pad<CharT> (decimal_part, '0', num_decimals);
+            pad<C> (decimal_part, '0', num_decimals);
             return s + decimal_part;
         }
 
-        inline String pad_left0(long long number, const unsigned n = 4)
+        template<typename C = char>
+        inline std::basic_string<C> pad_left0(long long int number, const unsigned n = 4)
         {
-            return pad_copy(to_string<long long>(number).c_str(), '0', n, PAD_LEFT);
+            return pad_copy (to_string<false, C> (number).c_str (), '0', n, PAD_LEFT);
         }
 
         /// Remove extension from file name.
-        template<typename T = char>
-        void remove_ext (std::basic_string<T>& fname)
+        template<typename C = char>
+        void remove_ext (std::basic_string<C>& fname)
         {
-            typename std::basic_string<T>::size_type pos = fname.find_last_of ('.');
-            if (pos != std::basic_string<T>::npos)
+            typename std::basic_string<C>::size_type pos = fname.find_last_of (L(C, '.'));
+            if (pos != std::basic_string<C>::npos)
             {
                 fname.erase (pos, fname.length ());
             }
         }
 
         /// Remove todos espaços duplos.
-        template<class String = std::wstring>
-        String& remove_double_spaces (String& s)
+        template<typename C = char>
+        std::basic_string<C>& remove_double_spaces (std::basic_string<C>& s)
         {
           if (s.size () == 0)
               return s;
-          while (replace_substr<typename String::value_type>(s, L"  ", L" "));
+          while (replace_substr<C>(s, L(C, "  "), L(C, " ")));
           return s;
         }
-
-        inline std::string& remove_double_spaces (std::string& s)
-        {
-          while (replace_substr<std::string::value_type>(s, "  ", " "));
-          return s;
-        }
-
     }   // namespace cpplib
 }       // namespace pensar_digital
-#endif
+#endif  // STRING_UTIL_HPP

@@ -37,7 +37,7 @@ namespace pensar_digital
             XMLResults* pResults = 0;
             XMLNode node = XMLNode::parseString (xml, tag, pResults);
             String xml_class_name = node.getAttribute ("class_name");
-            if (xml_class_name == class_name<T> ())
+            if (xml_class_name == class_name<T, char> ())
             {
                 String sid = node.getAttribute ("id");
                 *id_from_xml = std::stoi (sid);

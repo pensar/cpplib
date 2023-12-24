@@ -9,6 +9,7 @@
 #include "header_lib/json.hpp"
 #include "factory.hpp"
 #include "bytes_util.hpp"
+#include "type_util.hpp"
 
 #include <iostream> // std::istream, std::ostream
 #include <memory>   // std::shared_ptr
@@ -122,9 +123,10 @@ namespace pensar_digital
                     return true;
 			    }
 
-                inline String to_string() const noexcept
+                template <typename C = char>
+                std::basic_string<C> to_string () const noexcept
                 {
-                    return pd::to_string (mpublic) + "." + pd::to_string (mprotected) + "." + pd::to_string (mprivate);
+                    return pd::to_string<C> (mpublic) + "." + pd::to_string<C> (mprotected) + "." + pd::to_string<C> (mprivate);
                 }
 
                 // Convertion to xml string.
@@ -137,12 +139,17 @@ namespace pensar_digital
                 inline bool operator != (const Version& v) const { return !(*this == v); }
 
                 // Implicit conversion to string.
-                operator String() const noexcept { return to_string(); }
+                template <typename Char = char>
+                operator std::basic_string<Char>() const noexcept { return to_string<Char> (); }
 
                 friend std::istream& operator >> (std::istream& is, Version& v);
 
-                // Inherited via Object
-                String class_name() const;
+                template <typename Char = char>
+                std::basic_string<Char> class_name() const
+                {
+                    return pd::class_name<Version, Char> ();
+                }
+                
                 String debug_string() const noexcept;
                 inline const Id id() const noexcept { return mid; }
                 const Hash get_hash() const noexcept;

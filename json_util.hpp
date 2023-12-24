@@ -32,16 +32,16 @@ namespace pensar_digital
             {
                 auto k = Json::parse(sjson);
                 String json_class = k.at("class");
-                if (json_class != pd::class_name<T>())
-                    throw std::runtime_error("Invalid class name: " + pd::class_name<T>());
+                if (json_class != pd::class_name<T, char>())
+                    throw std::runtime_error("Invalid class name: " + pd::class_name<T, char>());
                 return k.at("id");
             }
             else
             {
                 *j = Json::parse(sjson);
                 String json_class = j->at("class");
-                if (json_class != pd::class_name<T>())
-                    throw std::runtime_error("Invalid class name: " + pd::class_name<T>());
+                if (json_class != pd::class_name<T, char>())
+                    throw std::runtime_error("Invalid class name: " + pd::class_name<T, char>());
                 return j->at("id");
             }
 

@@ -70,8 +70,8 @@ namespace pensar_digital
             {
                 auto j = Json::parse(sjson);
                 String json_class = j.at("class");
-                if (json_class != pd::class_name<Path>())
-                    throw std::runtime_error("Invalid class name: " + pd::class_name<Path>());
+                if (json_class != pd::class_name<Path, char>())
+                    throw std::runtime_error("Invalid class name: " + pd::class_name<Path, char>());
                 Id id;
                 VersionPtr v;
                 Path p;

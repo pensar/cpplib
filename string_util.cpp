@@ -16,6 +16,7 @@
 #include "string_util.hpp"
 
 #include <iostream>
+#include <codecvt>
 
 namespace pensar_digital
 {
@@ -25,6 +26,12 @@ namespace pensar_digital
         const bool PAD_LEFT  = false;
         const bool TRIM_ELEMENTS = true;
         const bool INCLUDE_EMPTY_FIELDS = true;
+        
+        std::wstring to_wstring(const std::string& s)
+        {
+            std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+            return converter.from_bytes(s);
+        }
 
         std::string  reverse (const std::string&  s)
         {
