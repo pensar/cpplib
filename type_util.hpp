@@ -17,7 +17,7 @@ namespace pensar_digital
         std::basic_string<C> class_name() noexcept
         {
             std::string s = typeid(T).name();
-            s.erase(0, 5); // remove "class " prefix;
+            s.erase(0, sizeof("class ") - 1); // remove "class " prefix;
             return s;
         }
         
@@ -26,7 +26,7 @@ namespace pensar_digital
         std::basic_string<wchar_t> class_name() noexcept
         {
             std::wstring s = typeid(T).name ();
-            s.erase(0, 6); // remove "class " prefix;
+            s.erase(0, sizeof(L"class ") - 1); // remove "class " prefix;
             return s;
         }
         //                return to_wstring(s);

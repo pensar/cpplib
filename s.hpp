@@ -113,7 +113,7 @@ namespace pensar_digital
                 std::array<Char, N> data;
                 bool case_sensitive = false;
                 bool accent_sensitive = false;
-                static const auto NULL_CHAR = (sizeof (Char) == sizeof(char)) ? '\0' : L'\0';
+                const Char NULL_CHAR = (sizeof (Char) == sizeof(char)) ? '\0' : L'\0';
 
                 // Returns the size of the string.
                 const constexpr inline size_t size() const noexcept
@@ -150,7 +150,7 @@ namespace pensar_digital
                 S (const Char* str)
 			    {
                     auto strlen = std::char_traits<Char>::length (str);
-				    std::memcpy (data.data(), str, strlen);
+				    std::memcpy (data.data(), str, strlen*sizeof(Char));
                     data[strlen] = NULL_CHAR;
 			    }
 
