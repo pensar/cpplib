@@ -40,7 +40,7 @@ namespace pensar_digital
             Id aid;
             Json j;
             pd::read_json<Object> (sjson, *this, &aid, &v, &j);
-            mid = aid;
+            mdata.mid = aid;
 
             // todo: check version compatibility.
             if (*VERSION != *v)
@@ -54,7 +54,7 @@ namespace pensar_digital
             binary_read(is, sclass_name, byte_order);
             if (sclass_name != class_name())
                 throw new std::runtime_error("Object::read: class name mismatch.");
-            binary_read<Id>(is, mid, byte_order);
+            binary_read<Id>(is, mdata.mid, byte_order);
         }
 
         void Object::read_bin_version(std::istream& is, const std::endian& byte_order)
@@ -81,7 +81,7 @@ namespace pensar_digital
 				Id stream_id;
                 Json j;
                 pd::read_json<Object>(is, *this, &stream_id, &stream_version, &j);
-                mid = stream_id;
+                mdata.mid = stream_id;
                 if (*VERSION != *stream_version)
                     throw new std::runtime_error("Object::read: version mismatch.");
             }
@@ -93,7 +93,7 @@ namespace pensar_digital
             if (amode == BINARY)
             {
                 binary_write     (os, class_name(), byte_order);
-                binary_write<Id> (os,           mid, byte_order);
+                binary_write<Id> (os, mdata.mid, byte_order);
 
                 VERSION->write   (os, amode, byte_order);  
             }

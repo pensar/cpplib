@@ -37,14 +37,23 @@ namespace pensar_digital
         {
             public:
                 typedef pd::Factory<Object, Id> Factory;
+                
             private:
                 inline static Factory mfactory = { 3, 10, NULL_ID }; //!< Member variable "factory"
-                Id mid; //!< Member variable "id"
+                /// \brief Class Object::Data is compliant with the StdLayoutTriviallyCopyable concept. 
+                /// \see https://en.cppreference.com/w/cpp/named_req/TriviallyCopyable  
+                /// \see https://en.cppreference.com/w/cpp/named_req/StandardLayoutType
+                struct Data
+                {
+                    Id mid;
+                    Data(const Id& id = NULL_ID) noexcept : mid(id) {}
+                };
+                Data mdata; //!< Member variable mdata contains the object data.
             protected:
 
                 /// Set id
                 /// \param val New value to set
-                void set_id(const Id& value) { mid = value; }
+                void set_id(const Id& value) { mdata.mid = value; }
 
                 String ObjXMLPrefix() const noexcept { return "<object class_name = \"" + class_name() + "\" id = \"" + Object::to_string() + "\""; }
 
@@ -54,13 +63,15 @@ namespace pensar_digital
                 /// \return true if they are equal, false otherwise.
                 /// \see equals
                 ///
-                virtual bool _equals(const Object& o) const { return (mid == o.mid); }
+                virtual bool _equals(const Object& o) const { return (mdata.mid == o.mdata.mid); }
 
             public:
                 inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
                 typedef Factory FactoryType;
+                typedef Data DataType;
+
                 /// Default constructor.
-                Object (const Id& id = NULL_ID, const IO_Mode mode = BINARY) noexcept : mid(id)
+                Object (const Id& id = NULL_ID, const IO_Mode mode = BINARY) noexcept : mdata(id)
                 {
                 };
 
@@ -74,7 +85,9 @@ namespace pensar_digital
                 /** Default destructor */
                 virtual ~Object() {}
 
-                Object& assign(const Object& o) noexcept { mid = o.mid; return *this; }
+                Data* data() noexcept { return &mdata; }
+
+                Object& assign(const Object& o) noexcept { mdata.mid = o.mdata.mid; return *this; }
 
                 inline virtual void bytes (std::vector<std::byte> v) const noexcept
                 {
@@ -86,7 +99,7 @@ namespace pensar_digital
                 virtual std::string class_name() const { String c = typeid(*this).name(); c.erase(0, sizeof("class ") - 1); return c; }
 
                 // Clone method. 
-                ObjectPtr clone() const noexcept { return pd::clone<Object>(*this, mid); }
+                ObjectPtr clone() const noexcept { return pd::clone<Object>(*this, mdata.mid); }
                 
                 /// Check if passed object equals self.
                 /// Derived classes must implement the _equals method. The hash compare logic is made on equals.
@@ -104,17 +117,17 @@ namespace pensar_digital
                 /// Access object id
                 /// \return The current value of id
                 ///
-                virtual const Id id() const noexcept { return mid; };
+                virtual const Id id() const noexcept { return mdata.mid; };
 
                 /// \brief Access hash
                 ///
                 /// \return  The current value of hash
-                virtual const Hash get_hash() const noexcept { return mid; };
+                virtual const Hash get_hash() const noexcept { return mdata.mid; };
 
                 // Implements initialize method from Initializable concept.
                 virtual bool initialize(const Id& id = NULL_ID) noexcept 
                 { 
-                    mid = id; 
+                    mdata.mid = id; 
                     return true; 
                 }
 
@@ -145,7 +158,7 @@ namespace pensar_digital
                     if (xml_class_name == class_name())
                     {
                         String sid = node.getAttribute("id");
-                        mid = std::stoi(sid);
+                        mdata.mid = std::stoi(sid);
                     }
                     else
                         throw std::runtime_error("Invalid class name");
@@ -165,7 +178,7 @@ namespace pensar_digital
 
                 /// Conversion to string.
                 /// \return A string with the object id.
-                virtual String to_string() const noexcept { return std::to_string(mid); }
+                virtual String to_string() const noexcept { return std::to_string(mdata.mid); }
 
                 /// Implicit conversion to string.
                 /// \return A string with the object id.
@@ -198,7 +211,7 @@ namespace pensar_digital
 
                 Factory::P clone ()
                 {
-                    return get (mid);
+                    return get (mdata.mid);
                 };
 
                 inline static Factory::P get (const Json& j)

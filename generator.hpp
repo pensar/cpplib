@@ -185,7 +185,7 @@ namespace pensar_digital
 
             Factory::P clone()
             {
-                return get (mid, minitial_value, mstep);
+                return get (get_id (), minitial_value, mstep);
             };
 
             inline static Factory::P get(const Json& j)

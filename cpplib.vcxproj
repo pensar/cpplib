@@ -205,7 +205,6 @@
     <ClInclude Include="memory.hpp" />
     <ClInclude Include="memory_buffer.hpp" />
     <ClInclude Include="mg.hpp" />
-    <ClInclude Include="obj.h" />
     <ClInclude Include="object.hpp" />
     <ClInclude Include="path.hpp" />
     <ClInclude Include="person.hpp" />
