@@ -147,12 +147,40 @@ namespace pensar_digital
                     return std::char_traits<Char>::length(data.data ());
 			    }
 
+                inline void copy(const Char* str, size_t str_length)
+                {
+                    if (str_length > N)
+                    {
+                        std::string error = "String is too long. Max size is ";
+                        error += std::to_string(N);
+                        throw std::runtime_error(error);
+                    }
+                    if (str == nullptr)
+                    {
+                        fill_null();
+                    }
+                    else
+                    {
+                        std::memcpy(data.data(), str, str_length * sizeof(Char));
+                        data[str_length] = NULL_CHAR;
+                    }
+                }
+
+                inline void copy(const Char* str)
+                {
+                    auto strlen = std::char_traits<Char>::length(str);
+                    copy(str, strlen);
+                }
+
                 S (const Char* str)
 			    {
-                    auto strlen = std::char_traits<Char>::length (str);
-				    std::memcpy (data.data(), str, strlen*sizeof(Char));
-                    data[strlen] = NULL_CHAR;
+                    copy(str);
 			    }
+
+                S(const std::basic_string<Char>& str)
+                {
+					copy(str.c_str(), str.length());
+                }
 
                 // Converts to Char*. Must be null terminated.
                 operator Char* () const noexcept
@@ -255,26 +283,14 @@ namespace pensar_digital
                 // Assigns a std::basic_string.
                 S& operator= (const std::basic_string<Char>& str) noexcept
                 {
-                    std::copy(str.begin(), str.end(), data.begin());
+                    copy(str);
                     return *this;
                 }
 
                 // Assigns a null terminated string.
                 S& operator= (const Char* str) 
                 {
-                    if (str == nullptr)
-                    {
-					    fill_null ();
-				    }
-                    else
-                    {
-                        auto strlen = std::char_traits<Char>::length(str);
-                        if (strlen > N)
-                        {
-						    throw std::runtime_error ("String is too long. Max = " + std::to_string (N));
-					    }
-					    std::copy(str, str + strlen, data.begin());
-				    }   
+                    copy(str);
                     return *this;
                 }
 
@@ -282,9 +298,39 @@ namespace pensar_digital
                 S& operator= (const std::array<Char, N>& arr) noexcept
 			    {
 				    std::copy(arr.begin(), arr.end(), data.begin());
+                    data[arr.size ()] = NULL_CHAR;
 				    return *this;
 			    }
+                
+                /*S& operator= (const S& other) noexcept
+                {
+					std::copy(other.data.begin(), other.length (), data.begin());
+					data[other.length ()] = NULL_CHAR;
+					return *this;
+				}
+                */
+                S& operator+= (const S& other)
+                {
+					auto strlen = length ();
+					auto other_strlen = other.length ();
+                    if (strlen + other_strlen > N)
+                    {
+						std::string error = "String is too long. Max size is ";
+						error += std::to_string(N);
+						throw std::runtime_error(error);
+					}
+                    std::memcpy(data.data() + strlen, other.data.data(), other_strlen * sizeof(Char));
+					data[strlen + other_strlen] = NULL_CHAR;
+					return *this;
+				}
 
+                S operator+ (const S& other)
+				{
+                    S result = *this;
+                    result += other;
+                    return result;
+                }
+                
                 // Makes S compatible with NarrowOutuputStreamable concept.
                 std::ostream& operator<< (std::ostream& os) noexcept
                 {

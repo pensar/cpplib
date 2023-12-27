@@ -37,6 +37,19 @@ namespace pensar_digital
             static_assert (pd::OutputStreamable<W>, "W is not OutputStreamable");
             WCHECK_EQ(W, w, L"abc", L"8");
 
+            std::string str = "abc";
+            S1 s3 = str;
+            CHECK_EQ(S1, s3, "abc", "9");
+
+            std::wstring wstr = L"abc";
+            W w2 = wstr;    
+            WCHECK_EQ(W, w2, L"abc", L"10");
+
+            S1 s4 = "abc";
+            S1 s5 = "def";
+            S1 s6 = s4 + s5;
+            CHECK_EQ(S1, s6, "abcdef", "11");
+
         TEST_END(S)
     }
 }
