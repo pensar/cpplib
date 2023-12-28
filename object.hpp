@@ -45,15 +45,19 @@ namespace pensar_digital
                 /// \see https://en.cppreference.com/w/cpp/named_req/StandardLayoutType
                 struct Data
                 {
-                    Id mid;
-                    Data(const Id& id = NULL_ID) noexcept : mid(id) {}
+                    Id mid;         //!< Unique id (among same class).
+                    Id mindex;      //!< Index in the factory.
+                    bool min_use;   //!< True if object is in use.
+                    bool mchanged;  //!< True if object has changed.
+                    Data(const Id& id = NULL_ID, bool in_use = false, bool changed = false) noexcept : 
+                        mid(id), mindex(NULL_ID), min_use(in_use), mchanged(changed) {}
                 };
                 Data mdata; //!< Member variable mdata contains the object data.
             protected:
 
                 /// Set id
                 /// \param val New value to set
-                void set_id(const Id& value) { mdata.mid = value; }
+                void set_id(const Id& value) { mdata.mchanged = (value != mdata.mid); mdata.mid = value; }
 
                 String ObjXMLPrefix() const noexcept { return "<object class_name = \"" + class_name() + "\" id = \"" + Object::to_string() + "\""; }
 
@@ -64,6 +68,9 @@ namespace pensar_digital
                 /// \see equals
                 ///
                 virtual bool _equals(const Object& o) const { return (mdata.mid == o.mdata.mid); }
+
+                /// \brief Set changed flag.
+                void set_changed() noexcept { mdata.mchanged = true; }
 
             public:
                 inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
@@ -98,6 +105,8 @@ namespace pensar_digital
 
                 virtual std::string class_name() const { String c = typeid(*this).name(); c.erase(0, sizeof("class ") - 1); return c; }
 
+                virtual bool changed() const noexcept { return mdata.mchanged; }
+
                 // Clone method. 
                 ObjectPtr clone() const noexcept { return pd::clone<Object>(*this, mdata.mid); }
                 
@@ -117,7 +126,11 @@ namespace pensar_digital
                 /// Access object id
                 /// \return The current value of id
                 ///
-                virtual const Id id() const noexcept { return mdata.mid; };
+                virtual const Id id () const noexcept { return mdata.mid; };
+
+                virtual const Id index () const noexcept { return mdata.mindex; }
+
+                virtual const bool in_use () const noexcept { return mdata.min_use; }    
 
                 /// \brief Access hash
                 ///
