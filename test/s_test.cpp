@@ -11,11 +11,11 @@ namespace pensar_digital
     namespace cpplib
     {
 
-        TEST(S, true)
-            static_assert(StdLayoutTriviallyCopyable<S<10>>, "S is not compliant with StdLayoutTriviallyCopyable concept.");
+        TEST(CS, true)
+            static_assert(StdLayoutTriviallyCopyable<CS<10>>, "S is not compliant with StdLayoutTriviallyCopyable concept.");
 
-            typedef S<10> S1;
-            typedef S<10> S2;
+            typedef CS<10> S1;
+            typedef CS<10> S2;
             S1 s;
             S1 s1;  
             CHECK_EQ(S1, s, s1, "0");
@@ -32,7 +32,7 @@ namespace pensar_digital
             s2 = "def";
             CHECK_EQ(S2, s2, "def", "7");
             static_assert (pd::OutputStreamable<S1>, "S is not OutputStreamable");
-            typedef S<10, wchar_t> W;
+            typedef CS<10, wchar_t> W;
             W w = L"abc";
             static_assert (pd::OutputStreamable<W>, "W is not OutputStreamable");
             WCHECK_EQ(W, w, L"abc", L"8");
@@ -50,6 +50,6 @@ namespace pensar_digital
             S1 s6 = s4 + s5;
             CHECK_EQ(S1, s6, "abcdef", "11");
 
-        TEST_END(S)
+        TEST_END(CS)
     }
 }

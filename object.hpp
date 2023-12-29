@@ -59,7 +59,7 @@ namespace pensar_digital
                 /// \param val New value to set
                 void set_id(const Id& value) { mdata.mchanged = (value != mdata.mid); mdata.mid = value; }
 
-                String ObjXMLPrefix() const noexcept { return "<object class_name = \"" + class_name() + "\" id = \"" + Object::to_string() + "\""; }
+                S ObjXMLPrefix() const noexcept { return "<object class_name = \"" + class_name() + "\" id = \"" + Object::to_string() + "\""; }
 
                 /// \brief Compare objects.
                 ///
@@ -103,7 +103,7 @@ namespace pensar_digital
 
                 virtual std::span<std::byte> wbytes() noexcept { return std::as_writable_bytes (std::span {this, this + sizeof(*this)}); }
 
-                virtual std::string class_name() const { String c = typeid(*this).name(); c.erase(0, sizeof("class ") - 1); return c; }
+                virtual std::string class_name() const { S c = typeid(*this).name(); c.erase(0, sizeof("class ") - 1); return c; }
 
                 virtual bool changed() const noexcept { return mdata.mchanged; }
 
@@ -145,7 +145,7 @@ namespace pensar_digital
                 }
 
                 // Conversion to json string.
-                inline virtual String json () const noexcept 
+                inline virtual S json () const noexcept 
                 { 
                     return pd::json<Object> (*this) + " }";
                 }
@@ -159,18 +159,18 @@ namespace pensar_digital
                 virtual std::ostream& write (std::ostream& os, const IO_Mode amode = BINARY, const std::endian& byte_order = std::endian::native) const;
 
                 // Conversion to xml string.
-                virtual String xml() const noexcept { return ObjXMLPrefix() + "/>"; }
+                virtual S xml() const noexcept { return ObjXMLPrefix() + "/>"; }
 
-                XMLNode parse_object_tag(const pensar_digital::cpplib::String& sxml)
+                XMLNode parse_object_tag(const pensar_digital::cpplib::S& sxml)
                 {
                     const char* xml = sxml.c_str();
                     XMLCSTR tag = "object";
                     XMLResults* pResults = 0;
                     XMLNode node = XMLNode::parseString(xml, tag, pResults);
-                    String xml_class_name = node.getAttribute("class_name");
+                    S xml_class_name = node.getAttribute("class_name");
                     if (xml_class_name == class_name())
                     {
-                        String sid = node.getAttribute("id");
+                        S sid = node.getAttribute("id");
                         mdata.mid = std::stoi(sid);
                     }
                     else
@@ -179,7 +179,7 @@ namespace pensar_digital
                 }
 
                 // Conversion from xml string.
-                virtual void from_xml(const String& sxml)
+                virtual void from_xml(const S& sxml)
                 {
                     parse_object_tag(sxml);
                 }
@@ -187,19 +187,19 @@ namespace pensar_digital
                 bool operator == (const Object& o) const { return   equals(o); }
                 bool operator != (const Object& o) const { return !equals(o); }
 
-                Object& from_json(const String& sjson);
+                Object& from_json(const S& sjson);
 
                 /// Conversion to string.
                 /// \return A string with the object id.
-                virtual String to_string() const noexcept { return std::to_string(mdata.mid); }
+                virtual S to_string() const noexcept { return std::to_string(mdata.mid); }
 
                 /// Implicit conversion to string.
                 /// \return A string with the object id.
-                operator String () const noexcept { return to_string(); }
+                operator S () const noexcept { return to_string(); }
 
                 /// Debug string.
                 /// \return A string with the object id.
-                virtual String debug_string() const noexcept
+                virtual S debug_string() const noexcept
                 {
                     std::stringstream ss;
                     ss << "id = " << to_string();
@@ -229,7 +229,7 @@ namespace pensar_digital
 
                 inline static Factory::P get (const Json& j)
                 {
-                    String json_class = j.at("class");
+                    S json_class = j.at("class");
                     if (json_class != pd::class_name<Object, char>())
                         throw std::runtime_error("Invalid class name: " + pd::class_name<Object, char>());
                     Factory::P ptr = get(j.at("id"));
@@ -242,7 +242,7 @@ namespace pensar_digital
                     return ptr;
                 }
 
-                inline static Factory::P get (const String& sjson)
+                inline static Factory::P get (const S& sjson)
                 {
                     Json j;
                     Factory::P ptr = get(pd::id<Object>(sjson, &j));
@@ -269,7 +269,7 @@ namespace pensar_digital
                 return o.write (os, TEXT);
             }
 
-            inline Object& operator >> (const String& sjson, Object& o) { return o.from_json(sjson); }
+            inline Object& operator >> (const S& sjson, Object& o) { return o.from_json(sjson); }
 
             inline std::istream& operator >> (std::istream& is,       ObjectPtr o) { return is >> *o    ; }
             inline std::ostream& operator << (std::ostream& os, const ObjectPtr o) { return os << *o    ; }

@@ -37,12 +37,12 @@ namespace pensar_digital
             protected:
                 typedef std::vector<char> Buffer;
                 Buffer binary_data;
-                String text_data;
+                S text_data;
                 Path mfullpath;
                 std::ios_base::openmode mode;
                 std::fstream file;
 
-            template <typename T = const String&>
+            template <typename T = const S&>
             File& _append(const T& content)
             {
                 if (is_open())
@@ -103,7 +103,7 @@ namespace pensar_digital
 
             FileFactory::P clone(const FilePtr& ptr) { return clone(*ptr); }
 
-            FileFactory::P parse_json(const String& sjson)
+            FileFactory::P parse_json(const S& sjson)
             {
                 Json j;
                 FileFactory::P ptr = get();
@@ -213,15 +213,15 @@ namespace pensar_digital
             FilePtr clone() const  noexcept { return pd::clone<File>(*this, mfullpath, mode, id()); }
 
             // Conversion to json string.
-            virtual String json() const noexcept
+            virtual S json() const noexcept
             {
                 std::stringstream ss;
-                String s = pd::json<File>(*this);
+                S s = pd::json<File>(*this);
                 ss << ", \"mfullpath\" : " << mfullpath.to_string() << " , \"mode\" : " << mode;
                 if (is_binary())
                 {
-                    String s;
-                    pd::binary_to_string<decltype(binary_data)::value_type, String::value_type>(binary_data, s);
+                    S s;
+                    pd::binary_to_string<decltype(binary_data)::value_type, S::value_type>(binary_data, s);
                     ss << " , \"binary_data\" : " << s;
                 }
                 else
@@ -250,16 +250,16 @@ namespace pensar_digital
                     Id id;
                     read_json<File>(is, *this, &id, &v, &j);
                     set_id(id);
-                    mfullpath = j["mfullpath"].get<String>();
+                    mfullpath = j["mfullpath"].get<S>();
                     mode = j["mode"].get<std::ios_base::openmode>();
                     if (is_binary())
                     {
-                        String s = j["binary_data"].get<String>();
-                        //pd::string_to_binary<String::value_type, decltype(binary_data)::value_type>(s, binary_data);
+                        S s = j["binary_data"].get<S>();
+                        //pd::string_to_binary<S::value_type, decltype(binary_data)::value_type>(s, binary_data);
                     }
                     else
                     {
-                        text_data = j["text_data"].get<String>();
+                        text_data = j["text_data"].get<S>();
                     }
                 }
                 return is;
@@ -279,9 +279,9 @@ namespace pensar_digital
             };
 
             // Convertion to xml string.
-            virtual String xml() const noexcept
+            virtual S xml() const noexcept
             {
-                String xml = ObjXMLPrefix() + "><path>";
+                S xml = ObjXMLPrefix() + "><path>";
                 xml += mfullpath.string() + "</path><mode>";
                 xml += std::to_string(mode) + "</mode>";
                 // Check if buffer is not empty.
@@ -291,13 +291,13 @@ namespace pensar_digital
                     if (is_binary())
                     {
                         xml += "<buffer type=\"binary\">";
-                        String s;
-                        xml += pd::binary_to_string<decltype(binary_data)::value_type, String::value_type>(binary_data, s);
+                        S s;
+                        xml += pd::binary_to_string<decltype(binary_data)::value_type, S::value_type>(binary_data, s);
                     }
                     else
                     {
                         xml += "<buffer type=\"text\">";
-                        xml += String(binary_data.data(), binary_data.size());
+                        xml += S(binary_data.data(), binary_data.size());
                     }
                     xml += "</buffer>";
                 }
@@ -306,7 +306,7 @@ namespace pensar_digital
             }
 
             // Convertion from xml string.
-            virtual void from_xml(const String& sxml)
+            virtual void from_xml(const S& sxml)
             {
                 XMLNode node = parse_object_tag(sxml);
                 XMLNode n = node.getChildNode("path");
@@ -318,11 +318,11 @@ namespace pensar_digital
                 n = node.getChildNode("buffer");
                 if (!n.isEmpty())
                 {
-                    String type = n.getAttribute("type");
+                    S type = n.getAttribute("type");
                     if (type == "binary")
                     {
-                        String s = n.getText();
-                        pd::binary_to_string<decltype(binary_data)::value_type, String::value_type>(binary_data, s);
+                        S s = n.getText();
+                        pd::binary_to_string<decltype(binary_data)::value_type, S::value_type>(binary_data, s);
                     }
                     else
                     {
@@ -331,7 +331,7 @@ namespace pensar_digital
                 }
             }
 
-            virtual String debug_string() const noexcept
+            virtual S debug_string() const noexcept
             {
                 return Object::debug_string() + " path = " + mfullpath.to_string();
             }
@@ -367,28 +367,28 @@ namespace pensar_digital
         {
         private:
         public:
-            TextFile(const Path& full_path, const std::ios_base::openmode amode = IN_OUT_ATE_MODE, const String& content = "", const Id aid = NULL_ID) : File(full_path, (amode& (~std::ios::binary)), aid)
+            TextFile(const Path& full_path, const std::ios_base::openmode amode = IN_OUT_ATE_MODE, const S& content = "", const Id aid = NULL_ID) : File(full_path, (amode& (~std::ios::binary)), aid)
             {
                 append(content);
             }
-            TextFile(const Path& full_path, const String& content = "", const Id aid = NULL_ID) : TextFile(full_path, IN_OUT_ATE_MODE, content, aid)
+            TextFile(const Path& full_path, const S& content = "", const Id aid = NULL_ID) : TextFile(full_path, IN_OUT_ATE_MODE, content, aid)
             {
             }
 
             virtual ~TextFile() { close(); }
 
-            File& append(const String& content)
+            File& append(const S& content)
             {
-                return _append<String>(content);
+                return _append<S>(content);
             }
 
-            String to_string() const noexcept
+            S to_string() const noexcept
             {
                 return text_data;
             }
 
             // Implicit conversion to string.
-            operator String() const noexcept
+            operator S() const noexcept
             {
                 return to_string();
             }

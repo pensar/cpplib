@@ -35,7 +35,7 @@ namespace pensar_digital
                 /** Access name
                  * \return The current value of name
                  */
-                String get_name() { return ""; }
+                S get_name() { return ""; }
                 /** Access language
                  * \return The current value of language
                  */

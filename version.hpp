@@ -94,7 +94,7 @@ namespace pensar_digital
                 
                 inline static VersionFactory& factory() noexcept { return mfactory; }   
 
-                inline static VersionFactory::P parse_json (const String& sjson)
+                inline static VersionFactory::P parse_json (const S& sjson)
                 {
                     Json j;
                     VersionFactory::P ptr = get();
@@ -130,8 +130,8 @@ namespace pensar_digital
                 }
 
                 // Convertion to xml string.
-                String xml() const noexcept;
-                void from_xml(const String& sxml);
+                S xml() const noexcept;
+                void from_xml(const S& sxml);
             
                 std::istream& read (std::istream& os, const IO_Mode amode = TEXT, const std::endian& byte_order = std::endian::native);
 
@@ -150,10 +150,10 @@ namespace pensar_digital
                     return pd::class_name<Version, Char> ();
                 }
                 
-                String debug_string() const noexcept;
+                S debug_string() const noexcept;
                 inline const Id id() const noexcept { return mid; }
                 const Hash get_hash() const noexcept;
-                String json() const noexcept;
+                S json() const noexcept;
                 std::ostream& write (std::ostream& os, const IO_Mode amode = TEXT, const std::endian& byte_order = std::endian::native) const;
 
             

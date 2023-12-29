@@ -47,8 +47,8 @@ namespace pensar_digital
         
         void from_json(const Json& j, File& f)
         {
-            String class_name = f.class_name();
-            String json_class = j.at("class");
+            S class_name = f.class_name();
+            S json_class = j.at("class");
             if (class_name == json_class)
             {
                 f.Object::set_id(j.at("id"));
@@ -72,7 +72,7 @@ namespace pensar_digital
 			std::ofstream fs(file_full_path, std::ios::out);
             if (!fs.is_open())
             {
-                String serror = "create_file: It was not possible to create file.";
+                S serror = "create_file: It was not possible to create file.";
                 throw std::runtime_error(serror + file_full_path);
                 fs.close();
             }

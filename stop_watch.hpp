@@ -56,7 +56,7 @@ namespace pensar_digital
 				return std::chrono::duration_cast<Resolution> (std::chrono::steady_clock::now() - ZERO).count();
 			}
 
-			String elapsed_formatted(ELAPSED_TYPE elapsed_nanoseconds)
+			S elapsed_formatted(ELAPSED_TYPE elapsed_nanoseconds)
 			{
 				ELAPSED_TYPE elapsed = elapsed_nanoseconds;
 				ELAPSED_TYPE hours = elapsed / 3600000000000;
@@ -69,7 +69,7 @@ namespace pensar_digital
 				elapsed -= milliseconds * 1000000;
 				ELAPSED_TYPE microseconds = elapsed / 1000;
 				elapsed -= microseconds * 1000;
-				String result = pd::pad_left0 (hours, 2) + ":";
+				S result = pd::pad_left0 (hours, 2) + ":";
 				result += pd::pad_left0 (minutes, 2) + ":";
 				result += pd::pad_left0 (seconds, 2) + ".";
 				result += pd::pad_left0 (milliseconds, 3) + ".";
@@ -80,11 +80,11 @@ namespace pensar_digital
 			}
 
 			// Get elapsed as a formatted string (hh:mm:ss.mmm)
-			String elapsed_formatted ()
+			S elapsed_formatted ()
 			{
 				return elapsed_formatted (elapsed ());
 			}
-			String elapsed_since_mark_formatted ()
+			S elapsed_since_mark_formatted ()
 			{
 				return elapsed_formatted(elapsed_since_mark ());
 			}

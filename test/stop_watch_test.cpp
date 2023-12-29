@@ -21,8 +21,8 @@ namespace pensar_digital
             StopWatch<>::ELAPSED_TYPE elapsed = sp.elapsed ();   
             CHECK(elapsed >= 10000, "0.");
             StopWatch<>::ELAPSED_TYPE mark_elapsed = sp.elapsed_since_mark ();
-            String elapsed_formatted = sp.elapsed_formatted ();
-            String elapsed_since_mark_formatted = sp.elapsed_since_mark_formatted ();
+            S elapsed_formatted = sp.elapsed_formatted ();
+            S elapsed_since_mark_formatted = sp.elapsed_since_mark_formatted ();
             CHECK(mark_elapsed < elapsed, "1. elapsed = " + elapsed_formatted + " elapsed_since_mark = " + elapsed_since_mark_formatted);
             //std::cout << "elapsed = " << elapsed_formatted << " elapsed_since_mark = " << elapsed_since_mark_formatted << std::endl;
         TEST_END(StopWatch)

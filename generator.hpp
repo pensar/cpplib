@@ -19,10 +19,10 @@ namespace pensar_digital
       ///
       /// Usually this is used as a static member for an entity class in conjunction with the Id mixin class like in the Person class:
       /// \code {.cpp}
-      ///  template <class String = std::wstring, class T = int> class Person : public Name<String>, public Id<T>
+      ///  template <class S = std::wstring, class T = int> class Person : public Name<S>, public Id<T>
       ///  {
       ///    public:
-      ///      Person(const String& aname = L"", const T aid = -1): Name<String>(aname), Id<T>((aid == NULL_ID) ? generator.get_id () : aid){};
+      ///      Person(const S& aname = L"", const T aid = -1): Name<S>(aname), Id<T>((aid == NULL_ID) ? generator.get_id () : aid){};
       ///      virtual ~Person(){};
       ///
       ///    static Generator<T> generator;
@@ -80,7 +80,7 @@ namespace pensar_digital
             inline virtual void set_value(T val) { mvalue = val; }
 
             // Conversion to json string.
-            inline virtual String json() const noexcept
+            inline virtual S json() const noexcept
             {
                 std::stringstream ss;
                 ss << pd::json<Generator<Type, T>>(*this);
@@ -141,9 +141,9 @@ namespace pensar_digital
             void set_id (const T& aid) { Object::set_id (aid); }
 
             // Convertion to xml string.
-            virtual String xml() const noexcept
+            virtual S xml() const noexcept
             {
-                String xml = ObjXMLPrefix() + ">";
+                S xml = ObjXMLPrefix() + ">";
                 //xml += VERSION->xml(); //todo.
                 xml += "<initial_value>" + pd::to_string<Id>(minitial_value, '.') + "</initial_value>";
                 xml += "<value>"         + pd::to_string<Id>(mvalue, '.') + "</value>";
@@ -153,7 +153,7 @@ namespace pensar_digital
             }   
             
             // Convertion from xml string.
-            virtual void from_xml(const String& sxml)
+            virtual void from_xml(const S& sxml)
             {
                 XMLNode node = parse_object_tag(sxml);
                 // todo: check version.
@@ -171,7 +171,7 @@ namespace pensar_digital
                     mstep = atoi (n.getText());
             }
 
-            Generator<Type, T>& parse_json(const String& s)
+            Generator<Type, T>& parse_json(const S& s)
 			{
 				Json j = Json::parse(s);
 				from_json<Type, T>(j, *this);
@@ -190,7 +190,7 @@ namespace pensar_digital
 
             inline static Factory::P get(const Json& j)
             {
-                String json_class = j.at("class");
+                S json_class = j.at("class");
                 if (json_class != pd::class_name<Generator<Type, T>>())
                     throw std::runtime_error("Invalid class name: " + pd::class_name<Generator<Type, T>>());
 
@@ -204,7 +204,7 @@ namespace pensar_digital
                 return ptr;
             }
 
-            inline static Factory::P get(const String& sjson)
+            inline static Factory::P get(const S& sjson)
             {
                 Json j;
                 T id = pd::id<Generator<Type, Id>>(sjson, &j);
@@ -260,8 +260,8 @@ namespace pensar_digital
       template <class Type, typename T>
       void from_json(const Json& j, Generator<Type, T>& g)
       {
-          String class_name = g.class_name();
-          String json_class = j.at("class");
+          S class_name = g.class_name();
+          S json_class = j.at("class");
           if (class_name == json_class)
           {
               g.Object::set_id(j.at("id"));

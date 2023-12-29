@@ -30,17 +30,17 @@ namespace pensar_digital
         {
             private:
 
-                String name;
+                S name;
             public:
-                typedef pd::Factory<Dummy, Id, String> Factory;
+                typedef pd::Factory<Dummy, Id, S> Factory;
                 inline static Factory factory = {3, 10, NULL_ID, ""};
                 inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
 
-                Dummy(const Id& id = NULL_ID, const String& aname = "") : Object(id), name(aname) {}
+                Dummy(const Id& id = NULL_ID, const S& aname = "") : Object(id), name(aname) {}
                 Dummy(const Dummy& d) : Object(d) { name = d.name; }
                 Dummy(Dummy&& d) noexcept : Object(d) { name = d.name; }
                 
-                inline static Factory::P get(const Id& aid = NULL_ID, const String& aname = "")
+                inline static Factory::P get(const Id& aid = NULL_ID, const S& aname = "")
                 {
                     return factory.get(aid, aname);
                 };
@@ -51,7 +51,7 @@ namespace pensar_digital
                 };
                 inline Factory::P clone(const DummyPtr& ptr) { return ptr->clone (); }
 
-                inline static Factory::P parse_json(const String& sjson)
+                inline static Factory::P parse_json(const S& sjson)
                 {
                     Json j;
                     Factory::P ptr = get(pd::id<Dummy>(sjson, &j));
@@ -72,12 +72,12 @@ namespace pensar_digital
                 virtual ~Dummy() {}
                 Dummy& assign(const Dummy& d) noexcept { Object::assign(d); name = d.name; return *this; }
 
-                virtual String class_name() const noexcept { return Object::class_name (); }
+                virtual S class_name() const noexcept { return Object::class_name (); }
 
                 virtual void set_id(const Id& aid) noexcept { Object::set_id(aid); }
             
                 // Implements initialize method from Initializable concept.
-                virtual bool initialize(const Id& aid = NULL_ID, const String& aname = "") noexcept
+                virtual bool initialize(const Id& aid = NULL_ID, const S& aname = "") noexcept
                 {
                     Object::set_id(aid);
                     name = aname;
@@ -87,7 +87,7 @@ namespace pensar_digital
                 DummyPtr clone() const  noexcept { return pd::clone<Dummy>(*this, id (), name); }
 
                 // Conversion to json string.
-                virtual String json() const noexcept
+                virtual S json() const noexcept
                 {
                     std::stringstream ss;
                     ss << (pd::json<Dummy>(*this));
@@ -108,7 +108,7 @@ namespace pensar_digital
                         VersionPtr v;
                         pd::read_json<Dummy>(is, *this, &id, &v, &j);
                         set_id (id);
-                        name = j["name"].get<String>();
+                        name = j["name"].get<S>();
                     }
                     return is;
                 };
@@ -127,34 +127,34 @@ namespace pensar_digital
                 };
 
                 // Convertion to xml string.
-                virtual String xml() const noexcept
+                virtual S xml() const noexcept
                 {
-                    String xml = ObjXMLPrefix() + ">";
+                    S xml = ObjXMLPrefix() + ">";
                     xml += "<name>" + name + "</name>";
                     xml += "</object>";
                     return xml;
                 }
 
                 // Convertion from xml string.
-                virtual void from_xml(const String& sxml)
+                virtual void from_xml(const S& sxml)
                 {
                     XMLNode node = parse_object_tag(sxml);
                     XMLNode n = node.getChildNode("name");
                     if (!n.isEmpty()) name = n.getText();
                 }
 
-                virtual String get_name() const noexcept { return name; }
-                void   set_name(const String& aname) noexcept { name = aname; }
+                virtual S get_name() const noexcept { return name; }
+                void   set_name(const S& aname) noexcept { name = aname; }
             
-                virtual String to_string() const noexcept { return Object::to_string () + " " + name; }
+                virtual S to_string() const noexcept { return Object::to_string () + " " + name; }
 
                 /// Implicit conversion to string.
                 /// \return A string with the object id.
-                operator String () const noexcept { return to_string(); }
+                operator S () const noexcept { return to_string(); }
 
                 /// Debug string.
                 /// \return A string with the object id.
-                virtual String debug_string() const noexcept
+                virtual S debug_string() const noexcept
                 {
 				    return Object::debug_string() + " name = " + name;
                 }

@@ -21,8 +21,8 @@ namespace pensar_digital
 
         void from_json(const Json& j, Dummy& d)
         {
-            String class_name = d.class_name();
-            String json_class = j.at("class");
+            S class_name = d.class_name();
+            S json_class = j.at("class");
             if (class_name == json_class)
             {
                 d.Object::set_id(j.at("id"));
