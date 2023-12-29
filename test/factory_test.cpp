@@ -56,13 +56,13 @@ namespace pensar_digital
 
         TEST(PoolFactory, true)
         {
-			PoolFactory<Object, pd::Id> factory (3, 10, 1);
+			PoolFactory<Object, Object::DataType> factory (3, 10, {1});
             {
                 size_t count = factory.get_available_count();
                 ObjectPtr ptr;
                 for (size_t i = 0; i < count; i++)
                 {
-                    ptr = factory.get(1);
+                    ptr = factory.get({1});
                     CHECK(factory.get_available_count () == factory.get_pool_size () - i - 1, "0.");
                 }
                 CHECK(factory.get_available_count() == 0, "0.1. available_count should be 0 but is " + pd::to_string((int)factory.get_available_count()));
@@ -70,16 +70,16 @@ namespace pensar_digital
             factory.reset(3, 10, 0);
 
             CHECK(factory.get_available_count() == 3, "1. available_count should be 3 but is " + pd::to_string((int)factory.get_available_count ()));
-			ObjectPtr o  = factory.get (1);
+			ObjectPtr o  = factory.get ({ 1 });
             CHECK(o->id () == 1, "0. o->id () should be 1 but is " + pd::to_string((int)o->id ()))
             CHECK(factory.get_available_count() == 2, "2. available_count should be 2.");   
-			ObjectPtr o1 = factory.get (2);
+            ObjectPtr o1 = factory.get({ 2 });
             CHECK(o1->id() == 2, "3. o1->id () should be 2 but is " + pd::to_string((int)o->id()))
             CHECK(factory.get_available_count() == 1, "4. available_count should be 1.");
-            ObjectPtr o2 = factory.get (3);
+            ObjectPtr o2 = factory.get({ 3 });
             CHECK(o2->id() == 3, "5. o2->id () should be 3 but is " + pd::to_string((int)o->id()))
             CHECK(factory.get_available_count() == 0, "6. available_count should be 0.");
-            ObjectPtr o3 = factory.get (4);
+            ObjectPtr o3 = factory.get({ 4 });
             CHECK(factory.get_available_count() == 9, "7. available_count should be 9 but is " + pd::to_string((int)factory.get_available_count()));
             CHECK(o3->id() == 4, "8. o3->id () should be 4 but is " + pd::to_string((int)o->id()))
             CHECK(*o != *o1, "9. *o != *o1 should be true.");

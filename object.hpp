@@ -35,11 +35,7 @@ namespace pensar_digital
         typedef std::shared_ptr<Object> ObjectPtr;
         class Object 
         {
-            public:
-                typedef pd::Factory<Object, Id> Factory;
-                
             private:
-                inline static Factory mfactory = { 3, 10, NULL_ID }; //!< Member variable "factory"
                 /// \brief Class Object::Data is compliant with the StdLayoutTriviallyCopyable concept. 
                 /// \see https://en.cppreference.com/w/cpp/named_req/TriviallyCopyable  
                 /// \see https://en.cppreference.com/w/cpp/named_req/StandardLayoutType
@@ -53,6 +49,15 @@ namespace pensar_digital
                         mid(id), mindex(index), min_use(in_use), mchanged(changed) {}
                 };
                 Data mdata; //!< Member variable mdata contains the object data.
+            public:
+                inline const static Data NULL_DATA = { NULL_ID, NULL_ID, false, false };
+                typedef Data DataType;
+                typedef pd::Factory<Object, typename Object::DataType> Factory;
+                inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
+                typedef Factory FactoryType;
+            private:
+                inline static Factory mfactory = { 3, 10, NULL_DATA }; //!< Member variable "factory"
+
             protected:
 
                 /// Set id
@@ -73,15 +78,12 @@ namespace pensar_digital
                 void set_changed() noexcept { mdata.mchanged = true; }
 
             public:
-                inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
-                typedef Factory FactoryType;
-                typedef Data DataType;
 
                 /// Default constructor.
-                Object (const Id& id = NULL_ID, Id index = NULL_ID, bool in_use = false, bool changed = false) noexcept : 
-                    mdata(id, index, in_use, changed)  
-                { 
-                };
+                Object(const Data& data = NULL_DATA) noexcept
+                {
+                    initialize(data);
+                }
 
                 /// Copy constructor
                 /// \param other Object to copy from
@@ -101,7 +103,15 @@ namespace pensar_digital
                     memcpy(v.data() + v.size(), &mdata, sizeof(mdata));
                 }
 
-                virtual std::span<std::byte> wbytes() noexcept { return std::as_writable_bytes (std::span {data (), data () + sizeof(*data ())}); }
+                virtual std::span<const std::byte> bytes() const noexcept { return std::span<const std::byte>((const std::byte*)&mdata, sizeof(mdata)); }
+                
+                /// \brief Uses std::as_writable_bytes to get a span of writable bytes from the object.
+                virtual std::span<std::byte> wbytes() noexcept
+                {
+                    auto byte_span = std::span<std::byte>(reinterpret_cast<std::byte*>(&mdata), sizeof(mdata));
+
+                    return std::as_writable_bytes(byte_span);
+				}
 
                 virtual std::string class_name() const { S c = typeid(*this).name(); c.erase(0, sizeof("class ") - 1); return c; }
 
@@ -140,9 +150,9 @@ namespace pensar_digital
                 virtual const Hash get_hash() const noexcept { return mdata.mid; };
 
                 // Implements initialize method from Initializable concept.
-                virtual bool initialize(const Id& id = NULL_ID) noexcept 
+                virtual bool initialize (const Data& data) noexcept
                 { 
-                    mdata.mid = id; 
+                    mdata = data;
                     return true; 
                 }
 
@@ -219,14 +229,19 @@ namespace pensar_digital
 
                 friend void from_json(const Json& j, Object& o);
                 
-                static inline Factory::P  get(const Id& aid = NULL_ID)
+                static inline Factory::P  get(const Data& data = NULL_DATA)
                 {
-                    return mfactory.get(aid);
+                    return mfactory.get(data);
                 };
+
+                static inline Factory::P  get(const Id& id, const Id& index = NULL_ID, const bool& in_use = false, const bool& changed = false)
+				{
+					return mfactory.get(Data (id, index, in_use, changed));
+				};
 
                 Factory::P clone ()
                 {
-                    return get (mdata.mid);
+                    return get (mdata);
                 };
 
                 inline static Factory::P get (const Json& j)
@@ -247,7 +262,7 @@ namespace pensar_digital
                 inline static Factory::P get (const S& sjson)
                 {
                     Json j;
-                    Factory::P ptr = get(pd::id<Object>(sjson, &j));
+                    Factory::P ptr = get (Data (pd::id<Object>(sjson, &j)));
 
                     VersionPtr v = Version::get(j);
 
