@@ -49,8 +49,8 @@ namespace pensar_digital
                     Id mindex;      //!< Index in the factory.
                     bool min_use;   //!< True if object is in use.
                     bool mchanged;  //!< True if object has changed.
-                    Data(const Id& id = NULL_ID, bool in_use = false, bool changed = false) noexcept : 
-                        mid(id), mindex(NULL_ID), min_use(in_use), mchanged(changed) {}
+                    Data(const Id& id = NULL_ID, Id index = NULL_ID, bool in_use = false, bool changed = false) noexcept : 
+                        mid(id), mindex(index), min_use(in_use), mchanged(changed) {}
                 };
                 Data mdata; //!< Member variable mdata contains the object data.
             protected:
@@ -78,8 +78,9 @@ namespace pensar_digital
                 typedef Data DataType;
 
                 /// Default constructor.
-                Object (const Id& id = NULL_ID, const IO_Mode mode = BINARY) noexcept : mdata(id)
-                {
+                Object (const Id& id = NULL_ID, Id index = NULL_ID, bool in_use = false, bool changed = false) noexcept : 
+                    mdata(id, index, in_use, changed)  
+                { 
                 };
 
                 /// Copy constructor
@@ -92,16 +93,15 @@ namespace pensar_digital
                 /** Default destructor */
                 virtual ~Object() {}
 
-                Data* data() noexcept { return &mdata; }
+                virtual Object& assign(const Object& o) noexcept { *data () = *(o.data ()); return *this; }
 
-                Object& assign(const Object& o) noexcept { mdata.mid = o.mdata.mid; return *this; }
-
-                inline virtual void bytes (std::vector<std::byte> v) const noexcept
+                inline virtual void bytes (std::vector<std::byte>& v) const noexcept
                 {
                     VERSION->bytes(v);
+                    memcpy(v.data() + v.size(), &mdata, sizeof(mdata));
                 }
 
-                virtual std::span<std::byte> wbytes() noexcept { return std::as_writable_bytes (std::span {this, this + sizeof(*this)}); }
+                virtual std::span<std::byte> wbytes() noexcept { return std::as_writable_bytes (std::span {data (), data () + sizeof(*data ())}); }
 
                 virtual std::string class_name() const { S c = typeid(*this).name(); c.erase(0, sizeof("class ") - 1); return c; }
 
@@ -110,6 +110,8 @@ namespace pensar_digital
                 // Clone method. 
                 ObjectPtr clone() const noexcept { return pd::clone<Object>(*this, mdata.mid); }
                 
+                virtual Data* data () const noexcept { return const_cast<Data*>(&mdata); }  
+
                 /// Check if passed object equals self.
                 /// Derived classes must implement the _equals method. The hash compare logic is made on equals.
                 /// _equals is called from template method equals and should only implement the specific comparison.
