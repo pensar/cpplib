@@ -23,8 +23,8 @@ namespace pensar_digital
         using VersionInt = int_fast16_t;
         using FileSize   = int_fast64_t;
         
-        extern       S DOUBLE_QUOTES;
-        extern const     Id NULL_ID;
+        extern       S  DOUBLE_QUOTES;
+        extern const Id NULL_ID;
         
         
         enum Alignment : int_fast16_t { NULL_ALIGNMENT = -1, BIT8 = 8, BIT16 = 16, BIT32 = 32, BIT64 = 64, BIT128 = 128, BIT256 = 256, BIT512 = 512, BIT1024 = 1024 };

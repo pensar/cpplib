@@ -208,7 +208,6 @@
     <ClInclude Include="object.hpp" />
     <ClInclude Include="path.hpp" />
     <ClInclude Include="person.hpp" />
-    <ClInclude Include="pobject.hpp" />
     <ClInclude Include="random_util.hpp" />
     <ClInclude Include="s.hpp" />
     <ClInclude Include="stop_watch.hpp" />
