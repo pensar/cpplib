@@ -1,3 +1,6 @@
+// author : Mauricio Gomes
+// license: MIT (https://opensource.org/licenses/MIT)
+
 #ifndef FACTORY_HPP_INCLUDED
 #define FACTORY_HPP_INCLUDED
 

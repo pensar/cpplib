@@ -57,7 +57,9 @@ namespace pensar_digital
                 typedef Factory FactoryType;
             private:
                 inline static Factory mfactory = { 3, 10, NULL_DATA }; //!< Member variable "factory"
-
+                
+                // Set Factory as friend class to allow access to private members.
+                friend class Factory;
             protected:
 
                 /// Set id
@@ -95,7 +97,7 @@ namespace pensar_digital
                 /** Default destructor */
                 virtual ~Object() {}
 
-                virtual Object& assign(const Object& o) noexcept { *data () = *(o.data ()); return *this; }
+                virtual Object& assign(const Object& o) noexcept { mdata = o.mdata; return *this; }
 
                 inline virtual void bytes (std::vector<std::byte>& v) const noexcept
                 {
@@ -120,8 +122,6 @@ namespace pensar_digital
                 // Clone method. 
                 ObjectPtr clone() const noexcept { return pd::clone<Object>(*this, mdata.mid); }
                 
-                virtual Data* data () const noexcept { return const_cast<Data*>(&mdata); }  
-
                 /// Check if passed object equals self.
                 /// Derived classes must implement the _equals method. The hash compare logic is made on equals.
                 /// _equals is called from template method equals and should only implement the specific comparison.

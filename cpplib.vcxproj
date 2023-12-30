@@ -206,6 +206,7 @@
     <ClInclude Include="memory_buffer.hpp" />
     <ClInclude Include="mg.hpp" />
     <ClInclude Include="object.hpp" />
+    <ClInclude Include="odb.hpp" />
     <ClInclude Include="path.hpp" />
     <ClInclude Include="person.hpp" />
     <ClInclude Include="random_util.hpp" />
