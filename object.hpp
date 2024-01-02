@@ -42,15 +42,12 @@ namespace pensar_digital
                 struct Data
                 {
                     Id mid;         //!< Unique id (among same class).
-                    Id mindex;      //!< Index in the factory.
-                    bool min_use;   //!< True if object is in use.
-                    bool mchanged;  //!< True if object has changed.
-                    Data(const Id& id = NULL_ID, Id index = NULL_ID, bool in_use = false, bool changed = false) noexcept : 
-                        mid(id), mindex(index), min_use(in_use), mchanged(changed) {}
+                    Data(const Id& id = NULL_ID) noexcept : 
+                        mid(id) {}
                 };
                 Data mdata; //!< Member variable mdata contains the object data.
             public:
-                inline const static Data NULL_DATA = { NULL_ID, NULL_ID, false, false };
+                inline const static Data NULL_DATA = { NULL_ID};
                 typedef Data DataType;
                 typedef pd::Factory<Object, typename Object::DataType> Factory;
                 inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
@@ -64,7 +61,7 @@ namespace pensar_digital
 
                 /// Set id
                 /// \param val New value to set
-                void set_id(const Id& value) { mdata.mchanged = (value != mdata.mid); mdata.mid = value; }
+                void set_id(const Id& value) { mdata.mid = value; }
 
                 S ObjXMLPrefix() const noexcept { return "<object class_name = \"" + class_name() + "\" id = \"" + Object::to_string() + "\""; }
 
@@ -74,10 +71,7 @@ namespace pensar_digital
                 /// \return true if they are equal, false otherwise.
                 /// \see equals
                 ///
-                virtual bool _equals(const Object& o) const { return (mdata.mid == o.mdata.mid); }
-
-                /// \brief Set changed flag.
-                void set_changed() noexcept { mdata.mchanged = true; }
+                virtual bool _equals(const Object& o) const { return ! (std::memcmp (&mdata, &(o.mdata), sizeof(mdata))); }
 
             public:
 
@@ -117,8 +111,6 @@ namespace pensar_digital
 
                 virtual std::string class_name() const { S c = typeid(*this).name(); c.erase(0, sizeof("class ") - 1); return c; }
 
-                virtual bool changed() const noexcept { return mdata.mchanged; }
-
                 // Clone method. 
                 ObjectPtr clone() const noexcept { return pd::clone<Object>(*this, mdata.mid); }
                 
@@ -139,10 +131,6 @@ namespace pensar_digital
                 /// \return The current value of id
                 ///
                 virtual const Id id () const noexcept { return mdata.mid; };
-
-                virtual const Id index () const noexcept { return mdata.mindex; }
-
-                virtual const bool in_use () const noexcept { return mdata.min_use; }    
 
                 /// \brief Access hash
                 ///
@@ -234,9 +222,9 @@ namespace pensar_digital
                     return mfactory.get(data);
                 };
 
-                static inline Factory::P  get(const Id& id, const Id& index = NULL_ID, const bool& in_use = false, const bool& changed = false)
+                static inline Factory::P  get(const Id& id)
 				{
-					return mfactory.get(Data (id, index, in_use, changed));
+					return mfactory.get(Data (id));
 				};
 
                 Factory::P clone ()

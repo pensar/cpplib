@@ -7,6 +7,7 @@
 #include "constant.hpp"
 #include "concept.hpp"
 #include "string_def.hpp"
+#include "generator.hpp"
 
 #include <memory>
 #include <type_traits>
@@ -55,7 +56,7 @@ namespace pensar_digital
                 T* mmockup_ptr;
             };
 
-            template <class T, typename... Args> //requires Initializable<T, Args...>
+            template <class DBObj, typename... Args> //requires Initializable<T, Args...>
             class PoolFactory : public NewFactory <T, Args...>
             {
                 private:
@@ -69,45 +70,60 @@ namespace pensar_digital
                 {
                     for (size_t i = 0; i < pool_size; ++i)
                     {
-                        T*&& ptr = new T(args ...);
-                        pool.push_back(std::move(ptr));
+                        T* ptr = new T(args ...);   
+                        ptr->mdata.mindex = i;
+                        ptr->mdata.min_use = false;
+                        ptr->mdata.mchanged = false;
+                        if (ptr->mdata.mid == NULL_ID)
+							ptr->mdata.mid = generator.get_id ();
+
+                        pool.push_back(ptr);
                     }
                     available_count = pool_size;
                 }
                 void add(const size_t& count, const Args& ... args)
                 {
+                    size_t index = pool.size ();
                     for (size_t i = 0; i < count; ++i)
                     {
-                        std::shared_ptr<T>&& ptr = std::make_shared<T>(args ...);
-                        pool.push_back(ptr);
+                        T* ptr = new T (args ...);
+                        ptr->mdata.mindex = index++;
+                        ptr->mdata.min_use = false;
+                        ptr->mdata.mchanged = false;
+                        if (ptr->mdata.mid == NULL_ID)
+                            ptr->mdata.mid = generator.get_id ();
+                        pool.push_back (ptr);
                     }
                     available_count += count;
                 }
             public:
-                //inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
                 PoolFactory(const size_t initial_pool_size, const size_t a_refill_size, const Args& ... args) :
                     available_count(0),
                     refill_size(a_refill_size)
                 {
+                    generator = new Generator<T>();
                     fill_pool(initial_pool_size, args ...);
                 };
 
-                PoolFactory(const Args& ... args) : PoolFactory(10, 10, args ...) { };
+                PoolFactory(const Args& ... args) : PoolFactory(10, 10, args ...) {};
 
                 virtual ~PoolFactory() {}
 
-                virtual P get(const Args& ... args)
+                virtual T* get(const Args& ... args)
                 {
                     // Iterate through the pool to find an available object.
-                    for (auto& ptr : pool)
+                    for (size_t i = 0; i < pool.size (); ++i)
                     {
-                        if (ptr.use_count() < 2)
+                        auto ptr = pool[i];
+                        if (! ptr->mdata.min_use)
                         {
                             ptr->initialize(args ...);
+                            ptr->mdata.min_use = true;
+                            ptr->mdata.mchanged = false;
                             available_count--;
 
                             // Need to copy to increase the use count.
-                            return *new (std::shared_ptr<T>) (ptr);
+                            return ptr;
                         }
                     }
                     assert(available_count <= 0);
@@ -130,9 +146,10 @@ namespace pensar_digital
                     refill_size = a_refill_size;
                 }
             private:
-                std::vector<typename std::shared_ptr<T>> pool;
+                std::vector<T*> pool;
                 size_t available_count;
                 size_t refill_size;
+                Generator<T> generator;
             };
 
             template <class T, typename... Args>
