@@ -212,6 +212,7 @@
     <ClInclude Include="s.hpp" />
     <ClInclude Include="stop_watch.hpp" />
     <ClInclude Include="string_def.hpp" />
+    <ClInclude Include="string_types.hpp" />
     <ClInclude Include="string_util.hpp" />
     <ClInclude Include="system.hpp" />
     <ClInclude Include="sys_user_info.hpp" />
@@ -222,6 +223,7 @@
     <ClInclude Include="xml_util.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClassDiagram.cd" />
     <None Include="cpp.hint" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

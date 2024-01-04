@@ -5,7 +5,7 @@
 #define S_HPP
 
 #include "constant.hpp"
-#include "string_util.hpp"
+#include "string_util.hpp"  
 #include "concept.hpp"
 #include <array>
 #include <algorithm>
@@ -105,15 +105,15 @@ namespace pensar_digital
             return greater (c, c2, case_sensitive, accent_sensitive) || equal (c, c2, case_sensitive, accent_sensitive);
         }
 
-        template<int N, typename Char = char> //, typename Encoding = icu::UnicodeString>
+        template<int N, typename C = char> //, typename Encoding = icu::UnicodeString>
         class CS
         {
             public:
-                typedef Char value_type;
-                std::array<Char, N> data;
+                typedef C value_type;
+                std::array<C, N> data;
                 bool case_sensitive = false;
                 bool accent_sensitive = false;
-                const Char NULL_CHAR = (sizeof (Char) == sizeof(char)) ? '\0' : L'\0';
+                const C NULL_CHAR = (sizeof (C) == sizeof(char)) ? '\0' : L'\0';
 
                 // Returns the size of the string.
                 const constexpr inline size_t size() const noexcept
@@ -121,7 +121,7 @@ namespace pensar_digital
 				    return N;
                 }
             
-                void inline fill (Char c) noexcept
+                void inline fill (C c) noexcept
                 {
 				    data.fill (c);
 			    }   
@@ -144,10 +144,10 @@ namespace pensar_digital
 
                 inline size_t length () const noexcept
                 {
-                    return std::char_traits<Char>::length(data.data ());
+                    return std::char_traits<C>::length(data.data ());
 			    }
 
-                inline void copy(const Char* str, size_t str_length)
+                inline void copy(const C* str, size_t str_length)
                 {
                     if (str_length > N)
                     {
@@ -155,43 +155,59 @@ namespace pensar_digital
                         error += std::to_string(N);
                         throw std::runtime_error(error);
                     }
-                    if (str == nullptr)
-                    {
+                    //if (str == nullptr)
+                    //{
                         fill_null();
-                    }
-                    else
-                    {
-                        std::memcpy(data.data(), str, str_length * sizeof(Char));
-                        data[str_length] = NULL_CHAR;
-                    }
+                    //}
+                    //else
+                    //{
+                        std::memcpy(data.data(), str, str_length * sizeof(C));
+                        //data[str_length] = NULL_CHAR;
+                    //}
                 }
 
-                inline void copy(const Char* str)
+                inline void copy(const C* str)
                 {
-                    auto strlen = std::char_traits<Char>::length(str);
+                    auto strlen = std::char_traits<C>::length(str);
                     copy(str, strlen);
                 }
 
-                CS (const Char* str)
+                inline void copy(const std::basic_string<C>& str)
+				{
+					copy(str.c_str(), str.length());
+				}
+
+                CS (const C* str)
 			    {
                     copy(str);
 			    }
 
-                CS(const std::basic_string<Char>& str)
+                CS(const std::basic_string<C>& str)
                 {
 					copy(str.c_str(), str.length());
                 }
 
-                // Converts to Char*. Must be null terminated.
-                operator Char* () const noexcept
+                // Converts to C*. Must be null terminated.
+                operator C* () const noexcept
 			    {
                     // Allocate memory for the new string.
                     size_t size = length () + 1;
-                    Char* c = new Char[size];
+                    C* c = new C[size];
                     // Copy the string. With null termination.
                     std::memcpy (c, data.data(), size);
                     return c;
 			    }
+
+                inline std::basic_string<C> to_string () const noexcept
+				{
+					return std::basic_string<C>(data.data());
+				}
+
+                // Converts to std::basic_string<C>.
+                operator std::basic_string<C> () const noexcept
+				{
+					return to_string ();
+				}
 
                 // Compare strings length.
                 inline size_t cmp_strlen(const CS& other) const noexcept
@@ -210,13 +226,13 @@ namespace pensar_digital
 			    }
 
                 // operator[]
-                inline Char& operator[] (const size_t index) const noexcept
+                inline C& operator[] (const size_t index) const noexcept
                 {
-				    // Removes const and returns Char&.
-                    return const_cast<Char&>(data[index]);
+				    // Removes const and returns C&.
+                    return const_cast<C&>(data[index]);
 			    }
 
-                inline Char& at(const size_t index) const noexcept
+                inline C& at(const size_t index) const noexcept
                 {
                     return operator[](index);
                 }
@@ -281,34 +297,33 @@ namespace pensar_digital
                 }
 
                 // Assigns a std::basic_string.
-                CS& operator= (const std::basic_string<Char>& str) noexcept
+                CS& operator= (const std::basic_string<C>& str) noexcept
                 {
                     copy(str);
                     return *this;
                 }
 
                 // Assigns a null terminated string.
-                CS& operator= (const Char* str) 
+                CS& operator= (const C* str) 
                 {
                     copy(str);
                     return *this;
                 }
 
                 // Assigns a std::array.
-                CS& operator= (const std::array<Char, N>& arr) noexcept
+                CS& operator= (const std::array<C, N>& arr) noexcept
 			    {
-				    std::copy(arr.begin(), arr.end(), data.begin());
-                    data[arr.size ()] = NULL_CHAR;
+                    std::memcpy(data.data(), arr.data(), N * sizeof(C));
 				    return *this;
 			    }
                 
-                /*CS& operator= (const CS& other) noexcept
-                {
+                //CS& operator= (const CS& other) noexcept = default;
+                /*{
 					std::copy(other.data.begin(), other.length (), data.begin());
 					data[other.length ()] = NULL_CHAR;
 					return *this;
-				}
-                */
+				}*/
+                
                 CS& operator+= (const CS& other)
                 {
 					auto strlen = length ();
@@ -319,7 +334,7 @@ namespace pensar_digital
 						error += std::to_string(N);
 						throw std::runtime_error(error);
 					}
-                    std::memcpy(data.data() + strlen, other.data.data(), other_strlen * sizeof(Char));
+                    std::memcpy(data.data() + strlen, other.data.data(), other_strlen * sizeof(C));
 					data[strlen + other_strlen] = NULL_CHAR;
 					return *this;
 				}
@@ -451,7 +466,14 @@ namespace pensar_digital
             std::copy(rhs.data.begin(), rhs.data.end(), result.data.begin() + 1);
             return result;
         }
-      
+        
+        // Assignment operator for std::array<C, N> with other std::array. returns a std::array<C, N>&.
+        template<int N, typename C = char>
+        std::array<C, N>& assign(std::array<C, N>& lhs, const std::array<C, N>& rhs) noexcept
+        {
+            std::memcpy(lhs.data(), rhs.data(), N);
+            return lhs;
+        }
     }   // namespace cpplib
 }       // namespace pensar_digital
 #endif  // CS_HPP

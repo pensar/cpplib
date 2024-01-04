@@ -8,7 +8,6 @@
 #include "string_util.hpp"
 #include "header_lib/json.hpp"
 #include "factory.hpp"
-#include "bytes_util.hpp"
 #include "type_util.hpp"
 
 #include <iostream> // std::istream, std::ostream

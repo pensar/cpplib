@@ -22,7 +22,7 @@ namespace pensar_digital
     using namespace pensar_digital::unit_test;
     namespace cpplib
     {
-        static_assert(Assignable<Dummy>);
+        //static_assert(Assignable<Dummy>);
 
         TEST(ObjectClone, true)
             Factory::P o = pd::Object::get(42);

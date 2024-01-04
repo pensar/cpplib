@@ -70,9 +70,10 @@ namespace pensar_digital
         {
             if (amode == BINARY)
             {
-                read_bin_obj(is, byte_order);
+                //read_bin_obj(is, byte_order);
 
-                read_bin_version(is, byte_order);
+                //read_bin_version(is, byte_order);
+                is.read((char*)data (), data_size ());
             }
             else // json format
             {
@@ -92,10 +93,11 @@ namespace pensar_digital
         {
             if (amode == BINARY)
             {
-                binary_write     (os, class_name(), byte_order);
-                binary_write<Id> (os, mdata.mid, byte_order);
+                //binary_write     (os, class_name(), byte_order);
+                //binary_write<Id> (os, mdata.mid, byte_order);
 
-                VERSION->write   (os, amode, byte_order);  
+                //VERSION->write   (os, amode, byte_order);  
+                os.write ((const char *)data(), data_size());
             }
             else // json format
             {

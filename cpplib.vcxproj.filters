@@ -242,8 +242,12 @@
     <ClInclude Include="s.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="string_types.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
 </Project>

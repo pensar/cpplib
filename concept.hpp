@@ -17,13 +17,6 @@ namespace pensar_digital
 {
 	namespace cpplib
 	{
-		// Assignable concept. Requires a member function T& assign(const T&).
-		template <typename T>
-		concept Assignable = requires (T t)
-		{
-			{t.assign(t)} noexcept -> std::convertible_to<T&>;
-		};
-		
 		// Checkable concept. Requires a member function ok() returning something convertible to bool.
 		template <typename T, typename... Args>
 		concept Checkable = requires (T t, Args&& ... args)
@@ -71,8 +64,8 @@ namespace pensar_digital
 		} && Factorable<T>;
 	
 		// FactoryCloneable concept requires Assignable and FactoryConstructible.
-		template <typename T, typename... Args>
-		concept FactoryCloneable = Assignable<T> && FactoryConstructible<T, Args...>;
+		//template <typename T, typename... Args>
+		//concept FactoryCloneable = Assignable<T> && FactoryConstructible<T, Args...>;
 
 		// AFactory concept requires a virtual get(const Args& ... args) const public method that returns
 		// something convertible to std::shared_ptr<T>.
