@@ -5,6 +5,8 @@
 #include "type_util.hpp"
 #include "io_util.hpp"
 #include "xml_util.hpp"
+#include "concept.hpp"
+
 #include <iostream>
 
 namespace pensar_digital
@@ -28,9 +30,9 @@ namespace pensar_digital
 			if (class_name == json_class)
 			{
 				v.set_id(j.at("id"));
-				v.mpublic = j.at("mpublic");
-				v.mprotected = j.at("mprotected");
-				v.mprivate = j.at("mprivate");
+				v.mdata.mpublic = j.at("mpublic");
+				v.mdata.mprotected = j.at("mprotected");
+				v.mdata.mprivate = j.at("mprivate");
 			}
 			else throw new std::runtime_error("Version expected class = " + class_name + " but json has " + json_class);
 		}
@@ -40,15 +42,15 @@ namespace pensar_digital
 			// Check if os is in binary mode.
 			if (is.flags() & std::ios::binary)
 			{
-				return is >> v.mpublic >> v.mprotected >> v.mprivate;
+				return is >> v.mdata.mpublic >> v.mdata.mprotected >> v.mdata.mprivate;
 			}
 			else // json format
 			{
 				Json j;
 				is >> j;
-				v.mpublic    = j.at("mpublic"   ).get<VersionInt>();
-				v.mprotected = j.at("mprotected").get<VersionInt>();
-				v.mprivate   = j.at("mprivate"  ).get<VersionInt>();
+				v.mdata.mpublic    = j.at("mpublic"   ).get<VersionInt>();
+				v.mdata.mprotected = j.at("mprotected").get<VersionInt>();
+				v.mdata.mprivate   = j.at("mprivate"  ).get<VersionInt>();
 				return is;
 			}
 		}
@@ -74,29 +76,30 @@ namespace pensar_digital
 		
 		bool Version::equals(const Version& v) const noexcept
 		{
-			return (v.id () == id ()) && (v.mprivate == mprivate) && (v.mprotected == mprotected) && (v.mpublic == mpublic);
+			static_assert (Hashable<Version>);
+			return (v.id () == id ()) && (v.mdata.mprivate == mdata.mprivate) && (v.mdata.mprotected == mdata.mprotected) && (v.mdata.mpublic == mdata.mpublic);
 		}
 
 		void Version::from_xml (const S& sxml)
 		{
-			XMLNode node = pd::parse_object_tag<Version> (sxml, &mid);
+			XMLNode node = pd::parse_object_tag<Version> (sxml, &mdata.mid);
 			XMLNode n = node.getChildNode("mprivate");
 			if (!n.isEmpty())
-				mprivate = atoi(n.getText());
+				mdata.mprivate = atoi(n.getText());
 			n = node.getChildNode("mprotected");
 			if (!n.isEmpty())
-				mprotected = atoi(n.getText());
+				mdata.mprotected = atoi(n.getText());
 			n = node.getChildNode("mpublic");
 			if (!n.isEmpty())
-				mpublic = atoi(n.getText());
+				mdata.mpublic = atoi(n.getText());
 		}
 		 
 		S Version::xml() const noexcept
 		{
 			S xml = pd::ObjXMLPrefix<Version>(*this) + ">";
-			xml += "<mpublic>" + pd::to_string(mpublic) + "</mpublic>";
-			xml += "<mprotected>" + pd::to_string(mprotected) + "</mprotected>";
-			xml += "<mprivate>" + pd::to_string(mprivate) + "</mprivate>";
+			xml += "<mpublic>" + pd::to_string(mdata.mpublic) + "</mpublic>";
+			xml += "<mprotected>" + pd::to_string(mdata.mprotected) + "</mprotected>";
+			xml += "<mprivate>" + pd::to_string(mdata.mprivate) + "</mprivate>";
 
 			xml += "</object>";
 			return xml;
@@ -110,7 +113,7 @@ namespace pensar_digital
 		S Version::json() const noexcept
 		{
 			std::stringstream ss;
-			ss << "{ \"class\" : \"" << pd::class_name<Version, char>() << "\" , \"id\" : " << id() << ", \"mpublic\" : " << mpublic << ", \"mprotected\" : " << mprotected << ", \"mprivate\" : " << mprivate << " }";
+			ss << "{ \"class\" : \"" << pd::class_name<Version, char>() << "\" , \"id\" : " << id() << ", \"mpublic\" : " << mdata.mpublic << ", \"mprotected\" : " << mdata.mprotected << ", \"mprivate\" : " << mdata.mprivate << " }";
 			return ss.str();
 		}
 	
@@ -118,14 +121,16 @@ namespace pensar_digital
 		{
 			if (amode == BINARY)
 			{
-				S sclass_name;
+				/* S sclass_name;
 				binary_read(is, sclass_name, byte_order);
 				if (sclass_name != class_name())
 					throw new std::runtime_error("Version::read: class name mismatch.");
-				binary_read<Id>        (is, mid, byte_order);
-				binary_read<VersionInt>(is, mpublic, byte_order);
-				binary_read<VersionInt>(is, mprotected, byte_order);
-				binary_read<VersionInt>(is, mprivate, byte_order);
+				binary_read<Id>        (is, mdata.mid, byte_order);
+				binary_read<VersionInt>(is, mdata.mpublic, byte_order);
+				binary_read<VersionInt>(is, mdata.mprotected, byte_order);
+				binary_read<VersionInt>(is, mdata.mprivate, byte_order);
+				*/
+				is.read((char*)data(), data_size());
 			}
 			else // json format
 			{
@@ -135,10 +140,11 @@ namespace pensar_digital
 				S json_class = j.at("class");
 				if (json_class != pd::class_name<Version, char>())
 					throw std::runtime_error("Invalid class name: " + pd::class_name<Version, char>());
-				mid = j.at("id").get<Id>();
-				mpublic = j.at("mpublic").get<VersionInt>();
-				mprotected = j.at("mprotected").get<VersionInt>();
-				mprivate = j.at("mprivate").get<VersionInt>();
+
+				mdata.mid        = j.at("id"        ).get<Id>        ();
+				mdata.mpublic    = j.at("mpublic"   ).get<VersionInt>();
+				mdata.mprotected = j.at("mprotected").get<VersionInt>();
+				mdata.mprivate   = j.at("mprivate"  ).get<VersionInt>();
 			}
 			return is;
 		}
@@ -147,17 +153,21 @@ namespace pensar_digital
 		{
 			if (amode == BINARY)
 			{
-				binary_write (os, class_name (), byte_order);
+				/*
+				binary_write(os, class_name(), byte_order);
 				binary_write<Id> (os, mid, byte_order);
-				binary_write<VersionInt>(os, mpublic);	
+				binary_write<VersionInt>(os, mpublic);
 				binary_write<VersionInt>(os, mprotected);
-				binary_write<VersionInt>(os, mprivate);	
+				binary_write<VersionInt>(os, mprivate);
 				return os;
+				*/
+				os.write((const char*)data(), data_size());
 			}
 			else // json format
 			{
-				return os << json ();
+				os << json ();
 			}
+			return os;
 		}
 	} // namespace cpplib
 } // namespace pensar_digital

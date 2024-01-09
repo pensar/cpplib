@@ -44,8 +44,6 @@ namespace pensar_digital
             return l; 
         }
 
-        struct Data { };
-
         class Object
         {
             private:
@@ -113,7 +111,10 @@ namespace pensar_digital
                 inline virtual void bytes (std::vector<std::byte>& v) const noexcept
                 {
                     VERSION->bytes(v);
-                    memcpy(v.data() + v.size(), data(), sizeof(data_size ()));
+                    size_t req_size = v.size() + data_size();
+                    if (v.capacity() < req_size)
+						v.resize(req_size);
+                    std::copy_n(reinterpret_cast<const std::byte*>(&mdata), data_size(), v.end() - data_size());
                 }
 
                 virtual std::span<const std::byte> bytes() const noexcept { return std::span<const std::byte>((const std::byte*)data (), data_size ()); }
@@ -140,8 +141,8 @@ namespace pensar_digital
                 /// \return true if objects have the same id, false otherwise.
                 bool equals(const Object& o) const noexcept
                 {
-                    if (get_hash() != 
-                        o.get_hash())
+                    if (hash() != 
+                        o.hash())
                         return false;
                         return _equals(o);
                 }
@@ -154,7 +155,7 @@ namespace pensar_digital
                 /// \brief Access hash
                 ///
                 /// \return  The current value of hash
-                virtual const Hash get_hash() const noexcept { return mdata.mid; };
+                virtual inline const Hash hash() const noexcept { return this->id(); };
 
                 // Implements initialize method from Initializable concept.
                 virtual bool initialize (const Data& data) noexcept
@@ -171,7 +172,7 @@ namespace pensar_digital
 
                 virtual void read_bin_obj(std::istream& is, const std::endian& byte_order = std::endian::native);
 
-                void read_bin_version(std::istream& is, const std::endian& byte_order = std::endian::native);
+                void read_bin_version(std::istream& is, const Version& version, const std::endian& byte_order = std::endian::native);
 
                 virtual std::istream& read (std::istream& is, const IO_Mode amode = BINARY, const std::endian& byte_order = std::endian::native);
 

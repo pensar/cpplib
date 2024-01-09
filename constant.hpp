@@ -13,6 +13,9 @@ namespace pensar_digital
 {
     namespace cpplib
     {
+        struct Data {
+        }; // Empty struct to be used as a base for all structs that are only data containers for objects.
+
         #define WIDE2(x) L##x
         #define WIDE1(x) WIDE2(x)
         #define WFILE WIDE1(__FILE__)
@@ -32,6 +35,8 @@ namespace pensar_digital
         enum IO_Mode : bool { BINARY = true, TEXT = false};
 
         typedef std::vector<std::byte> Bytes;
+
+        typedef std::byte* BytePtr;
 
     }   // namespace cpplib
 }       // namespace pensar_digital

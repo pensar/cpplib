@@ -24,6 +24,13 @@ namespace pensar_digital
 			{t.ok(args ...)} -> std::convertible_to<bool>;
 		};
 
+		// Hashable concept. Requires a member function hash() returning something convertible to Hash type.
+		template <typename T>
+		concept Hashable = requires (T t)
+		{
+			{t.hash()} -> std::convertible_to<Hash>;
+		};
+
 		// RangeCheckable concept. Requires Checkable and operators >= and <=.
 		template <typename T>
 		concept RangeCheckable = requires (T t)
@@ -88,10 +95,6 @@ namespace pensar_digital
 		// ContainerV is a concept requiring Container<T> and T::value_type to be of type V.
 		template <typename T, typename V>
 		concept ContainerV = Container<T> && std::is_same<typename T::value_type, V>::value;
-
-
-
-		
 
 		// Interfaceable concept two public typedefs named i_type and i_type_ro.
 		template <typename T>
@@ -262,6 +265,16 @@ namespace pensar_digital
 		// StdLayoutTriviallyCopyable concept requires a type T that is standard layout and trivially copyable.
 		template<typename T>
 		concept StdLayoutTriviallyCopyable = StandardLayout<T> && TriviallyCopyable<T>;	
+		// Memcpyasble concept. Requires a function data() returning something convertible to void*. Usually a pointer to std::byte. And a data_size() returning something convertible to size_t.
+
+		template <class T>
+		concept Persistible = requires (T t)
+		{
+			// Requires T::Datatype defined.
+			//T::Datatype;
+			{t.data()     } -> std::convertible_to<pd::Data*>;
+			{t.data_size()} -> std::convertible_to<size_t>;
+		} && StdLayoutTriviallyCopyable<typename T::Datatype> && Identifiable<T> && Hashable<T>;
 
 		// TriviallyDestructible concept requires a type T that is trivially destructible.
 		template<typename T>

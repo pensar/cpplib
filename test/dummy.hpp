@@ -110,7 +110,9 @@ namespace pensar_digital
                     {
                         if (amode == BINARY)
                         {
-                            // todo: implement binary read.
+                            Object::read(is, BINARY, byte_order);
+                            read_bin_version(is, *VERSION, byte_order);
+                            is.read((char*)data(), data_size());
                         }
                         else // json format
                         {
@@ -128,7 +130,9 @@ namespace pensar_digital
                 {
                     if (amode == BINARY)
                     {
-                        // todo: implement binary write.
+                        Object::write (os, amode, byte_order);
+                        VERSION->write(os, amode, byte_order);
+                        os.write((const char*)data(), data_size());
                     }
                     else // json format
                     {

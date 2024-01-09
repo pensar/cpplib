@@ -120,8 +120,8 @@ namespace pensar_digital
                     ObjectPtr p = pd::Object::get(i);
                     objects.push_back(p);
                 }
-                //pd::TextFile f("c:\\tmp\\test\\ObjectTextStreaming\\test.txt", "blah");
-                std::ofstream out("c:\\tmp\\test\\ObjectTextStreaming\\test.txt", File::OUTPUT);
+                //pd::TextFile f("c:\\tmp\\test\\ObjectTextFileStreaming\\test.txt", "blah");
+                std::ofstream out("c:\\tmp\\test\\ObjectTextFileStreaming\\test.txt", File::OUTPUT);
                 out << "[";
                 for (Id i = 0; i < 999; i++)
                 {
@@ -131,7 +131,7 @@ namespace pensar_digital
                 out.flush ();
                 out.close();
 
-               std::ifstream f ("c:\\tmp\\test\\ObjectTextStreaming\\test.txt");
+               std::ifstream f ("c:\\tmp\\test\\ObjectTextFileStreaming\\test.txt");
                S s;
                pd::read_all (f, s);
                 
@@ -155,14 +155,14 @@ namespace pensar_digital
                 {
 					objects.push_back(pd::Object::get(i));
 				}
-                std::ofstream out ("c:\\tmp\\test\\ObjectBinaryStreaming\\test.bin", std::ios::binary);
+                std::ofstream out ("c:\\tmp\\test\\ObjectBinaryFileStreaming\\test.bin", std::ios::binary);
 
                 for (Id i = 0; i < 1000; i++)
                 {
                     objects[i]->write (out) ;    
                 }
 				out.close();
-                std::ifstream in ("c:\\tmp\\test\\ObjectBinaryStreaming\\test.bin", std::ios::binary);
+                std::ifstream in ("c:\\tmp\\test\\ObjectBinaryFileStreaming\\test.bin", std::ios::binary);
                 for (Id i = 0; i < 1000; i++)
                 {
 					ObjectPtr o = pd::Object::get();

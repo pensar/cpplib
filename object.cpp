@@ -57,11 +57,11 @@ namespace pensar_digital
             binary_read<Id>(is, mdata.mid, byte_order);
         }
 
-        void Object::read_bin_version(std::istream& is, const std::endian& byte_order)
+        void Object::read_bin_version(std::istream& is, const Version& version, const std::endian& byte_order)
         {
             Version v;
             v.read(is, BINARY, byte_order);
-            if (*VERSION != v)
+            if (version != v)
                 throw new std::runtime_error("Version mismatch.");
         }
 
@@ -72,7 +72,7 @@ namespace pensar_digital
             {
                 //read_bin_obj(is, byte_order);
 
-                //read_bin_version(is, byte_order);
+                read_bin_version(is, *VERSION, byte_order);
                 is.read((char*)data (), data_size ());
             }
             else // json format
@@ -96,7 +96,7 @@ namespace pensar_digital
                 //binary_write     (os, class_name(), byte_order);
                 //binary_write<Id> (os, mdata.mid, byte_order);
 
-                //VERSION->write   (os, amode, byte_order);  
+                VERSION->write   (os, amode, byte_order);  
                 os.write ((const char *)data(), data_size());
             }
             else // json format

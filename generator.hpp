@@ -45,21 +45,21 @@ namespace pensar_digital
             /// \brief Constructs a Generator.
             /// \param [in] initial_value Initial value for the generator, defaults to 0.
             /// \param [in] astep Step to be used when incrementing the generator, defaults to 1.
-            Generator (T aid = NULL_ID, T initial_value = 0, T step = 1) noexcept : Object(aid), minitial_value(initial_value), mvalue(initial_value), mstep(step) {};
+            Generator (T aid = NULL_ID, T initial_value = 0, T step = 1) noexcept : Object(aid), mdata (initial_value, step) {};
 
             virtual ~Generator () = default;
 
             /// \brief Increments value and return the new value.
             /// \return The new value.
-            inline virtual const T get_id () { mvalue += mstep; return mvalue; }
+            inline virtual const T get_id () { mdata.mvalue += mdata.mstep; return mdata.mvalue; }
 
             /// \brief Gets the next value without incrementing the current one.
             /// \return The next value.
-            inline virtual const T next() { return (mvalue + mstep); }
+            inline virtual const T next() { return (mdata.mvalue + mdata.mstep); }
 
             /// \brief Gets the current value.
             /// \return The current value.
-            inline virtual const T current () const { return mvalue; }
+            inline virtual const T current () const { return mdata.mvalue; }
             
             /// \brief Initialize a Generator.
             /// \param [in] initial_value Initial value for the generator, defaults to 0.
@@ -67,9 +67,9 @@ namespace pensar_digital
             virtual bool initialize(T aid = NULL_ID, T initial_value = 0, T step = 1) noexcept
             {
                 bool ok = Object::initialize(aid);
-                minitial_value = initial_value;
-                mvalue = initial_value;
-                mstep = step;
+                mdata.minitial_value = initial_value;
+                mdata.mvalue = initial_value;
+                mdata.mstep = step;
                 return ok;
             }
             
@@ -77,14 +77,14 @@ namespace pensar_digital
 
             /// \brief Set value. Next call to get will get value + 1.
             /// \param val New value to set
-            inline virtual void set_value(T val) { mvalue = val; }
+            inline virtual void set_value(T val) { mdata.mvalue = val; }
 
             // Conversion to json string.
             inline virtual S json() const noexcept
             {
                 std::stringstream ss;
                 ss << pd::json<Generator<Type, T>>(*this);
-                ss << ", \"minitial_value\" : " << minitial_value << ", \"mvalue\" : " << mvalue << ", \"mstep\" : " << mstep << " }";
+                ss << ", \"minitial_value\" : " << mdata.minitial_value << ", \"mvalue\" : " << mdata.mvalue << ", \"mstep\" : " << mdata.mstep << " }";
                 return ss.str();
             }
 
@@ -92,11 +92,14 @@ namespace pensar_digital
             {
                 if (amode == BINARY)
                 {
-                    read_bin_obj (is, byte_order);
-                    read_bin_version (is, byte_order);
-                    binary_read<decltype (minitial_value)> (is, minitial_value, byte_order);
-                    binary_read<decltype (mvalue        )> (is, mvalue        , byte_order);   
-                    binary_read<decltype (mstep         )> (is, mstep         , byte_order);   
+                    //read_bin_obj (is, byte_order);
+                    //read_bin_version (is, byte_order);
+                    //binary_read<decltype (mdata.minitial_value)> (is, mdata.minitial_value, byte_order);
+                    //binary_read<decltype (mdata.mvalue        )> (is, mdata.mvalue        , byte_order);   
+                    //binary_read<decltype (mdata.mstep         )> (is, mdata.mstep         , byte_order);   
+                    Object::read (is, BINARY, byte_order);
+                    read_bin_version(is, *VERSION, byte_order);
+                    is.read((char*)data(), data_size());
                 }
                 else // json format
                 {
@@ -104,9 +107,9 @@ namespace pensar_digital
                     T id = NULL_ID;
                     VersionPtr v;
                     read_json<Generator<Type, T>>(is, *this, &id, &v, &j);
-                    minitial_value = j["minitial_value"];
-                    mvalue         = j["mvalue"        ];
-                    mstep          = j["mstep"         ];
+                    mdata.minitial_value = j["minitial_value"];
+                    mdata.mvalue         = j["mvalue"        ];
+                    mdata.mstep          = j["mstep"         ];
                 }
                 return is;
             };
@@ -121,10 +124,12 @@ namespace pensar_digital
                 if (amode == BINARY)
                 {
                     Object::write(os, amode, byte_order);
-                    binary_write<decltype (minitial_value)> (os, minitial_value, byte_order);
-                    binary_write<decltype (mvalue)>         (os, mvalue        , byte_order);
-                    binary_write<decltype (mstep )>         (os, mstep         , byte_order);
                     VERSION->write(os, amode, byte_order);
+                    os.write((const char*)data(), data_size());
+                    //binary_write<decltype (mdata.minitial_value)> (os, mdata.minitial_value, byte_order);
+                    //binary_write<decltype (mdata.mvalue)>         (os, mdata.mvalue        , byte_order);
+                    //binary_write<decltype (mdata.mstep )>         (os, mdata.mstep         , byte_order);
+                    //VERSION->write(os, amode, byte_order);
                 }
                 else // json format
                 {
@@ -145,9 +150,9 @@ namespace pensar_digital
             {
                 S xml = ObjXMLPrefix() + ">";
                 //xml += VERSION->xml(); //todo.
-                xml += "<initial_value>" + pd::to_string<Id>(minitial_value, '.') + "</initial_value>";
-                xml += "<value>"         + pd::to_string<Id>(mvalue, '.') + "</value>";
-                xml += "<step>"          + pd::to_string<Id>(mstep, '.') + "</step>";
+                xml += "<initial_value>" + pd::to_string<Id>(mdata.minitial_value, '.') + "</initial_value>";
+                xml += "<value>"         + pd::to_string<Id>(mdata.mvalue, '.') + "</value>";
+                xml += "<step>"          + pd::to_string<Id>(mdata.mstep, '.') + "</step>";
                 xml += "</object>";
                 return xml;
             }   
@@ -160,15 +165,15 @@ namespace pensar_digital
 
                 XMLNode n = node.getChildNode("initial_value");
                 if (!n.isEmpty())
-                    minitial_value = atoi(n.getText());
+                    mdata.minitial_value = atoi(n.getText());
 
                 n = node.getChildNode("value");
                 if (!n.isEmpty())
-                    mvalue = atoi (n.getText());
+                    mdata.mvalue = atoi (n.getText());
 
                 n = node.getChildNode("step");
 				if (!n.isEmpty()) 
-                    mstep = atoi (n.getText());
+                    mdata.mstep = atoi (n.getText());
             }
 
             Generator<Type, T>& parse_json(const S& s)
@@ -185,7 +190,7 @@ namespace pensar_digital
 
             Factory::P clone()
             {
-                return get (get_id (), minitial_value, mstep);
+                return get (get_id (), mdata.minitial_value, mdata.mstep);
             };
 
             inline static Factory::P get(const Json& j)
@@ -194,7 +199,7 @@ namespace pensar_digital
                 if (json_class != pd::class_name<Generator<Type, T>>())
                     throw std::runtime_error("Invalid class name: " + pd::class_name<Generator<Type, T>>());
 
-                typename Factory::P ptr = get (j.at("mid"), j.at("minitial_value"), j.at("mstep"));
+                typename Factory::P ptr = get (j.at("mid"), j.at("initial_value"), j.at("step"));
 
                 VersionPtr v = Version::get(j["VERSION"]);
 
@@ -208,8 +213,8 @@ namespace pensar_digital
             {
                 Json j;
                 T id = pd::id<Generator<Type, Id>>(sjson, &j);
-                T initial_value = j.at("minitial_value");
-                T step          = j.at("mstep"         );
+                T initial_value = j.at("initial_value");
+                T step          = j.at("step"         );
                 typename Factory::P ptr = get (id, initial_value, step);
 
                 VersionPtr v = Version::get(j);
@@ -229,14 +234,24 @@ namespace pensar_digital
 				const Generator<Type, T>* pother = dynamic_cast<const Generator<Type, T>*>(&other);
 				if (pother == nullptr)
 					return false;
-				return ((minitial_value == pother->minitial_value) && 
-                        (mvalue         == pother->mvalue        ) && 
-                        (mstep          == pother->mstep         ));
+				return ((mdata.minitial_value == pother->mdata.minitial_value) && 
+                        (mdata.mvalue         == pother->mdata.mvalue        ) && 
+                        (mdata.mstep          == pother->mdata.mstep         ));
 			}
         private:
-            T minitial_value; //!< Generator initial_value.
-            T mvalue        ; //!< Generator current value.
-            T mstep         ; //!< Step to increment value.
+            struct Data : public pd::Data
+			{
+				T minitial_value; //!< Generator initial_value.
+				T mvalue        ; //!< Generator current value.
+				T mstep         ; //!< Step to increment value.
+                Data(T initial_value = 0, T step = 1) : minitial_value(initial_value), mvalue (initial_value), mstep (step) {}
+            }; // struct Data
+                Data mdata;
+            public:
+                typedef Data Datatype;
+                Data* data() { return &mdata; } 
+                virtual const pd::Data* data() const noexcept { return &mdata; }
+                virtual size_t data_size() const noexcept { return sizeof(mdata); }
       }; // class Generator
 
       /// Makes Generator Streamable.
@@ -252,7 +267,7 @@ namespace pensar_digital
           j["class"] = g.class_name();
           j["id"] = g.id();
           j["mvalue"] = g.get_current();
-          j["mstep"] = g.mstep;
+          j["mstep"] = g.mdata.mstep;
 
           to_json(j, *(g.VERSION));
       }
@@ -265,8 +280,8 @@ namespace pensar_digital
           if (class_name == json_class)
           {
               g.Object::set_id(j.at("id"));
-              g.mvalue = j["mvalue"];
-              g.mstep = j["mstep"];
+              g.mdata.mvalue = j["mvalue"];
+              g.mdata.mstep = j["mstep"];
               g.VERSION->from_json(j);
           }
           else throw new std::runtime_error("Generator expected class = " + class_name + " but json has " + json_class);
