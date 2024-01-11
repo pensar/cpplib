@@ -117,6 +117,11 @@ namespace pensar_digital
                 return fs::path::parent_path();
             }
 
+            Path root_path () const noexcept
+			{
+				return fs::path::root_path();
+			}
+
             Path filename() const noexcept
             {
                 return fs::path::filename();
@@ -202,7 +207,9 @@ namespace pensar_digital
             {
                 if (amode == BINARY)
                 {
-                    // todo: implement binary read.
+                    Object::write(os, amode, byte_order);
+                    VERSION->write(os, amode, byte_order);
+                    os.write((const char*)data(), data_size());
                 }
                 else // json format
                 {
@@ -242,16 +249,20 @@ namespace pensar_digital
             // Assignment operator for const Path&.
             Path& operator = (const Path& p) { fs::path::operator = (p); return *this; }
 
-            void create_dir_if_does_not_exist() const noexcept
+            void create_dir () const noexcept
             {
                 Path dir = *this;
-                if (has_filename())
+                if (has_filename()) // Final slash indicates directory. If not present it assumes file.
                     dir = parent_path();
                 if (!dir.exists())
                 {
                     fs::create_directories(dir);
                 }
             }
+
+            inline size_t size () const noexcept { return fs::path::string().size(); }
+
+
 
             inline fs::path std_path() const noexcept { return static_cast<const fs::path&>(*this); }
 
@@ -293,13 +304,13 @@ namespace pensar_digital
 
         static inline Path CURRENT_DIR = ".";
 
-        template <typename C = char>
-        class CPath : public CS<MAX_UNC_PATH, C>
+        template <typename C = char, size_t N = MAX_PATH>
+        class CPath : public CS<N, C>
         {
             public:
-                typedef CS<MAX_UNC_PATH, C> Str;
+                typedef CS<N, C> Str;
                 CPath(const Str& path = ".") : Str(path) {}
-
+                
                 // Constructor from fs::path.
                 //CPath (const fs::path& path) : Str (path.string()) {}
 
@@ -309,6 +320,35 @@ namespace pensar_digital
                 // Conversion to fs::path operator.
                 operator fs::path() const noexcept { return to_fspath(); }
         };
+         
+        // path_to_cpath.
+        template <typename C = char, size_t N = MAX_PATH>
+        inline CPath<C, N> path_to_cpath(const Path& path)
+        {
+            if (N < path.string().size()) 
+                throw std::runtime_error("path_to_cpath: N < path.string().size()");
+            if constexpr (std::is_same_v<C, char>)
+				return CPath<C, N>(path.string());
+			else
+				return CPath<C, N>(path.wstring());
+        }
+
+        // cpath_to_path.
+        template <size_t N = MAX_PATH>
+        inline Path cpath_to_path(const CPath<char, N>& cpath)
+        {
+            if (N < cpath.std_str().size())
+                throw std::runtime_error("cpath_to_path: N < cpath.std_str().size()");
+            return Path(cpath.std_str());
+        }        
+
+        template <size_t N = MAX_PATH>
+        inline Path cpath_to_path(const CPath<wchar_t, N>& cpath)
+        {
+            if (N < cpath.std_str().size())
+                throw std::runtime_error("cpath_to_path: N < cpath.std_wstr().size()"); 
+            return Path(cpath.std_wstr());
+        }
 
         // Json conversion.
         extern void to_json   (      Json& j, const Path& p);

@@ -65,7 +65,7 @@ namespace pensar_digital
                     }
                     else
                     {
-                        mfullpath.create_dir_if_does_not_exist();
+                        mfullpath.create_dir ();
                         mode |= std::ios::out;
                     }
                     file.open(static_cast<fs::path>(mfullpath), mode);
@@ -202,7 +202,7 @@ namespace pensar_digital
                 else
                 {
                     // File does not exist.
-                    mfullpath.create_dir_if_does_not_exist();
+                    mfullpath.create_dir ();
                     mode |= std::ios::out;
                     open(mfullpath, mode);
                     close();

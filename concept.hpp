@@ -311,4 +311,3 @@ namespace pensar_digital
 	} // namespace cpplib
 } // namespace pensar_digital	
 #endif // CONCEPT
-
