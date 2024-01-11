@@ -4,6 +4,9 @@
 #define PATH_HPP
 
 #include "object.hpp"
+#include "s.hpp"
+#include "system.hpp"
+
 #include "string_def.hpp"
 #include "memory.hpp"
 #include "constant.hpp"
@@ -37,8 +40,7 @@ namespace pensar_digital
         class Path : public fs::path, public Object
         {
             private:
-                static inline fs::path CURRENT_DIR = ".";
-                inline static PathFactory mfactory = { 3, 10, CURRENT_DIR, NULL_ID };
+                inline static PathFactory mfactory = { 3, 10, ".", NULL_ID};
             public:
                 inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
 
@@ -288,6 +290,26 @@ namespace pensar_digital
             // Inherited via Object
             inline void set_id(const Id& value) { Object::set_id(value); }
         };  // class Path
+
+        static inline Path CURRENT_DIR = ".";
+
+        template <typename C = char>
+        class CPath : public CS<MAX_UNC_PATH, C>
+        {
+            public:
+                typedef CS<MAX_UNC_PATH, C> Str;
+                CPath(const Str& path = ".") : Str(path) {}
+
+                // Constructor from fs::path.
+                //CPath (const fs::path& path) : Str (path.string()) {}
+
+                inline fs::path to_fspath() const noexcept { return fs::path(this->Str::std_str()); }
+                inline Path     to_path() const noexcept { return Path(this->Str::std_str()); }
+
+                // Conversion to fs::path operator.
+                operator fs::path() const noexcept { return to_fspath(); }
+        };
+
         // Json conversion.
         extern void to_json   (      Json& j, const Path& p);
         extern void from_json (const Json& j,       Path& p);
