@@ -275,6 +275,9 @@ namespace pensar_digital
             // Implicit conversion to const char* returning a value allocated in the heap using _strdup.
             operator const char* () const { return _strdup(fs::path::string().c_str()); }
 
+            // Conversion from const char* operator.
+            Path& operator = (const char* s) { fs::path::operator = (s); return *this; }
+
             // /= operator for std::string.
             Path& operator /= (const std::string& s) { fs::path::operator /= (s); return *this; }
 
@@ -319,6 +322,8 @@ namespace pensar_digital
 
                 // Conversion to fs::path operator.
                 operator fs::path() const noexcept { return to_fspath(); }
+
+
         };
          
         // path_to_cpath.

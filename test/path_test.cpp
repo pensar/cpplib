@@ -30,6 +30,11 @@ namespace pensar_digital
             // Verifies path does not exist.
             CHECK(!path.exists(), "4");
 
+            path = "c:\\tmp\\test\\path_test\\";
+            CHECK(!path.has_filename (), "5");
+
+            path += "\\path_test.txt";
+            CHECK(path.has_filename (), "6");
         TEST_END(Path)
     }
 }

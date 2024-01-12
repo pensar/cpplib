@@ -375,6 +375,11 @@ namespace pensar_digital
             {
             }
 
+            TextFile(const char* full_path, const std::ios_base::openmode amode = IN_OUT_ATE_MODE, const S& content = "", const Id aid = NULL_ID) : TextFile(Path(full_path), amode, content, aid)
+            {
+                append (content);
+			}
+
             virtual ~TextFile() { close(); }
 
             File& append(const S& content)
