@@ -8,274 +8,122 @@
 #pragma hdrstop
 #endif
 
+#include "string_def.hpp"
+#include "string_types.hpp"
+#include "system.hpp"
+#include "object.hpp"
 #include "io_util.hpp"
 #include "path.hpp"
-#include "object.hpp"
 #include "version.hpp"  
 #include "generator.hpp"
 #include "clone_util.hpp"
+#include "memory_buffer.hpp"
 
 #include <sstream>
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <memory>   // shared_ptr
 
 namespace pensar_digital
 {
     namespace cpplib
     {
         namespace pd = pensar_digital::cpplib;
-        class File;
-        typedef std::shared_ptr<File> FilePtr;
-        typedef Factory<File, Path, std::ios_base::openmode, Id> FileFactory;
+        namespace fs = std::filesystem;
+
         /// \brief File class.
         ///
+        template <typename C = char>
         class File : public Object
         {
-            private:
-                inline static FileFactory mfactory = {3, 10, ".", std::ios_base::binary, NULL_ID};
-            protected:
-                typedef std::vector<char> Buffer;
-                Buffer binary_data;
-                S text_data;
-                Path mfullpath;
-                std::ios_base::openmode mode;
-                std::fstream file;
+            public:
+                inline static const size_t MAX_BUFFER_SIZE = 1024 ^ 3; // 1 GB
+                inline const static std::ios_base::openmode INPUT = std::ios::in;
+                inline const static std::ios_base::openmode OUTPUT = std::ios::out;
+                inline const static std::ios_base::openmode IN_OUT_ATE_MODE = std::ios::in | std::ios::out | std::ios::ate;
+			    inline const static std::ios_base::openmode IN_OUT_TRUNC_MODE = std::ios::in | std::ios::out | std::ios::trunc;
+                inline const static std::ios_base::openmode DEFAULT_MODE = IN_OUT_ATE_MODE;
 
-            template <typename T = const S&>
-            File& _append(const T& content)
-            {
-                if (is_open())
-                {
-                    file.seekg(0, std::ios::end);
-                }
-                else
-                {
-                    if (mfullpath.exists())
-                    {
-                        if (mfullpath.has_filename())
-                        {
-                            file.open(static_cast<fs::path>(mfullpath), mode);
-                        }
-                        else
-                        {
-                            // Path exists but is not a file.
-                            throw std::runtime_error("Path " + mfullpath.string() + " exists but is not a file.");
-                        }
-                    }
-                    else
-                    {
-                        mfullpath.create_dir ();
-                        mode |= std::ios::out;
-                    }
-                    file.open(static_cast<fs::path>(mfullpath), mode);
-                };
-                file << content;
-                close();
-                return *this;
-            }
-
+        protected:
+                std::ios_base::openmode mmode; // Last mode used to open the file.
+                Path mfullpath;                // Full path of the file. 
+                typedef std::basic_fstream<C> FStream;
+                FStream* stream_ptr; 
         public:
-            inline static const VersionPtr VERSION = Version::get (1, 1, 1);
-            inline static const size_t MAX_IN_MEMORY_FILE_SIZE_BYTE = 1024 ^ 3; // 1 GB
-            inline const static std::ios_base::openmode INPUT           = std::ios::in;
-            inline const static std::ios_base::openmode OUTPUT          = std::ios::out;
-            inline const static std::ios_base::openmode IN_OUT_ATE_MODE = std::ios::in | std::ios::out | std::ios::ate;
-            inline const static std::ios_base::openmode IN_OUT_ATE_BIN_MODE = IN_OUT_ATE_MODE | std::ios::binary;
             
-            File(const Path& afull_path = ".", const std::ios_base::openmode amode = IN_OUT_ATE_BIN_MODE, const Id aid = NULL_ID) :
-                Object(aid), mfullpath(afull_path), mode(amode)
+            File(const Path& full_path = L".", const Id id = NULL_ID, const std::ios_base::openmode mode = IN_OUT_ATE_MODE) :
+                mfullpath(full_path), Object(id), mmode(mode)
             {
-                initialize(afull_path, amode, aid);
+                mfullpath.create_dir (); // Create the directory if it does not exist.
+                stream_ptr = new FStream (full_path.std_path (), mode);
             }
 
-            virtual ~File() noexcept { close(); }
-
-            virtual FileFactory::P get(const Path& afull_path = ".", const std::ios_base::openmode amode = File::IN_OUT_ATE_BIN_MODE, const Id aid = NULL_ID)
-            {
-                return mfactory.get(afull_path, amode, aid);
-            };
-
-            FileFactory::P clone(const File& afile)
-            {
-                return get (afile.fullpath (), afile.get_mode (), afile.id ());
+            virtual ~File() noexcept 
+            { 
+                close(); 
+                delete stream_ptr;
             }
 
-            FileFactory::P clone(const FilePtr& ptr) { return clone(*ptr); }
-
-            FileFactory::P parse_json(const S& sjson)
-            {
-                Json j;
-                FileFactory::P ptr = get();
-                std::stringstream ss(sjson);
-                ss >> *ptr;
-                return ptr;
-            };
-            void close() noexcept { if (is_open()) file.close(); }
+            void close() noexcept { if (is_open()) stream_ptr->close(); }
 
             bool exists() const { return mfullpath.exists(); }
 
             const Path& fullpath() const noexcept { return mfullpath; }
 
-            void open(const Path& afull_path = "", const std::ios_base::openmode amode = 0)
-            {
-                if (afull_path != "")
-                {
-                    mfullpath = afull_path;
-                }
-                if (amode != 0)
-                {
-                    mode = amode;
-                }
-                file.open(static_cast<fs::path>(mfullpath), mode);
-            }
-
-            bool is_open() const noexcept { return file.is_open(); }
-            bool is_good() const noexcept { return file.good(); }
-            bool is_app() const noexcept { return (mode & std::ios::app) != 0; }
-            bool is_ate() const noexcept { return (mode & std::ios::ate) != 0; }
+            bool is_open() const noexcept { return stream_ptr->is_open(); }
+            bool is_good() const noexcept { return stream_ptr->good(); }
+            bool is_app() const noexcept { return (mmode & std::ios::app) != 0; }
+            bool is_ate() const noexcept { return (mmode & std::ios::ate) != 0; }
             bool is_auto_seek_end_before_write() const noexcept { return is_app(); }
             bool is_auto_seek_end_on_open() const noexcept { return is_ate(); }
-            bool is_binary() const noexcept { return (mode & std::ios::binary) != 0; }
-            bool is_in() const noexcept { return (mode & std::ios::in) != 0; }
-            bool is_out() const noexcept { return (mode & std::ios::out) != 0; }
-            bool is_trunc() const noexcept { return (mode & std::ios::trunc) != 0; }
-            bool eof() const noexcept { return file.eof(); }
-            bool fail() const noexcept { return file.fail(); }
-            bool bad() const noexcept { return file.bad(); }
-            bool good() const noexcept { return file.good(); }
+            bool is_binary() const noexcept { return (mmode & std::ios::binary) != 0; }
+            bool is_in() const noexcept { return (mmode & std::ios::in) != 0; }
+            bool is_out() const noexcept { return (mmode & std::ios::out) != 0; }
+            bool is_trunc() const noexcept { return (mmode & std::ios::trunc) != 0; }
+            bool eof() const noexcept { return stream_ptr->eof(); }
+            bool fail() const noexcept { return stream_ptr->fail(); }
+            bool bad() const noexcept { return stream_ptr->bad(); }
+            bool good() const noexcept { return stream_ptr->good(); }
 
             // Implements initialize method from Initializable concept.
-            virtual bool initialize(const Path& afull_path, const std::ios_base::openmode amode = IN_OUT_ATE_BIN_MODE, const Id aid = NULL_ID) noexcept
+            virtual bool initialize(const Path& afull_path = CURRENT_DIR<C>, const Id id = NULL_ID, const std::ios_base::openmode mode = DEFAULT_MODE) noexcept
             {
-                binary_data = Buffer();
                 mfullpath = afull_path;
-                mode = amode;
-                Object::set_id(aid);
-                if (mfullpath.exists())
-                {
-                    if (mfullpath.has_filename())
-                    {
-                        size_t file_size = fs::file_size(mfullpath);
-                        if ((file_size < MAX_IN_MEMORY_FILE_SIZE_BYTE) && (file_size < get_available_memory()))
-                        {
-                            std::ifstream file(static_cast<fs::path>(mfullpath), mode);
-                            if (file.is_open())
-                            {
-                                if (is_binary())
-                                {
-                                    file.seekg(0, std::ios::end);
-                                    size_t size = file.tellg();
-                                    file.seekg(0, std::ios::beg);
-                                    binary_data.resize(size);
-                                    file.read(binary_data.data(), size);
-                                    close();
-                                }
-                                else
-                                {
-                                    std::stringstream buffer;
-                                    buffer << file.rdbuf();
-                                    text_data = buffer.str();
-                                    close();
-                                }
-                            }
-                            else
-                            {
-                                // File exists but could not be opened.
-                                // todo: log ("Could not open file " + mfullpath.string());
-                                return false;
-                            }
-                        }
-                        else
-                        {
-                            // Read a file when size > 1GB;
-
-                        }
-                    }
-                    else
-                    {
-                        // Path does not have a filename.
-                        // todo: log ("Path " + mfullpath.string() + " does not have a filename.");
-                        return false;
-                    }
-                }
-                else
-                {
-                    // File does not exist.
-                    mfullpath.create_dir ();
-                    mode |= std::ios::out;
-                    open(mfullpath, mode);
-                    close();
-                }
+                mmode = mode;
+                Object::set_id(id);
                 return true;
             }
 
-            FilePtr clone() const  noexcept { return pd::clone<File>(*this, mfullpath, mode, id()); }
+            //FilePtr clone() const  noexcept { return pd::clone<File>(*this, mfullpath, mmode, id()); }
 
             // Conversion to json string.
             virtual S json() const noexcept
             {
                 std::stringstream ss;
                 S s = pd::json<File>(*this);
-                ss << ", \"mfullpath\" : " << mfullpath.to_string() << " , \"mode\" : " << mode;
-                if (is_binary())
-                {
-                    S s;
-                    pd::binary_to_string<decltype(binary_data)::value_type, S::value_type>(binary_data, s);
-                    ss << " , \"binary_data\" : " << s;
-                }
-                else
-                {
-                    ss << " , \"text_data\" : \"" << text_data;
-                }
+                ss << ", \"mfullpath\" : " << mfullpath.to_string() << " , \"mode\" : " << mmode;
                 ss << "\" }";
                 return ss.str();
             }
 
             virtual std::ios_base::openmode get_mode() const noexcept
             {
-                return mode;
+                return mmode;
             }
 
-            virtual std::istream& read(std::istream& is, const IO_Mode& amode = TEXT, const std::endian& byte_order = std::endian::native)
+            virtual std::istream& read_json(std::istream& is)
             {
-                if (amode == BINARY)
-                {
-                    // todo: implement binary read.
-                }
-                else // json format
                 {
                     Json j;
                     VersionPtr v;
                     Id id;
-                    read_json<File>(is, *this, &id, &v, &j);
+                    pd::read_json<File<C>>(is, *this, &id, &v, &j);
                     set_id(id);
                     mfullpath = j["mfullpath"].get<S>();
-                    mode = j["mode"].get<std::ios_base::openmode>();
-                    if (is_binary())
-                    {
-                        S s = j["binary_data"].get<S>();
-                        //pd::string_to_binary<S::value_type, decltype(binary_data)::value_type>(s, binary_data);
-                    }
-                    else
-                    {
-                        text_data = j["text_data"].get<S>();
-                    }
+                    mmode = j["mode"].get<std::ios_base::openmode>();
                 }
                 return is;
-            };
-
-            virtual std::ostream& write(std::ostream& os, const IO_Mode& amode = TEXT, const std::endian& byte_order = std::endian::native) const
-            {
-                if (amode == BINARY)
-                {
-                    // todo: implement binary read.
-                }
-                else // json format
-                {
-                    os << json();
-                }
-                return os;
             };
 
             // Convertion to xml string.
@@ -283,24 +131,7 @@ namespace pensar_digital
             {
                 S xml = ObjXMLPrefix() + "><path>";
                 xml += mfullpath.string() + "</path><mode>";
-                xml += std::to_string(mode) + "</mode>";
-                // Check if buffer is not empty.
-                if (!binary_data.empty())
-                {
-                    // Check if buffer is binary.
-                    if (is_binary())
-                    {
-                        xml += "<buffer type=\"binary\">";
-                        S s;
-                        xml += pd::binary_to_string<decltype(binary_data)::value_type, S::value_type>(binary_data, s);
-                    }
-                    else
-                    {
-                        xml += "<buffer type=\"text\">";
-                        xml += S(binary_data.data(), binary_data.size());
-                    }
-                    xml += "</buffer>";
-                }
+                xml += std::to_string(mmode) + "</mode>";
                 xml += "</object>";
                 return xml;
             }
@@ -314,21 +145,7 @@ namespace pensar_digital
                     this->mfullpath = n.getText();
                 n = node.getChildNode("mode");
                 if (!n.isEmpty()) 
-                    this->mode = std::stoi(n.getText());
-                n = node.getChildNode("buffer");
-                if (!n.isEmpty())
-                {
-                    S type = n.getAttribute("type");
-                    if (type == "binary")
-                    {
-                        S s = n.getText();
-                        pd::binary_to_string<decltype(binary_data)::value_type, S::value_type>(binary_data, s);
-                    }
-                    else
-                    {
-                        text_data = n.getText();
-                    }
-                }
+                    this->mmode = std::stoi(n.getText());
             }
 
             virtual S debug_string() const noexcept
@@ -338,24 +155,24 @@ namespace pensar_digital
 
             inline File& set_binary_mode() noexcept
             {
-                mode |= std::ios::binary;
+                mmode |= std::ios::binary;
                 return *this;
             }
 
             inline File& set_text_mode() noexcept
             {
-                mode &= ~std::ios::binary;
+                mmode &= ~std::ios::binary;
                 return *this;
             }
 
             // Opens the file if necessary and returns the file stream.
-            inline std::fstream& fstream()
+            inline FStream& open ()
             {
                 if (!is_open())
                 {
-                    file.open(static_cast<fs::path>(mfullpath), mode);
+                    stream_ptr->open (mfullpath, mmode);
                 }
-                return file;
+                return *stream_ptr;
             }
 
             //friend void to_json   (      Json& j, const File& f);
@@ -363,52 +180,96 @@ namespace pensar_digital
 
         };  // class File   
 
-        class TextFile : public File
+        template <typename C = char>
+        class TextFile : public File<C>
         {
-        private:
-        public:
-            TextFile(const Path& full_path, const std::ios_base::openmode amode = IN_OUT_ATE_MODE, const S& content = "", const Id aid = NULL_ID) : File(full_path, (amode& (~std::ios::binary)), aid)
-            {
-                append(content);
-            }
-            TextFile(const Path& full_path, const S& content = "", const Id aid = NULL_ID) : TextFile(full_path, IN_OUT_ATE_MODE, content, aid)
-            {
-            }
+            private:
+            public:
+                typedef std::basic_string<C> S;
+                inline static const VersionPtr VERSION = Version::get(1, 1, 1);
+                TextFile(const Path& full_path, const S& content = EMPTY<C>, 
+                         const std::ios_base::openmode mode = File<C>::DEFAULT_MODE, const Id id = NULL_ID) : File<C>(full_path, id, (mode& (~std::ios::binary)))
+                {
+                    append (content);
+                }
 
-            TextFile(const char* full_path, const std::ios_base::openmode amode = IN_OUT_ATE_MODE, const S& content = "", const Id aid = NULL_ID) : TextFile(Path(full_path), amode, content, aid)
-            {
-                append (content);
-			}
+                //TextFile(const Path& full_path, const S& content = EMPTY<C>, const Id aid = NULL_ID) :
+                //    TextFile(full_path, File<C>::DEFAULT_MODE, content, id)
+                //{
+                //}
 
-            virtual ~TextFile() { close(); }
+                virtual ~TextFile() = default;
 
-            File& append(const S& content)
-            {
-                return _append<S>(content);
-            }
+                TextFile<C>& append (const S& content)
+                {
+                    // Appends content.
+                    if (! File<C>::is_open()) 
+                        File<C>::open ();
 
-            S to_string() const noexcept
-            {
-                return text_data;
-            }
+                    File<C>::stream_ptr->seekp(0, std::ios::end);
+				    *(File<C>::stream_ptr) << content;
+                    return *this;
+                }
 
-            // Implicit conversion to string.
-            operator S() const noexcept
-            {
-                return to_string();
-            }
+                S to_string() const noexcept
+                {
+                    return File<C>::mfullpath.to_string ();
+                }
+
+                // Implicit conversion to string.
+                operator S() const noexcept
+                {
+                    return to_string();
+                }
         };
 
-        class BinaryFile : public File
+        class BinaryFile : public File<char>
         {
+			private:
+			public:
+				inline static const VersionPtr VERSION = Version::get(1, 1, 1);
+			private:
+                BinaryFile (const Path&                   full_path, 
+                            const std::ios_base::openmode mode      = DEFAULT_MODE, 
+                            const BytePtr                 data      = nullptr, 
+                            const size_t                  size      = 0,
+                            const Id                      id        = NULL_ID
+                            ) : File (full_path, id, (mode | std::ios::binary))
+                {
+					append (data, size);
+				}
+
+                BinaryFile (const Path& full_path, const BytePtr data = nullptr, const size_t size = 0, const Id id = NULL_ID) : BinaryFile(full_path, IN_OUT_ATE_MODE, data, size, id)
+                {
+				}
+
+				virtual ~BinaryFile() { close(); }
+
+                BinaryFile& append(const BytePtr data = nullptr, const size_t size = 0)
+                {
+                    static_assert (sizeof(char) == sizeof(std::byte), "sizeof(char) != sizeof(Byte)");
+                    if ((data != nullptr) && (size > 0))
+					{
+						if (! is_open()) 
+							open ();
+
+						stream_ptr->seekp(0, std::ios::end);
+						stream_ptr->write(reinterpret_cast<const char*>(data), size);
+					}
+					return *this;
+                }
+			private:
+                MemoryBuffer  data;
         };
         // Streaming operators.
-        extern std::istream& operator >> (std::istream& is, File& file);
-        extern std::ostream& operator << (std::ostream& os, const File& file);
+        extern std::istream& operator >> (std::istream& is, File<char>& file);
+        extern std::ostream& operator << (std::ostream& os, const File<char>& file);
+        extern std::wistream& operator >> (std::wistream& is, File<wchar_t>& file);
+        extern std::wostream& operator << (std::wostream& os, const File<wchar_t>& file);
 
         // Json conversion.
-        extern void to_json   (      Json& j, const File& f);
-        extern void from_json (const Json& j,       File& f);
+        extern void to_json   (      Json& j, const File<char>& f);
+        extern void from_json (const Json& j,       File<char>& f);
 
 
     } // namespace cpplib

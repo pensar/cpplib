@@ -11,7 +11,8 @@ namespace pensar_digital
     namespace cpplib
     {
         TEST(TextFile, true)
-            TextFile file ("c:\\tmp\\test\\path_test\\text-file-test.txt");
+            TextFile<wchar_t> file (L"c:\\tmp\\test\\file_test\\text-file-test.txt", L"blah");
+            CHECK(file.exists(), "0");
         TEST_END(TextFile)
     }
 }

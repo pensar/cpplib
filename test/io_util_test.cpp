@@ -21,9 +21,9 @@ namespace pensar_digital
             Path temp_dir = get_user_home<true>() / "test_dir";
             Path file1 = temp_dir / "file_name";
             Path file2 = temp_dir / "dir" / "file_name";
-            TextFile tf (file1, "blah");
-            CHECK(tf.exists (), "0");
-            TextFile tf2 (file2, "blah");
+            TextFile<> tf(file1, "blah");
+            CHECK(tf.exists(), "0");
+            TextFile<> tf2(file2, "blah");
             CHECK(tf2.exists(), "0");
             fs::last_write_time (file2, last_write_time (file1)); // Do timestamp file2 = timestamp file2.
             //CHECK_EQ(Path, file1, file2, "2");

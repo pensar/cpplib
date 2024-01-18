@@ -46,7 +46,9 @@ namespace pensar_digital
 
             Path(const fs::path& p = ".", const Id& id = NULL_ID) : Object(id), fs::path(p) {}
             Path(const std::string& s, const Id& id = NULL_ID) : Object(id), fs::path(s) {}
-            Path(const char* s, const Id& id = NULL_ID) : Object(id), fs::path(s) {}
+            Path(const char* path, const Id& id = NULL_ID) : Object(id), fs::path(path) {}
+            Path(const wchar_t* path, const Id& id = NULL_ID) : Object(id), fs::path(path) {}
+            Path(const std::wstring& path, const Id& id = NULL_ID) : Object(id), fs::path(path) {}
 
             // Copy constructor.
             Path(const Path& p, const Id& aid = NULL_ID) noexcept : Object(aid), fs::path(p) {}
@@ -249,15 +251,17 @@ namespace pensar_digital
             // Assignment operator for const Path&.
             Path& operator = (const Path& p) { fs::path::operator = (p); return *this; }
 
+            /// <summary>
+            /// Creates the directory if it does not exist (including all parent directories).
+            /// It assumes it is a directory if the path ends with a path separator. Otherwise it assumes it is a file.
+            /// In the latter case it creates the parent directory.
+            /// </summary>
             void create_dir () const noexcept
             {
-                Path dir = *this;
                 if (has_filename()) // Final slash indicates directory. If not present it assumes file.
-                    dir = parent_path();
-                if (!dir.exists())
-                {
-                    fs::create_directories(dir);
-                }
+					fs::create_directories (parent_path());
+				else
+					fs::create_directories (*this);
             }
 
             inline size_t size () const noexcept { return fs::path::string().size(); }
@@ -288,7 +292,7 @@ namespace pensar_digital
             Path operator + (const std::string& s) const { Path p = *this; p /= s; return p; }
 
             // == operator 
-            bool operator == (const Path& apath) const { return apath == fs::path::c_str(); }
+            bool operator == (const Path& apath) const { return apath.std_path () == this->std_path (); }
 
             // != operator for std::string.
             bool operator != (const std::string& s) const { return !(*this == s); }
@@ -303,9 +307,9 @@ namespace pensar_digital
 
             // Inherited via Object
             inline void set_id(const Id& value) { Object::set_id(value); }
-        };  // class Path
 
-        static inline Path CURRENT_DIR = ".";
+            using fs::path::value_type;
+        };  // class Path
 
         template <typename C = char, size_t N = MAX_PATH>
         class CPath : public CS<N, C>

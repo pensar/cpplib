@@ -16,10 +16,8 @@ namespace pensar_digital
         struct Data {
         }; // Empty struct to be used as a base for all structs that are only data containers for objects.
 
-        #define WIDE2(x) L##x
-        #define WIDE1(x) WIDE2(x)
-        #define WFILE WIDE1(__FILE__)
-        #define WLINE WIDE1(__LINE__)
+        #define WFILE W(wchar_t,(__FILE__)) // WFILE is the same as __FILE__ but with an L prefix to indicate a wide string.
+        #define WLINE W(wchar_t,(__LINE__)) // WLINE is the same as __LINE__ but with an L prefix to indicate a wide string.
 
         using Id         = int_fast64_t; // istream >> unsigned long was not compiling.
         using Hash       = int_fast64_t;

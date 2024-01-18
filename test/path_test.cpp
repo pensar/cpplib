@@ -13,12 +13,13 @@ namespace pensar_digital
         TEST(Path, true)
             static_assert (StdLayoutTriviallyCopyable<CPath<>>);
             Path path;
-            CHECK_EQ (Path, path, CURRENT_DIR, "0");
+            CHECK_EQ (Path, path, CURRENT_DIR<wchar_t>, "0");
 
             path = "\\\\";
             CHECK_EQ (Path, path, path.root_path (), "1");
 
             path = "c:\\tmp\\test\\path_test\\"; // Final slash indicates directory. If not present it assumes file.
+            path.remove();
 
             // Verifies path does not exist.
             CHECK(!path.exists(), "2");
@@ -26,15 +27,25 @@ namespace pensar_digital
             path.create_dir ();
             CHECK(path.exists(), "3");
 
-            path.remove ();
-            // Verifies path does not exist.
-            CHECK(!path.exists(), "4");
-
-            path = "c:\\tmp\\test\\path_test\\";
-            CHECK(!path.has_filename (), "5");
+            CHECK(!path.has_filename (), "4");
 
             path += "\\path_test.txt";
-            CHECK(path.has_filename (), "6");
+            CHECK(path.has_filename (), "5");
+
+            // Deletes file.
+            fs::remove (path);
+
+            // Verifies file does not exist.
+            CHECK(!path.exists(), "6");
+
+            Path path2 = path.filename ();
+
+            CHECK_EQ (Path, path2, "path_test.txt", "7");
+
+            path2 = path.parent_path ();
+            CHECK_EQ (Path, path2, "c:\\tmp\\test\\path_test", "8");
+
+            path2.remove ();
         TEST_END(Path)
     }
 }

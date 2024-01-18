@@ -9,6 +9,7 @@
 #include <iostream>
 #include <type_traits>
 #include <string>
+#include <bit>  // std::endian
 
 namespace pensar_digital
 {
@@ -16,13 +17,13 @@ namespace pensar_digital
 	{
         #ifdef _WIN32 
             #include <windows.h>
-            #define MAX_UNC_PATH 32767 // Max UNC path length
-            #define PATH_SEPARATOR '\\'
-            #define LINE_FEED "\r\n"
+            #define PATH_SEPARATOR W(C, '\\')
+            #define LINE_FEED W(C,"\r\n")
         #elif __linux__
             #include <unistd.h>
             #include <sys/utsname.h>
-            #define MAX_PATH 4096 // Max path length in Linux
+            #define MAX_PATH         4096 // Max path length in Linux
+            #define MAX_UNC_PATH     4096 // Max UNC path length.
             #define PATH_SEPARATOR '/'
             #define LINE_FEED "\n"
         #endif

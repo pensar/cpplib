@@ -6,10 +6,10 @@ namespace pensar_digital
 {
     namespace cpplib
     {
-        std::istream& operator >> (std::istream& is,       File& file) { return file.read  (is); }
-        std::ostream& operator << (std::ostream& os, const File& file) { return file.write (os); }
+        std::istream& operator >> (std::istream& is,       File<char>& file) { return file.read  (is); }
+        std::ostream& operator << (std::ostream& os, const File<char>& file) { return file.write (os); }
 
-        void to_json(Json& j, const File& f)
+        void to_json(Json& j, const File<char>& f)
          {
              j["class"] = f.class_name();
              j["id"] = f.id();
@@ -20,7 +20,7 @@ namespace pensar_digital
              j["mode"] = f.is_binary() ? "BINARY" : "TEXT";
          }
 
-         void from_json(const Json& j, File& f)
+         void from_json(const Json& j, File<char>& f)
          {
              S class_name = f.class_name();
              S json_class = j.at("class");

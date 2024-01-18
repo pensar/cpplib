@@ -121,7 +121,7 @@ namespace pensar_digital
                     objects.push_back(p);
                 }
                 //pd::TextFile f("c:\\tmp\\test\\ObjectTextFileStreaming\\test.txt", "blah");
-                std::ofstream out("c:\\tmp\\test\\ObjectTextFileStreaming\\test.txt", File::OUTPUT);
+                std::ofstream out("c:\\tmp\\test\\ObjectTextFileStreaming\\test.txt", File<char>::OUTPUT);
                 out << "[";
                 for (Id i = 0; i < 999; i++)
                 {

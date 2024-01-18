@@ -10,6 +10,38 @@ namespace pensar_digital
 {
 	namespace cpplib
 	{
+		template<typename C = char>
+		struct EmptyString 
+		{
+			inline static const C* value = "";
+		};
+
+		template<>
+		struct EmptyString<wchar_t>
+		{
+			inline static const wchar_t* value = L"";
+		};
+
+		template <typename C = char>
+		inline static const C* EMPTY = EmptyString<C>::value;
+
+		template<typename C = char>
+		struct CurrentDir
+		{
+			inline static const C* value = ".";
+		};
+
+		template<>
+		struct CurrentDir<wchar_t>
+		{
+			inline static const wchar_t* value = L".";
+		};
+
+		// Define constant CURRENT_DIR.
+		template <typename C = char>
+		inline static const C* CURRENT_DIR = CurrentDir<C>::value;
+
+
 		using S = std::string;
 		using SView = std::string_view;
 		using SIter = std::string::iterator;

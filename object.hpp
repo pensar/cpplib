@@ -211,7 +211,8 @@ namespace pensar_digital
 
                 /// Conversion to string.
                 /// \return A string with the object id.
-                virtual S to_string() const noexcept { return std::to_string(mdata.mid); }
+                template <typename C = char>
+                std::basic_string<C> to_string() const noexcept { return std::to_string(mdata.mid); }
 
                 /// Implicit conversion to string.
                 /// \return A string with the object id.
@@ -222,7 +223,7 @@ namespace pensar_digital
                 virtual S debug_string() const noexcept
                 {
                     std::stringstream ss;
-                    ss << "id = " << to_string();
+                    ss << "id = " << Object::to_string<char>();
                     return ss.str();
 
                 }
