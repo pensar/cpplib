@@ -86,6 +86,26 @@ namespace pensar_digital
             bool bad() const noexcept { return stream_ptr->bad(); }
             bool good() const noexcept { return stream_ptr->good(); }
 
+            char* c_str() const noexcept { return (char*)mfullpath.c_str(); }
+
+            // Delete the file.
+            bool remove() 
+            { 
+                if (is_open()) 
+                    close();
+                char* path;
+                if (std::is_same_v<C, char>)
+					path = mfullpath.cstr();
+                else
+                {
+                    std::string s = mfullpath.string();
+                    path = (char*)s.c_str();
+                }
+                return (std::remove(path) == 0);
+            }
+
+                
+
             // Implements initialize method from Initializable concept.
             virtual bool initialize(const Path& afull_path = CURRENT_DIR<C>, const Id id = NULL_ID, const std::ios_base::openmode mode = DEFAULT_MODE) noexcept
             {
@@ -166,7 +186,7 @@ namespace pensar_digital
             }
 
             // Opens the file if necessary and returns the file stream.
-            inline FStream& open ()
+            inline FStream& open () const
             {
                 if (!is_open())
                 {
@@ -190,7 +210,11 @@ namespace pensar_digital
                 TextFile(const Path& full_path, const S& content = EMPTY<C>, 
                          const std::ios_base::openmode mode = File<C>::DEFAULT_MODE, const Id id = NULL_ID) : File<C>(full_path, id, (mode& (~std::ios::binary)))
                 {
-                    append (content);
+                    if (File<C>::exists ())
+                        append (content);
+                    else
+                        write (content);
+                    File<C>::close ();
                 }
 
                 //TextFile(const Path& full_path, const S& content = EMPTY<C>, const Id aid = NULL_ID) :
@@ -199,7 +223,16 @@ namespace pensar_digital
                 //}
 
                 virtual ~TextFile() = default;
+                TextFile<C>& write(const S& content)
+                {
+					// Writes content.
+					if (! File<C>::is_open()) 
+						File<C>::open ();
 
+					File<C>::stream_ptr->seekp(0, std::ios::beg);
+                    *(File<C>::stream_ptr) << content;
+					return *this;
+                }
                 TextFile<C>& append (const S& content)
                 {
                     // Appends content.
@@ -221,6 +254,20 @@ namespace pensar_digital
                 {
                     return to_string();
                 }
+
+                // Reads the file content and returns it as a std::basic_string<C>.
+                S read() const
+                {
+					if (! File<C>::is_open()) 
+						File<C>::open ();
+
+					File<C>::stream_ptr->seekg(0, std::ios::end);
+					size_t size = File<C>::stream_ptr->tellg();
+					S content(size, 0);
+					File<C>::stream_ptr->seekg(0, std::ios::beg);
+					File<C>::stream_ptr->read(&content[0], size);
+					return content;
+				}
         };
 
         class BinaryFile : public File<char>

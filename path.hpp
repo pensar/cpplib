@@ -17,6 +17,8 @@
 #include "clone_util.hpp"
 
 #include <string>
+#include <cstdio>
+
 #ifdef _MSC_VER
 #include <io.h>
 #include <windows.h>
@@ -85,11 +87,21 @@ namespace pensar_digital
                 return clone(p);
             };
 
+            // is directory?
+            bool is_directory() const noexcept
+            {
+				return fs::is_directory(*this);
+			}
+
             bool remove() const noexcept
             {
                 if (exists())
                 {
-                    return fs::remove(*this);
+                    // Remove file or directory.
+                    if (is_directory ())
+						return fs::remove_all(*this);
+					else
+						return fs::remove(*this);
                 }
                 return true;
             }
@@ -279,6 +291,20 @@ namespace pensar_digital
             // Implicit conversion to const char* returning a value allocated in the heap using _strdup.
             operator const char* () const { return _strdup(fs::path::string().c_str()); }
 
+            wchar_t * wstr() const { return _wcsdup(fs::path::wstring().c_str()); }
+            char* cstr() const { return _strdup(fs::path::string().c_str()); }
+
+            template <typename C = char>
+            C* str() const
+            {
+                if constexpr (std::is_same_v<C, char>)
+					return cstr();
+				else if constexpr (std::is_same_v<C, wchar_t>)
+					return wstr();
+				else
+				    throw std::runtime_error("Unsupported character type."); 
+            }
+           
             // Conversion from const char* operator.
             Path& operator = (const char* s) { fs::path::operator = (s); return *this; }
 
