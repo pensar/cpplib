@@ -27,7 +27,12 @@ namespace pensar_digital
         extern       S  DOUBLE_QUOTES;
         extern const Id NULL_ID;
         
+        template <std::unsigned_integral T>
+        constexpr T null_value() { return 0; }
         
+        template <std::signed_integral T>
+        constexpr T null_value() { return -1; }
+
         enum Alignment : int_fast16_t { NULL_ALIGNMENT = -1, BIT8 = 8, BIT16 = 16, BIT32 = 32, BIT64 = 64, BIT128 = 128, BIT256 = 256, BIT512 = 512, BIT1024 = 1024 };
         
         enum IO_Mode : bool { BINARY = true, TEXT = false};

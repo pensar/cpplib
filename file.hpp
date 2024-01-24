@@ -18,6 +18,7 @@
 #include "generator.hpp"
 #include "clone_util.hpp"
 #include "memory_buffer.hpp"
+#include "random_util.hpp"
 
 #include <sstream>
 #include <iostream>
@@ -269,6 +270,132 @@ namespace pensar_digital
 					return content;
 				}
         };
+        
+        // Random file file name generator.
+        
+        template <typename C = char>
+        class RandomFileNameGenerator
+        {
+			private:
+				typedef std::basic_string<C> S;
+
+				inline static const size_t DEFAULT_LENGTH                =     8;
+				inline static const S      DEFAULT_TEXT_FILE_EXTENSION   = "txt";
+                inline static const S      DEFAULT_BINARY_FILE_EXTENSION = "bin";
+                
+                // Extension type. It can be fixed, random, none, numeric sequence, C char sequence, or a function.  
+                enum class ExtensionType { FIXED, RANDOM, NONE, NUMERIC_SEQUENCE, CHAR_SEQUENCE, FUNCTION };
+                inline static const ExtensionType DEFAULT_EXTENSION_TYPE = ExtensionType::FIXED;
+
+                // Determines the function signature as a typedef. It is named custom_exension_generator and it should return a string and take no arguments.
+                typedef std::function<S()> CUSTOM_EXT_FUNCTION;
+                // Defines a NULL_CUSTOM_EXT_FUNCTION.  That should always return an empty string.
+                inline static const CUSTOM_EXT_FUNCTION NULL_CUSTOM_EXT_FUNCTION = []() { return EMPTY<C>; };
+
+				// Extension type.
+                ExtensionType mextension_type;
+
+                // Extension.
+                S mextension;
+
+                inline static const size_t MAX_FULL_NAME_LENGTH = 255;
+                
+
+                // Numeric sequence.    
+                typedef Generator<RandomFileNameGenerator, size_t> G;
+                G generator;
+
+                // Char sequence.
+                // todo: CharGenerator<C> char_generator;
+
+                // Custom extension function.
+                CUSTOM_EXT_FUNCTION mcustom_ext_function;
+
+                // Generates a random string of length len.
+                inline static S random_string(const size_t len)
+                {
+					static const S CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+                    Random<size_t> r(0, CHARS.size() - 1);
+
+					S s;
+                    size_t i = len;
+					s.reserve(i);
+                    typename S::value_type c = CHARS[r()];
+                    
+                    size_t count = 1000; // Max count is 1000. If c is still a number after 1000 tries, then throws an exception.
+                    // while c is a number, try again.
+                    while (c >= '0' && c <= '9') 
+                    {
+                        c = CHARS[r()];
+                        if (--count == 0)
+                        {
+                            // Logs error and throws an exception.
+                            S error_msg = "RandomFileNameGenerator::random_string(): Error: Could not generate a random string after 1000 tries.";
+                            LOG(error_msg);
+                            throw std::runtime_error(error_msg);
+                        }
+							
+                    }
+					s += c;
+                    --i;
+					while (i--)
+						s += CHARS[r ()];
+
+					return s;
+				}
+
+                S get_extension() const
+                {
+                    switch (mextension_type)
+                    {
+						case ExtensionType::FIXED:
+							return mextension;
+						case ExtensionType::RANDOM:
+							return random_string(DEFAULT_LENGTH);
+						case ExtensionType::NONE:
+							return EMPTY<C>;
+						//case ExtensionType::NUMERIC_SEQUENCE:
+							//return std::to_string((const G::IdType)generator.get_id());
+						case ExtensionType::CHAR_SEQUENCE:
+							return EMPTY<C>; // todo: char_generator();
+						case ExtensionType::FUNCTION:
+							return mcustom_ext_function();
+						default:
+							return EMPTY<C>;
+					}
+				}   
+
+                    
+            public:
+            // Constructor.
+            RandomFileNameGenerator (const ExtensionType ext_type = DEFAULT_EXTENSION_TYPE, const S& extension = DEFAULT_TEXT_FILE_EXTENSION, const CUSTOM_EXT_FUNCTION& custom_ext_function = NULL_CUSTOM_EXT_FUNCTION) :
+                mextension_type(ext_type), mextension(extension), mcustom_ext_function(custom_ext_function)
+            {
+			}
+
+            // Generates a random text file name. () operator.
+            inline Path operator() (const S& name_prefix = "", const S& name_suffix = "", const S& extension = DEFAULT_TEXT_FILE_EXTENSION, const Path& path = fs::temp_directory_path())
+            {
+                return path / (name_prefix + random_string(DEFAULT_LENGTH) + name_suffix + "." + get_extension());
+            }
+        };
+
+        // TmpTextFile is a temporary text file.
+        template <typename C = char>
+        class TmpTextFile : public TextFile<C>
+        {
+			public:
+				inline static const VersionPtr VERSION = Version::get(1, 1, 1);
+                TmpTextFile(const S& file_name = EMPTY<C>, const S& content = EMPTY<C>, const Id id = null_value<Id>()) : TextFile<C>(fs::temp_directory_path() / file_name, content, File<C>::DEFAULT_MODE, id)
+                {
+				}
+                virtual ~TmpTextFile()
+                {
+                    // Removes the file. If it is open, it is closed first. If operation fails, a log message is generated.
+					if (! File<C>::remove())
+                         LOG("Failed to remove temporary file " + File<C>::mfullpath.to_string());
+				}
+			};  // class TmpTextFile
 
         class BinaryFile : public File<char>
         {
@@ -280,13 +407,13 @@ namespace pensar_digital
                             const std::ios_base::openmode mode      = DEFAULT_MODE, 
                             const BytePtr                 data      = nullptr, 
                             const size_t                  size      = 0,
-                            const Id                      id        = NULL_ID
+                            const Id                      id        = null_value<Id>()
                             ) : File (full_path, id, (mode | std::ios::binary))
                 {
 					append (data, size);
 				}
 
-                BinaryFile (const Path& full_path, const BytePtr data = nullptr, const size_t size = 0, const Id id = NULL_ID) : BinaryFile(full_path, IN_OUT_ATE_MODE, data, size, id)
+                BinaryFile (const Path& full_path, const BytePtr data = nullptr, const size_t size = 0, const Id id = null_value<Id>()) : BinaryFile(full_path, IN_OUT_ATE_MODE, data, size, id)
                 {
 				}
 

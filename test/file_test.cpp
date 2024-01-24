@@ -10,6 +10,21 @@ namespace pensar_digital
     using namespace pensar_digital::unit_test;
     namespace cpplib
     {
+        TEST(RandomFileNameGenerator, true)
+            RandomFileNameGenerator<char> r;
+            Path p = r ();
+            std::string filename = p.filename_only().string();
+            CHECK_EQ(std::string, p.extension(), ".txt", "1");
+            CHECK_EQ(size_t, filename.length (), 8, "2");
+            CHECK(filename.find_first_not_of ("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") == std::string::npos, "3");
+            
+            // Check if it does not start with a number.
+            CHECK(filename.find_first_of ("0123456789") != 0, "4");
+
+
+	
+        TEST_END(RandomFileNameGenerator)
+
         TEST(TextFile, true)
             std::fstream fs("c:\\tmp\\test\\file_test\\text-file-test.txt", std::ios::out | std::ios::in | std::ios::trunc);
         try

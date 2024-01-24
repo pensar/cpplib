@@ -29,7 +29,7 @@ namespace pensar_digital
       ///
       ///  };
       /// \endcode
-      template <typename Type = void, typename T = Id>
+      template <typename Type = Id, typename T = Id>
       class Generator : public Object     
       {
         public:
@@ -39,19 +39,19 @@ namespace pensar_digital
             typedef std::shared_ptr<Generator<Type, T>> GeneratorPtr;
             typedef pd::Factory<Generator<Type, T>, T, T, T> Factory;
 
-            inline static Factory mfactory = { 3, 10, NULL_ID, 0, 1 }; //!< Member variable "factory"
+            inline static Factory mfactory = { 3, 10, null_value<T>(), 0, 1}; //!< Member variable "factory"
             inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
 
             /// \brief Constructs a Generator.
             /// \param [in] initial_value Initial value for the generator, defaults to 0.
             /// \param [in] astep Step to be used when incrementing the generator, defaults to 1.
-            Generator (T aid = NULL_ID, T initial_value = 0, T step = 1) noexcept : Object(aid), mdata (initial_value, step) {};
+            Generator (T aid = null_value<T>(), T initial_value = 0, T step = 1) noexcept : Object(aid == null_value<T>() ? 0 : aid), mdata(initial_value, step) {};
 
             virtual ~Generator () = default;
 
             /// \brief Increments value and return the new value.
             /// \return The new value.
-            inline virtual const T get_id () { mdata.mvalue += mdata.mstep; return mdata.mvalue; }
+            inline virtual T get_id () { mdata.mvalue += mdata.mstep; return mdata.mvalue; }
 
             /// \brief Gets the next value without incrementing the current one.
             /// \return The next value.
@@ -64,9 +64,9 @@ namespace pensar_digital
             /// \brief Initialize a Generator.
             /// \param [in] initial_value Initial value for the generator, defaults to 0.
             /// \param [in] astep Step to be used when incrementing the generator, defaults to 1.
-            virtual bool initialize(T aid = NULL_ID, T initial_value = 0, T step = 1) noexcept
+            virtual bool initialize(T aid = null_value<T>(), T initial_value = 0, T step = 1) noexcept
             {
-                bool ok = Object::initialize(aid);
+                bool ok = Object::initialize(aid == null_value<T>() ? 0 : aid);
                 mdata.minitial_value = initial_value;
                 mdata.mvalue = initial_value;
                 mdata.mstep = step;
@@ -104,9 +104,9 @@ namespace pensar_digital
                 else // json format
                 {
                     Json j;
-                    T id = NULL_ID;
+                    T id = null_value<T>();
                     VersionPtr v;
-                    read_json<Generator<Type, T>>(is, *this, &id, &v, &j);
+                    read_json<Generator<Type, T>, T>(is, *this, &id, &v, &j);
                     mdata.minitial_value = j["minitial_value"];
                     mdata.mvalue         = j["mvalue"        ];
                     mdata.mstep          = j["mstep"         ];
@@ -183,7 +183,7 @@ namespace pensar_digital
 				return *this;
 			}   
             
-            static inline Factory::P  get (T aid = NULL_ID, T initial_value = 0, T step = 1) noexcept
+            static inline Factory::P  get (T aid = null_value<T>(), T initial_value = 0, T step = 1) noexcept
             {
                 return mfactory.get (aid, initial_value, step);
             };

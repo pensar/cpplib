@@ -41,6 +41,35 @@ namespace pensar_digital
 		template <typename C = char>
 		inline static const C* CURRENT_DIR = CurrentDir<C>::value;
 
+		template<typename C = char>
+		struct DefaultTextFileExtension
+		{
+			inline static const C* value = ".txt";
+		};
+
+		template<>
+		struct DefaultTextFileExtension<wchar_t>
+		{
+			inline static const wchar_t* value = L".txt";
+		};
+
+		template <typename C = char>
+		inline static const C* DEFAULT_TXT_FILE_EXTENSION = DefaultTextFileExtension<C>::value;
+
+		template<typename C = char>
+		struct DefaultBinaryFileExtension
+		{
+			inline static const C* value = ".bin";
+		};
+
+		template<>
+		struct DefaultBinaryFileExtension<wchar_t>
+		{
+			inline static const wchar_t* value = L".bin";
+		};
+
+		template <typename C = char>
+		inline static const C* DEFAULT_BIN_FILE_EXTENSION = DefaultBinaryFileExtension<C>::value;
 
 		using S = std::string;
 		using SView = std::string_view;

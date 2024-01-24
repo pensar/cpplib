@@ -11,24 +11,25 @@ namespace pensar_digital
   {
     extern std::chrono::system_clock::rep seed ();
     extern std::default_random_engine get_generator ();
-
-    template <typename T = int, class Distribution = std::uniform_int_distribution<T>, class Generator = std::default_random_engine>
-    class Random
+    
+    template <typename T = std::chrono::system_clock::rep, class Distribution = std::uniform_int_distribution<T>, class RandomGenerator = std::default_random_engine>
+    class Random 
     {
-      public:
-        Random (const T min_value, const T max_value):
-          _min(min_value),
-          _max(max_value),
-          generator(Generator(seed ())),
-          distribution(Distribution(min_value, min_value)) {}
+        public:
 
-        T get () { return distribution(generator); }
+        Random(const T min_value, const T max_value) : 
+            mmin(min_value), mmax(max_value), mseed(seed()), mdistribution(min_value, max_value), mgenerator(mseed) {}
 
-      private:
-        T _min;
-        T _max;
-        Generator generator;
-        Distribution distribution;
+        T operator()() {
+            return mdistribution(mgenerator);
+        }
+
+    private:
+        Distribution mdistribution;
+        RandomGenerator mgenerator;
+        std::chrono::system_clock::rep mseed;
+        T mmin;
+        T mmax;
     };
 
     class CRandom

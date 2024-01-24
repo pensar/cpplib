@@ -38,15 +38,15 @@ namespace pensar_digital
         class Version   
         {
             private:
-                inline static VersionFactory mfactory = { 3, 10, 1, 1, 1, NULL_ID };
+                inline static VersionFactory mfactory = { 3, 10, 1, 1, 1, null_value<Id>() };
                 struct Data : public pd::Data
 				{
 					VersionInt mpublic;
 					VersionInt mprotected;
 					VersionInt mprivate;
 					Id         mid;
-                    Data (const VersionInt& pub = NULL_VERSION, const VersionInt& prot = NULL_VERSION, const VersionInt& priv = NULL_VERSION, const Id& aid = NULL_ID)
-						: mpublic(pub), mprotected(prot), mprivate(priv), mid(aid) {}
+                    Data (const VersionInt& pub = NULL_VERSION, const VersionInt& prot = NULL_VERSION, const VersionInt& priv = NULL_VERSION, const Id& aid = null_value<Id>())
+						: mpublic(pub), mprotected(prot), mprivate(priv), mid(aid == null_value<Id>() ? 0 : aid) {}
 				};
                 Data mdata;
 
@@ -62,13 +62,13 @@ namespace pensar_digital
                 virtual const pd::Data* data() const noexcept { return &mdata; }
                 virtual size_t data_size() const noexcept { return sizeof(mdata); }
 
-                Version(const VersionInt& pub = NULL_VERSION, const VersionInt& prot = NULL_VERSION, const VersionInt& priv = NULL_VERSION, const Id& id = NULL_ID)
+                Version(const VersionInt& pub = NULL_VERSION, const VersionInt& prot = NULL_VERSION, const VersionInt& priv = NULL_VERSION, const Id& id = null_value<Id>())
                     : mdata (pub, prot, priv, id) {}
 
                 inline static VersionFactory::P get(const VersionInt& pub = pd::Version::NULL_VERSION,
                     const VersionInt& pro = Version::NULL_VERSION,
                     const VersionInt& pri = Version::NULL_VERSION,
-                    const Id& aid = NULL_ID)
+                    const Id& aid = null_value<Id>())
                 {
                     return mfactory.get (pub, pro, pri, aid);
                 };
@@ -131,12 +131,12 @@ namespace pensar_digital
 
                 bool equals (const Version& v) const noexcept;
 	
-                inline virtual bool initialize (const VersionInt& pub = NULL_VERSION, const VersionInt& prot = NULL_VERSION, const VersionInt& priv = NULL_VERSION, const Id& aid = NULL_ID) noexcept
+                inline virtual bool initialize (const VersionInt& pub = NULL_VERSION, const VersionInt& prot = NULL_VERSION, const VersionInt& priv = NULL_VERSION, const Id& aid = null_value<Id>()) noexcept
                 {
                     mdata.mpublic    = pub ;
                     mdata.mprotected = prot;
                     mdata.mprivate   = priv;
-                    mdata.mid        = aid ;
+                    mdata.mid        = (aid == null_value<Id>() ? 0 : aid);
 
                     return true;
 			    }

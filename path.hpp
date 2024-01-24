@@ -42,25 +42,25 @@ namespace pensar_digital
         class Path : public fs::path, public Object
         {
             private:
-                inline static PathFactory mfactory = { 3, 10, ".", NULL_ID};
+                inline static PathFactory mfactory = { 3, 10, ".", null_value<Id>()};
             public:
                 inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
 
-            Path(const fs::path& p = ".", const Id& id = NULL_ID) : Object(id), fs::path(p) {}
-            Path(const std::string& s, const Id& id = NULL_ID) : Object(id), fs::path(s) {}
-            Path(const char* path, const Id& id = NULL_ID) : Object(id), fs::path(path) {}
-            Path(const wchar_t* path, const Id& id = NULL_ID) : Object(id), fs::path(path) {}
-            Path(const std::wstring& path, const Id& id = NULL_ID) : Object(id), fs::path(path) {}
+            Path(const fs::path& p = ".", const Id& id = null_value<Id>()) : Object(id), fs::path(p) {}
+            Path(const std::string& s, const Id& id = null_value<Id>()) : Object(id), fs::path(s) {}
+            Path(const char* path, const Id& id = null_value<Id>()) : Object(id), fs::path(path) {}
+            Path(const wchar_t* path, const Id& id = null_value<Id>()) : Object(id), fs::path(path) {}
+            Path(const std::wstring& path, const Id& id = null_value<Id>()) : Object(id), fs::path(path) {}
 
             // Copy constructor.
-            Path(const Path& p, const Id& aid = NULL_ID) noexcept : Object(aid), fs::path(p) {}
+            Path(const Path& p, const Id& aid = null_value<Id>()) noexcept : Object(aid), fs::path(p) {}
 
             // Move constructor.
-            Path(Path&& p, const Id& aid = NULL_ID) noexcept : Object(aid), fs::path(p) {}
+            Path(Path&& p, const Id& aid = null_value<Id>()) noexcept : Object(aid), fs::path(p) {}
 
             // virtual destructor.
             virtual ~Path() noexcept = default;
-            static PathFactory::P get(const fs::path& p = ".", const Id& aid = NULL_ID)
+            static PathFactory::P get(const fs::path& p = ".", const Id& aid = null_value<Id>())
             {
                 return mfactory.get (p, aid);
             };
@@ -146,6 +146,11 @@ namespace pensar_digital
                 return fs::path::stem();
             }
 
+            Path filename_only () const noexcept
+            {
+                return stem ();
+			}
+
             Path extension() const noexcept
             {
                 return fs::path::extension();
@@ -182,7 +187,7 @@ namespace pensar_digital
             }
 
             // Implements initialize method from Initializable concept.
-            virtual bool initialize(const fs::path& p, const Id& aid = NULL_ID) noexcept
+            virtual bool initialize(const fs::path& p, const Id& aid = null_value<Id>()) noexcept
             {
                 fs::path::operator = (p);
                 Object::set_id(aid);

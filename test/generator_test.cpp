@@ -133,7 +133,7 @@ namespace pensar_digital
             Hash h = g.hash();
 
     
-            //G::Factory::P ptr = buffer.read<G, G::IdType, G::IdType, G::IdType>(NULL_ID, 0, 1);
+            //G::Factory::P ptr = buffer.read<G, G::IdType, G::IdType, G::IdType>(null_value<T>(), 0, 1);
 
             G::Factory::P p2 = buffer.read (1);
             G g2(1);
