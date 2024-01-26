@@ -13,6 +13,7 @@ namespace pensar_digital
         TEST(RandomFileNameGenerator, true)
             RandomFileNameGenerator<char> r;
             Path p = r ();
+            CHECK_EQ(char*, p.parent_path().cstr(), TMP_DIR.remove_trailing_separator ().cstr(), "0");
             std::string filename = p.filename_only().string();
             CHECK_EQ(std::string, p.extension(), ".txt", "1");
             CHECK_EQ(size_t, filename.length (), 8, "2");
@@ -26,19 +27,18 @@ namespace pensar_digital
         TEST_END(RandomFileNameGenerator)
 
         TEST(TextFile, true)
-            std::fstream fs("c:\\tmp\\test\\file_test\\text-file-test.txt", std::ios::out | std::ios::in | std::ios::trunc);
         try
         {
             TextFile<> file("c:\\tmp\\test\\file_test\\text-file-test.txt", "blah");
             file.close();
-            // Checks if file exists.
             
+            // Checks if file exists.
             CHECK(file.exists(), "0");
             std::string s = file.read();
             CHECK_EQ(std::string, s, "blah", "1");
 
             // Deletes file.
-            if (file.remove() != 0)
+            if (! file.remove())
             {
 				CHECK(false, "2");
 			}

@@ -42,9 +42,9 @@ namespace pensar_digital
                 inline static const size_t MAX_BUFFER_SIZE = 1024 ^ 3; // 1 GB
                 inline const static std::ios_base::openmode INPUT = std::ios::in;
                 inline const static std::ios_base::openmode OUTPUT = std::ios::out;
-                inline const static std::ios_base::openmode IN_OUT_ATE_MODE = std::ios::in | std::ios::out | std::ios::ate;
-			    inline const static std::ios_base::openmode IN_OUT_TRUNC_MODE = std::ios::in | std::ios::out | std::ios::trunc;
-                inline const static std::ios_base::openmode DEFAULT_MODE = IN_OUT_ATE_MODE;
+                inline const static std::ios_base::openmode IN_OUT_ATE_APP_MODE = std::ios::in | std::ios::out | std::ios::ate | std::ios::app;
+			    inline const static std::ios_base::openmode OUT_TRUNC_MODE = std::ios::out | std::ios::trunc;
+                inline const static std::ios_base::openmode DEFAULT_MODE = IN_OUT_ATE_APP_MODE;
 
         protected:
                 std::ios_base::openmode mmode; // Last mode used to open the file.
@@ -53,11 +53,20 @@ namespace pensar_digital
                 FStream* stream_ptr; 
         public:
             
-            File(const Path& full_path = L".", const Id id = NULL_ID, const std::ios_base::openmode mode = IN_OUT_ATE_MODE) :
+            File(const Path& full_path = L".", const Id id = NULL_ID, const std::ios_base::openmode mode = DEFAULT_MODE) :
                 mfullpath(full_path), Object(id), mmode(mode)
             {
                 mfullpath.create_dir (); // Create the directory if it does not exist.
-                stream_ptr = new FStream (full_path.std_path (), mode);
+                if (!mfullpath.exists())
+                {
+                    stream_ptr = new FStream(mfullpath.cstr(), OUT_TRUNC_MODE);
+                    stream_ptr->close();
+                    stream_ptr->open(mfullpath.std_path(), mmode);
+                }
+                else
+                {
+                    stream_ptr = new FStream(full_path.std_path(), mmode);
+                }
             }
 
             virtual ~File() noexcept 
@@ -374,7 +383,7 @@ namespace pensar_digital
 			}
 
             // Generates a random text file name. () operator.
-            inline Path operator() (const S& name_prefix = "", const S& name_suffix = "", const S& extension = DEFAULT_TEXT_FILE_EXTENSION, const Path& path = fs::temp_directory_path())
+            inline Path operator() (const S& name_prefix = "", const S& name_suffix = "", const S& extension = DEFAULT_TEXT_FILE_EXTENSION, const Path& path = TMP_DIR)
             {
                 return path / (name_prefix + random_string(DEFAULT_LENGTH) + name_suffix + "." + get_extension());
             }
@@ -386,7 +395,7 @@ namespace pensar_digital
         {
 			public:
 				inline static const VersionPtr VERSION = Version::get(1, 1, 1);
-                TmpTextFile(const S& file_name = EMPTY<C>, const S& content = EMPTY<C>, const Id id = null_value<Id>()) : TextFile<C>(fs::temp_directory_path() / file_name, content, File<C>::DEFAULT_MODE, id)
+                TmpTextFile(const S& file_name = EMPTY<C>, const S& content = EMPTY<C>, const Id id = null_value<Id>()) : TextFile<C>(TMP_DIR / file_name, content, File<C>::DEFAULT_MODE, id)
                 {
 				}
                 virtual ~TmpTextFile()
@@ -413,7 +422,7 @@ namespace pensar_digital
 					append (data, size);
 				}
 
-                BinaryFile (const Path& full_path, const BytePtr data = nullptr, const size_t size = 0, const Id id = null_value<Id>()) : BinaryFile(full_path, IN_OUT_ATE_MODE, data, size, id)
+                BinaryFile (const Path& full_path, const BytePtr data = nullptr, const size_t size = 0, const Id id = null_value<Id>()) : BinaryFile(full_path, DEFAULT_MODE, data, size, id)
                 {
 				}
 

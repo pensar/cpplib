@@ -17,7 +17,6 @@ namespace pensar_digital
 	{
         #ifdef _WIN32 
             #include <windows.h>
-            #define PATH_SEPARATOR W(C, '\\')
             #define LINE_FEED W(C,"\r\n")
         #elif __linux__
             #include <unistd.h>
@@ -65,7 +64,14 @@ namespace pensar_digital
             }
 
             static inline S20 endianess () { return (std::endian::native == std::endian::little) ? "Little Endian" : "Big Endian"; }
-                                    
+            static inline S2 path_separator ()
+            {
+                #ifdef _WIN32
+                return '\\';
+                #else
+                        return '/';
+                #endif
+            }
             inline const static S2 LF = LINE_FEED;
             
         };

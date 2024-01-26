@@ -6,7 +6,6 @@
 #include "object.hpp"
 #include "s.hpp"
 #include "system.hpp"
-
 #include "string_def.hpp"
 #include "memory.hpp"
 #include "constant.hpp"
@@ -18,6 +17,7 @@
 
 #include <string>
 #include <cstdio>
+#include <stdlib.h>
 
 #ifdef _MSC_VER
 #include <io.h>
@@ -182,7 +182,16 @@ namespace pensar_digital
 
             Path& remove_trailing_separator() noexcept
             {
-                //fs::path::remove_trailing_separator (); // todo.
+
+                if (! has_filename()) 
+                {
+                    std::string s = this->string();
+                    if (s.back() == pd::PATH_SEPARATOR<char>)
+                    {
+						s.pop_back();
+						*this = s;
+					}
+                }
                 return *this;
             }
 
@@ -393,6 +402,17 @@ namespace pensar_digital
         // Json conversion.
         extern void to_json   (      Json& j, const Path& p);
         extern void from_json (const Json& j,       Path& p);
+
+        // Sets TMP environment variable to a temporary directory.
+        inline const Path& set_tmp_env_var(const Path& path = fs::temp_directory_path())
+        {
+            Path p = "TMP=";
+            p += path;
+            _putenv(p.cstr());
+            return path;
+        }
+        static inline Path TMP_DIR = set_tmp_env_var("c:\\tmp\\");
+
     } // namespace cpplib
 } // namespace pensar_digital
 #endif  

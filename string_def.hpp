@@ -11,6 +11,22 @@ namespace pensar_digital
 	namespace cpplib
 	{
 		template<typename C = char>
+		struct PathSeparatorChar
+		{
+			inline static const C value = '\\';
+		};
+
+		template<>
+		struct PathSeparatorChar<wchar_t>
+		{
+			inline static const wchar_t value = L'\\';
+		};
+
+		template <typename C = char>
+		inline static const C PATH_SEPARATOR = PathSeparatorChar<C>::value;
+
+		
+		template<typename C = char>
 		struct EmptyString 
 		{
 			inline static const C* value = "";
