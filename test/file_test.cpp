@@ -29,19 +29,17 @@ namespace pensar_digital
         TEST(TextFile, true)
         try
         {
-            TextFile<> file("c:\\tmp\\test\\file_test\\text-file-test.txt", "blah");
-            file.close();
-            
-            // Checks if file exists.
-            CHECK(file.exists(), "0");
-            std::string s = file.read();
-            CHECK_EQ(std::string, s, "blah", "1");
-
-            // Deletes file.
-            if (! file.remove())
+            Path p;
             {
-				CHECK(false, "2");
-			}
+                TmpTextFile<char> file("text-file-test.txt", "blah");
+                p = file.fullpath ();
+            
+                // Checks if file exists.
+                CHECK(file.exists(), "0");
+                std::string s = file.read();
+                CHECK_EQ(std::string, s, "blah", "1");
+			}   
+            CHECK(! p.exists(), "1");
         }
         catch (const std::exception& e)
         {
