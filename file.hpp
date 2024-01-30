@@ -103,15 +103,9 @@ namespace pensar_digital
             { 
                 if (is_open()) 
                     close();
-                char* path;
-                if (std::is_same_v<C, char>)
-					path = mfullpath.cstr();
-                else
-                {
-                    std::string s = mfullpath.string();
-                    path = (char*)s.c_str();
-                }
-                return (std::remove(path) == 0);
+                std::string s = mfullpath.string();
+               
+                return (std::remove(s.c_str ()) == 0);
             }
 
                 
@@ -383,7 +377,7 @@ namespace pensar_digital
 			}
 
             // Generates a random text file name. () operator.
-            inline Path operator() (const S& name_prefix = "", const S& name_suffix = "", const S& extension = DEFAULT_TEXT_FILE_EXTENSION, const Path& path = TMP_DIR)
+            inline Path operator() (const S& name_prefix = "", const S& name_suffix = "", const S& extension = DEFAULT_TEXT_FILE_EXTENSION, const Path& path = TMP_DIR<char>)
             {
                 return path / (name_prefix + random_string(DEFAULT_LENGTH) + name_suffix + "." + get_extension());
             }
@@ -395,16 +389,41 @@ namespace pensar_digital
         {
 			public:
 				inline static const VersionPtr VERSION = Version::get(1, 1, 1);
-                TmpTextFile(const S& file_name = EMPTY<C>, const S& content = EMPTY<C>, const Id id = null_value<Id>()) : TextFile<C>(TMP_DIR / file_name, content, File<C>::DEFAULT_MODE, id)
+                TmpTextFile(const std::basic_string<C>& file_name = EMPTY<C>, const std::basic_string<C>& content = EMPTY<C>, const Id id = null_value<Id>()) : TextFile<C>(TMP_PATH / file_name, content, File<C>::DEFAULT_MODE, id)
                 {
 				}
+
+                void log_error()
+                {
+                    LOG("Failed to remove temporary file " + File<char>::mfullpath.string<char>());
+                }
+
+                void wlog_error()
+                {
+                    Path p = File<wchar_t>::mfullpath;
+                    WLOG(L"Failed to remove temporary file " + p.wstring());
+                }
+
+                template <typename Char>
+                void log_err()
+				{
+					LOG("Failed to remove temporary file " + File<Char>::mfullpath.string<Char>());
+				}
+
+                template <>
+                void log_err<wchar_t>()
+				{
+                    wlog_error();
+                }
                 virtual ~TmpTextFile()
                 {
                     // Removes the file. If it is open, it is closed first. If operation fails, a log message is generated.
-					if (! File<C>::remove())
-                         LOG("Failed to remove temporary file " + File<C>::mfullpath.to_string());
+                    if (!File<C>::remove())
+                    {
+                        log_err<C>();
+                    }
 				}
-			};  // class TmpTextFile
+		};  // class TmpTextFile
 
         class BinaryFile : public File<char>
         {

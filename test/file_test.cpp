@@ -13,7 +13,7 @@ namespace pensar_digital
         TEST(RandomFileNameGenerator, true)
             RandomFileNameGenerator<char> r;
             Path p = r ();
-            CHECK_EQ(char*, p.parent_path().cstr(), TMP_DIR.remove_trailing_separator ().cstr(), "0");
+            CHECK_EQ(Path, p.parent_path(), TMP_PATH.copy_without_trailing_separator(), "0");
             std::string filename = p.filename_only().string();
             CHECK_EQ(std::string, p.extension(), ".txt", "1");
             CHECK_EQ(size_t, filename.length (), 8, "2");
@@ -27,8 +27,6 @@ namespace pensar_digital
         TEST_END(RandomFileNameGenerator)
 
         TEST(TextFile, true)
-        try
-        {
             Path p;
             {
                 TmpTextFile<char> file("text-file-test.txt", "blah");
@@ -39,18 +37,16 @@ namespace pensar_digital
                 std::string s = file.read();
                 CHECK_EQ(std::string, s, "blah", "1");
 			}   
-            CHECK(! p.exists(), "1");
-        }
-        catch (const std::exception& e)
-        {
-        }
+            CHECK(! p.exists(), "2");
 
             
-            //TextFile<wchar_t> file (L"c:\\tmp\\test\\file_test\\text-file-test.txt", L"blah");
-            //file.close();
-            //file.open();
-            //std::wstring s = file.read();
-            //WCHECK_EQ(std::wstring, s, L"blah", L"1");
+            {
+                TmpTextFile<wchar_t> file(L"wtext-file-test.txt", L"blah");
+                p = file.fullpath ();
+                std::wstring ws = file.read();
+                WCHECK_EQ(std::wstring, ws, L"blah", L"3");
+            }
+            CHECK(! p.exists(), "4");
             
         TEST_END(TextFile)
     }

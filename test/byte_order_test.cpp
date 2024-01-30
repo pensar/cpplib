@@ -41,12 +41,12 @@ namespace pensar_digital
                     static_assert (ContainerV<pd::Array<T>, T>);
                     static_assert (ContainerV<std::vector<T>, T>);
 
-                    t.check<std::vector<T>, std::vector<T>, char>(a3, expected, pd::to_string<decltype(count)>(count++) + ".", __FILE__, __LINE__);
+                    t.check_equal_collection<std::vector<T>, std::vector<T>, char>(a3, expected, pd::to_string<decltype(count)>(count++) + ".", __FILE__, __LINE__);
 
                     pd::convert<>(b, size, pd::big_address_8_byte_order, pd::native_byte_order);
                     std::memcpy(c.data(), b.data(), b.size());
                     std::vector<T> a5(c.data(), c.data() + c.size());
-                    t.check<std::vector<T>, std::vector<T>, char>(a5, a6, pd::to_string<decltype(count)>(count++) + ".", __FILE__, __LINE__);
+                    t.check_equal_collection<std::vector<T>, std::vector<T>, char>(a5, a6, pd::to_string<decltype(count)>(count++) + ".", __FILE__, __LINE__);
                 }
                 else
                 {

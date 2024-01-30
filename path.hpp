@@ -195,6 +195,12 @@ namespace pensar_digital
                 return *this;
             }
 
+            Path copy_without_trailing_separator() const noexcept
+			{
+				Path p = *this;
+				return p.remove_trailing_separator();
+			}
+
             // Implements initialize method from Initializable concept.
             virtual bool initialize(const fs::path& p, const Id& aid = null_value<Id>()) noexcept
             {
@@ -301,6 +307,20 @@ namespace pensar_digital
 
             // Implicit conversion to std::string.
             operator std::string() const noexcept { return fs::path::string(); }
+
+            // Implicit conversion to std::wstring.
+            operator std::wstring() const noexcept { return fs::path::wstring(); }
+
+            template <typename C = char>
+            std::basic_string<C> string () const
+			{
+				if constexpr (std::is_same_v<C, char>)
+					return fs::path::string();
+				else if constexpr (std::is_same_v<C, wchar_t>)
+					return fs::path::wstring();
+				else
+					throw std::runtime_error("Unsupported character type.");
+			}
 
             // Implicit conversion to const char* returning a value allocated in the heap using _strdup.
             operator const char* () const { return _strdup(fs::path::string().c_str()); }
@@ -411,8 +431,21 @@ namespace pensar_digital
             _putenv(p.cstr());
             return path;
         }
-        static inline Path TMP_DIR = set_tmp_env_var("c:\\tmp\\");
+        static inline const Path TMP_PATH = set_tmp_env_var("c:\\tmp\\");
+        template<typename C = char>
+        struct TmpDirString
+        {
+            inline static const C* value = TMP_PATH.cstr ();
+        };
 
+        template<>
+        struct TmpDirString<wchar_t>
+        {
+            inline static const wchar_t* value = TMP_PATH.wstr ();
+        };
+
+        template <typename C = char>
+        inline static const C* TMP_DIR = TmpDirString<C>::value;
     } // namespace cpplib
 } // namespace pensar_digital
 #endif  
