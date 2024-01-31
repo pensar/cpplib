@@ -66,17 +66,15 @@ namespace pensar_digital
 
                 virtual const pd::Data* data() const noexcept { return &mdata; }
                 virtual size_t data_size() const noexcept { return sizeof(mdata); }
-            private:
+                /// Set id
+                /// \param val New value to set
+                void set_id(const Id& value) { mdata.mid = value; }
+        private:
                 inline static Factory mfactory = { 3, 10, NULL_DATA }; //!< Member variable "factory"
                 
                 // Set Factory as friend class to allow access to private members.
                 friend class Factory;
             protected:
-
-                /// Set id
-                /// \param val New value to set
-                void set_id(const Id& value) { mdata.mid = value; }
-
                 S ObjXMLPrefix() const noexcept { return "<object class_name = \"" + class_name() + "\" id = \"" + Object::to_string() + "\""; }
 
                 /// \brief Compare objects.

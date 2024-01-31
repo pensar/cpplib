@@ -127,10 +127,11 @@ namespace pensar_digital
                 size_t mread_offset; //!< Member variable "offset"
                 std::unordered_map<Id, size_t> mindex; //!< Returns the buffer offset in bytes for a given id.
                 inline static const size_t DATA_SIZE = sizeof (T::Datatype); //!< Size of the data.
+                inline static const size_t TOTAL_SIZE = DATA_SIZE + sizeof (Id); //!< Total size includes id size.
 
         public:
                 /// Default constructor.
-            ObjMemoryBuffer(size_t initial_size = 1000 * DATA_SIZE) : mread_offset(0), mwrite_offset(0)
+            ObjMemoryBuffer(size_t initial_size = 1000 * TOTAL_SIZE) : mread_offset(0), mwrite_offset(0)
                 {
                     // Allocate memory.
                     mbuffer = std::span<std::byte>(new std::byte[initial_size], initial_size);
@@ -161,13 +162,13 @@ namespace pensar_digital
                 /// \brief Available data to read from the buffer.
                 const size_t ravailable() const noexcept { return mwrite_offset - mread_offset; }
 
-                void write(const void* data) noexcept
+                void write(const void* data, const size_t size) noexcept
                 {
                     // Check if there is enough space in the buffer.
-                    if (wavailable() < DATA_SIZE)
+                    if (wavailable() < size)
                     {
                         // Allocate more memory.
-                        auto new_buffer = std::span<std::byte>(new std::byte[mbuffer.size() + DATA_SIZE], mbuffer.size() + DATA_SIZE);
+                        auto new_buffer = std::span<std::byte>(new std::byte[mbuffer.size() + size], mbuffer.size() + size);
                         // Copy the old buffer to the new one.
                         memcpy(new_buffer.data(), mbuffer.data(), mbuffer.size());
                         // Delete the old buffer.
@@ -177,10 +178,10 @@ namespace pensar_digital
                     }
                 
                     // Copy the data to the buffer.
-                    memcpy (mbuffer.data() + mwrite_offset, data, DATA_SIZE);
+                    memcpy (mbuffer.data() + mwrite_offset, data, size);
 
                     // Update the offset.
-                    mwrite_offset += DATA_SIZE;
+                    mwrite_offset += size;
                 }
 
                 /// \brief Adds data to the buffer. 
@@ -193,37 +194,40 @@ namespace pensar_digital
                     if (offset_it != mindex.end())
                     {
 						// Update the data.
-						memcpy (mbuffer.data() + offset_it->second, (std::byte*)(obj.data ()), DATA_SIZE);
-						return;
+						memcpy (mbuffer.data() + offset_it->second + sizeof (Id), (std::byte*)(obj.data()), DATA_SIZE);
 					}
-
-                    write (obj.data ());
+                    else
+                    {
+                        auto id = obj.id();
+                        write(&id, sizeof(id));
+                        write(obj.data(), DATA_SIZE);
+                    }
 				}
 
                 template <typename... Args> requires FactoryConstructible<T, Args...>
                 T::Factory::P write (Args&&... args) noexcept
                 {
                     typename T::Factory::P p = T::get (std::forward<Args>(args)...);
-                    write(p->data ());
+                    write(*p);
 
                     return p;
                 }
 
-                void read (BytePtr dest, const size_t offset)
+                void read (BytePtr dest, const size_t offset, size_t size)
 				{
 					// Check if there is enough data in the buffer.
-					if (ravailable() < DATA_SIZE)
+					if (ravailable() < size)
 					{
                         throw std::runtime_error ("MemoryBuffer::read: not enough data in the buffer.");
 					}
 
 					// Copy the data from the buffer.
-					memcpy(dest, mbuffer.data() + offset, DATA_SIZE);
+					memcpy(dest, mbuffer.data() + offset, size);
 
 					// Update the offset.
                     if (mread_offset == offset)
                     {
-						mread_offset += DATA_SIZE;
+						mread_offset += size;
 					}
 				}
 
@@ -233,12 +237,15 @@ namespace pensar_digital
                     if (offset_it != mindex.end())
                     {
                         // Copy the data from the buffer.
-                        read((BytePtr)(p->data()), offset_it->second);
+                        read((BytePtr)(p->data()), offset_it->second + sizeof(Id), DATA_SIZE);
                     }
 					else
 					{
 						// Reads next data from the buffer.
-                        read((BytePtr)(p->data()), mread_offset);
+                        Id id;
+                        read ((BytePtr)(&id), mread_offset, sizeof(Id));
+                        p->set_id(id);
+                        read((BytePtr)(p->data()), mread_offset, DATA_SIZE);
 					}
                 }
 
