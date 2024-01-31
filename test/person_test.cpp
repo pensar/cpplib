@@ -14,10 +14,10 @@ namespace pensar_digital
     {
         TEST(Person, true)
             PersonName<> name = { "Mauricio", "", "Gomes" };
-            std::chrono::year year(1980);
-            std::chrono::month month(1);
-            std::chrono::day day(1);            
-            Date dob(year, month, day);
+            //std::chrono::year year(1980);
+            //std::chrono::month month(1);
+            //std::chrono::day day(1);            
+            Date dob(1980, 1, 1);
             Person::DataType data = { name, dob };
             Person p(data);
             static_assert(StdLayoutTriviallyCopyable<Person::DataType>, "Person must be a standard layout trivially copyable type");

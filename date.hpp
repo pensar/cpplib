@@ -12,8 +12,16 @@ namespace pensar_digital
 {
     namespace cpplib
     {
-        typedef std::chrono::year_month_day Date;
+        class Date : public std::chrono::year_month_day
+        {
+            public:
+			    Date (int year, int month, int day)
+					: std::chrono::year_month_day (std::chrono::year (year), std::chrono::month (month), std::chrono::day (day))
+				{
+				}
 
+        };
+ 
         // Ensure the class is trivially copyable and standard layout.
         static_assert (StdLayoutTriviallyCopyable<Date>);
 
