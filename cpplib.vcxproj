@@ -176,6 +176,7 @@
     <ClCompile Include="test\io_util_test.cpp" />
     <ClCompile Include="test\object_test.cpp" />
     <ClCompile Include="test\path_test.cpp" />
+    <ClCompile Include="test\person_test.cpp" />
     <ClCompile Include="test\stop_watch_test.cpp" />
     <ClCompile Include="test\s_test.cpp" />
     <ClCompile Include="version.cpp" />

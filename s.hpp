@@ -113,7 +113,7 @@ namespace pensar_digital
                 std::array<C, N> data;
                 bool case_sensitive = false;
                 bool accent_sensitive = false;
-                const C NULL_CHAR = (sizeof (C) == sizeof(char)) ? '\0' : L'\0';
+                const C NULL_CHAR = null_char<C>();
 
                 // Returns the size of the string.
                 const constexpr inline size_t size() const noexcept

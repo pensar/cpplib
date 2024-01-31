@@ -12,6 +12,7 @@
 #include "../clone_util.hpp"
 #include "../factory.hpp"
 #include "../string_types.hpp"
+#include "../person.hpp"
 
 #include <memory>
 
@@ -19,6 +20,7 @@ namespace pensar_digital
 {
     namespace cpplib
     {
+        using namespace pensar_digital::contact;
         class Dummy;
 #pragma warning( disable : 4250) // Disable warning C4250: inherits via dominance.
         typedef std::shared_ptr<Dummy> DummyPtr;
@@ -32,8 +34,8 @@ namespace pensar_digital
             private:
                 struct Data : public pd::Data
                 {
-                    Name mname;
-                    Data (const Name& name = NULL_NAME) noexcept : mname(name) {}
+                    S20 mname;
+                    Data(const S20& name = "") noexcept : mname(name) {}
 
                 };
                 Data mdata; //!< Member variable mdata contains the object data.
@@ -44,7 +46,7 @@ namespace pensar_digital
                     virtual const pd::Data* data() const noexcept { return &mdata; }
                     virtual size_t data_size() const noexcept { return sizeof(mdata); }
 
-                    Dummy(const Id& id = NULL_ID, const Name& name = "") : Object(id), mdata(name) {}
+                    Dummy(const Id& id = NULL_ID, const S20& name = "") : Object(id), mdata(name) {}
                     Dummy(const Dummy& d) : Object(d), mdata (d.mdata.mname) { }
                     Dummy(Dummy&& d) noexcept : Object(d) { assign (d); }
                 

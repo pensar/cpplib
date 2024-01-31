@@ -41,6 +41,22 @@ namespace pensar_digital
 		template <typename C = char>
 		inline static const C* EMPTY = EmptyString<C>::value;
 
+
+		template<typename C = char>
+		struct SpaceStruct
+		{
+			inline static const C value = ' ';
+		};
+
+		template<>
+		struct SpaceStruct<wchar_t>
+		{
+			inline static const wchar_t value = L' ';
+		};
+
+		template <typename C = char>
+		inline static const C SPACE = SpaceStruct<C>::value;
+
 		template<typename C = char>
 		struct CurrentDir
 		{
@@ -86,6 +102,23 @@ namespace pensar_digital
 
 		template <typename C = char>
 		inline static const C* DEFAULT_BIN_FILE_EXTENSION = DefaultBinaryFileExtension<C>::value;
+		
+		template <typename C = char>
+		struct NullCharStruct
+		{
+			inline static const C value = '\0';
+		};
+
+		template<>
+		struct NullCharStruct<wchar_t>
+		{
+			inline static const wchar_t value = L'\0';
+		};
+
+		template <typename C = char>
+		inline static const C null_char() {
+			return NullCharStruct<C>::value;
+		}
 
 		using S = std::string;
 		using SView = std::string_view;

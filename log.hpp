@@ -30,25 +30,25 @@ namespace pensar_digital
             };
 
             template <typename C = char>
-            inline static const C* DEFAULT_LOG_FILE_NAME() {
-                static const C* filename = DefaultLogFileNameStruct<C>::value;
-                return filename;
+            inline static const C* default_log_file_name() 
+            {
+                return DefaultLogFileNameStruct<C>::value;
             }
 
             template <typename C = char>
-            std::basic_fstream<C> _log(DEFAULT_LOG_FILE_NAME<C>());
+            std::basic_fstream<C> _log(default_log_file_name<C>());
 
-            static inline std::wfstream wlog(DEFAULT_LOG_FILE_NAME<wchar_t>());
+            static inline std::wfstream wlog(default_log_file_name<wchar_t>());
 
             static inline bool log_on = true;
             
             template <typename C = char>
-            inline void enable_log  () {if (! _log<>.is_open ()) _log<>.open (DEFAULT_LOG_FILE_NAME<C> ()); log_on = true;}
+            inline void enable_log  () {if (! _log<>.is_open ()) _log<>.open (default_log_file_name<C> ()); log_on = true;}
             template <typename C = char>
             inline void disable_log () {_log<>.close (); log_on = false;}
 
             template <>
-            inline void enable_log() { if (!wlog.is_open()) wlog.open(DEFAULT_LOG_FILE_NAME<wchar_t> ()); log_on = true; }
+            inline void enable_log() { if (!wlog.is_open()) wlog.open(default_log_file_name<wchar_t> ()); log_on = true; }
             template <>
             inline void disable_log() { wlog.close(); log_on = false; }
 
