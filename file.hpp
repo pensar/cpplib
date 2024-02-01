@@ -122,10 +122,10 @@ namespace pensar_digital
             //FilePtr clone() const  noexcept { return pd::clone<File>(*this, mfullpath, mmode, id()); }
 
             // Conversion to json string.
-            virtual S json() const noexcept
+            virtual String json() const noexcept
             {
                 std::stringstream ss;
-                S s = pd::json<File>(*this);
+                String s = pd::json<File>(*this);
                 ss << ", \"mfullpath\" : " << mfullpath.to_string() << " , \"mode\" : " << mmode;
                 ss << "\" }";
                 return ss.str();
@@ -144,16 +144,16 @@ namespace pensar_digital
                     Id id;
                     pd::read_json<File<C>>(is, *this, &id, &v, &j);
                     set_id(id);
-                    mfullpath = j["mfullpath"].get<S>();
+                    mfullpath = j["mfullpath"].get<String>();
                     mmode = j["mode"].get<std::ios_base::openmode>();
                 }
                 return is;
             };
 
             // Convertion to xml string.
-            virtual S xml() const noexcept
+            virtual String xml() const noexcept
             {
-                S xml = ObjXMLPrefix() + "><path>";
+                String xml = ObjXMLPrefix() + "><path>";
                 xml += mfullpath.string() + "</path><mode>";
                 xml += std::to_string(mmode) + "</mode>";
                 xml += "</object>";
@@ -161,7 +161,7 @@ namespace pensar_digital
             }
 
             // Convertion from xml string.
-            virtual void from_xml(const S& sxml)
+            virtual void from_xml(const String& sxml)
             {
                 XMLNode node = parse_object_tag(sxml);
                 XMLNode n = node.getChildNode("path");
@@ -172,7 +172,7 @@ namespace pensar_digital
                     this->mmode = std::stoi(n.getText());
             }
 
-            virtual S debug_string() const noexcept
+            virtual String debug_string() const noexcept
             {
                 return Object::debug_string() + " path = " + mfullpath.to_string();
             }
@@ -209,9 +209,9 @@ namespace pensar_digital
         {
             private:
             public:
-                typedef std::basic_string<C> S;
+                typedef std::basic_string<C> String;
                 inline static const VersionPtr VERSION = Version::get(1, 1, 1);
-                TextFile(const Path& full_path, const S& content = EMPTY<C>, 
+                TextFile(const Path& full_path, const String& content = EMPTY<C>, 
                          const std::ios_base::openmode mode = File<C>::DEFAULT_MODE, const Id id = NULL_ID) : File<C>(full_path, id, (mode& (~std::ios::binary)))
                 {
                     if (File<C>::exists ())
@@ -221,13 +221,13 @@ namespace pensar_digital
                     File<C>::close ();
                 }
 
-                //TextFile(const Path& full_path, const S& content = EMPTY<C>, const Id aid = NULL_ID) :
+                //TextFile(const Path& full_path, const String& content = EMPTY<C>, const Id aid = NULL_ID) :
                 //    TextFile(full_path, File<C>::DEFAULT_MODE, content, id)
                 //{
                 //}
 
                 virtual ~TextFile() = default;
-                TextFile<C>& write(const S& content)
+                TextFile<C>& write(const String& content)
                 {
 					// Writes content.
 					if (! File<C>::is_open()) 
@@ -237,7 +237,7 @@ namespace pensar_digital
                     *(File<C>::stream_ptr) << content;
 					return *this;
                 }
-                TextFile<C>& append (const S& content)
+                TextFile<C>& append (const String& content)
                 {
                     // Appends content.
                     if (! File<C>::is_open()) 
@@ -248,26 +248,26 @@ namespace pensar_digital
                     return *this;
                 }
 
-                S to_string() const noexcept
+                String to_string() const noexcept
                 {
                     return File<C>::mfullpath.to_string ();
                 }
 
                 // Implicit conversion to string.
-                operator S() const noexcept
+                operator String() const noexcept
                 {
                     return to_string();
                 }
 
                 // Reads the file content and returns it as a std::basic_string<C>.
-                S read() const
+                String read() const
                 {
 					if (! File<C>::is_open()) 
 						File<C>::open ();
 
 					File<C>::stream_ptr->seekg(0, std::ios::end);
 					size_t size = File<C>::stream_ptr->tellg();
-					S content(size, 0);
+					String content(size, 0);
 					File<C>::stream_ptr->seekg(0, std::ios::beg);
 					File<C>::stream_ptr->read(&content[0], size);
 					return content;
@@ -280,18 +280,18 @@ namespace pensar_digital
         class RandomFileNameGenerator
         {
 			private:
-				typedef std::basic_string<C> S;
+				typedef std::basic_string<C> String;
 
 				inline static const size_t DEFAULT_LENGTH                =     8;
-				inline static const S      DEFAULT_TEXT_FILE_EXTENSION   = "txt";
-                inline static const S      DEFAULT_BINARY_FILE_EXTENSION = "bin";
+				inline static const String      DEFAULT_TEXT_FILE_EXTENSION   = "txt";
+                inline static const String      DEFAULT_BINARY_FILE_EXTENSION = "bin";
                 
                 // Extension type. It can be fixed, random, none, numeric sequence, C char sequence, or a function.  
                 enum class ExtensionType { FIXED, RANDOM, NONE, NUMERIC_SEQUENCE, CHAR_SEQUENCE, FUNCTION };
                 inline static const ExtensionType DEFAULT_EXTENSION_TYPE = ExtensionType::FIXED;
 
                 // Determines the function signature as a typedef. It is named custom_exension_generator and it should return a string and take no arguments.
-                typedef std::function<S()> CUSTOM_EXT_FUNCTION;
+                typedef std::function<String()> CUSTOM_EXT_FUNCTION;
                 // Defines a NULL_CUSTOM_EXT_FUNCTION.  That should always return an empty string.
                 inline static const CUSTOM_EXT_FUNCTION NULL_CUSTOM_EXT_FUNCTION = []() { return EMPTY<C>; };
 
@@ -299,7 +299,7 @@ namespace pensar_digital
                 ExtensionType mextension_type;
 
                 // Extension.
-                S mextension;
+                String mextension;
 
                 inline static const size_t MAX_FULL_NAME_LENGTH = 255;
                 
@@ -315,15 +315,15 @@ namespace pensar_digital
                 CUSTOM_EXT_FUNCTION mcustom_ext_function;
 
                 // Generates a random string of length len.
-                inline static S random_string(const size_t len)
+                inline static String random_string(const size_t len)
                 {
-					static const S CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+					static const String CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
                     Random<size_t> r(0, CHARS.size() - 1);
 
-					S s;
+					String s;
                     size_t i = len;
 					s.reserve(i);
-                    typename S::value_type c = CHARS[r()];
+                    typename String::value_type c = CHARS[r()];
                     
                     size_t count = 1000; // Max count is 1000. If c is still a number after 1000 tries, then throws an exception.
                     // while c is a number, try again.
@@ -333,7 +333,7 @@ namespace pensar_digital
                         if (--count == 0)
                         {
                             // Logs error and throws an exception.
-                            S error_msg = "RandomFileNameGenerator::random_string(): Error: Could not generate a random string after 1000 tries.";
+                            String error_msg = "RandomFileNameGenerator::random_string(): Error: Could not generate a random string after 1000 tries.";
                             LOG(error_msg);
                             throw std::runtime_error(error_msg);
                         }
@@ -347,7 +347,7 @@ namespace pensar_digital
 					return s;
 				}
 
-                S get_extension() const
+                String get_extension() const
                 {
                     switch (mextension_type)
                     {
@@ -371,13 +371,13 @@ namespace pensar_digital
                     
             public:
             // Constructor.
-            RandomFileNameGenerator (const ExtensionType ext_type = DEFAULT_EXTENSION_TYPE, const S& extension = DEFAULT_TEXT_FILE_EXTENSION, const CUSTOM_EXT_FUNCTION& custom_ext_function = NULL_CUSTOM_EXT_FUNCTION) :
+            RandomFileNameGenerator (const ExtensionType ext_type = DEFAULT_EXTENSION_TYPE, const String& extension = DEFAULT_TEXT_FILE_EXTENSION, const CUSTOM_EXT_FUNCTION& custom_ext_function = NULL_CUSTOM_EXT_FUNCTION) :
                 mextension_type(ext_type), mextension(extension), mcustom_ext_function(custom_ext_function)
             {
 			}
 
             // Generates a random text file name. () operator.
-            inline Path operator() (const S& name_prefix = "", const S& name_suffix = "", const S& extension = DEFAULT_TEXT_FILE_EXTENSION, const Path& path = TMP_DIR<char>)
+            inline Path operator() (const String& name_prefix = "", const String& name_suffix = "", const String& extension = DEFAULT_TEXT_FILE_EXTENSION, const Path& path = TMP_DIR<char>)
             {
                 return path / (name_prefix + random_string(DEFAULT_LENGTH) + name_suffix + "." + get_extension());
             }

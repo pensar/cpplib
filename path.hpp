@@ -72,10 +72,10 @@ namespace pensar_digital
 
             PathFactory::P clone(const PathPtr& ptr) { return clone(*ptr); }
            
-            PathFactory::P parse_json(const S& sjson)
+            PathFactory::P parse_json(const String& sjson)
             {
                 auto j = Json::parse(sjson);
-                S json_class = j.at("class");
+                String json_class = j.at("class");
                 if (json_class != pd::class_name<Path, char>())
                     throw std::runtime_error("Invalid class name: " + pd::class_name<Path, char>());
                 Id id;
@@ -210,7 +210,7 @@ namespace pensar_digital
             }
 
             // Conversion to json string.
-            virtual S json() const noexcept
+            virtual String json() const noexcept
             {
                 std::stringstream ss(pd::json<Path>(*this));
                 ss << ",path:" << this->fs::path::string() << "}";
@@ -253,23 +253,23 @@ namespace pensar_digital
             };
 
             // Convertion to xml string.
-            virtual S xml() const noexcept
+            virtual String xml() const noexcept
             {
-                S xml = ObjXMLPrefix() + "><path>";
+                String xml = ObjXMLPrefix() + "><path>";
                 xml += fs::path::string() + "</path>";
                 xml += "</object>";
                 return xml;
             }
 
             // Convertion from xml string.
-            virtual void from_xml(const S& sxml)
+            virtual void from_xml(const String& sxml)
             {
                 XMLNode node = parse_object_tag(sxml);
                 XMLNode n = node.getChildNode("path");
                 if (!n.isEmpty()) *this = n.getText();
             }
 
-            virtual S debug_string() const noexcept
+            virtual String debug_string() const noexcept
             {
                 return Object::debug_string() + " path = " + fs::path::string();
             }

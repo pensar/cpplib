@@ -11,16 +11,16 @@ namespace pensar_digital
 {
 	namespace cpplib
 	{
-		class DummyFactory2 : public Factory<Dummy, Id, S>
+		class DummyFactory2 : public Factory<Dummy, Id, String>
 		{
 		public:
 			inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
-			DummyFactory2(const Id& aid = NULL_ID, const S& aname = "") : Factory<Dummy, Id, S>(3, 10, aid, aname) { };
+			DummyFactory2(const Id& aid = NULL_ID, const String& aname = "") : Factory<Dummy, Id, String>(3, 10, aid, aname) { };
 			virtual ~DummyFactory2() { };
-			using P = Factory<Dummy, Id, S>::P;
-			virtual P get(const Id& aid = NULL_ID, const S& aname = "")
+			using P = Factory<Dummy, Id, String>::P;
+			virtual P get(const Id& aid = NULL_ID, const String& aname = "")
 			{
-				return Factory<Dummy, Id, S>::get(aid, aname);
+				return Factory<Dummy, Id, String>::get(aid, aname);
 			};
 
 			P clone (const Dummy& adummy)
@@ -29,7 +29,7 @@ namespace pensar_digital
 			};
 			P clone(const DummyPtr& ptr) { return clone (*ptr);}
 
-			P parse_json (const S& sjson)
+			P parse_json (const String& sjson)
 			{
 				Json j;
 				P ptr = get(pd::id<Dummy>(sjson, &j));

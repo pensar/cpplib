@@ -112,7 +112,7 @@ namespace pensar_digital
                 /// \return  The current value of hash
                 virtual inline const Hash hash() const noexcept { return mdata.mid; };
 
-                inline static VersionFactory::P parse_json (const S& sjson)
+                inline static VersionFactory::P parse_json (const String& sjson)
                 {
                     Json j;
                     VersionFactory::P ptr = get();
@@ -148,8 +148,8 @@ namespace pensar_digital
                 }
 
                 // Convertion to xml string.
-                S xml() const noexcept;
-                void from_xml(const S& sxml);
+                String xml() const noexcept;
+                void from_xml(const String& sxml);
             
                 std::istream& read (std::istream& os, const IO_Mode amode = TEXT, const std::endian& byte_order = std::endian::native);
 
@@ -168,10 +168,10 @@ namespace pensar_digital
                     return pd::class_name<Version, Char> ();
                 }
                 
-                S debug_string() const noexcept;
+                String debug_string() const noexcept;
                 inline const Id id() const noexcept { return mdata.mid; }
                 const Hash get_hash() const noexcept;
-                S json() const noexcept;
+                String json() const noexcept;
                 std::ostream& write (std::ostream& os, const IO_Mode amode = TEXT, const std::endian& byte_order = std::endian::native) const;
 
             

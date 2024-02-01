@@ -120,7 +120,7 @@ namespace pensar_digital
 			return NullCharStruct<C>::value;
 		}
 
-		using S = std::string;
+		using String = std::string;
 		using SView = std::string_view;
 		using SIter = std::string::iterator;
 		using SConstIter = std::string::const_iterator;

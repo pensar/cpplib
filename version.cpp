@@ -25,8 +25,8 @@ namespace pensar_digital
 
 		void from_json(const Json& j, Version& v)
 		{
-			S class_name = v.class_name();
-			S json_class = j.at("class");
+			String class_name = v.class_name();
+			String json_class = j.at("class");
 			if (class_name == json_class)
 			{
 				v.set_id(j.at("id"));
@@ -69,9 +69,9 @@ namespace pensar_digital
 			return os;
 		}
 
-		S Version::debug_string() const noexcept
+		String Version::debug_string() const noexcept
 		{
-			return S();
+			return String();
 		}
 		
 		bool Version::equals(const Version& v) const noexcept
@@ -80,7 +80,7 @@ namespace pensar_digital
 			return (v.id () == id ()) && (v.mdata.mprivate == mdata.mprivate) && (v.mdata.mprotected == mdata.mprotected) && (v.mdata.mpublic == mdata.mpublic);
 		}
 
-		void Version::from_xml (const S& sxml)
+		void Version::from_xml (const String& sxml)
 		{
 			XMLNode node = pd::parse_object_tag<Version> (sxml, &mdata.mid);
 			XMLNode n = node.getChildNode("mprivate");
@@ -94,9 +94,9 @@ namespace pensar_digital
 				mdata.mpublic = atoi(n.getText());
 		}
 		 
-		S Version::xml() const noexcept
+		String Version::xml() const noexcept
 		{
-			S xml = pd::ObjXMLPrefix<Version>(*this) + ">";
+			String xml = pd::ObjXMLPrefix<Version>(*this) + ">";
 			xml += "<mpublic>" + pd::to_string(mdata.mpublic) + "</mpublic>";
 			xml += "<mprotected>" + pd::to_string(mdata.mprotected) + "</mprotected>";
 			xml += "<mprivate>" + pd::to_string(mdata.mprivate) + "</mprivate>";
@@ -110,7 +110,7 @@ namespace pensar_digital
 			return Hash (897896785686); // todo: implement hash.
 		}
 
-		S Version::json() const noexcept
+		String Version::json() const noexcept
 		{
 			std::stringstream ss;
 			ss << "{ \"class\" : \"" << pd::class_name<Version, char>() << "\" , \"id\" : " << id() << ", \"mpublic\" : " << mdata.mpublic << ", \"mprotected\" : " << mdata.mprotected << ", \"mprivate\" : " << mdata.mprivate << " }";
@@ -121,7 +121,7 @@ namespace pensar_digital
 		{
 			if (amode == BINARY)
 			{
-				/* S sclass_name;
+				/* String sclass_name;
 				binary_read(is, sclass_name, byte_order);
 				if (sclass_name != class_name())
 					throw new std::runtime_error("Version::read: class name mismatch.");
@@ -134,10 +134,10 @@ namespace pensar_digital
 			}
 			else // json format
 			{
-				S sjson;
+				String sjson;
 				is >> sjson;
 				auto j = Json::parse(sjson);
-				S json_class = j.at("class");
+				String json_class = j.at("class");
 				if (json_class != pd::class_name<Version, char>())
 					throw std::runtime_error("Invalid class name: " + pd::class_name<Version, char>());
 

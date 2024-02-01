@@ -19,8 +19,8 @@ namespace pd = pensar_digital::cpplib;
         // one argument
         pd::Object from_json (const pd::Json& j) 
         {
-            pd::S class_name = pd::class_name<pd::Object> ();
-            pd::S json_class = j.at("class");
+            pd::String class_name = pd::class_name<pd::Object> ();
+            pd::String json_class = j.at("class");
             if (class_name == json_class)
             {
                 return *pd::Object::get.get (j.at("id"));
@@ -34,7 +34,7 @@ namespace pensar_digital
 {
 	namespace cpplib
 	{
-        Object& Object::from_json(const S& sjson)
+        Object& Object::from_json(const String& sjson)
         {
             VersionPtr v;
             Id aid;
@@ -50,7 +50,7 @@ namespace pensar_digital
         
         void Object::read_bin_obj(std::istream& is, const std::endian& byte_order)
         {
-            S sclass_name;
+            String sclass_name;
             binary_read(is, sclass_name, byte_order);
             if (sclass_name != class_name())
                 throw new std::runtime_error("Object::read: class name mismatch.");
@@ -77,7 +77,7 @@ namespace pensar_digital
             }
             else // json format
             {
-                S stream_class_name;
+                String stream_class_name;
 				VersionPtr stream_version;
 				Id stream_id;
                 Json j;
@@ -117,8 +117,8 @@ namespace pensar_digital
 
         void from_json(const Json& j, Object& o)
         {
-            S class_name = o.class_name();
-            S json_class = j.at("class");
+            String class_name = o.class_name();
+            String json_class = j.at("class");
             if (class_name == json_class)
                 o.set_id(j.at("id"));
             else throw new std::runtime_error("Object expected class = " + class_name + " but json has " + json_class);

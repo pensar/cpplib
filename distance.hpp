@@ -18,8 +18,8 @@ namespace pensar_digital
 
         /// Levenshtein Distance Algorithm
         // adapted from Anders Sewerin Johansen code.
-        template<typename S = std::string>
-        int distance (const S& source, const S& target)
+        template<typename String = std::string>
+        int distance (const String& source, const String& target)
         {
             //cpplog << "source = " << source << " " << "target = " << target << std::endl;
             //LOG_FLUSH
@@ -97,31 +97,31 @@ namespace pensar_digital
             return matrix[n][m];
         };
 
-        template <typename S = std::string>
+        template <typename String = std::string>
         struct LessDistance
         {
-            S reference;
+            String reference;
 
-            LessDistance (const S& s) : reference(s) {}
+            LessDistance (const String& s) : reference(s) {}
 
-            bool operator () (const S& left, const S& right)
+            bool operator () (const String& left, const String& right)
             {
                 //cpplog << "left = " << left << " right = " << right << std::endl;
-                return pd::distance<S> (left, reference) < pd::distance<S> (right, reference);
+                return pd::distance<String> (left, reference) < pd::distance<String> (right, reference);
             }
         };
 
-        template <typename S = std::string, class Container = std::vector<S>>
-        typename Container::value_type min_distance (const S& s, const Container& c)
+        template <typename String = std::string, class Container = std::vector<String>>
+        typename Container::value_type min_distance (const String& s, const Container& c)
         {
             INVALID_ARGUMENT(c.size () == 0, "c.size () = 0");
 
             typename Container::const_iterator it = c.begin ();
             typename Container::value_type min = *it;
-            int min_dist = pd::distance<S> (min, s);
+            int min_dist = pd::distance<String> (min, s);
             for (; it != c.end (); ++it)
             {
-                int dist = pd::distance<S> (*it, s);
+                int dist = pd::distance<String> (*it, s);
                 if (dist < min_dist)
                 {
                     min = *it;
@@ -138,17 +138,17 @@ namespace pensar_digital
             return min_distance (std::string(s), c);
         }
 
-        template <typename S = std::string, class Container = std::map<std::string, std::string>>
-        typename Container::value_type min_distance_map_key (const S& s, const Container& c, int max_distance = std::numeric_limits<int>::max())
+        template <typename String = std::string, class Container = std::map<std::string, std::string>>
+        typename Container::value_type min_distance_map_key (const String& s, const Container& c, int max_distance = std::numeric_limits<int>::max())
         {
             INVALID_ARGUMENT(c.size () == 0, "c.size () = 0");
 
             typename Container::const_iterator it = c.begin ();
             std::pair<typename Container::key_type, typename Container::mapped_type> min(it->first, it->second);
-            int min_dist = pd::distance<S> (min.first, s);
+            int min_dist = pd::distance<String> (min.first, s);
             for (; it != c.end (); ++it)
             {
-                int dist = pd::distance<S> (it->first, s);
+                int dist = pd::distance<String> (it->first, s);
                 if (dist < min_dist)
                 {
                     min = *it;
@@ -160,12 +160,12 @@ namespace pensar_digital
             return (min_dist <= max_distance) ? min : nope;
         }
 
-        template <typename S = std::string, class Container = std::vector<S>, class OutContainer = std::vector<S>>
-        void min_distance (const S& s, const Container& c, OutContainer& out, unsigned max_elements = 0)
+        template <typename String = std::string, class Container = std::vector<String>, class OutContainer = std::vector<String>>
+        void min_distance (const String& s, const Container& c, OutContainer& out, unsigned max_elements = 0)
         {
             INVALID_ARGUMENT(c.size () == 0, "c.size () = 0");
-            LessDistance<S> ld (s);
-            typedef std::multiset<S, LessDistance<S>> MSet;
+            LessDistance<String> ld (s);
+            typedef std::multiset<String, LessDistance<String>> MSet;
             MSet mset (ld);
             for (typename Container::const_iterator it = c.begin (); it != c.end (); ++it)
             {

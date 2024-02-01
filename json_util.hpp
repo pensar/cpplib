@@ -18,20 +18,20 @@ namespace pensar_digital
     {
         using Json = nlohmann::json;
 
-        // Jsonable concept. Requires a member function json() returning something convertible to S.
+        // Jsonable concept. Requires a member function json() returning something convertible to String.
         template <typename T>
         concept Jsonable = requires (T t)
         {
-            {t.json()} noexcept -> std::convertible_to<S>;
+            {t.json()} noexcept -> std::convertible_to<String>;
         };
 
         template<class T>
-        Id id(const S& sjson, Json* j)
+        Id id(const String& sjson, Json* j)
         {
             if (j == nullptr)
             {
                 auto k = Json::parse(sjson);
-                S json_class = k.at("class");
+                String json_class = k.at("class");
                 if (json_class != pd::class_name<T, char>())
                     throw std::runtime_error("Invalid class name: " + pd::class_name<T, char>());
                 return k.at("id");
@@ -39,7 +39,7 @@ namespace pensar_digital
             else
             {
                 *j = Json::parse(sjson);
-                S json_class = j->at("class");
+                String json_class = j->at("class");
                 if (json_class != pd::class_name<T, char>())
                     throw std::runtime_error("Invalid class name: " + pd::class_name<T, char>());
                 return j->at("id");
@@ -47,7 +47,7 @@ namespace pensar_digital
 
         }
         template <class T, typename IdType = Id>
-        T& read_json(const S& sjson, T& o, IdType* out_id, VersionPtr* out_v, Json* out_j = nullptr)
+        T& read_json(const String& sjson, T& o, IdType* out_id, VersionPtr* out_v, Json* out_j = nullptr)
         {
             *out_id = (id<T>(sjson, out_j));
             *out_v = Version::get(*out_j);
@@ -57,13 +57,13 @@ namespace pensar_digital
         template <class T, typename IdType = Id>
         std::istream& read_json(std::istream& is, T& o, IdType* out_id, VersionPtr* out_v, Json* out_j = nullptr)
         {
-            S sjson;
+            String sjson;
             read_json (read_all (is, sjson), o, out_id, out_v, out_j);
             return is;
         }
 
         template <Versionable T>
-        S json (const T& o)
+        String json (const T& o)
         {
             std::stringstream ss;
             ss << "{ \"class\" : \"" << o.class_name();

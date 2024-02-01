@@ -40,7 +40,7 @@ namespace pensar_digital
                 };
                 Data mdata; //!< Member variable mdata contains the object data.
             public:
-                    typedef pd::Factory<Dummy, Id, S> Factory;
+                    typedef pd::Factory<Dummy, Id, String> Factory;
                     inline static Factory factory = {3, 10, NULL_ID, ""};
                     inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
                     virtual const pd::Data* data() const noexcept { return &mdata; }
@@ -53,7 +53,7 @@ namespace pensar_digital
                     //Dummy& assign(const Dummy&  o) noexcept { Object::assign(o); std::memcpy(&mdata, &(o.mdata), sizeof(mdata)); }
                     //Dummy& assign(const Dummy&& o) noexcept { Object::assign(o); std::memmove(&mdata, &(o.mdata), sizeof(mdata)); }
 
-                    inline static Factory::P get(const Id& aid = NULL_ID, const S& aname = "")
+                    inline static Factory::P get(const Id& aid = NULL_ID, const String& aname = "")
                     {
                         return factory.get(aid, aname);
                     };
@@ -64,7 +64,7 @@ namespace pensar_digital
                     };
                     inline Factory::P clone(const DummyPtr& ptr) { return ptr->clone (); }
 
-                    inline static Factory::P parse_json(const S& sjson)
+                    inline static Factory::P parse_json(const String& sjson)
                     {
                         Json j;
                         Factory::P ptr = get(pd::id<Dummy>(sjson, &j));
@@ -85,12 +85,12 @@ namespace pensar_digital
                     virtual ~Dummy() {}
                     //Dummy& assign(const Dummy& d) noexcept { Object::assign(d); mdata = d.mdata; return *this; }
 
-                    virtual S class_name() const noexcept { return Object::class_name (); }
+                    virtual String class_name() const noexcept { return Object::class_name (); }
 
                     virtual void set_id(const Id& aid) noexcept { Object::set_id(aid); }
             
                     // Implements initialize method from Initializable concept.
-                    virtual bool initialize(const Id& aid = NULL_ID, const S& name = "") noexcept
+                    virtual bool initialize(const Id& aid = NULL_ID, const String& name = "") noexcept
                     {
                         Object::set_id(aid);
                         mdata.mname = name;
@@ -100,7 +100,7 @@ namespace pensar_digital
                     DummyPtr clone() const  noexcept { return pd::clone<Dummy>(*this, id (), mdata.mname); }
 
                     // Conversion to json string.
-                    virtual S json() const noexcept
+                    virtual String json() const noexcept
                     {
                         std::stringstream ss;
                         ss << (pd::json<Dummy>(*this));
@@ -123,7 +123,7 @@ namespace pensar_digital
                             VersionPtr v;
                             pd::read_json<Dummy>(is, *this, &id, &v, &j);
                             set_id (id);
-                            mdata.mname = j["name"].get<S>();
+                            mdata.mname = j["name"].get<String>();
                         }
                         return is;
                 };
@@ -144,34 +144,34 @@ namespace pensar_digital
                 };
 
                 // Convertion to xml string.
-                virtual S xml() const noexcept
+                virtual String xml() const noexcept
                 {
-                    S xml = ObjXMLPrefix() + ">";
+                    String xml = ObjXMLPrefix() + ">";
                     xml += "<name>" + mdata.mname.to_string () + "</name>";
                     xml += "</object>";
                     return xml;
                 }
 
                 // Convertion from xml string.
-                virtual void from_xml(const S& sxml)
+                virtual void from_xml(const String& sxml)
                 {
                     XMLNode node = parse_object_tag(sxml);
                     XMLNode n = node.getChildNode("name");
                     if (!n.isEmpty()) mdata.mname = n.getText();
                 }
 
-                virtual S get_name() const noexcept { return mdata.mname; }
-                void   set_name(const S& aname) noexcept { mdata.mname = aname; }
+                virtual String get_name() const noexcept { return mdata.mname; }
+                void   set_name(const String& aname) noexcept { mdata.mname = aname; }
             
-                virtual S to_string() const noexcept { return Object::to_string () + " " + mdata.mname.to_string (); }
+                virtual String to_string() const noexcept { return Object::to_string () + " " + mdata.mname.to_string (); }
 
                 /// Implicit conversion to string.
                 /// \return A string with the object id.
-                operator S () const noexcept { return to_string(); }
+                operator String () const noexcept { return to_string(); }
 
                 /// Debug string.
                 /// \return A string with the object id.
-                virtual S debug_string() const noexcept
+                virtual String debug_string() const noexcept
                 {
 				    return Object::debug_string() + " name = " + mdata.mname;
                 }

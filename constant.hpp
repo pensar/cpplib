@@ -24,7 +24,7 @@ namespace pensar_digital
         using VersionInt = int_fast16_t;
         using FileSize   = int_fast64_t;
         
-        extern       S  DOUBLE_QUOTES;
+        extern       String  DOUBLE_QUOTES;
         extern const Id NULL_ID;
         
         template <std::unsigned_integral T>

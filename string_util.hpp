@@ -44,9 +44,9 @@ namespace pensar_digital
         // Reads all chars from a istream into a string.
         // \param is the input stream.
         // \param s the string to hold the result.
-        inline S& read_all (std::basic_istream<S::value_type>& is, S& s)
+        inline String& read_all (std::basic_istream<String::value_type>& is, String& s)
         {
-			S::value_type c;
+			String::value_type c;
 			while (is.get (c))
 				s += c;
             return s;
@@ -253,7 +253,7 @@ namespace pensar_digital
 
         /// \copydoc pad_copy(std::basic_string<T>&, const T, const typename std::basic_string<T>::size_type)
         /// \return Padded string.
-        inline S pad_copy (const char* s, const char c, const unsigned n, bool where = PAD_RIGHT)
+        inline String pad_copy (const char* s, const char c, const unsigned n, bool where = PAD_RIGHT)
         {
             assert (s != 0);
 
@@ -322,11 +322,11 @@ namespace pensar_digital
             }
         }
 
-        template<class S = std::string>
-        S no_accents (const S& s)
+        template<class String = std::string>
+        String no_accents (const String& s)
         {
-            S r = s;
-            remove_accents<typename S::value_type> (r);
+            String r = s;
+            remove_accents<typename String::value_type> (r);
             return r;
         }
 
@@ -468,7 +468,7 @@ namespace pensar_digital
         }
 
         template<typename C = char>
-        std::basic_string<C> insert_grouping_char (const S& s, typename S::value_type grouping_char = L(C, ','))
+        std::basic_string<C> insert_grouping_char (const String& s, typename String::value_type grouping_char = L(C, ','))
         {
             std::basic_string<C> f; //formatted string.
             unsigned primeiro = s.length () % 3;
@@ -541,7 +541,7 @@ namespace pensar_digital
         }
 
         //template<bool use_grouping_char = false, typename C = char>
-        //std::basic_string<C> to_string(unsigned long long int number, typename S::value_type grouping_char = L(C, ','))
+        //std::basic_string<C> to_string(unsigned long long int number, typename String::value_type grouping_char = L(C, ','))
         //{
         //    return to_string <unsigned long long int, use_grouping_char>(number, grouping_char);
        // }

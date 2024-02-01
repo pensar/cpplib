@@ -12,7 +12,7 @@ namespace pensar_digital
     namespace cpplib
     {
         const Id NULL_ID = -1;
-        S DOUBLE_QUOTES = "\"";
+        String DOUBLE_QUOTES = "\"";
         #ifdef CODE_GEAR
         #pragma package(smart_init)
         #endif

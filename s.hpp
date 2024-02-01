@@ -104,7 +104,19 @@ namespace pensar_digital
         {
             return greater (c, c2, case_sensitive, accent_sensitive) || equal (c, c2, case_sensitive, accent_sensitive);
         }
-
+            
+        template <typename C = char>
+        class Str1
+        {
+            private:
+            C* data = nullptr;
+            Str1 (C* s, size_t size)
+			{
+				data = new C[size];
+				std::memcpy(data, s, size * sizeof(C));
+			}   
+        };
+        static_assert (StdLayoutTriviallyCopyable<Str1<>>, "Str must be trivially copyable");
         template<int N, typename C = char> //, typename Encoding = icu::UnicodeString>
         class CS
         {
@@ -311,18 +323,11 @@ namespace pensar_digital
                 }
 
                 // Assigns a std::array.
-                CS& operator= (const std::array<C, N>& arr) noexcept
+                /*CS& operator= (const std::array<C, N>& arr) noexcept
 			    {
                     std::memcpy(data.data(), arr.data(), N * sizeof(C));
 				    return *this;
-			    }
-                
-                //CS& operator= (const CS& other) noexcept = default;
-                /*{
-					std::copy(other.data.begin(), other.length (), data.begin());
-					data[other.length ()] = NULL_CHAR;
-					return *this;
-				}*/
+			    }*/
                 
                 CS& operator+= (const CS& other)
                 {

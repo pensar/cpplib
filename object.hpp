@@ -75,7 +75,7 @@ namespace pensar_digital
                 // Set Factory as friend class to allow access to private members.
                 friend class Factory;
             protected:
-                S ObjXMLPrefix() const noexcept { return "<object class_name = \"" + class_name() + "\" id = \"" + Object::to_string() + "\""; }
+                String ObjXMLPrefix() const noexcept { return "<object class_name = \"" + class_name() + "\" id = \"" + Object::to_string() + "\""; }
 
                 /// \brief Compare objects.
                 ///
@@ -127,7 +127,7 @@ namespace pensar_digital
                     return std::as_writable_bytes(byte_span);
 				}
 
-                virtual std::string class_name() const { S c = typeid(*this).name(); c.erase(0, sizeof("class ") - 1); return c; }
+                virtual std::string class_name() const { String c = typeid(*this).name(); c.erase(0, sizeof("class ") - 1); return c; }
 
                 // Clone method. 
                 ObjectPtr clone() const noexcept { return pd::clone<Object>(*this, mdata.mid); }
@@ -163,7 +163,7 @@ namespace pensar_digital
                 }
 
                 // Conversion to json string.
-                inline virtual S json () const noexcept 
+                inline virtual String json () const noexcept 
                 { 
                     return pd::json<Object> (*this) + " }";
                 }
@@ -177,18 +177,18 @@ namespace pensar_digital
                 virtual std::ostream& write (std::ostream& os, const IO_Mode amode = BINARY, const std::endian& byte_order = std::endian::native) const;
 
                 // Conversion to xml string.
-                virtual S xml() const noexcept { return ObjXMLPrefix() + "/>"; }
+                virtual String xml() const noexcept { return ObjXMLPrefix() + "/>"; }
 
-                XMLNode parse_object_tag(const pensar_digital::cpplib::S& sxml)
+                XMLNode parse_object_tag(const pensar_digital::cpplib::String& sxml)
                 {
                     const char* xml = sxml.c_str();
                     XMLCSTR tag = "object";
                     XMLResults* pResults = 0;
                     XMLNode node = XMLNode::parseString(xml, tag, pResults);
-                    S xml_class_name = node.getAttribute("class_name");
+                    String xml_class_name = node.getAttribute("class_name");
                     if (xml_class_name == class_name())
                     {
-                        S sid = node.getAttribute("id");
+                        String sid = node.getAttribute("id");
                         mdata.mid = std::stoi(sid);
                     }
                     else
@@ -197,7 +197,7 @@ namespace pensar_digital
                 }
 
                 // Conversion from xml string.
-                virtual void from_xml(const S& sxml)
+                virtual void from_xml(const String& sxml)
                 {
                     parse_object_tag(sxml);
                 }
@@ -205,7 +205,7 @@ namespace pensar_digital
                 bool operator == (const Object& o) const { return   equals(o); }
                 bool operator != (const Object& o) const { return !equals(o); }
 
-                Object& from_json(const S& sjson);
+                Object& from_json(const String& sjson);
 
                 /// Conversion to string.
                 /// \return A string with the object id.
@@ -214,11 +214,11 @@ namespace pensar_digital
 
                 /// Implicit conversion to string.
                 /// \return A string with the object id.
-                operator S () const noexcept { return to_string(); }
+                operator String () const noexcept { return to_string(); }
 
                 /// Debug string.
                 /// \return A string with the object id.
-                virtual S debug_string() const noexcept
+                virtual String debug_string() const noexcept
                 {
                     std::stringstream ss;
                     ss << "id = " << Object::to_string<char>();
@@ -253,7 +253,7 @@ namespace pensar_digital
 
                 inline static Factory::P get (const Json& j)
                 {
-                    S json_class = j.at("class");
+                    String json_class = j.at("class");
                     if (json_class != pd::class_name<Object, char>())
                         throw std::runtime_error("Invalid class name: " + pd::class_name<Object, char>());
                     Factory::P ptr = get(j.at("id"));
@@ -266,7 +266,7 @@ namespace pensar_digital
                     return ptr;
                 }
 
-                inline static Factory::P get (const S& sjson)
+                inline static Factory::P get (const String& sjson)
                 {
                     Json j;
                     Factory::P ptr = get (Data (pd::id<Object>(sjson, &j)));
@@ -293,7 +293,7 @@ namespace pensar_digital
                 return o.write (os, TEXT);
             }
 
-            inline Object& operator >> (const S& sjson, Object& o) { return o.from_json(sjson); }
+            inline Object& operator >> (const String& sjson, Object& o) { return o.from_json(sjson); }
 
             inline std::istream& operator >> (std::istream& is,       ObjectPtr o) { return is >> *o    ; }
             inline std::ostream& operator << (std::ostream& os, const ObjectPtr o) { return os << *o    ; }

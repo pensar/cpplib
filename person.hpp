@@ -349,7 +349,7 @@ namespace pensar_digital
 
             inline static Factory::P get(const Json& j)
             {
-                S json_class = j.at("class");
+                String json_class = j.at("class");
                 if (json_class != pd::class_name<Generator<Type, T>>())
                     throw std::runtime_error("Invalid class name: " + pd::class_name<Generator<Type, T>>());
 
@@ -363,7 +363,7 @@ namespace pensar_digital
                 return ptr;
             }
 
-            inline static Factory::P get(const S& sjson)
+            inline static Factory::P get(const String& sjson)
             {
                 Json j;
                 T id = pd::id<Generator<Type, Id>>(sjson, &j);
@@ -422,8 +422,8 @@ namespace pensar_digital
                 s = j["mlast"];
 				p.mdata.mname.mlast = s;
 
+
                 pd::VersionPtr vp = pd::Version::get(j);
-                // todo: check version compatibility.
                 if (*(p.VERSION) != *vp)
                     throw std::runtime_error("Person::from_json : version mismatch.");
             }

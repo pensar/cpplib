@@ -39,8 +39,8 @@ namespace pensar_digital
             ObjectPtr o = pd::Object::get(42);
 			std::stringstream ss;
 			ss << *o;
-            S expected = "{ \"class\" : \"pensar_digital::cpplib::Object\", \"id\" : 42, \"VERSION\": { \"class\" : \"pensar_digital::cpplib::Version\" , \"id\" : 0, \"mpublic\" : 1, \"mprotected\" : 1, \"mprivate\" : 1 } }";
-            CHECK_EQ(S, ss.str(), expected, "0");
+            String expected = "{ \"class\" : \"pensar_digital::cpplib::Object\", \"id\" : 42, \"VERSION\": { \"class\" : \"pensar_digital::cpplib::Version\" , \"id\" : 0, \"mpublic\" : 1, \"mprotected\" : 1, \"mprivate\" : 1 } }";
+            CHECK_EQ(String, ss.str(), expected, "0");
 
             ObjectPtr o2 = pd::Object::get();
             o->json () >> *o2;
@@ -49,8 +49,8 @@ namespace pensar_digital
 			DummyPtr d = Dummy::get (42, "d");
             std::stringstream ss3;
             ss3 << *d;
-            S expected2 = "{ \"class\" : \"pensar_digital::cpplib::Dummy\", \"id\" : 42, \"VERSION\": { \"class\" : \"pensar_digital::cpplib::Version\" , \"id\" : 0, \"mpublic\" : 1, \"mprotected\" : 1, \"mprivate\" : 1 }, \"name\" : \"d\" }";
-            CHECK_EQ(S, ss3.str(), expected2, "1");
+            String expected2 = "{ \"class\" : \"pensar_digital::cpplib::Dummy\", \"id\" : 42, \"VERSION\": { \"class\" : \"pensar_digital::cpplib::Version\" , \"id\" : 0, \"mpublic\" : 1, \"mprotected\" : 1, \"mprivate\" : 1 }, \"name\" : \"d\" }";
+            CHECK_EQ(String, ss3.str(), expected2, "1");
 			DummyPtr d2 = Dummy::get ();
 			ss3 >> *d2;
 			CHECK_EQ(Dummy, *d, *d2, "1. d == d2 should be true");
@@ -58,8 +58,8 @@ namespace pensar_digital
 
         TEST(ObjectJsonConversion, true)
             ObjectPtr o = pd::Object::get(42);
-            S expected = "{ \"class\" : \"pensar_digital::cpplib::Object\", \"id\" : 42, \"VERSION\": { \"class\" : \"pensar_digital::cpplib::Version\" , \"id\" : 0, \"mpublic\" : 1, \"mprotected\" : 1, \"mprivate\" : 1 } }";
-            CHECK_EQ(S, o->json (), expected, "0.");
+            String expected = "{ \"class\" : \"pensar_digital::cpplib::Object\", \"id\" : 42, \"VERSION\": { \"class\" : \"pensar_digital::cpplib::Version\" , \"id\" : 0, \"mpublic\" : 1, \"mprotected\" : 1, \"mprivate\" : 1 } }";
+            CHECK_EQ(String, o->json (), expected, "0.");
 
             ObjectPtr o1 = pd::Object::get (o->json());
             CHECK(*o == *o1, "1. o should be equal to o1");
@@ -67,7 +67,7 @@ namespace pensar_digital
            DummyPtr d = Dummy::get (42, "d");
            expected = "{ \"class\" : \"pensar_digital::cpplib::Dummy\", \"id\" : 42, \"VERSION\": { \"class\" : \"pensar_digital::cpplib::Version\" , \"id\" : 0, \"mpublic\" : 1, \"mprotected\" : 1, \"mprivate\" : 1 }, \"name\" : \""
                         + d->get_name() + "\" }";
-           CHECK_EQ(S, d->json (), expected, "2");
+           CHECK_EQ(String, d->json (), expected, "2");
 
            DummyPtr d1 = Dummy::parse_json (d->json());
            CHECK_EQ(Dummy, *d, *d1, "3. d should be equal to d1");
@@ -75,9 +75,9 @@ namespace pensar_digital
         
         TEST(ObjectXMLConversion, true)
             ObjectPtr o = pd::Object::get(42);
-            S xml = o->xml ();
-            S expected = "<object class_name = \"pensar_digital::cpplib::Object\" id = \"42\"/>";
-            CHECK_EQ(S, xml, expected, "0. xml should be equal to " + expected + " but was " + xml + ".");
+            String xml = o->xml ();
+            String expected = "<object class_name = \"pensar_digital::cpplib::Object\" id = \"42\"/>";
+            CHECK_EQ(String, xml, expected, "0. xml should be equal to " + expected + " but was " + xml + ".");
 
             ObjectPtr o1 = pd::Object::get ();
             CHECK_NOT_EQ(Object, *o, *o1, "1. o == o1");
@@ -87,7 +87,7 @@ namespace pensar_digital
             DummyPtr d = Dummy::get(42, "d");
             xml = d->xml ();
             expected = "<object class_name = \"pensar_digital::cpplib::Dummy\" id = \"42\"><name>d</name></object>";
-            CHECK_EQ(S, xml, expected, "2. xml should be equal to " + expected + " but was " + xml + ".");
+            CHECK_EQ(String, xml, expected, "2. xml should be equal to " + expected + " but was " + xml + ".");
 
             DummyPtr d1 = Dummy::get();
             CHECK(*d != *d1, "3. d == d1");
@@ -104,11 +104,11 @@ namespace pensar_digital
 				}
                 for (Id i = 0; i < 1000; i++)
                 {
-                    S si = pd::to_string(i);
+                    String si = pd::to_string(i);
                     ObjectPtr o = pd::Object::get(i);
-                    S expected = "{ \"class\" : \"pensar_digital::cpplib::Object\", \"id\" : " + si;
+                    String expected = "{ \"class\" : \"pensar_digital::cpplib::Object\", \"id\" : " + si;
                     expected += ", \"VERSION\": { \"class\" : \"pensar_digital::cpplib::Version\" , \"id\" : 0, \"mpublic\" : 1, \"mprotected\" : 1, \"mprivate\" : 1 } }";
-                    CHECK_EQ(S, o->json(), expected, si);
+                    CHECK_EQ(String, o->json(), expected, si);
                 }
             TEST_END(ObjectJsonString)
 
@@ -132,7 +132,7 @@ namespace pensar_digital
                 out.close();
 
                std::ifstream f ("c:\\tmp\\test\\ObjectTextFileStreaming\\test.txt");
-               S s;
+               String s;
                pd::read_all (f, s);
                 
                 Json j = Json::parse (s);

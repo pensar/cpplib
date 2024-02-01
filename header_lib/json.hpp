@@ -10913,8 +10913,8 @@ namespace detail
         /*!
         @brief reads a UBJSON string
 
-        This function is either called after reading the 'S' byte explicitly
-        indicating a string, or in case of an object key where the 'S' byte can be
+        This function is either called after reading the 'String' byte explicitly
+        indicating a string, or in case of an object key where the 'String' byte can be
         left out.
 
         @param[out] result   created string
