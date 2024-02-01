@@ -123,7 +123,7 @@ namespace pensar_digital
         static_assert (TriviallyCopyable <G::DataType>);
         static_assert (StandardLayout <G::DataType>);
         static_assert (StdLayoutTriviallyCopyable <G::DataType>);
-        static_assert (Persistible<G>);
+        static_assert (Persistable<G>);
 
             ObjMemoryBuffer<G> buffer;
             //G::Factory::P p = G::get (1, 0, 1);

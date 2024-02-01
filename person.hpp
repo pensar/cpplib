@@ -133,25 +133,34 @@ namespace pensar_digital
         class PersonName
         {
 			public:
-				pd::CS<MAX_FIRST_NAME , C> first;
-                pd::CS<MAX_MIDDLE_NAME, C> middle;
-                pd::CS<MAX_LAST_NAME , C>   last;
-
-                PersonName (pd::CS<MAX_FIRST_NAME, C> f = pd::EMPTY<C>, pd::CS<MAX_MIDDLE_NAME, C> m = pd::EMPTY<C>, pd::CS<MAX_LAST_NAME, C> l = pd::EMPTY<C>) : first(f), middle(m), last(l) {}
+				pd::CS<MAX_FIRST_NAME , C> mfirst;
+                pd::CS<MAX_MIDDLE_NAME, C> mmiddle;
+                pd::CS<MAX_LAST_NAME , C>  mlast;
+              
+                PersonName (pd::CS<MAX_FIRST_NAME, C> f = pd::EMPTY<C>, pd::CS<MAX_MIDDLE_NAME, C> m = pd::EMPTY<C>, pd::CS<MAX_LAST_NAME, C> l = pd::EMPTY<C>) : mfirst(f), mmiddle(m), mlast(l) {}
 
                 const pd::CS<MAX_NAME, C> name() const
 				{
-                    std::basic_string<C> s = first.to_string();
-                    std::basic_string<C> s2 = middle.to_string() + pd::SPACE<C> + last.to_string();
-                    std::basic_string<C> s3 = last.to_string();
-                    s += middle.empty() ? s3 : s2;
+                    std::basic_string<C> s = mfirst.to_string();
+                    std::basic_string<C> s2 = mfirst.to_string() + pd::SPACE<C> + mlast.to_string();
+                    std::basic_string<C> s3 = mlast.to_string();
+                    s += mmiddle.empty() ? s3 : s2;
                     return s;       
                 }
                
 				bool operator==(const PersonName<C>& other) const
 				{
-					return first == other.first && middle == other.middle && last == other.last;
+					return mfirst == other.mfirst && mmiddle == other.mmiddle && mlast == other.mlast;
 				}
+
+                inline std::string json() const noexcept
+                {
+                    std::stringstream ss;
+                    ss << pd::json<PersonName<C>>(*this);
+                    ss << ", \"first\" : " << mfirst << ", \"middle\" : " <<  mmiddle << ", \"last\" : " << mlast << " }";
+                    return ss.str();
+                }
+
         };
 
         template <typename C = char>
@@ -250,15 +259,16 @@ namespace pensar_digital
                 }
                 else // json format
                 {
-                    /*
-                    Json j;
-                    T id = null_value<T>();
-                    VersionPtr v;
-                    read_json<Generator<Type, T>, T>(is, *this, &id, &v, &j);
-                    mdata.minitial_value = j["minitial_value"];
-                    mdata.mvalue = j["mvalue"];
-                    mdata.mstep = j["mstep"];
-                    */
+                    pd::Json j;
+                    pd::Id id = pd::NULL_ID;
+                    pd::VersionPtr v;
+                    pd::read_json<Person>(is, *this, &id, &v, &j);
+                    std::string s = j["first"];
+                    mdata.mname.mfirst = s;
+                    s = j["middle"];
+                    mdata.mname.mmiddle = s;
+					s = j["last"];
+                    mdata.mname.mlast = s;
                 }
                 return is;
             };
@@ -381,8 +391,45 @@ namespace pensar_digital
                     return false;
                 return (std::memcmp (&mdata, &pother->mdata, sizeof(mdata)) == 0);
             }
-        };
 
+            friend void to_json(pd::Json& j, const Person& p);
+            friend void from_json(const pd::Json& j, Person& p);
+
+        };
+       
+        inline void to_json(pd::Json& j, const Person& p)
+        {
+            j["class" ] = p.class_name();
+            j["id"    ] = p.id();
+            j["first" ] = p.mdata.mname.mfirst;
+            j["middle"] = p.mdata.mname.mmiddle;
+            j["last"  ] = p.mdata.mname.mlast;
+
+            to_json(j, *(p.VERSION));
+        }
+
+        inline void from_json(const pd::Json& j, Person& p)
+        {
+            std::string class_name = p.class_name();
+            std::string  json_class = j.at("class");
+            if (class_name == json_class)
+            {
+                p.Object::set_id(j.at("id"));
+                std::string s = j["mfirst"];
+                p.mdata.mname.mfirst = s;
+                s = j["mmiddle"];
+				p.mdata.mname.mmiddle = s;
+                s = j["mlast"];
+				p.mdata.mname.mlast = s;
+
+                pd::VersionPtr vp = pd::Version::get(j);
+                // todo: check version compatibility.
+                if (*(p.VERSION) != *vp)
+                    throw std::runtime_error("Person::from_json : version mismatch.");
+            }
+            else 
+                throw new std::runtime_error("Person expected class = " + class_name + " but json has " + json_class);
+        }
 	} // namespace contact
 } // namespace pensar_digital
 

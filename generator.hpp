@@ -104,12 +104,12 @@ namespace pensar_digital
                 else // json format
                 {
                     Json j;
-                    T id = null_value<T>();
+                    Id id = NULL_ID;
                     VersionPtr v;
-                    read_json<Generator<Type, T>, T>(is, *this, &id, &v, &j);
-                    mdata.minitial_value = j["minitial_value"];
-                    mdata.mvalue         = j["mvalue"        ];
-                    mdata.mstep          = j["mstep"         ];
+                    read_json<Generator<Type, T>>(is, *this, &id, &v, &j);
+                    mdata.minitial_value = j["minitial_value" ];
+                    mdata.mvalue         = j["mvalue"];
+                    mdata.mstep          = j["mstep"  ];
                 }
                 return is;
             };

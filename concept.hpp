@@ -268,7 +268,7 @@ namespace pensar_digital
 		// Memcpyasble concept. Requires a function data() returning something convertible to void*. Usually a pointer to std::byte. And a data_size() returning something convertible to size_t.
 
 		template <class T>
-		concept Persistible = requires (T t)
+		concept Persistable = requires (T t)
 		{
 			// Requires T::Datatype defined.
 			//T::Datatype;

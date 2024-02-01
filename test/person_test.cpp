@@ -20,7 +20,7 @@ namespace pensar_digital
             static_assert(Identifiable<Person>, "Person must be a Identifiable type");
             static_assert(Hashable<Person>, "Person must be a Hashable type");
  
-            static_assert(Persistible<Person>, "Person must be a Persistable type");
+            static_assert(Persistable<Person>, "Person must be a Persistable type");
 
             PersonName<> name = { "Mauricio", "", "Gomes" };
             //std::chrono::year year(1980);

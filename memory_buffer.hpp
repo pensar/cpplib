@@ -116,9 +116,9 @@ namespace pensar_digital
         }; // MemoryBuffer
 
         /// <summary>
-        /// Specialization of memory buffer to deal with binary data for a Persistible type.
+        /// Specialization of memory buffer to deal with binary data for a Persistable type.
         /// </summary>
-        template <Persistible T>
+        template <Persistable T>
         class ObjMemoryBuffer 
         {
             private:
