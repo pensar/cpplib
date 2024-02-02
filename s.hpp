@@ -106,17 +106,31 @@ namespace pensar_digital
         }
             
         template <typename C = char>
-        class Str1
+        class S
         {
-            private:
-            C* data = nullptr;
-            Str1 (C* s, size_t size)
-			{
-				data = new C[size];
-				std::memcpy(data, s, size * sizeof(C));
-			}   
+            public:
+                std::array<C, 50> data;
+                bool case_sensitive = false;
+                bool accent_sensitive = false;
+                S (C* s = EMPTY_CSTR<C>, size_t length = 1)
+			    {
+				    std::memcpy(data.data (), s, length * sizeof(C));
+			    }   
+                typedef C value_type;
+                const C NULL_CHAR = null_char<C>();
+
+                // Returns the length of the string.
+                const constexpr inline size_t length() const noexcept
+                {
+                    return std::char_traits<C>::length(data);
+                }
+
+                inline bool empty() const noexcept
+                {
+                    return length() == 0;
+                }
         };
-        static_assert (StdLayoutTriviallyCopyable<Str1<>>, "Str must be trivially copyable");
+
         template<int N, typename C = char> //, typename Encoding = icu::UnicodeString>
         class CS
         {

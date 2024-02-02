@@ -12,8 +12,9 @@ namespace pensar_digital
     {
 
         TEST(CS, true)
-            static_assert(StdLayoutTriviallyCopyable<CS<10>>, "S is not compliant with StdLayoutTriviallyCopyable concept.");
-
+            static_assert(StdLayoutTriviallyCopyable<CS<10>>, "CS is not compliant with StdLayoutTriviallyCopyable concept.");
+            S s0;
+            static_assert(StdLayoutTriviallyCopyable<S<>>, "S is not compliant with StdLayoutTriviallyCopyable concept.");
             typedef CS<10> S1;
             typedef CS<10> S2;
             S1 s;
