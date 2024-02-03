@@ -371,52 +371,41 @@ namespace pensar_digital
             using fs::path::value_type;
         };  // class Path
 
-        template <typename C = char, size_t N = MAX_PATH>
-        class CPath : public CS<N, C>
+        template <typename C = char>
+        class CPath : public S<C>
         {
             public:
-                typedef CS<N, C> Str;
-                CPath(const Str& path = ".") : Str(path) {}
+                CPath(const S<C>& path = CURRENT_DIR<C>) : S<C>(path) {}
                 
                 // Constructor from fs::path.
                 //CPath (const fs::path& path) : Str (path.string()) {}
 
-                inline fs::path to_fspath() const noexcept { return fs::path(this->Str::std_str()); }
-                inline Path     to_path() const noexcept { return Path(this->Str::std_str()); }
+                inline fs::path to_fspath() const noexcept { return fs::path(S<C>::to_string()); }
+                inline Path     to_path() const noexcept { return Path(S<C>::to_string()); }
 
                 // Conversion to fs::path operator.
                 operator fs::path() const noexcept { return to_fspath(); }
-
-
         };
          
         // path_to_cpath.
-        template <typename C = char, size_t N = MAX_PATH>
-        inline CPath<C, N> path_to_cpath(const Path& path)
+        template <typename C = char>
+        inline CPath<C> path_to_cpath(const Path& path)
         {
-            if (N < path.string().size()) 
-                throw std::runtime_error("path_to_cpath: N < path.string().size()");
             if constexpr (std::is_same_v<C, char>)
-				return CPath<C, N>(path.string());
+				return CPath<C>(path.string());
 			else
-				return CPath<C, N>(path.wstring());
+				return CPath<C>(path.wstring());
         }
 
         // cpath_to_path.
-        template <size_t N = MAX_PATH>
-        inline Path cpath_to_path(const CPath<char, N>& cpath)
+        inline Path cpath_to_path(const CPath<char>& cpath)
         {
-            if (N < cpath.std_str().size())
-                throw std::runtime_error("cpath_to_path: N < cpath.std_str().size()");
-            return Path(cpath.std_str());
+            return Path (cpath.to_path());
         }        
 
-        template <size_t N = MAX_PATH>
-        inline Path cpath_to_path(const CPath<wchar_t, N>& cpath)
+        inline Path cpath_to_path(const CPath<wchar_t>& cpath)
         {
-            if (N < cpath.std_str().size())
-                throw std::runtime_error("cpath_to_path: N < cpath.std_wstr().size()"); 
-            return Path(cpath.std_wstr());
+            return Path (cpath.to_path());
         }
 
         // Json conversion.
@@ -448,4 +437,4 @@ namespace pensar_digital
         inline static const C* TMP_DIR = TmpDirString<C>::value;
     } // namespace cpplib
 } // namespace pensar_digital
-#endif  
+#endif  // CPPLIB_FS_PATH_H

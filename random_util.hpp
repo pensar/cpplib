@@ -35,7 +35,7 @@ namespace pensar_digital
     class CRandom
     {
       public:
-        CRandom (int min_value, int max_value): _min(min_value), _max(max_value) { srand (seed()); }
+        CRandom (int min_value, int max_value): _min(min_value), _max(max_value) { srand ((unsigned int) seed()); }
 
         inline int get () const { return rand () % (_max - _min + 1) + _min;}
         inline int get_min () const { return _min; }

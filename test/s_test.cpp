@@ -11,46 +11,42 @@ namespace pensar_digital
     namespace cpplib
     {
 
-        TEST(CS, true)
-            static_assert(StdLayoutTriviallyCopyable<CS<10>>, "CS is not compliant with StdLayoutTriviallyCopyable concept.");
-            S s0;
+        TEST(S, true)
             static_assert(StdLayoutTriviallyCopyable<S<>>, "S is not compliant with StdLayoutTriviallyCopyable concept.");
-            typedef CS<10> S1;
-            typedef CS<10> S2;
-            S1 s;
-            S1 s1;  
-            CHECK_EQ(S1, s, s1, "0");
+            S<> s;
+            S<> s1;  
+            CHECK_EQ(S<>, s, s1, "0");
             s = "abc";
-            CHECK_NOT_EQ(S1, s, s1, "1");
-            CHECK_EQ(S1, s, "abc", "2");
+            CHECK_NOT_EQ(S<>, s, s1, "1");
+            CHECK_EQ(S<>, s, "abc", "2");
             CHECK_EQ(size_t, s.length (),  3, "3");
-            CHECK_EQ(size_t,   s.size (), 10, "4");
+            CHECK_EQ(size_t,   s.size (), S<>::MAX_SIZE, "4");
 
-            S2 s2 = "abc";
-            CHECK_EQ(S2, s2, "abc", "5");
+            S s2 = "abc";
+            CHECK_EQ(S<>, s2.to_string (), "abc", "5");
             CHECK (s == s2, "6");
 
             s2 = "def";
-            CHECK_EQ(S2, s2, "def", "7");
-            static_assert (pd::OutputStreamable<S1>, "S is not OutputStreamable");
-            typedef CS<10, wchar_t> W;
+            CHECK_EQ(S<>, s2, "def", "7");
+            static_assert (pd::OutputStreamable<S<>>, "S is not OutputStreamable");
+            typedef S<wchar_t> W;
             W w = L"abc";
             static_assert (pd::OutputStreamable<W>, "W is not OutputStreamable");
             WCHECK_EQ(W, w, L"abc", L"8");
 
             std::string str = "abc";
-            S1 s3 = str;
-            CHECK_EQ(S1, s3, "abc", "9");
+            S<> s3 = str;
+            CHECK_EQ(S<>, s3, "abc", "9");
 
             std::wstring wstr = L"abc";
             W w2 = wstr;    
             WCHECK_EQ(W, w2, L"abc", L"10");
 
-            S1 s4 = "abc";
-            S1 s5 = "def";
-            S1 s6 = s4 + s5;
-            CHECK_EQ(S1, s6, "abcdef", "11");
+            S<> s4 = "abc";
+            S<> s5 = "def";
+            S<> s6 = s4 + s5;
+            CHECK_EQ(S<>, s6, "abcdef", "11");
 
-        TEST_END(CS)
+        TEST_END(S)
     }
 }

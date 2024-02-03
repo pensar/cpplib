@@ -34,8 +34,9 @@ namespace pensar_digital
             private:
                 struct Data : public pd::Data
                 {
-                    S20 mname;
-                    Data(const S20& name = "") noexcept : mname(name) {}
+                    S<> mname;
+                    Data(const S<>& name = "") noexcept : mname(name) {}
+                    size_t data_size() const noexcept { return mname.length (); }  
 
                 };
                 Data mdata; //!< Member variable mdata contains the object data.
@@ -44,9 +45,9 @@ namespace pensar_digital
                     inline static Factory factory = {3, 10, NULL_ID, ""};
                     inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
                     virtual const pd::Data* data() const noexcept { return &mdata; }
-                    virtual size_t data_size() const noexcept { return sizeof(mdata); }
+                    virtual size_t data_size() const noexcept { return mdata.data_size (); }
 
-                    Dummy(const Id& id = NULL_ID, const S20& name = "") : Object(id), mdata(name) {}
+                    Dummy(const Id& id = NULL_ID, const S<>& name = "") : Object(id), mdata(name) {}
                     Dummy(const Dummy& d) : Object(d), mdata (d.mdata.mname) { }
                     Dummy(Dummy&& d) noexcept : Object(d) { assign (d); }
                 

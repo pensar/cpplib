@@ -31,8 +31,6 @@ namespace pensar_digital
 	namespace contact
 	{
 		namespace pd = pensar_digital::cpplib;
-        using S20 = pd::S20;
-        using WS20 = pd::WS20;
         
         enum class LocationType { ltHome, ltWork, ltOther };
         enum class ContactQualifier { cqBusiness, cqPersonal, cqOther };
@@ -49,101 +47,21 @@ namespace pensar_digital
         static inline const size_t        MAX_NAME = MAX_FIRST_NAME + MAX_MIDDLE_NAME + MAX_LAST_NAME;
         
         
-        /*
-        template <typename C = char>
-        struct FirstName : pd::CS<MAX_FIRST_NAME, C> 
-        {
-            FirstName(const pd::CS<MAX_FIRST_NAME, C>& first = pd::EMPTY<C>) : pd::CS<MAX_FIRST_NAME, C>(first) {}
-
-            // conversion from std::basic_string
-            FirstName(const std::basic_string<C>& s) : pd::CS<MAX_FIRST_NAME, C>(s) {}
-
-            // Conversion from C string.
-            FirstName(const C* s) : pd::CS<MAX_FIRST_NAME, C>(s) {}
-
-            using pd::CS<MAX_FIRST_NAME, C>::operator=;
-        };
-
-        template <typename C = char>
-        struct MiddleName : pd::CS<MAX_MIDDLE_NAME, C> 
-        {
-            MiddleName(const pd::CS<MAX_MIDDLE_NAME, C>& middle = pd::EMPTY<C>) : pd::CS<MAX_MIDDLE_NAME, C>(middle) {}
-
-            // conversion from std::basic_string
-            MiddleName(const std::basic_string<C>& s) : pd::CS<MAX_MIDDLE_NAME, C>(s) {}
-
-            // Conversion from C string.
-            MiddleName(const C* s) : pd::CS<MAX_MIDDLE_NAME, C>(s) {}
-            using pd::CS<MAX_MIDDLE_NAME, C>::operator=;
-        };
-
-        template <typename C = char>
-        struct LastName : pd::CS<MAX_LAST_NAME, C> 
-        {
-			LastName(const pd::CS<MAX_LAST_NAME, C>& last = pd::EMPTY<C>) : pd::CS<MAX_LAST_NAME, C>(last) {}
-
-			// conversion from std::basic_string
-			LastName(const std::basic_string<C>& s) : pd::CS<MAX_LAST_NAME, C>(s) {}
-        
-            // Conversion from C string.
-            LastName(const C* s) : pd::CS<MAX_LAST_NAME, C>(s) {}
-            using pd::CS<MAX_LAST_NAME, C>::operator=;
-        };
-
-    	template <typename C = char>
-		struct Name : pd::CS<MAX_NAME_LENGTH, C> {};
-        template <typename C = char>
-        struct NullNameStruct
-        {
-			inline static const Name<C> value = { "NULL" };
-		};  
-
-        template<>
-        struct NullNameStruct<wchar_t>
-        {
-            inline static const Name<wchar_t> value = { L"NULL" };
-        };
-
-        template <typename C = char>
-        inline static const Name<C> null_name()
-        {
-            return NullNameStruct<C>::value;
-        }
-
-
-        template <typename C = char>
-        struct EmptyNameStruct
-        {
-            inline static const Name<C> value = { "" };
-        };
-
-        template<>
-        struct EmptyNameStruct<wchar_t>
-        {
-            inline static const Name<wchar_t> value = { L"" };
-        };
-
-        template <typename C = char>
-        inline static const Name<C> empty_name()
-        {
-            return EmptyNameStruct<C>::value;
-        }
-*/
         template <typename C = char>
         class PersonName
         {
 			public:
-				pd::CS<MAX_FIRST_NAME , C> mfirst;
-                pd::CS<MAX_MIDDLE_NAME, C> mmiddle;
-                pd::CS<MAX_LAST_NAME , C>  mlast;
+				pd::S<C> mfirst;
+                pd::S<C> mmiddle;
+                pd::S<C>  mlast;
               
-                PersonName (pd::CS<MAX_FIRST_NAME, C> f = pd::EMPTY<C>, pd::CS<MAX_MIDDLE_NAME, C> m = pd::EMPTY<C>, pd::CS<MAX_LAST_NAME, C> l = pd::EMPTY<C>) : mfirst(f), mmiddle(m), mlast(l) {}
+                PersonName (const pd::S<C>& f = pd::EMPTY<C>, const pd::S<C>& m = pd::EMPTY<C>, const pd::S<C>& l = pd::EMPTY<C>) : mfirst(f), mmiddle(m), mlast(l) {}
 
-                const pd::CS<MAX_NAME, C> name() const
+                const pd::S<C> name() const
 				{
-                    std::basic_string<C> s = mfirst.to_string();
-                    std::basic_string<C> s2 = mfirst.to_string() + pd::SPACE<C> + mlast.to_string();
-                    std::basic_string<C> s3 = mlast.to_string();
+                    std::basic_string<C> s  = mfirst.to_string ();
+                    std::basic_string<C> s2 = mfirst.to_string () + pd::SPACE<C> + mlast.to_string();
+                    std::basic_string<C> s3 = mlast.to_string ();
                     s += mmiddle.empty() ? s3 : s2;
                     return s;       
                 }
@@ -184,7 +102,7 @@ namespace pensar_digital
         // Make PersonName OutputStreamable.
         inline std::ostream& operator<<(std::ostream& os, const PersonName<char>& name)
 		{
-			os << name.name(); 
+			os << name.mfirst << name.mmiddle << name.mlast; 
 			return os;
 		}
 

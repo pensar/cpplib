@@ -17,7 +17,7 @@ namespace pensar_digital
 	{
         #ifdef _WIN32 
             #include <windows.h>
-            #define LINE_FEED W(C,"\r\n")
+            #define LINE_FEED "\r\n"
         #elif __linux__
             #include <unistd.h>
             #include <sys/utsname.h>
@@ -27,15 +27,11 @@ namespace pensar_digital
             #define LINE_FEED "\n"
         #endif
 
-        template <typename C = char>
         class System 
         {
             public:
-                typedef CS< 2, C> S2;
-                typedef CS<10, C> S10;
-                typedef CS<20, C> S20;
 
-            static S10 os_name() 
+            static std::string os_name() 
             {
                 #ifdef _WIN32   
                     return "Windows";
@@ -46,14 +42,14 @@ namespace pensar_digital
                 #endif
             }
 
-            static S10 os_version() 
+            static std::string os_version() 
             {
                 #ifdef _WIN32
                     OSVERSIONINFO info;
                     ZeroMemory(&info, sizeof(OSVERSIONINFO));
                     info.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-                    GetVersionEx(&info);
                     return std::to_string(info.dwMajorVersion) + "." + std::to_string(info.dwMinorVersion);
+
                 #elif __linux__
                     struct utsname buffer;
                     uname(&buffer);
@@ -63,8 +59,8 @@ namespace pensar_digital
                 #endif
             }
 
-            static inline S20 endianess () { return (std::endian::native == std::endian::little) ? "Little Endian" : "Big Endian"; }
-            static inline S2 path_separator ()
+            static inline std::string endianess () { return (std::endian::native == std::endian::little) ? "Little Endian" : "Big Endian"; }
+            static inline char path_separator ()
             {
                 #ifdef _WIN32
                 return '\\';
@@ -72,7 +68,7 @@ namespace pensar_digital
                         return '/';
                 #endif
             }
-            inline const static S2 LF = LINE_FEED;
+            inline const static std::string LF = LINE_FEED;
             
         };
 
