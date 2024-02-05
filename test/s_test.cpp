@@ -48,5 +48,43 @@ namespace pensar_digital
             CHECK_EQ(S<>, s6, "abcdef", "11");
 
         TEST_END(S)
+
+        TEST(CS, true)
+            static_assert(StdLayoutTriviallyCopyable<CS<10>>, "S is not compliant with StdLayoutTriviallyCopyable concept.");
+            CS<> s;
+            CS<> s1;
+            CHECK_EQ(CS<>, s, s1, "0");
+            s = "abc";
+            CHECK_NOT_EQ(CS<>, s, s1, "1");
+            CHECK_EQ(CS<>, s, "abc", "2");
+            CHECK_EQ(size_t, s.length(), 3, "3");
+            CHECK_EQ(size_t, s.size(), CS<>::MAX_SIZE, "4");
+
+            CS s2 = "abc";
+            CHECK_EQ(CS<>, s2.to_string(), "abc", "5");
+            CHECK(s == s2, "6");
+
+            s2 = "def";
+            CHECK_EQ(CS<>, s2, "def", "7");
+            static_assert (pd::OutputStreamable<CS<>>, "S is not OutputStreamable");
+            typedef CS<20, wchar_t> W;
+            W w = L"abc";
+            static_assert (pd::OutputStreamable<W>, "W is not OutputStreamable");
+            WCHECK_EQ(W, w, L"abc", L"8");
+
+            std::string str = "abc";
+            CS<> s3 = str;
+            CHECK_EQ(CS<>, s3, "abc", "9");
+
+            std::wstring wstr = L"abc";
+            W w2 = wstr;
+            WCHECK_EQ(W, w2, L"abc", L"10");
+
+            CS<> s4 = "abc";
+            CS<> s5 = "def";
+            CS<> s6 = s4 + s5;
+            CHECK_EQ(CS<>, s6, "abcdef", "11");
+
+            TEST_END(CS)
     }
 }
