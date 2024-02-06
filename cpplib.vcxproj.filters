@@ -126,6 +126,9 @@
     <ClCompile Include="test\person_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="test\e-mail_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="constant.hpp">
@@ -252,6 +255,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="string_types.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="e-mail.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

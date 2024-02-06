@@ -41,23 +41,27 @@ namespace pensar_digital
             ContactQualifier qualifier;
         };
 
-        static inline const size_t  MAX_FIRST_NAME = 20;
+        static inline const size_t MAX_FIRST_NAME  = 20;
         static inline const size_t MAX_MIDDLE_NAME = 20;
-        static inline const size_t   MAX_LAST_NAME = 20;
-        static inline const size_t        MAX_NAME = MAX_FIRST_NAME + MAX_MIDDLE_NAME + MAX_LAST_NAME;
+        static inline const size_t MAX_LAST_NAME   = 20;
+        static inline const size_t MAX_NAME        = MAX_FIRST_NAME + MAX_MIDDLE_NAME + MAX_LAST_NAME + 2;
         
         
         template <typename C = char>
         class PersonName
         {
 			public:
-				pd::S<C> mfirst;
-                pd::S<C> mmiddle;
-                pd::S<C>  mlast;
-              
-                PersonName (const pd::S<C>& f = pd::EMPTY<C>, const pd::S<C>& m = pd::EMPTY<C>, const pd::S<C>& l = pd::EMPTY<C>) : mfirst(f), mmiddle(m), mlast(l) {}
+                typedef pd::CS<MAX_FIRST_NAME , C> First;
+                typedef pd::CS<MAX_MIDDLE_NAME, C> Middle;
+                typedef pd::CS<MAX_LAST_NAME  , C> Last;
 
-                const pd::S<C> name() const
+                First  mfirst ;
+                Middle mmiddle;
+                Last   mlast  ;
+              
+                PersonName (const First& f = pd::EMPTY<C>, const Middle& m = pd::EMPTY<C>, const Last& l = pd::EMPTY<C>) : mfirst(f), mmiddle(m), mlast(l) {}
+
+                const pd::CS<MAX_NAME, C> name() const
 				{
                     std::basic_string<C> s  = mfirst.to_string ();
                     std::basic_string<C> s2 = mfirst.to_string () + pd::SPACE<C> + mlast.to_string();
@@ -102,7 +106,7 @@ namespace pensar_digital
         // Make PersonName OutputStreamable.
         inline std::ostream& operator<<(std::ostream& os, const PersonName<char>& name)
 		{
-			os << name.mfirst << name.mmiddle << name.mlast; 
+			os << name.name (); 
 			return os;
 		}
 
@@ -125,7 +129,7 @@ namespace pensar_digital
                 {
                     PersonName<> mname;       
                     pd::Date mdate_of_birth; // Format: YYYY-MM-DD
-                    Data (const PersonName<>& name, pd::Date dob): mname(name), mdate_of_birth(dob) {}   
+                    Data (const PersonName<>& name, pd::Date dob = pd::NULL_DATE): mname(name), mdate_of_birth(dob) {}   
                     //std::unordered_set<Contact> phoneNumbers;
                     //std::unordered_set<Contact> emails;
 
