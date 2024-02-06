@@ -32,14 +32,20 @@ namespace pensar_digital
 	{
 		namespace pd = pensar_digital::cpplib;
         
-        enum class LocationType { ltHome, ltWork, ltOther };
-        enum class ContactQualifier { cqBusiness, cqPersonal, cqOther };
+        enum class ContactLocationType   { ltHome    , ltWork    , ltOther };
+        enum class ContactUsageQualifier { cqBusiness, cqPersonal, cqOther };
 
         struct Contact 
         {
-            LocationType type;
-            ContactQualifier qualifier;
+            ContactUsageQualifier qualifier;
         };
+
+        struct PhoneNumber : public Contact
+		{
+			typedef pd::CS<0, 3> CountryCode;
+            typedef pd::CS<1, 4> AreaCode; // Referred as Identification Code in E.164 standard. (https://en.wikipedia.org/wiki/E.164)
+            typedef pd::CS<0, 10> Number; // E.164 standard allows for a maximum of 15 digits. (https://en.wikipedia.org/wiki/E.164)
+		};
 
         static inline const size_t MAX_FIRST_NAME  = 20;
         static inline const size_t MAX_MIDDLE_NAME = 20;
@@ -51,9 +57,9 @@ namespace pensar_digital
         class PersonName
         {
 			public:
-                typedef pd::CS<MAX_FIRST_NAME , C> First;
-                typedef pd::CS<MAX_MIDDLE_NAME, C> Middle;
-                typedef pd::CS<MAX_LAST_NAME  , C> Last;
+                typedef pd::CS<0, MAX_FIRST_NAME , C> First;
+                typedef pd::CS<0, MAX_MIDDLE_NAME, C> Middle;
+                typedef pd::CS<0, MAX_LAST_NAME  , C> Last;
 
                 First  mfirst ;
                 Middle mmiddle;
@@ -61,7 +67,7 @@ namespace pensar_digital
               
                 PersonName (const First& f = pd::EMPTY<C>, const Middle& m = pd::EMPTY<C>, const Last& l = pd::EMPTY<C>) : mfirst(f), mmiddle(m), mlast(l) {}
 
-                const pd::CS<MAX_NAME, C> name() const
+                const pd::CS<0, MAX_NAME, C> name() const
 				{
                     std::basic_string<C> s  = mfirst.to_string ();
                     std::basic_string<C> s2 = mfirst.to_string () + pd::SPACE<C> + mlast.to_string();

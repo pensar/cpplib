@@ -112,22 +112,23 @@ namespace pensar_digital
 
 
 
-        template<int N = 20, typename C = char> //, typename Encoding = icu::UnicodeString>
+        template<size_t MIN = 0, size_t MAX = 20, typename C = char> //, typename Encoding = icu::UnicodeString>
         class CS
         {
         public:
             typedef C value_type;
-            std::array<C, N> data;
+            std::array<C, MAX> data;
             bool case_sensitive = false;
             bool accent_sensitive = false;
             const C NULL_CHAR = (sizeof(C) == sizeof(char)) ? '\0' : L'\0';
-            inline static const size_t MAX_SIZE = N;
-            inline static const size_t MAX_LENGTH = N - 1;
+            inline static const size_t MAX_SIZE   = MAX;
+            inline static const size_t MAX_LENGTH = MAX - 1;
+            inline static const size_t MIN_SIZE   = MIN;
 
             // Returns the size of the string.
             const constexpr inline size_t size() const noexcept
             {
-                return N;
+                return MAX;
             }
 
             void inline fill(C c) noexcept
@@ -158,12 +159,18 @@ namespace pensar_digital
 
             inline void copy(const C* str, size_t str_length)
             {
-                if (str_length > N)
+                if (str_length > MAX)
                 {
                     std::string error = "String is too long. Max size is ";
-                    error += std::to_string(N);
+                    error += std::to_string(MAX);
                     throw std::runtime_error(error);
                 }
+                if (str_length < MIN)
+				{
+					std::string error = "String is too short. Min size is ";
+					error += std::to_string(MIN);
+					throw std::runtime_error(error);
+				}   
                 //if (str == nullptr)
                 //{
                 fill_null();
@@ -320,9 +327,9 @@ namespace pensar_digital
             }
 
             // Assigns a std::array.
-            CS& operator= (const std::array<C, N>& arr) noexcept
+            CS& operator= (const std::array<C, MAX>& arr) noexcept
             {
-                std::memcpy(data.data(), arr.data(), N * sizeof(C));
+                std::memcpy(data.data(), arr.data(), MAX * sizeof(C));
                 return *this;
             }
 
@@ -337,10 +344,10 @@ namespace pensar_digital
             {
                 auto strlen = length();
                 auto other_strlen = other.length();
-                if (strlen + other_strlen > N)
+                if (strlen + other_strlen > MAX)
                 {
                     std::string error = "CString is too long. Max size is ";
-                    error += std::to_string(N);
+                    error += std::to_string(MAX);
                     throw std::runtime_error(error);
                 }
                 std::memcpy(data.data() + strlen, other.data.data(), other_strlen * sizeof(C));
@@ -372,11 +379,11 @@ namespace pensar_digital
 
         // Concatenates two CS objects. Must be of same char type.
         template<int N, int N2, typename Char = char>
-        CS<N + N2, Char> operator+ (const CS<N, Char>& lhs, const CS<N2, Char>& rhs) noexcept
+        CS<0, N + N2, Char> operator+ (const CS<0, N, Char>& lhs, const CS<0, N2, Char>& rhs) noexcept
         {
             static_assert (N > 0, "CS<N, Char> operator+ (const CS<N, Char>& lhs, const CS<N, Char>& rhs) - lhs must be of size N > 0");
 
-            CS<N + N2, Char> result;
+            CS<0, N + N2, Char> result;
             std::copy(lhs.data.begin(), lhs.data.end(), result.data.begin());
             std::copy(rhs.data.begin(), rhs.data.end(), result.data.begin() + N);
             return result;
@@ -384,7 +391,7 @@ namespace pensar_digital
 
         // Concatenates a CS object and a std::basic_string. Must be of same char type.
         template<int N, int N2, typename Char = char>
-        CS<N + N2, Char> operator+ (const CS<N, Char>& lhs, const std::basic_string<Char>& rhs)
+        CS<0, N + N2, Char> operator+ (const CS<0, N, Char>& lhs, const std::basic_string<Char>& rhs)
         {
             static_assert (N > 0, "CS<N, Char> operator+ (const CS<N, Char>& lhs, const std::basic_string<Char>& rhs) - lhs must be of size N > 0");
 
@@ -393,7 +400,7 @@ namespace pensar_digital
                 throw std::runtime_error("CS<N, Char> operator+ (const CS<N, Char>& lhs, const std::basic_string<Char>& rhs) - rhs must be of size N2");
             }
 
-            CS<N + N2, Char> result;
+            CS<0, N + N2, Char> result;
             std::copy(lhs.data.begin(), lhs.data.end(), result.data.begin());
             std::copy(rhs.begin(), rhs.end(), result.data.begin() + N);
             return result;
@@ -401,7 +408,7 @@ namespace pensar_digital
 
         // Concatenates a CS object and a null terminated string. Must be of same char type.
         template<int N, int N2, typename Char = char>
-        CS<N + N2, Char> operator+ (const CS<N, Char>& lhs, const Char* rhs)
+        CS<0, N + N2, Char> operator+ (const CS<0, N, Char>& lhs, const Char* rhs)
         {
             static_assert (N > 0, "CS<N, Char> operator+ (const CS<N, Char>& lhs, const Char* rhs) - lhs must be of size N > 0");
 
@@ -409,7 +416,7 @@ namespace pensar_digital
             {
                 throw std::runtime_error("CS<N, Char> operator+ (const CS<N, Char>& lhs, const Char* rhs) - rhs must be of size N2");
             }
-            CS<N + N2, Char> result;
+            CS<0, N + N2, Char> result;
             std::copy(lhs.data.begin(), lhs.data.end(), result.data.begin());
             std::copy(rhs, rhs + N, result.data.begin() + N);
             return result;
@@ -417,12 +424,12 @@ namespace pensar_digital
 
         // Concatenates a CS object and a std::array. Must be of same char type.
         template<int N, int N2, typename Char = char>
-        CS<N + N2, Char> operator+ (const CS<N, Char>& lhs, const std::array<Char, N2>& rhs) noexcept
+        CS<0, N + N2, Char> operator+ (const CS<0, N, Char>& lhs, const std::array<Char, N2>& rhs) noexcept
         {
             static_assert (N2 > 0, "CS<N, Char> operator+ (const CS<N, Char>& lhs, const std::array<Char, N2>& rhs) - rhs must be of size > 0");
             static_assert (N > 0, "CS<N, Char> operator+ (const CS<N, Char>& lhs, const std::array<Char, N2>& rhs) - lhs must be of size > 0");
 
-            CS<N + N2, Char> result;
+            CS<0, N + N2, Char> result;
             std::copy(lhs.data.begin(), lhs.data.end(), result.data.begin());
             std::copy(rhs.begin(), rhs.end(), result.data.begin() + N);
             return result;
@@ -430,11 +437,11 @@ namespace pensar_digital
 
         // Concatenates a std::basic_string and a CS object. Must be of same char type.
         template<int N, typename Char = char>
-        CS<N + 1, Char> operator+ (const std::basic_string<Char>& lhs, const CS<N, Char>& rhs) noexcept
+        CS<0, N + 1, Char> operator+ (const std::basic_string<Char>& lhs, const CS<0, N, Char>& rhs) noexcept
         {
             static_assert (N > 0, "CS<N, Char> operator+ (const std::basic_string<Char>& lhs, const CS<N, Char>& rhs) - rhs must be of size > 0");
 
-            CS<N + 1, Char> result;
+            CS<0, N + 1, Char> result;
             std::copy(lhs.begin(), lhs.end(), result.data.begin());
             std::copy(rhs.data.begin(), rhs.data.end(), result.data.begin() + N);
             return result;
@@ -442,11 +449,11 @@ namespace pensar_digital
 
         // Concatenates a std::array and a CS object. Must be of same char type.
         template<int N, int N2, typename Char = char>
-        CS<N + N2, Char> operator+ (const std::array<Char, N>& lhs, const CS<N2, Char>& rhs) noexcept
+        CS<0, N + N2, Char> operator+ (const std::array<Char, N>& lhs, const CS<0, N2, Char>& rhs) noexcept
         {
             static_assert (N > 0, "CS<N, Char> operator+ (const std::array<Char, N>& lhs, const CS<N2, Char>& rhs) - lhs must be of size > 0");
 
-            CS<N + N2, Char> result;
+            CS<0, N + N2, Char> result;
             std::copy(lhs.begin(), lhs.end(), result.data.begin());
             std::copy(rhs.data.begin(), rhs.data.end(), result.data.begin() + N);
             return result;
@@ -454,11 +461,11 @@ namespace pensar_digital
 
         // Concatenates a CS object and a char. Must be of same char type.
         template<int N, typename Char = char>
-        CS<N + sizeof(Char), Char> operator+ (const CS<N, Char>& lhs, const Char& rhs) noexcept
+        CS<0, N + sizeof(Char), Char> operator+ (const CS<0, N, Char>& lhs, const Char& rhs) noexcept
         {
             static_assert (N > 0, "CS<N, Char> operator+ (const CS<N, Char>& lhs, const Char& rhs) - lhs must be of size > 0");
 
-            CS<N + sizeof(Char), Char> result;
+            CS<0, N + sizeof(Char), Char> result;
             std::copy(lhs.data.begin(), lhs.data.end(), result.data.begin());
             result.data[N] = rhs;
             return result;
@@ -466,11 +473,11 @@ namespace pensar_digital
 
         // Concatenates a char and a CS object. Must be of same char type.
         template<int N, typename Char = char>
-        CS<N + sizeof(Char), Char> operator+ (const Char& lhs, const CS<N, Char>& rhs) noexcept
+        CS<0, N + sizeof(Char), Char> operator+ (const Char& lhs, const CS<0, N, Char>& rhs) noexcept
         {
             static_assert (N > 0, "CS<N, Char> operator+ (const Char& lhs, const CS<N, Char>& rhs) - lhs must be of size > 0");
 
-            CS<N + sizeof(Char), Char> result;
+            CS<0, N + sizeof(Char), Char> result;
             result.data[0] = lhs;
             std::copy(rhs.data.begin(), rhs.data.end(), result.data.begin() + 1);
             return result;

@@ -67,7 +67,7 @@ namespace pensar_digital
             s2 = "def";
             CHECK_EQ(CS<>, s2, "def", "7");
             static_assert (pd::OutputStreamable<CS<>>, "S is not OutputStreamable");
-            typedef CS<20, wchar_t> W;
+            typedef CS<0, 20, wchar_t> W;
             W w = L"abc";
             static_assert (pd::OutputStreamable<W>, "W is not OutputStreamable");
             WCHECK_EQ(W, w, L"abc", L"8");
