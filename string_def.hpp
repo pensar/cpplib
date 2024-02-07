@@ -39,9 +39,12 @@ namespace pensar_digital
 		};
 
 		template <typename C = char>
-		inline static const C* EMPTY = EmptyString<C>::value;
+		inline static const C* empty () 
+		{
+			return EmptyString<C>::value;
+		}
 		template <typename C = char>
-		inline static C* EMPTY_CSTR = const_cast<char*>(EMPTY<C>);
+		inline static C* EMPTY_CSTR = const_cast<char*>(empty<C> ());
 
 		template<typename C = char>
 		struct SpaceStruct

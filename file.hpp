@@ -211,7 +211,7 @@ namespace pensar_digital
             public:
                 typedef std::basic_string<C> String;
                 inline static const VersionPtr VERSION = Version::get(1, 1, 1);
-                TextFile(const Path& full_path, const String& content = EMPTY<C>, 
+                TextFile(const Path& full_path, const String& content = empty<C> (), 
                          const std::ios_base::openmode mode = File<C>::DEFAULT_MODE, const Id id = NULL_ID) : File<C>(full_path, id, (mode& (~std::ios::binary)))
                 {
                     if (File<C>::exists ())
@@ -221,7 +221,7 @@ namespace pensar_digital
                     File<C>::close ();
                 }
 
-                //TextFile(const Path& full_path, const String& content = EMPTY<C>, const Id aid = NULL_ID) :
+                //TextFile(const Path& full_path, const String& content = empty<C> (), const Id aid = NULL_ID) :
                 //    TextFile(full_path, File<C>::DEFAULT_MODE, content, id)
                 //{
                 //}
@@ -293,7 +293,7 @@ namespace pensar_digital
                 // Determines the function signature as a typedef. It is named custom_exension_generator and it should return a string and take no arguments.
                 typedef std::function<String()> CUSTOM_EXT_FUNCTION;
                 // Defines a NULL_CUSTOM_EXT_FUNCTION.  That should always return an empty string.
-                inline static const CUSTOM_EXT_FUNCTION NULL_CUSTOM_EXT_FUNCTION = []() { return EMPTY<C>; };
+                inline static const CUSTOM_EXT_FUNCTION NULL_CUSTOM_EXT_FUNCTION = []() { return empty<C> (); };
 
 				// Extension type.
                 ExtensionType mextension_type;
@@ -356,15 +356,15 @@ namespace pensar_digital
 						case ExtensionType::RANDOM:
 							return random_string(DEFAULT_LENGTH);
 						case ExtensionType::NONE:
-							return EMPTY<C>;
+							return empty<C> ();
 						//case ExtensionType::NUMERIC_SEQUENCE:
 							//return std::to_string((const G::IdType)generator.get_id());
 						case ExtensionType::CHAR_SEQUENCE:
-							return EMPTY<C>; // todo: char_generator();
+							return empty<C> (); // todo: char_generator();
 						case ExtensionType::FUNCTION:
 							return mcustom_ext_function();
 						default:
-							return EMPTY<C>;
+							return empty<C> ();
 					}
 				}   
 
@@ -389,7 +389,7 @@ namespace pensar_digital
         {
 			public:
 				inline static const VersionPtr VERSION = Version::get(1, 1, 1);
-                TmpTextFile(const std::basic_string<C>& file_name = EMPTY<C>, const std::basic_string<C>& content = EMPTY<C>, const Id id = null_value<Id>()) : TextFile<C>(TMP_PATH / file_name, content, File<C>::DEFAULT_MODE, id)
+                TmpTextFile(const std::basic_string<C>& file_name = empty<C> (), const std::basic_string<C>& content = empty<C> (), const Id id = null_value<Id>()) : TextFile<C>(TMP_PATH / file_name, content, File<C>::DEFAULT_MODE, id)
                 {
 				}
 

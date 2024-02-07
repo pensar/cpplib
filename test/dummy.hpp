@@ -20,7 +20,7 @@ namespace pensar_digital
 {
     namespace cpplib
     {
-        using namespace pensar_digital::contact;
+        using namespace pensar_digital::cpplib::contact;
         class Dummy;
 #pragma warning( disable : 4250) // Disable warning C4250: inherits via dominance.
         typedef std::shared_ptr<Dummy> DummyPtr;

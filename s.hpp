@@ -157,29 +157,28 @@ namespace pensar_digital
                 return std::char_traits<C>::length(data.data());
             }
 
-            inline void copy(const C* str, size_t str_length)
+            inline void copy(const C* s, size_t s_length, bool add_null_at_end = true, bool fill_null_before_copy = true)
             {
-                if (str_length > MAX)
+                if (s_length >= MAX)
                 {
                     std::string error = "String is too long. Max size is ";
                     error += std::to_string(MAX);
                     throw std::runtime_error(error);
                 }
-                if (str_length < MIN)
+                if (s_length < MIN)
 				{
 					std::string error = "String is too short. Min size is ";
 					error += std::to_string(MIN);
 					throw std::runtime_error(error);
 				}   
-                //if (str == nullptr)
-                //{
-                fill_null();
-                //}
-                //else
-                //{
-                std::memcpy(data.data(), str, str_length * sizeof(C));
-                //data[str_length] = NULL_CHAR;
-            //}
+                if (fill_null_before_copy)
+                    fill_null();
+
+                if (s_length > 0)
+                    std::memcpy(data.data(), s, s_length * sizeof(C));
+
+                if (add_null_at_end and (s_length >= 0))
+                    data[s_length] = NULL_CHAR;
             }
 
             inline void copy(const C* str)
@@ -503,7 +502,7 @@ namespace pensar_digital
 
             std::array<C, MAX_SIZE> data;   ///< The string data.
 
-            S(const C* s = EMPTY<C>, const size_t str_length = 0)
+            S(const C* s = empty<C> (), const size_t str_length = 0)
             {
                 size_t l = (str_length == 0) ? std::char_traits<C>::length(s) : str_length;
                 copy(s, l * sizeof(C), ADD_NULL_AT_END);

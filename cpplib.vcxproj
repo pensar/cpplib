@@ -191,6 +191,7 @@
     <ClInclude Include="byte_order.hpp" />
     <ClInclude Include="constant.hpp" />
     <ClInclude Include="constraint.hpp" />
+    <ClInclude Include="contact.hpp" />
     <ClInclude Include="country.hpp" />
     <ClInclude Include="concept.hpp" />
     <ClInclude Include="date.hpp" />
@@ -214,6 +215,7 @@
     <ClInclude Include="object.hpp" />
     <ClInclude Include="path.hpp" />
     <ClInclude Include="person.hpp" />
+    <ClInclude Include="phone.hpp" />
     <ClInclude Include="random_util.hpp" />
     <ClInclude Include="s.hpp" />
     <ClInclude Include="stop_watch.hpp" />
