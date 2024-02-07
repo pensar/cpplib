@@ -332,12 +332,11 @@ namespace pensar_digital
                 return *this;
             }
 
-            //CS& operator= (const CS& other) noexcept = default;
-            /*{
-                std::copy(other.data.begin(), other.length (), data.begin());
-                data[other.length ()] = NULL_CHAR;
+            CS& assign (const CS& other)
+            {
+                copy (other.data.data(), other.length (), ADD_NULL_AT_END);
                 return *this;
-            }*/
+            }
 
             CS& operator+= (const CS& other)
             {

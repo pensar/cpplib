@@ -60,6 +60,12 @@ namespace pensar_digital
                 PersonName<> expected = { "Mauricio", "", "Gomes" };
                 CHECK_EQ(PersonName<>, p.name(), expected, "1");
 
+                p.add_email("local_part@domain");
+                Email<> expected_email = { "local_part", "domain" };
+                Email<> actual_email = p.data()->memails[0];
+                CHECK_EQ(Email<>, actual_email, expected_email, "4");
+
+
                 pd::ObjMemoryBuffer<Person> buffer;
                 buffer.write(p);
 
@@ -68,6 +74,10 @@ namespace pensar_digital
 
                 buffer.read(&p2);
                 CHECK_EQ(Person, p2, p, "3");
+
+                Email<> expected_email2 = { "local_part", "domain" };
+                Email<> actual_email2 = p2.data()->memails[0];
+                CHECK_EQ(Email<>,actual_email2, expected_email2, "4");
 
                 TEST_END(Person)
         }

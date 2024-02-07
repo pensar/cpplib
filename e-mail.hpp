@@ -41,6 +41,24 @@ namespace pensar_digital
     {
         namespace contact
         {
+
+            inline bool is_valid_local_part(const std::string& local_part)
+            {
+                auto iter = local_part.begin();
+                return x3::parse(iter, local_part.end(), local_part) && iter == local_part.end();
+            }
+
+            inline bool is_valid_domain(const std::string& domain)
+            {
+                auto iter = domain.begin();
+                return x3::parse(iter, domain.end(), domain) && iter == domain.end();
+            }
+
+            inline bool is_valid_email_address(const std::string& email_address) {
+                auto iter = email_address.begin();
+                return x3::parse(iter, email_address.end(), addr_spec) && iter == email_address.end();
+            }
+
             template <typename C = char>
             struct Email
             {
@@ -50,8 +68,45 @@ namespace pensar_digital
                 Domain    mdomain;
                 ContactQualifier mqualifier;
 
+                void initialize(const LocalPart& lp = empty<C>(), const Domain& d = empty<C>(), ContactQualifier cq = ContactQualifier::Business)
+                {
+                    if (!is_valid_local_part(lp))
+                    {
+                        throw std::runtime_error("Invalid local part");
+                    }
+                    if (!is_valid_domain(d))
+                    {
+                        throw std::runtime_error("Invalid domain");
+                    }
+                    mlocal_part.assign (lp);
+                    mdomain.assign (d);
+                    mqualifier  = cq;
+                }
+
                 Email(const LocalPart& lp = empty<C>(), const Domain& d = empty<C>(), ContactQualifier cq = ContactQualifier::Business)
-                    : mlocal_part(lp), mdomain(d), mqualifier(cq) {}
+                    : mlocal_part(lp), mdomain(d), mqualifier(cq) 
+                {
+                    initialize(lp, d, cq);
+                }
+
+                Email(const std::basic_string<C>& s, ContactQualifier cq = ContactQualifier::Business)
+					: mqualifier(cq)
+				{
+					auto at = s.find('@');
+					if (at != std::basic_string<C>::npos)
+					{
+                        initialize(s.substr(0, at), s.substr(at + 1), cq);
+					}
+					else
+					{
+						throw std::runtime_error("Invalid email address");
+					}
+				}
+
+                Email (const C* s, ContactQualifier cq = ContactQualifier::Business)
+				     : Email(std::basic_string<C>(s), cq)
+				{
+				}
 
                 // Implicit conversion to basic_string<C>
                 operator std::basic_string<C>() const noexcept
@@ -121,11 +176,6 @@ namespace pensar_digital
                     throw std::runtime_error("Invalid email address");
                 }
                 return is;
-            }
-
-            inline bool is_valid_email_address(const std::string& email_address) {
-                auto iter = email_address.begin();
-                return x3::parse(iter, email_address.end(), addr_spec) && iter == email_address.end();
             }
         }   // namespace contact
     }       // namespace cpplib
