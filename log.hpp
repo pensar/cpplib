@@ -2,6 +2,8 @@
 #define LOG_H_INCLUDED
 
 #include "macros.hpp"
+#include "s.hpp"
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -16,29 +18,15 @@ namespace pensar_digital
 
         #ifdef LOG_ON
         
-            // All this structure is just to create a default file name template<typename C = char>
-            template <typename C = char>
-            struct DefaultLogFileNameStruct
-			{
-                inline static const C* value = "log.txt";
-            };
-
-            template<>
-            struct DefaultLogFileNameStruct<wchar_t>
-            {
-                inline static const wchar_t* value = L"log.txt";
-            };
-
-            template <typename C = char>
             inline static const C* default_log_file_name() 
             {
-                return DefaultLogFileNameStruct<C>::value;
+                return W("log.txt");
             }
 
             template <typename C = char>
-            std::basic_fstream<C> _log(default_log_file_name<C>());
+            std::basic_fstream<C> _log(default_log_file_name());
 
-            static inline std::wfstream wlog(default_log_file_name<wchar_t>());
+            static inline std::wfstream wlog(default_log_file_name());
 
             static inline bool log_on = true;
             
@@ -48,7 +36,7 @@ namespace pensar_digital
             inline void disable_log () {_log<>.close (); log_on = false;}
 
             template <>
-            inline void enable_log() { if (!wlog.is_open()) wlog.open(default_log_file_name<wchar_t> ()); log_on = true; }
+            inline void enable_log() { if (!wlog.is_open()) wlog.open(default_log_file_name ()); log_on = true; }
             template <>
             inline void disable_log() { wlog.close(); log_on = false; }
 
@@ -78,7 +66,7 @@ namespace pensar_digital
                 #define LOG \/\/
                 #define LOG_FLUSH \/\/
             #else
-                #define cpplog if (0) std::cout
+                #define cpplog if (0) out ()
                 #define LOG if (0)
                 #define LOG_FLUSH ;
             #endif

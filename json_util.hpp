@@ -5,7 +5,7 @@
 #define JSON_UTIL_HPP
 
 #include "concept.hpp"
-#include "string_def.hpp"
+#include "s.hpp"
 #include "header_lib/json.hpp"
 #include "version.hpp" 
 #include "type_util.hpp"
@@ -18,36 +18,36 @@ namespace pensar_digital
     {
         using Json = nlohmann::json;
 
-        // Jsonable concept. Requires a member function json() returning something convertible to String.
+        // Jsonable concept. Requires a member function json() returning something convertible to S.
         template <typename T>
         concept Jsonable = requires (T t)
         {
-            {t.json()} noexcept -> std::convertible_to<String>;
+            {t.json()} noexcept -> std::convertible_to<S>;
         };
 
         template<class T>
-        Id id(const String& sjson, Json* j)
+        Id id(const S& sjson, Json* j)
         {
             if (j == nullptr)
             {
                 auto k = Json::parse(sjson);
-                String json_class = k.at("class");
-                if (json_class != pd::class_name<T, char>())
-                    throw std::runtime_error("Invalid class name: " + pd::class_name<T, char>());
-                return k.at("id");
+                S json_class = k.at(W("class"));
+                if (json_class != pd::class_name<T>())
+                    throw std::runtime_error(W("Invalid class name: ") + pd::class_name<T>());
+                return k.at(W("id"));
             }
             else
             {
                 *j = Json::parse(sjson);
-                String json_class = j->at("class");
-                if (json_class != pd::class_name<T, char>())
-                    throw std::runtime_error("Invalid class name: " + pd::class_name<T, char>());
-                return j->at("id");
+                S json_class = j->at(W("class"));
+                if (json_class != pd::class_name<T>())
+                    throw std::runtime_error(W("Invalid class name: ") + pd::class_name<T>());
+                return j->at(W("id"));
             }
 
         }
         template <class T, typename IdType = Id>
-        T& read_json(const String& sjson, T& o, IdType* out_id, VersionPtr* out_v, Json* out_j = nullptr)
+        T& read_json(const S& sjson, T& o, IdType* out_id, VersionPtr* out_v, Json* out_j = nullptr)
         {
             *out_id = (id<T>(sjson, out_j));
             *out_v = Version::get(*out_j);
@@ -55,19 +55,19 @@ namespace pensar_digital
         }
 
         template <class T, typename IdType = Id>
-        std::istream& read_json(std::istream& is, T& o, IdType* out_id, VersionPtr* out_v, Json* out_j = nullptr)
+        InStream& read_json(InStream& is, T& o, IdType* out_id, VersionPtr* out_v, Json* out_j = nullptr)
         {
-            String sjson;
+            S sjson;
             read_json (read_all (is, sjson), o, out_id, out_v, out_j);
             return is;
         }
 
         template <Versionable T>
-        String json (const T& o)
+        S json (const T& o)
         {
-            std::stringstream ss;
-            ss << "{ \"class\" : \"" << o.class_name();
-            ss << "\", \"id\" : " << o.id() << ", \"VERSION\": ";
+            SStream ss;
+            ss << W("{ \"class\" : \"") << o.class_name();
+            ss << W("\", \"id\" : ") << o.id() << W(", \"VERSION\": ");
             ss << *(o.VERSION);
             return ss.str();
         }

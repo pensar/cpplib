@@ -2,8 +2,7 @@
 // license: MIT (https://opensource.org/licenses/MIT)
 
 #include "../../unit-test/test.hpp"
-#include "../string_def.hpp"
-#include "../string_util.hpp"
+#include "../s.hpp"
 #include "../object.hpp"
 #include "constraint.hpp"
 
@@ -16,47 +15,47 @@ namespace pensar_digital
         TEST(Constraint, true)
             StringConstraint sc (ONLY_DIGITS_REGEX);
 
-            CHECK( sc.ok ("123" ), "0"); 
-            CHECK(!sc.ok ("123a"), "1");
-            CHECK(!sc.ok ("a123"), "2");
-            CHECK( sc.ok (""    ), "3");
-            CHECK(!sc.ok (" "   ), "4");
-            CHECK(!sc.ok (" 123"), "5");
-            CHECK( sc.ok ("0"   ), "6");
+            CHECK( sc.ok (W("123") ), W("0"));
+            CHECK(!sc.ok (W("123a")), W("1"));
+            CHECK(!sc.ok (W("a123")), W("2"));
+            CHECK( sc.ok (W("")    ), W("3"));
+            CHECK(!sc.ok (W(" ")   ), W("4"));
+            CHECK(!sc.ok (W(" 123")), W("5"));
+            CHECK( sc.ok (W("0")   ), W("6"));
 
-            StringConstraint sc2("^bola$");
-            CHECK( sc2.ok ("bola" ), "7");
-            CHECK(!sc2.ok (" bola"), "8");
-            CHECK(!sc2.ok (""     ), "9");
+            StringConstraint sc2(W("^bola$"));
+            CHECK( sc2.ok (W("bola") ), W("7"));
+            CHECK(!sc2.ok (W(" bola")), W("8"));
+            CHECK(!sc2.ok (W("")     ), W("9"));
 
             CompositeConstraint<StringConstraint, StringConstraint> sc3 = (sc || sc2);
-            CHECK( sc3.ok ("bola" ), "10");
-            CHECK( sc3.ok ("123"  ), "11"); 
-            CHECK(!sc3.ok ("123bola" ), "12");
+            CHECK( sc3.ok (W("bola") ), W("10"));
+            CHECK( sc3.ok (W("123")  ), W("11"));
+            CHECK(!sc3.ok (W("123bola")), W("12"));
         TEST_END (Constraint);
 
         TEST(RangeConstraint, true)
 			RangeConstraint<int> rc (0, 10);
-			CHECK( rc.ok (0  ), "0");
-			CHECK( rc.ok (10 ), "1");
-			CHECK( rc.ok (5  ), "2");
-			CHECK(!rc.ok (-1 ), "3");
-			CHECK(!rc.ok (11 ), "4");
-            CHECK(!rc.ok (100), "5");
+			CHECK( rc.ok (0  ), W("0"));
+			CHECK( rc.ok (10 ), W("1"));
+			CHECK( rc.ok (5  ), W("2"));
+			CHECK(!rc.ok (-1 ), W("3"));
+			CHECK(!rc.ok (11 ), W("4"));
+            CHECK(!rc.ok (100), W("5"));
 
-            RangeConstraint<char> rc2 ('A', 'E');
-            CHECK( rc2.ok ('A'), "6");  
-            CHECK( rc2.ok ('E'), "7");
-            CHECK( rc2.ok ('C'), "8");
-            CHECK(!rc2.ok ('@'), "9");
-            CHECK(!rc2.ok ('F'), "10");
-            CHECK(!rc2.ok ('a'), "11");
-            CHECK(!rc2.ok ('e'), "12");
+            RangeConstraint<char> rc2 (W('A'), W('E'));
+            CHECK( rc2.ok (W('A')), W("6"));
+            CHECK( rc2.ok (W('E')), W("7"));
+            CHECK( rc2.ok (W('C')), W("8"));
+            CHECK(!rc2.ok (W('@')), W("9"));
+            CHECK(!rc2.ok (W('F')), W("10"));
+            CHECK(!rc2.ok (W('a')), W("11"));
+            CHECK(!rc2.ok (W('e')), W("12"));
 
             RangeConstraint<int> rc3 (10);
-            CHECK( rc3.ok (10), "13");
-            CHECK(!rc3.ok (9 ), "14");
-            CHECK(!rc3.ok (11), "15");
+            CHECK( rc3.ok (10), W("13"));
+            CHECK(!rc3.ok (9 ), W("14"));
+            CHECK(!rc3.ok (11), W("15"));
 		TEST_END (RangeConstraint);
 
         TEST(CompositeConstraints, true)
@@ -68,39 +67,39 @@ namespace pensar_digital
 
             typedef CompositeConstraint<RangeConstraint<int>, RangeConstraint<int>> CompositeRangeInt;
             CompositeRangeInt babies_or_kids = (baby || kid);
-			CHECK( babies_or_kids.ok ( 0), "0");
-			CHECK(!babies_or_kids.ok (11), "1");
-            CHECK( babies_or_kids.ok ( 3), "2");   
-            CHECK( babies_or_kids.ok (10), "3");
+			CHECK( babies_or_kids.ok ( 0), W("0"));
+			CHECK(!babies_or_kids.ok (11), W("1"));
+            CHECK( babies_or_kids.ok ( 3), W("2"));
+            CHECK( babies_or_kids.ok (10), W("3"));
 
             CompositeRangeInt teens_or_adults = (teen || adult);
-            CHECK( teens_or_adults.ok ( 11), "4");  
-            CHECK( teens_or_adults.ok ( 19), "5");
-            CHECK( teens_or_adults.ok ( 20), "6");  
-            CHECK( teens_or_adults.ok ( 60), "7");
-            CHECK(!teens_or_adults.ok ( 10), "8");
-            CHECK(!teens_or_adults.ok ( 61), "9");
+            CHECK( teens_or_adults.ok ( 11), W("4"));
+            CHECK( teens_or_adults.ok ( 19), W("5"));
+            CHECK( teens_or_adults.ok ( 20), W("6"));
+            CHECK( teens_or_adults.ok ( 60), W("7"));
+            CHECK(!teens_or_adults.ok ( 10), W("8"));
+            CHECK(!teens_or_adults.ok ( 61), W("9"));
 
             typedef CompositeConstraint<CompositeRangeInt, RangeConstraint<int>> Composite3RangeInt;
             Composite3RangeInt no_adults = (babies_or_kids || teen);
-            CHECK( no_adults.ok ( 0), "10");
-            CHECK( no_adults.ok ( 3), "11");
-            CHECK( no_adults.ok ( 10), "12");
-            CHECK( no_adults.ok ( 11), "13");
-            CHECK( no_adults.ok ( 19), "14");
-            CHECK(!no_adults.ok ( 20), "15");
-            CHECK(!no_adults.ok ( 60), "16");
-            CHECK(!no_adults.ok ( 61), "17");
+            CHECK( no_adults.ok ( 0), W("10"));
+            CHECK( no_adults.ok ( 3), W("11"));
+            CHECK( no_adults.ok ( 10), W("12"));
+            CHECK( no_adults.ok ( 11), W("13"));
+            CHECK( no_adults.ok ( 19), W("14"));
+            CHECK(!no_adults.ok ( 20), W("15"));
+            CHECK(!no_adults.ok ( 60), W("16"));
+            CHECK(!no_adults.ok ( 61), W("17"));
 
             RangeConstraint<int> legal (18, 200);
-            CHECK(!legal.ok(0), "10");
-            CHECK(!legal.ok(3), "11");
-            CHECK(!legal.ok(10), "12");
-            CHECK(!legal.ok(11), "13");
-            CHECK(legal.ok(19), "14");
-            CHECK(legal.ok(20), "15");
-            CHECK(legal.ok(60), "16");
-            CHECK(legal.ok(61), "17");
+            CHECK(!legal.ok(0), W("10"));
+            CHECK(!legal.ok(3), W("11"));
+            CHECK(!legal.ok(10), W("12"));
+            CHECK(!legal.ok(11), W("13"));
+            CHECK(legal.ok(19), W("14"));
+            CHECK(legal.ok(20), W("15"));
+            CHECK(legal.ok(60), W("16"));
+            CHECK(legal.ok(61), W("17"));
 
         TEST_END (CompositeConstraints)
     }   // cpplib.

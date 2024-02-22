@@ -5,7 +5,6 @@
 #define constantesHPP
 //---------------------------------------------------------------------------
 #include <cstdint>
-#include "string_def.hpp"
 #include <vector>  
 #include <cstddef> // std::byte
 
@@ -24,7 +23,6 @@ namespace pensar_digital
         using VersionInt = int_fast16_t;
         using FileSize   = int_fast64_t;
         
-        extern       String  DOUBLE_QUOTES;
         extern const Id NULL_ID;
         
         template <std::unsigned_integral T>

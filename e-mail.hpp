@@ -59,16 +59,15 @@ namespace pensar_digital
                 return x3::parse(iter, email_address.end(), addr_spec) && iter == email_address.end();
             }
 
-            template <typename C = char>
             struct Email
             {
-                typedef pd::CS<0, 64, C> LocalPart; // The maximum length of the local part is 64 characters
-                typedef pd::CS<0, 255, C> Domain; // The maximum length of the domain name is 255 characters    
+                typedef pd::CS<0, 64> LocalPart; // The maximum length of the local part is 64 characters
+                typedef pd::CS<0, 255> Domain; // The maximum length of the domain name is 255 characters    
                 LocalPart mlocal_part;
                 Domain    mdomain;
                 ContactQualifier mqualifier;
 
-                void initialize(const LocalPart& lp = empty<C>(), const Domain& d = empty<C>(), ContactQualifier cq = ContactQualifier::Business)
+                inline void initialize(const LocalPart& lp = EMPTY, const Domain& d = EMPTY, ContactQualifier cq = ContactQualifier::Business)
                 {
                     if (!is_valid_local_part(lp))
                     {
@@ -83,35 +82,41 @@ namespace pensar_digital
                     mqualifier  = cq;
                 }
 
-                Email(const LocalPart& lp = empty<C>(), const Domain& d = empty<C>(), ContactQualifier cq = ContactQualifier::Business)
+                inline Email(const LocalPart& lp = EMPTY, const Domain& d = EMPTY, ContactQualifier cq = ContactQualifier::Business)
                     : mlocal_part(lp), mdomain(d), mqualifier(cq) 
                 {
                     initialize(lp, d, cq);
                 }
 
-                Email(const std::basic_string<C>& s, ContactQualifier cq = ContactQualifier::Business)
+                inline Email(const S& s, ContactQualifier cq = ContactQualifier::Business)
 					: mqualifier(cq)
 				{
-					auto at = s.find('@');
-					if (at != std::basic_string<C>::npos)
+					auto at = s.find(W('@'));
+					if (at != S::npos)
 					{
                         initialize(s.substr(0, at), s.substr(at + 1), cq);
 					}
 					else
 					{
-						throw std::runtime_error("Invalid email address");
+						throw std::runtime_error(W("Invalid email address"));
 					}
 				}
 
-                Email (const C* s, ContactQualifier cq = ContactQualifier::Business)
-				     : Email(std::basic_string<C>(s), cq)
+                inline Email (const C* s, ContactQualifier cq = ContactQualifier::Business)
+				     : Email(S(s), cq)
 				{
 				}
 
+                // Conversion to S
+                inline S str() const noexcept
+				{
+                    return  mlocal_part.to_string () + W("@") + mdomain;
+				}
+
                 // Implicit conversion to basic_string<C>
-                operator std::basic_string<C>() const noexcept
+                inline operator S() const noexcept
                 {
-                    return mlocal_part + "@" + mdomain;
+                    return str ();
                 }
 
                 inline bool equal_local_part(const Email& other) const noexcept
@@ -134,46 +139,37 @@ namespace pensar_digital
                     return !(*this == other);
                 }
 
-                inline std::string json() const noexcept
+                inline S json() const noexcept
                 {
-                    std::stringstream ss;
-                    ss << "{ \"class\" : \"" << pd::class_name<Email<char>>();
-                    ss << ", \"local_part\" : " << mlocal_part << ", \"domain\" : " << mdomain << " }";
+                    SStream ss;
+                    ss << W("{ \"class\" : \"") << pd::class_name<Email>();
+                    ss << W(", \"local_part\" : ") << mlocal_part.str () << W(", \"domain\" : ") << mdomain << W(" }");
                     return ss.str();
                 }
 
-                inline std::wstring wjson() const noexcept
-                {
-                    std::wstringstream ss;
-                    ss << L"{ \"class\" : \"" << pd::class_name<Email<wchar_t>>();
-                    ss << L", \"local_part\" : " << mlocal_part << L", \"domain\" : " << mdomain << L" }";
-                    return ss.str();
-                }
             };
 
             // Make Email OutputStreamable.
-            template <typename C>
-            std::basic_ostream<C>& operator<<(std::basic_ostream<C>& os, const Email<C>& e)
+            inline OutStream& operator<<(OutStream& os, const Email& e)
             {
-                os << e.mlocal_part << "@" << e.mdomain;
+                os << e.mlocal_part.str () << W("@") << e.mdomain;
                 return os;
             }
 
             // Make Email InputStreamable.
-            template <typename C>
-            std::basic_istream<C>& operator>>(std::basic_istream<C>& is, Email<C>& e)
+            inline InStream& operator>>(InStream& is, Email& e)
             {
-                std::basic_string<C> s;
+                S s;
                 is >> s;
-                auto at = s.find('@');
-                if (at != std::basic_string<C>::npos)
+                auto at = s.find(W('@'));
+                if (at != S::npos)
                 {
                     e.mlocal_part = s.substr(0, at);
                     e.mdomain = s.substr(at + 1);
                 }
                 else
                 {
-                    throw std::runtime_error("Invalid email address");
+                    throw std::runtime_error(W("Invalid email address"));
                 }
                 return is;
             }

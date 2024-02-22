@@ -2,8 +2,7 @@
 // license: MIT (https://opensource.org/licenses/MIT)
 
 #include "../../unit-test/test.hpp"
-#include "../string_def.hpp"
-#include "../string_util.hpp"
+#include "../s.hpp"
 #include "../object.hpp"
 #include "../io_util.hpp"
 #include "../sys_user_info.hpp"
@@ -18,13 +17,13 @@ namespace pensar_digital
     namespace cpplib
     {
         TEST(PathTest, true)
-            Path temp_dir = get_user_home<true>() / "test_dir";
-            Path file1 = temp_dir / "file_name";
-            Path file2 = temp_dir / "dir" / "file_name";
-            TextFile<> tf(file1, "blah");
-            CHECK(tf.exists(), "0");
-            TextFile<> tf2(file2, "blah");
-            CHECK(tf2.exists(), "0");
+            Path temp_dir = get_user_home<true>() / W("test_dir");
+            Path file1 = temp_dir / W("file_name");
+            Path file2 = temp_dir / W("dir" / "file_name");
+            TextFile tf(file1, W("blah"));
+            CHECK(tf.exists(), W("0"));
+            TextFile tf2(file2, W("blah"));
+            CHECK(tf2.exists(), W("0"));
             fs::last_write_time (file2, last_write_time (file1)); // Do timestamp file2 = timestamp file2.
             //CHECK_EQ(Path, file1, file2, "2");
 

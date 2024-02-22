@@ -5,7 +5,7 @@
 #define VERSION_HPP_INCLUDED
 
 #include "constant.hpp"
-#include "string_util.hpp"
+#include "s.hpp"
 #include "header_lib/json.hpp"
 #include "factory.hpp"
 #include "type_util.hpp"
@@ -112,11 +112,11 @@ namespace pensar_digital
                 /// \return  The current value of hash
                 virtual inline const Hash hash() const noexcept { return mdata.mid; };
 
-                inline static VersionFactory::P parse_json (const String& sjson)
+                inline static VersionFactory::P parse_json (const S& sjson)
                 {
                     Json j;
                     VersionFactory::P ptr = get();
-                    std::stringstream ss(sjson);
+                    SStream ss(sjson);
                     ss >> *ptr;
                     return ptr;
                 };
@@ -141,46 +141,43 @@ namespace pensar_digital
                     return true;
 			    }
 
-                template <typename C = char>
-                std::basic_string<C> to_string () const noexcept
+                S to_string () const noexcept
                 {
-                    return pd::to_string<C> (mdata.mpublic) + "." + pd::to_string<C> (mdata.mprotected) + "." + pd::to_string<C> (mdata.mprivate);
+                    return pd::to_string (mdata.mpublic) + W(".") + pd::to_string (mdata.mprotected) + W(".") + pd::to_string (mdata.mprivate);
                 }
 
                 // Convertion to xml string.
-                String xml() const noexcept;
-                void from_xml(const String& sxml);
+                S xml() const noexcept;
+                void from_xml(const S& sxml);
             
-                std::istream& read (std::istream& os, const IO_Mode amode = TEXT, const std::endian& byte_order = std::endian::native);
+                InStream& read (InStream& os, const IO_Mode amode = TEXT, const std::endian& byte_order = std::endian::native);
 
                 inline bool operator == (const Version& v) const { return ((mdata.mid == v.mdata.mid) && (mdata.mpublic == v.mdata.mpublic) && (mdata.mprotected == v.mdata.mprotected) && (mdata.mprivate == v.mdata.mprivate)); }
                 inline bool operator != (const Version& v) const { return !(*this == v); }
 
                 // Implicit conversion to string.
-                template <typename Char = char>
-                operator std::basic_string<Char>() const noexcept { return to_string<Char> (); }
+                operator S() const noexcept { return to_string (); }
 
                 friend std::istream& operator >> (std::istream& is, Version& v);
 
-                template <typename Char = char>
-                std::basic_string<Char> class_name() const
+                S class_name() const
                 {
-                    return pd::class_name<Version, Char> ();
+                    return pd::class_name<Version> ();
                 }
                 
-                String debug_string() const noexcept;
+                S debug_string() const noexcept;
                 inline const Id id() const noexcept { return mdata.mid; }
                 const Hash get_hash() const noexcept;
-                String json() const noexcept;
-                std::ostream& write (std::ostream& os, const IO_Mode amode = TEXT, const std::endian& byte_order = std::endian::native) const;
+                S json() const noexcept;
+                OutStream& write (OutStream& os, const IO_Mode amode = TEXT, const std::endian& byte_order = std::endian::native) const;
 
             
                 friend void from_json(const Json& j, Version& o);
 
         }; // class Version
         // Stream operators.
-        extern std::istream& operator >> (std::istream& is, Version& v);
-        extern std::ostream& operator << (std::ostream& os, const Version& v);
+        extern InStream& operator >> (InStream & is, Version& v);
+        extern OutStream& operator << (OutStream & os, const Version& v);
         extern void to_json(Json& j, const Version& o);
         extern void from_json(const Json& j, Version& o);
 

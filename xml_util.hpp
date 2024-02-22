@@ -5,8 +5,7 @@
 #define XML_UTIL_HPP_INCLUDED
 
 #include "constant.hpp"
-#include "string_def.hpp"
-#include "string_util.hpp"
+#include "s.hpp"
 #include "type_util.hpp"
 #include "header_lib/xmlParser.h"
 
@@ -18,32 +17,32 @@ namespace pensar_digital
         template <class T>
         concept Objectable = requires (T t)    
         {
-            { t.class_name() } -> std::convertible_to<String>;
+            { t.class_name() } -> std::convertible_to<S>;
             { t.id() } -> std::convertible_to<Id>;
         };
 
 
         template<Objectable T>
-        String ObjXMLPrefix (const T& o) noexcept
+        S ObjXMLPrefix (const T& o) noexcept
         { 
             return "<object class_name = \"" + o.class_name() + "\" id = \"" + std::to_string (o.id ()) + "\""; 
         }
 
         template <class T>
-        XMLNode parse_object_tag (const String& sxml, Id* id_from_xml)
+        XMLNode parse_object_tag (const S& sxml, Id* id_from_xml)
         {
             const char* xml = sxml.c_str ();
-            XMLCSTR tag = "object";
+            XMLCSTR tag = W("object");
             XMLResults* pResults = 0;
             XMLNode node = XMLNode::parseString (xml, tag, pResults);
-            String xml_class_name = node.getAttribute ("class_name");
-            if (xml_class_name == class_name<T, char> ())
+            S xml_class_name = node.getAttribute (W("class_name"));
+            if (xml_class_name == class_name<T> ())
             {
-                String sid = node.getAttribute ("id");
+                S sid = node.getAttribute (W("id"));
                 *id_from_xml = std::stoi (sid);
             }
             else
-                throw std::runtime_error ("Invalid class name");
+                throw std::runtime_error (W("Invalid class name"));
             return node;
         }
 

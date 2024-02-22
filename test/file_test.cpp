@@ -11,16 +11,16 @@ namespace pensar_digital
     namespace cpplib
     {
         TEST(RandomFileNameGenerator, true)
-            RandomFileNameGenerator<char> r;
+            RandomFileNameGenerator r;
             Path p = r ();
-            CHECK_EQ(Path, p.parent_path(), TMP_PATH.copy_without_trailing_separator(), "0");
+            CHECK_EQ(Path, p.parent_path(), TMP_PATH.copy_without_trailing_separator(), W("0"));
             std::string filename = p.filename_only().string();
-            CHECK_EQ(std::string, p.extension(), ".txt", "1");
-            CHECK_EQ(size_t, filename.length (), 8, "2");
-            CHECK(filename.find_first_not_of ("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") == std::string::npos, "3");
+            CHECK_EQ(std::string, p.extension(), W(".txt"), W("1"));
+            CHECK_EQ(size_t, filename.length (), 8, W("2"));
+            CHECK(filename.find_first_not_of (W("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")) == S::npos, W("3"));
             
             // Check if it does not start with a number.
-            CHECK(filename.find_first_of ("0123456789") != 0, "4");
+            CHECK(filename.find_first_of (W("0123456789")) != 0, W("4"));
 
 
 	
@@ -29,25 +29,16 @@ namespace pensar_digital
         TEST(TextFile, true)
             Path p;
             {
-                TmpTextFile<char> file("text-file-test.txt", "blah");
+                p = TMP_PATH / W("text-file-test.txt");
+                TmpTextFile file(p, W("blah"));
                 p = file.fullpath ();
             
                 // Checks if file exists.
-                CHECK(file.exists(), "0");
-                std::string s = file.read();
-                CHECK_EQ(std::string, s, "blah", "1");
+                CHECK(file.exists(), W("0"));
+                S s = file.read();
+                CHECK_EQ(S, s, W("blah"), W("1"));
 			}   
-            CHECK(! p.exists(), "2");
-
-            
-            {
-                TmpTextFile<wchar_t> file(L"wtext-file-test.txt", L"blah");
-                p = file.fullpath ();
-                std::wstring ws = file.read();
-                WCHECK_EQ(std::wstring, ws, L"blah", L"3");
-            }
-            CHECK(! p.exists(), "4");
-            
+            CHECK(! p.exists(), W("2"));
         TEST_END(TextFile)
     }
 }

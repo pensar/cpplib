@@ -272,7 +272,7 @@ namespace pensar_digital
 		{
 			// Requires T::Datatype defined.
 			//T::Datatype;
-			{t.data()     } -> std::convertible_to<pd::Data*>;
+			{t.data()     } -> std::convertible_to<Data*>;
 			{t.data_size()} -> std::convertible_to<size_t>;
 		} && StdLayoutTriviallyCopyable<typename T::Datatype> && Identifiable<T> && Hashable<T>;
 

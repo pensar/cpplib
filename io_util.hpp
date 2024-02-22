@@ -4,7 +4,7 @@
 #ifndef io_utilH
 #define io_utilH
 
-#include "string_def.hpp"
+#include "s.hpp"
 #include "memory.hpp"
 #include "constant.hpp"
 #include "concept.hpp"
@@ -26,7 +26,7 @@ namespace pensar_digital
         namespace fs = std::filesystem;
 
 #ifdef _MSC_VER
-        inline String& windows_read_file (const String& filename, String* s) 
+        inline S& windows_read_file (const S& filename, S* s) 
         {
             HANDLE file = CreateFileA(filename.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
             if (file == INVALID_HANDLE_VALUE) {
@@ -41,7 +41,7 @@ namespace pensar_digital
             if (addr == NULL) {
                 // handle error
             }
-            s = new String(addr, file_size);
+            s = new S(addr, file_size);
             UnmapViewOfFile(addr);
             CloseHandle(file_mapping);
             CloseHandle(file);
@@ -69,7 +69,7 @@ namespace pensar_digital
 			return s;
 		}
 #endif  
-        inline String& read_file_mmap (const String& filename, String *s) 
+        inline S& read_file_mmap (const S& filename, S *s) 
 		{   
 #ifdef _MSC_VER
 			return windows_read_file (filename, s);
@@ -80,7 +80,7 @@ namespace pensar_digital
         }
 
         template <typename T>
-        void binary_write(std::ostream& os, const T& t, const size_t& size, const std::endian& byte_order = std::endian::native)
+        void binary_write(OutStream& os, const T& t, const size_t& size, const std::endian& byte_order = std::endian::native)
         {
             os.write((char*)&size, sizeof(size));
             os.write((char*)&t, size);
@@ -123,14 +123,14 @@ namespace pensar_digital
 			}
 		}  
 
-        // binary_write for String.
-        inline void binary_write (std::ostream& os, const String& s, const std::endian& byte_order = std::endian::native)
+        // binary_write for S.
+        inline void binary_write (OutStream& os, const S& s, const std::endian& byte_order = std::endian::native)
         {
-            binary_write<String::value_type> (os, s, byte_order);
+            binary_write<S::value_type> (os, s, byte_order);
 		}
 
         template <typename T>
-        void binary_read (std::istream& is, T& t, const size_t& size, const std::endian& byte_order = std::endian::native)
+        void binary_read (InStream& is, T& t, const size_t& size, const std::endian& byte_order = std::endian::native)
 		{
             is.read ((char*)(&size), sizeof(size));
             //str.resize(size);
@@ -174,12 +174,12 @@ namespace pensar_digital
 			}
 		}
 
-        inline void binary_read (std::istream& is, String& s, const std::endian& byte_order = std::endian::native)
+        inline void binary_read (std::istream& is, S& s, const std::endian& byte_order = std::endian::native)
 		{
-			binary_read<String::value_type> (is, s, byte_order);
+			binary_read<S::value_type> (is, s, byte_order);
 		}
 
-        template <typename DataType = uint8_t, typename CharType = String::value_type>
+        template <typename DataType = uint8_t, typename CharType = S::value_type>
         std::basic_string<CharType>& binary_to_string (const std::vector<DataType>& data, std::basic_string<CharType>& out)
         {
             out.clear();
@@ -248,7 +248,7 @@ namespace pensar_digital
         extern bool operator != (const std::ftime& left, const std::ftime& right);
         extern bool operator <  (const std::ftime& left, const std::ftime& right);
         extern std::ftime fileTimestamp (const char* gridFilePath);
-        extern std::string fileTimestampString (const char* gridFilePath);
+        extern std::string fileTimestampS (const char* gridFilePath);
         #endif
 
         //extern long long get_file_size(const char* sFileName);

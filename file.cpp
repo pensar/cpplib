@@ -5,30 +5,30 @@
 namespace pensar_digital
 {
     namespace cpplib
-    {
-        std::istream& operator >> (std::istream& is,       File<char>& file) { return file.read  (is); }
-        std::ostream& operator << (std::ostream& os, const File<char>& file) { return file.write (os); }
+    { 
+        InStream&  operator >> (InStream&  is,       File& file) { return file.read  (is); }
+        OutStream& operator << (OutStream& os, const File& file) { return file.write (os); }
 
-        void to_json(Json& j, const File<char>& f)
+        void to_json(Json& j, const File& f)
          {
-             j["class"] = f.class_name();
-             j["id"] = f.id();
-             j["mpublic"] = f.VERSION->get_public();
-             j["mprotected"] = f.VERSION->get_protected();
-             j["mprivate"] = f.VERSION->get_private();
-             j["path"] = f.fullpath ();
-             j["mode"] = f.is_binary() ? "BINARY" : "TEXT";
+             j[W("class")] = f.class_name();
+             j[W("id")] = f.id();
+             j[W("mpublic")] = f.VERSION->get_public();
+             j[W("mprotected")] = f.VERSION->get_protected();
+             j[W("mprivate")] = f.VERSION->get_private();
+             j[W("path")] = f.fullpath ();
+             j[W("mode")] = f.is_binary() ? W("BINARY") : W("TEXT");
          }
 
-         void from_json(const Json& j, File<char>& f)
+         void from_json(const Json& j, File& f)
          {
-             String class_name = f.class_name();
-             String json_class = j.at("class");
+             S class_name = f.class_name();
+             S json_class = j.at(W("class"));
              if (class_name == json_class)
              {
-                 f.set_id(j.at("id"));
-                 f.mfullpath = j.at("mfullpath");
-                 if (j.at("mode") == "BINARY")
+                 f.set_id(j.at(W("id")));
+                 f.mfullpath = j.at(W("mfullpath"));
+                 if (j.at(W("mode")) == W("BINARY"))
                  {
                      f.set_binary_mode ();
                  }
@@ -37,7 +37,7 @@ namespace pensar_digital
                     f.set_text_mode ();
                  }
              }
-             else throw new std::runtime_error("Object expected class = " + class_name + " but json has " + json_class);
+             else throw new std::runtime_error(W("Object expected class = ") + class_name + W(" but json has ") + json_class);
          }
 
     }   // namespace cpplib

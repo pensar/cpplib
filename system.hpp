@@ -17,58 +17,60 @@ namespace pensar_digital
 	{
         #ifdef _WIN32 
             #include <windows.h>
-            #define LINE_FEED "\r\n"
+            #define LINE_FEED W("\r\n")
         #elif __linux__
             #include <unistd.h>
             #include <sys/utsname.h>
             #define MAX_PATH         4096 // Max path length in Linux
             #define MAX_UNC_PATH     4096 // Max UNC path length.
-            #define PATH_SEPARATOR '/'
-            #define LINE_FEED "\n"
+            #define PATH_SEPARATOR W('/')
+            #define LINE_FEED W("\n")
         #endif
 
         class System 
         {
             public:
 
-            static std::string os_name() 
+            static S os_name() 
             {
                 #ifdef _WIN32   
-                    return "Windows";
+                    return W("Windows");
                 #elif __linux__ 
-                    return   "Linux";
+                    return   W("Linux");
                 #else 
-                    return "Other";
+                    return W(Other);
                 #endif
             }
 
-            static std::string os_version() 
+            static S os_version() 
             {
                 #ifdef _WIN32
                     OSVERSIONINFO info;
                     ZeroMemory(&info, sizeof(OSVERSIONINFO));
                     info.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-                    return std::to_string(info.dwMajorVersion) + "." + std::to_string(info.dwMinorVersion);
+                    std::string s = to_string(info.dwMajorVersion) + "." + to_string(info.dwMinorVersion);
+                    S r(s.c_str ());
+                return r;
 
                 #elif __linux__
                     struct utsname buffer;
                     uname(&buffer);
                     return buffer.release;
                 #else
-                return "Unknown";
+                return W("Unknown");
                 #endif
             }
 
-            static inline std::string endianess () { return (std::endian::native == std::endian::little) ? "Little Endian" : "Big Endian"; }
-            static inline char path_separator ()
+            static inline S endianess () { return (std::endian::native == std::endian::little) ? W("Little Endian") : W("Big Endian"); }
+            static inline C path_separator ()
             {
                 #ifdef _WIN32
-                return '\\';
+                return W('\\');
                 #else
-                        return '/';
+                        return W('/');
                 #endif
             }
-            inline const static std::string LF = LINE_FEED;
+            inline const static S LF = LINE_FEED;
             
         };
 

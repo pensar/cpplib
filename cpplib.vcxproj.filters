@@ -33,9 +33,6 @@
     <ClCompile Include="random_util.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="string_util.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="sys_user_info.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -164,12 +161,6 @@
     <ClInclude Include="random_util.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="string_def.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="string_util.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="sys_user_info.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -264,6 +255,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="phone.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="string_def.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="transcoder.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

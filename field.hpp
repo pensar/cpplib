@@ -17,15 +17,15 @@ namespace pensar_digital
 			private:
 			T mvalue;
 			bool misnull;
-			String mname;
-			String mdisplay_name;
-			String mdescription;
+			S mname;
+			S mdisplay_name;
+			S mdescription;
 			static Generator<Field<T>> mgenerator;
 
 			public:
 				inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
 
-			Field(String name, String display_name, String description, bool isnull = true, Id id = NULL_ID) 
+			Field(S name, S display_name, S description, bool isnull = true, Id id = NULL_ID) 
 				: Object (id == NULL_ID ? mgenerator.get () : id),
 				  mname         (name        ),
 				  mdisplay_name (display_name),
@@ -34,7 +34,7 @@ namespace pensar_digital
 			{
 			}
 
-			Field(String name, String display_name, String description, T value, bool is_null = false) :
+			Field(S name, S display_name, S description, T value, bool is_null = false) :
 				Object (),
 				Field  (name, display_name, description, is_null),
 				mvalue (value)
@@ -105,16 +105,16 @@ namespace pensar_digital
 			// Implicit conversion to T
 			operator T() const { return value; }
 
-			virtual String name() const { return mname; }
+			virtual S name() const { return mname; }
 
-			virtual String display_name() const { return mdisplay_name; }
+			virtual S display_name() const { return mdisplay_name; }
 
-			virtual String description() const { return mdescription; }
+			virtual S description() const { return mdescription; }
 
-			virtual String to_string() const noexcept { return value.to_string(); }
+			virtual S to_string() const noexcept { return value.to_string(); }
 
-			// Implicit conversion to String
-			operator String() const { return to_string(); }
+			// Implicit conversion to S
+			operator S() const { return to_string(); }
 
 			virtual bool operator==(const Field& other) const { return mvalue == other.mvalue; }
 
@@ -132,27 +132,27 @@ namespace pensar_digital
 			Field& operator=(const T& value) { this->mvalue = value; return *this; }
 		};
 
-		class StringField : public virtual Field<String>
+		class StringField : public virtual Field<S>
 		{
 			public:
 				inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
-				StringField(String name, String display_name, String description, bool is_null = true) :
-				Field<String>(name, display_name, description, is_null)
+				StringField(S name, S display_name, S description, bool is_null = true) :
+				Field<S>(name, display_name, description, is_null)
 			{
 			}
-			StringField(String name, String display_name, String description, String value, bool is_null = false) :
-				Field<String>(name, display_name, description, value, is_null)
+			StringField(S name, S display_name, S description, S value, bool is_null = false) :
+				Field<S>(name, display_name, description, value, is_null)
 			{
 			}
 
 			/// Copy constructor.
-			StringField(const StringField& other) : Field<String>(other)
+			StringField(const StringField& other) : Field<S>(other)
 			{
 				assign (other);
 			}
 
 			/// Move constructor.
-			StringField(StringField&& other) : Field<String>(std::move(other))
+			StringField(StringField&& other) : Field<S>(std::move(other))
 			{
 				assign (other);
 			}

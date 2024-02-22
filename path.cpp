@@ -18,27 +18,27 @@ namespace pensar_digital
 {
     namespace cpplib
     {
-        std::istream& operator >> (std::istream& is,       Path& path) { return path.read  (is); }
-        std::ostream& operator << (std::ostream& os, const Path& path) { return path.write (os); }
+        InStream&  operator >> (InStream&  is,       Path& path) { return path.read  (is); }
+        OutStream& operator << (OutStream& os, const Path& path) { return path.write (os); }
 
         void to_json(Json& j, const Path& p)
         {
-            j["class"] = p.class_name();
-            j["id"] = p.id();
-            j["VERSION"] = *p.VERSION;
-            j["path"] = p;
+            j[W("class")] = p.class_name();
+            j[W("id")] = p.id();
+            j[W("VERSION")] = *p.VERSION;
+            j[W("path")] = p;
         }
 
         void from_json(const Json& j, Path& p)
         {
-            String class_name = p.class_name();
-            String json_class = j.at("class");
+            S class_name = p.class_name();
+            S json_class = j.at(W("class"));
             if (class_name == json_class)
             {
-                p.set_id(j.at("id"));
-                p = j.at("path");
+                p.set_id(j.at(W("id")));
+                p = j.at(W("path"));
             }
-            else throw new std::runtime_error("Object expected class = " + class_name + " but json has " + json_class);
+            else throw new std::runtime_error(W("Object expected class = ") + class_name + W(" but json has ") + json_class);
         }
         
     }   // namespace cpplib

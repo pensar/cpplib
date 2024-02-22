@@ -2,8 +2,7 @@
 // license: MIT (https://opensource.org/licenses/MIT)
 
 #include "../../unit-test/test.hpp"
-#include "../string_def.hpp"
-#include "../string_util.hpp"
+#include "../s.hpp"
 #include "../object.hpp"
 #include "constraint.hpp"
 
@@ -28,10 +27,10 @@ namespace pensar_digital
 
         TEST(CheckableConcept, true)
             static_assert(Checkable<Checkable0<int>, int>);
-            static_assert(Checkable<Checkable0<String>, String>);
+            static_assert(Checkable<Checkable0<S>, S>);
             static_assert(Checkable<Checkable0<>>);
             static_assert(Checkable<Checkable1>);
-            static_assert(Checkable<StringConstraint, String>);
+            static_assert(Checkable<StringConstraint, S>);
         TEST_END(CheckableConcept)
     }
 }

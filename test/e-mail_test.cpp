@@ -12,7 +12,10 @@ namespace pensar_digital
         namespace contact
         {
             TEST(Email, true)
-                CHECK(is_valid_email_address("x@x.com"), "0");
+                CHECK(is_valid_email_address(W("x@x.com")), W("0"));
+                Email email(W("x@x.com"));
+                CHECK_EQ(S, email.str (), W("x@x.com"), W("1"));
+
             TEST_END(Email)
         } // namespace contact
     } // namespace cpplib

@@ -1,12 +1,13 @@
 #include "dummy.hpp"
+#include "s.hpp" 
 
 namespace pensar_digital
 {
     namespace cpplib
     {
         /// Makes Dummy Streamable.
-        std::ostream& operator << (std::ostream& os, const Dummy& d) { return d.write(os); }
-        std::istream& operator >> (std::istream& is, Dummy& d) { return d.read(is); }
+        OutStream& operator << (OutStream& os, const Dummy& d) { return d.write(os); }
+        InStream& operator  >> ( InStream& is,       Dummy& d) { return d.read (is); }
 
        /*
         void to_json(Json& j, const Dummy& d)
@@ -21,8 +22,8 @@ namespace pensar_digital
 
         void from_json(const Json& j, Dummy& d)
         {
-            String class_name = d.class_name();
-            String json_class = j.at("class");
+            S class_name = d.class_name();
+            S json_class = j.at("class");
             if (class_name == json_class)
             {
                 d.Object::set_id(j.at("id"));

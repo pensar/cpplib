@@ -7,10 +7,8 @@ namespace pensar_digital
 {
 	namespace cpplib
 	{
-		std::ostream& operator<< (std::ostream& os, const Error<char>& e) { return e.WriteToStream  (os); }
-		std::istream& operator>> (std::istream& is,		  Error<char>& e) { return e.ReadFromStream (is); }
+		OutStream& operator<< (OutStream& os, const Error& e) { return e.WriteToStream  (os); }
+		InStream&  operator>> (InStream&  is,	    Error& e) { return e.ReadFromStream (is); }
 
-		std::wostream& operator<< (std::wostream& os, const Error<wchar_t>& e) { return e.WriteToStream  (os); }
-		std::wistream& operator>> (std::wistream& is,       Error<wchar_t>& e) { return e.ReadFromStream (is); }
 	} // namespace cpplib
 }     // namespace pensar_digital

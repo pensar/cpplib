@@ -16,11 +16,11 @@ namespace pensar_digital
 {
 	namespace cpplib
 	{
-		inline static const String ONLY_DIGITS_REGEX = "^[0-9]*$";
-		inline static const String AT_LEAST_ONE_DIGIT_REGEX = "^[0-9]+$";
-		inline static const String ONLY_LETTERS_REGEX = "^[a-zA-Z]*$";
-		inline static const String ONLY_LETTERS_AND_DIGITS_REGEX = "^[a-zA-Z0-9]*$";
-		inline static const String ONLY_LETTERS_AND_DIGITS_AND_UNDERSCORES_REGEX = "^[a-zA-Z0-9_]*$";
+		inline static const S ONLY_DIGITS_REGEX = "^[0-9]*$";
+		inline static const S AT_LEAST_ONE_DIGIT_REGEX = "^[0-9]+$";
+		inline static const S ONLY_LETTERS_REGEX = "^[a-zA-Z]*$";
+		inline static const S ONLY_LETTERS_AND_DIGITS_REGEX = "^[a-zA-Z0-9]*$";
+		inline static const S ONLY_LETTERS_AND_DIGITS_AND_UNDERSCORES_REGEX = "^[a-zA-Z0-9_]*$";
 
 		template <typename L, typename R, typename ResultType, class D>
 		class Operand : public Object
@@ -162,7 +162,7 @@ namespace pensar_digital
 		class Constraint : public Object
 		{
 			private:
-			String name;
+			S name;
 
 			public:
 				inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
@@ -170,18 +170,18 @@ namespace pensar_digital
 				//typedef IConstraintRO<Constraint> IRO; // Read only interface type.
 
 				/// Default constructor
-				Constraint(const Id aid = NULL_ID, const String& aname = "") : Object(aid), name(aname) {}
+				Constraint(const Id aid = NULL_ID, const S& aname = "") : Object(aid), name(aname) {}
 			
 				virtual ~Constraint () {}
 
 				/// Returns the name of the constraint
-				inline const String& get_name () const noexcept { return name; }
+				inline const S& get_name () const noexcept { return name; }
 
 				/// Sets the name of the constraint
-				inline void set_name (const String& aname) { name = aname; }
+				inline void set_name (const S& aname) { name = aname; }
 
 				// Implements initialize method from Initializable concept.
-				virtual bool initialize(const Id& aid = NULL_ID, const String& aname = "") noexcept
+				virtual bool initialize(const Id& aid = NULL_ID, const S& aname = "") noexcept
 				{
 					Object::set_id(aid);
 					name = aname;
@@ -246,7 +246,7 @@ namespace pensar_digital
 									 const R&  aright,
 									 const OpType aop,
 									 const Id aid = NULL_ID, 
-									 const String& aname = "") : Base(aid, aname),
+									 const S& aname = "") : Base(aid, aname),
 									 left(aleft), right(aright), op (aop)
 				{
 				}
@@ -283,7 +283,7 @@ namespace pensar_digital
 			return *new C(left, right, OrOperand<L,R>());
 		}
 
-		// String constraint.
+		// S constraint.
 		class StringConstraint : public Constraint <StringConstraint>
 		{
 			private:
@@ -294,12 +294,12 @@ namespace pensar_digital
 				inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
 
 				/// Default constructor
-				StringConstraint (const String& aregex = "", const Id aid = NULL_ID, const String& aname = "") 
+				StringConstraint (const S& aregex = "", const Id aid = NULL_ID, const S& aname = "") 
 					: Base(aid, aname), regex (aregex) { }
 
 				virtual ~StringConstraint() {}
 
-				bool ok(const String& s = "") const noexcept
+				bool ok(const S& s = "") const noexcept
 				{ 
 					return std::regex_search (s, regex);
 				};
@@ -319,10 +319,10 @@ namespace pensar_digital
 				inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
 
 				/// Default constructor
-				RangeConstraint (const T& amin, const T& amax, const Id aid = NULL_ID, const String& aname = "") 
+				RangeConstraint (const T& amin, const T& amax, const Id aid = NULL_ID, const S& aname = "") 
 					: Base(aid, aname), mmin (amin), mmax (amax) { }
 
-				RangeConstraint (const T& avalue, const Id aid = NULL_ID, const String& aname = "") 
+				RangeConstraint (const T& avalue, const Id aid = NULL_ID, const S& aname = "") 
 					: Base(aid, aname), mmin (avalue), mmax (avalue) { }	
 
 				virtual ~RangeConstraint() {}

@@ -8,7 +8,7 @@
 #pragma hdrstop
 #endif
 
-#include "string_def.hpp"
+#include "s.hpp"
 #include "string_types.hpp"
 #include "system.hpp"
 #include "object.hpp"
@@ -19,6 +19,7 @@
 #include "clone_util.hpp"
 #include "memory_buffer.hpp"
 #include "random_util.hpp"
+#include "log.hpp"
 
 #include <sstream>
 #include <iostream>
@@ -35,7 +36,6 @@ namespace pensar_digital
 
         /// \brief File class.
         ///
-        template <typename C = char>
         class File : public Object
         {
             public:
@@ -53,7 +53,7 @@ namespace pensar_digital
                 FStream* stream_ptr; 
         public:
             
-            File(const Path& full_path = L".", const Id id = NULL_ID, const std::ios_base::openmode mode = DEFAULT_MODE) :
+            inline File(const Path& full_path = W("."), const Id id = NULL_ID, const std::ios_base::openmode mode = DEFAULT_MODE) :
                 mfullpath(full_path), Object(id), mmode(mode)
             {
                 mfullpath.create_dir (); // Create the directory if it does not exist.
@@ -69,37 +69,39 @@ namespace pensar_digital
                 }
             }
 
-            virtual ~File() noexcept 
+            inline virtual ~File() noexcept
             { 
                 close(); 
                 delete stream_ptr;
             }
 
-            void close() noexcept { if (is_open()) stream_ptr->close(); }
+            inline void close() noexcept { if (is_open()) stream_ptr->close(); }
 
-            bool exists() const { return mfullpath.exists(); }
+            inline bool exists() const { return mfullpath.exists(); }
 
-            const Path& fullpath() const noexcept { return mfullpath; }
+            inline const Path& fullpath() const noexcept { return mfullpath; }
 
-            bool is_open() const noexcept { return stream_ptr->is_open(); }
-            bool is_good() const noexcept { return stream_ptr->good(); }
-            bool is_app() const noexcept { return (mmode & std::ios::app) != 0; }
-            bool is_ate() const noexcept { return (mmode & std::ios::ate) != 0; }
-            bool is_auto_seek_end_before_write() const noexcept { return is_app(); }
-            bool is_auto_seek_end_on_open() const noexcept { return is_ate(); }
-            bool is_binary() const noexcept { return (mmode & std::ios::binary) != 0; }
-            bool is_in() const noexcept { return (mmode & std::ios::in) != 0; }
-            bool is_out() const noexcept { return (mmode & std::ios::out) != 0; }
-            bool is_trunc() const noexcept { return (mmode & std::ios::trunc) != 0; }
-            bool eof() const noexcept { return stream_ptr->eof(); }
-            bool fail() const noexcept { return stream_ptr->fail(); }
-            bool bad() const noexcept { return stream_ptr->bad(); }
-            bool good() const noexcept { return stream_ptr->good(); }
+            inline bool is_open() const noexcept { return stream_ptr->is_open(); }
+            inline bool is_good() const noexcept { return stream_ptr->good(); }
+            inline bool is_app() const noexcept { return (mmode & std::ios::app) != 0; }
+            inline bool is_ate() const noexcept { return (mmode & std::ios::ate) != 0; }
+            inline bool is_auto_seek_end_before_write() const noexcept { return is_app(); }
+            inline bool is_auto_seek_end_on_open() const noexcept { return is_ate(); }
+            inline bool is_binary() const noexcept { return (mmode & std::ios::binary) != 0; }
+            inline bool is_in() const noexcept { return (mmode & std::ios::in) != 0; }
+            inline bool is_out() const noexcept { return (mmode & std::ios::out) != 0; }
+            inline bool is_trunc() const noexcept { return (mmode & std::ios::trunc) != 0; }
+            inline bool eof() const noexcept { return stream_ptr->eof(); }
+            inline bool fail() const noexcept { return stream_ptr->fail(); }
+            inline bool bad() const noexcept { return stream_ptr->bad(); }
+            inline bool good() const noexcept { return stream_ptr->good(); }
 
-            char* c_str() const noexcept { return (char*)mfullpath.c_str(); }
+            inline const char* c_str() const noexcept 
+            { S s = mfullpath.string().c_str(); // returns safely the null terminated string.
+            }
 
             // Delete the file.
-            bool remove() 
+            inline bool remove() 
             { 
                 if (is_open()) 
                     close();
@@ -111,7 +113,7 @@ namespace pensar_digital
                 
 
             // Implements initialize method from Initializable concept.
-            virtual bool initialize(const Path& afull_path = CURRENT_DIR<C>, const Id id = NULL_ID, const std::ios_base::openmode mode = DEFAULT_MODE) noexcept
+            inline virtual bool initialize(const Path& afull_path = CURRENT_DIR, const Id id = NULL_ID, const std::ios_base::openmode mode = DEFAULT_MODE) noexcept
             {
                 mfullpath = afull_path;
                 mmode = mode;
@@ -122,59 +124,59 @@ namespace pensar_digital
             //FilePtr clone() const  noexcept { return pd::clone<File>(*this, mfullpath, mmode, id()); }
 
             // Conversion to json string.
-            virtual String json() const noexcept
+            inline virtual S json() const noexcept
             {
-                std::stringstream ss;
-                String s = pd::json<File>(*this);
-                ss << ", \"mfullpath\" : " << mfullpath.to_string() << " , \"mode\" : " << mmode;
-                ss << "\" }";
+                SStream ss;
+                S s = pd::json<File>(*this);
+                ss << W(", \"mfullpath\" : ") << mfullpath.string<C>() << W(" , \"mode\" : ") << mmode;
+                ss << W("\" }");
                 return ss.str();
             }
 
-            virtual std::ios_base::openmode get_mode() const noexcept
+            inline virtual std::ios_base::openmode get_mode() const noexcept
             {
                 return mmode;
             }
 
-            virtual std::istream& read_json(std::istream& is)
+            inline virtual InStream& read_json(InStream& is)
             {
                 {
                     Json j;
                     VersionPtr v;
                     Id id;
-                    pd::read_json<File<C>>(is, *this, &id, &v, &j);
+                    pd::read_json<File>(is, *this, &id, &v, &j);
                     set_id(id);
-                    mfullpath = j["mfullpath"].get<String>();
-                    mmode = j["mode"].get<std::ios_base::openmode>();
+                    mfullpath = j[W("mfullpath")].get<S>();
+                    mmode = j[W("mode")].get<std::ios_base::openmode>();
                 }
                 return is;
             };
 
             // Convertion to xml string.
-            virtual String xml() const noexcept
+            inline virtual S xml() const noexcept
             {
-                String xml = ObjXMLPrefix() + "><path>";
-                xml += mfullpath.string() + "</path><mode>";
-                xml += std::to_string(mmode) + "</mode>";
-                xml += "</object>";
+                S xml = ObjXMLPrefix() + W("><path>");
+                xml += mfullpath.string<C>() + W("</path><mode>");
+                xml += std::to_string(mmode) + W("</mode>");
+                xml += W("</object>");
                 return xml;
             }
 
             // Convertion from xml string.
-            virtual void from_xml(const String& sxml)
+            inline virtual void from_xml(const S& sxml)
             {
                 XMLNode node = parse_object_tag(sxml);
-                XMLNode n = node.getChildNode("path");
+                XMLNode n = node.getChildNode(W("path"));
                 if (!n.isEmpty()) 
                     this->mfullpath = n.getText();
-                n = node.getChildNode("mode");
+                n = node.getChildNode(W("mode"));
                 if (!n.isEmpty()) 
                     this->mmode = std::stoi(n.getText());
             }
 
-            virtual String debug_string() const noexcept
+            inline virtual S debug_string() const noexcept
             {
-                return Object::debug_string() + " path = " + mfullpath.to_string();
+                return Object::debug_string() + W(" path = ") + mfullpath.string<C>();
             }
 
             inline File& set_binary_mode() noexcept
@@ -204,102 +206,98 @@ namespace pensar_digital
 
         };  // class File   
 
-        template <typename C = char>
-        class TextFile : public File<C>
+        class TextFile : public File
         {
             private:
             public:
-                typedef std::basic_string<C> String;
                 inline static const VersionPtr VERSION = Version::get(1, 1, 1);
-                TextFile(const Path& full_path, const String& content = empty<C> (), 
-                         const std::ios_base::openmode mode = File<C>::DEFAULT_MODE, const Id id = NULL_ID) : File<C>(full_path, id, (mode& (~std::ios::binary)))
+                TextFile(const Path& full_path, const S& content = EMPTY, 
+                         const std::ios_base::openmode mode = File::DEFAULT_MODE, const Id id = NULL_ID) : File(full_path, id, (mode& (~std::ios::binary)))
                 {
-                    if (File<C>::exists ())
+                    if (File::exists ())
                         append (content);
                     else
                         write (content);
-                    File<C>::close ();
+                    File::close ();
                 }
 
-                //TextFile(const Path& full_path, const String& content = empty<C> (), const Id aid = NULL_ID) :
-                //    TextFile(full_path, File<C>::DEFAULT_MODE, content, id)
+                //TextFile(const Path& full_path, const S& content = empty<C> (), const Id aid = NULL_ID) :
+                //    TextFile(full_path, File::DEFAULT_MODE, content, id)
                 //{
                 //}
 
-                virtual ~TextFile() = default;
-                TextFile<C>& write(const String& content)
+                inline virtual ~TextFile() = default;
+                inline TextFile& write(const S& content)
                 {
 					// Writes content.
-					if (! File<C>::is_open()) 
-						File<C>::open ();
+					if (! File::is_open()) 
+						File::open ();
 
-					File<C>::stream_ptr->seekp(0, std::ios::beg);
-                    *(File<C>::stream_ptr) << content;
+					File::stream_ptr->seekp(0, std::ios::beg);
+                    *(File::stream_ptr) << content;
 					return *this;
                 }
-                TextFile<C>& append (const String& content)
+                inline TextFile& append (const S& content)
                 {
                     // Appends content.
-                    if (! File<C>::is_open()) 
-                        File<C>::open ();
+                    if (! File::is_open()) 
+                        File::open ();
 
-                    File<C>::stream_ptr->seekp(0, std::ios::end);
-				    *(File<C>::stream_ptr) << content;
+                    File::stream_ptr->seekp(0, std::ios::end);
+				    *(File::stream_ptr) << content;
                     return *this;
                 }
 
-                String to_string() const noexcept
+                inline S to_string() const noexcept
                 {
-                    return File<C>::mfullpath.to_string ();
+                    return File::mfullpath.to_string ();
                 }
 
                 // Implicit conversion to string.
-                operator String() const noexcept
+                inline operator S() const noexcept
                 {
                     return to_string();
                 }
 
                 // Reads the file content and returns it as a std::basic_string<C>.
-                String read() const
+                inline S read() const
                 {
-					if (! File<C>::is_open()) 
-						File<C>::open ();
+					if (! File::is_open()) 
+						File::open ();
 
-					File<C>::stream_ptr->seekg(0, std::ios::end);
-					size_t size = File<C>::stream_ptr->tellg();
-					String content(size, 0);
-					File<C>::stream_ptr->seekg(0, std::ios::beg);
-					File<C>::stream_ptr->read(&content[0], size);
+					File::stream_ptr->seekg(0, std::ios::end);
+					size_t size = File::stream_ptr->tellg();
+					S content(size, 0);
+					File::stream_ptr->seekg(0, std::ios::beg);
+					File::stream_ptr->read(&content[0], size);
 					return content;
 				}
         };
         
         // Random file file name generator.
         
-        template <typename C = char>
         class RandomFileNameGenerator
         {
 			private:
-				typedef std::basic_string<C> String;
 
 				inline static const size_t DEFAULT_LENGTH                =     8;
-				inline static const String      DEFAULT_TEXT_FILE_EXTENSION   = "txt";
-                inline static const String      DEFAULT_BINARY_FILE_EXTENSION = "bin";
+				inline static const S      DEFAULT_TEXT_FILE_EXTENSION   = "txt";
+                inline static const S      DEFAULT_BINARY_FILE_EXTENSION = "bin";
                 
                 // Extension type. It can be fixed, random, none, numeric sequence, C char sequence, or a function.  
                 enum class ExtensionType { FIXED, RANDOM, NONE, NUMERIC_SEQUENCE, CHAR_SEQUENCE, FUNCTION };
                 inline static const ExtensionType DEFAULT_EXTENSION_TYPE = ExtensionType::FIXED;
 
                 // Determines the function signature as a typedef. It is named custom_exension_generator and it should return a string and take no arguments.
-                typedef std::function<String()> CUSTOM_EXT_FUNCTION;
+                typedef std::function<S()> CUSTOM_EXT_FUNCTION;
                 // Defines a NULL_CUSTOM_EXT_FUNCTION.  That should always return an empty string.
-                inline static const CUSTOM_EXT_FUNCTION NULL_CUSTOM_EXT_FUNCTION = []() { return empty<C> (); };
+                inline static const CUSTOM_EXT_FUNCTION NULL_CUSTOM_EXT_FUNCTION = []() { return EMPTY; };
 
 				// Extension type.
                 ExtensionType mextension_type;
 
                 // Extension.
-                String mextension;
+                S mextension;
 
                 inline static const size_t MAX_FULL_NAME_LENGTH = 255;
                 
@@ -315,15 +313,15 @@ namespace pensar_digital
                 CUSTOM_EXT_FUNCTION mcustom_ext_function;
 
                 // Generates a random string of length len.
-                inline static String random_string(const size_t len)
+                inline static S random_string(const size_t len)
                 {
-					static const String CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+					static const S CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
                     Random<size_t> r(0, CHARS.size() - 1);
 
-					String s;
+					S s;
                     size_t i = len;
 					s.reserve(i);
-                    typename String::value_type c = CHARS[r()];
+                    typename S::value_type c = CHARS[r()];
                     
                     size_t count = 1000; // Max count is 1000. If c is still a number after 1000 tries, then throws an exception.
                     // while c is a number, try again.
@@ -333,7 +331,7 @@ namespace pensar_digital
                         if (--count == 0)
                         {
                             // Logs error and throws an exception.
-                            String error_msg = "RandomFileNameGenerator::random_string(): Error: Could not generate a random string after 1000 tries.";
+                            S error_msg = W("RandomFileNameGenerator::random_string(): Error: Could not generate a random string after 1000 tries.");
                             LOG(error_msg);
                             throw std::runtime_error(error_msg);
                         }
@@ -347,7 +345,7 @@ namespace pensar_digital
 					return s;
 				}
 
-                String get_extension() const
+                inline S get_extension() const
                 {
                     switch (mextension_type)
                     {
@@ -356,58 +354,60 @@ namespace pensar_digital
 						case ExtensionType::RANDOM:
 							return random_string(DEFAULT_LENGTH);
 						case ExtensionType::NONE:
-							return empty<C> ();
+							return EMPTY;
 						//case ExtensionType::NUMERIC_SEQUENCE:
 							//return std::to_string((const G::IdType)generator.get_id());
 						case ExtensionType::CHAR_SEQUENCE:
-							return empty<C> (); // todo: char_generator();
+							return EMPTY; // todo: char_generator();
 						case ExtensionType::FUNCTION:
 							return mcustom_ext_function();
 						default:
-							return empty<C> ();
+							return EMPTY;
 					}
 				}   
 
                     
             public:
             // Constructor.
-            RandomFileNameGenerator (const ExtensionType ext_type = DEFAULT_EXTENSION_TYPE, const String& extension = DEFAULT_TEXT_FILE_EXTENSION, const CUSTOM_EXT_FUNCTION& custom_ext_function = NULL_CUSTOM_EXT_FUNCTION) :
+                inline RandomFileNameGenerator (const ExtensionType ext_type = DEFAULT_EXTENSION_TYPE, const S& extension = DEFAULT_TEXT_FILE_EXTENSION, const CUSTOM_EXT_FUNCTION& custom_ext_function = NULL_CUSTOM_EXT_FUNCTION) :
                 mextension_type(ext_type), mextension(extension), mcustom_ext_function(custom_ext_function)
             {
 			}
 
             // Generates a random text file name. () operator.
-            inline Path operator() (const String& name_prefix = "", const String& name_suffix = "", const String& extension = DEFAULT_TEXT_FILE_EXTENSION, const Path& path = TMP_DIR<char>)
+            inline Path operator() (const S& name_prefix = "", const S& name_suffix = "", const S& extension = DEFAULT_TEXT_FILE_EXTENSION, const Path& path = TMP_DIR)
             {
-                return path / (name_prefix + random_string(DEFAULT_LENGTH) + name_suffix + "." + get_extension());
+                return path / (name_prefix + random_string(DEFAULT_LENGTH) + name_suffix + W(".") + get_extension());
             }
         };
 
         // TmpTextFile is a temporary text file.
-        template <typename C = char>
-        class TmpTextFile : public TextFile<C>
+        class TmpTextFile : public TextFile
         {
 			public:
 				inline static const VersionPtr VERSION = Version::get(1, 1, 1);
-                TmpTextFile(const std::basic_string<C>& file_name = empty<C> (), const std::basic_string<C>& content = empty<C> (), const Id id = null_value<Id>()) : TextFile<C>(TMP_PATH / file_name, content, File<C>::DEFAULT_MODE, id)
+                inline TmpTextFile (const S& file_name = EMPTY, const S& content = EMPTY, const Id id = null_value<Id>()) : TextFile(TMP_PATH / file_name, content, File::DEFAULT_MODE, id)
                 {
 				}
 
-                void log_error()
+                inline TmpTextFile (const C* file_name = EMPTY, const C* content = EMPTY, const Id id = null_value<Id>())
+                    : TextFile (S(file_name), S(content), File::DEFAULT_MODE, id) {}
+
+                inline void log_error()
                 {
-                    LOG("Failed to remove temporary file " + File<char>::mfullpath.string<char>());
+                    LOG(W("Failed to remove temporary file ") + File::mfullpath.s ());
                 }
 
-                void wlog_error()
+                inline void wlog_error()
                 {
-                    Path p = File<wchar_t>::mfullpath;
+                    Path p = File::mfullpath;
                     WLOG(L"Failed to remove temporary file " + p.wstring());
                 }
 
                 template <typename Char>
                 void log_err()
 				{
-					LOG("Failed to remove temporary file " + File<Char>::mfullpath.string<Char>());
+					LOG("Failed to remove temporary file " + File::mfullpath.string());
 				}
 
                 template <>
@@ -415,23 +415,23 @@ namespace pensar_digital
 				{
                     wlog_error();
                 }
-                virtual ~TmpTextFile()
+                inline virtual ~TmpTextFile()
                 {
                     // Removes the file. If it is open, it is closed first. If operation fails, a log message is generated.
-                    if (!File<C>::remove())
+                    if (!File::remove())
                     {
                         log_err<C>();
                     }
 				}
 		};  // class TmpTextFile
 
-        class BinaryFile : public File<char>
+        class BinaryFile : public File
         {
 			private:
 			public:
 				inline static const VersionPtr VERSION = Version::get(1, 1, 1);
 			private:
-                BinaryFile (const Path&                   full_path, 
+                inline BinaryFile (const Path&                   full_path,
                             const std::ios_base::openmode mode      = DEFAULT_MODE, 
                             const BytePtr                 data      = nullptr, 
                             const size_t                  size      = 0,
@@ -441,15 +441,15 @@ namespace pensar_digital
 					append (data, size);
 				}
 
-                BinaryFile (const Path& full_path, const BytePtr data = nullptr, const size_t size = 0, const Id id = null_value<Id>()) : BinaryFile(full_path, DEFAULT_MODE, data, size, id)
+                inline BinaryFile (const Path& full_path, const BytePtr data = nullptr, const size_t size = 0, const Id id = null_value<Id>()) : BinaryFile(full_path, DEFAULT_MODE, data, size, id)
                 {
 				}
 
-				virtual ~BinaryFile() { close(); }
+                inline virtual ~BinaryFile() { close(); }
 
-                BinaryFile& append(const BytePtr data = nullptr, const size_t size = 0)
+                inline BinaryFile& append(const BytePtr data = nullptr, const size_t size = 0)
                 {
-                    static_assert (sizeof(char) == sizeof(std::byte), "sizeof(char) != sizeof(Byte)");
+                    static_assert (sizeof(char) == sizeof(std::byte), W("sizeof(char) != sizeof(Byte)"));
                     if ((data != nullptr) && (size > 0))
 					{
 						if (! is_open()) 
@@ -464,14 +464,12 @@ namespace pensar_digital
                 MemoryBuffer  data;
         };
         // Streaming operators.
-        extern std::istream& operator >> (std::istream& is, File<char>& file);
-        extern std::ostream& operator << (std::ostream& os, const File<char>& file);
-        extern std::wistream& operator >> (std::wistream& is, File<wchar_t>& file);
-        extern std::wostream& operator << (std::wostream& os, const File<wchar_t>& file);
+        extern InStream&  operator >> (InStream&  is,       File& file);
+        extern OutStream& operator << (OutStream& os, const File& file);
 
         // Json conversion.
-        extern void to_json   (      Json& j, const File<char>& f);
-        extern void from_json (const Json& j,       File<char>& f);
+        extern void to_json   (      Json& j, const File& f);
+        extern void from_json (const Json& j,       File& f);
 
 
     } // namespace cpplib

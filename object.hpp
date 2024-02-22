@@ -5,7 +5,7 @@
 #define OBJECT_HPP
 
 #include "constant.hpp"
-#include "string_util.hpp"
+#include "s.hpp"
 #include "header_lib/xmlParser.h"
 #include "clone_util.hpp"
 #include "version.hpp"
@@ -69,13 +69,13 @@ namespace pensar_digital
                 /// Set id
                 /// \param val New value to set
                 void set_id(const Id& value) { mdata.mid = value; }
-        private:
+            private:
                 inline static Factory mfactory = { 3, 10, NULL_DATA }; //!< Member variable "factory"
                 
                 // Set Factory as friend class to allow access to private members.
                 friend class Factory;
             protected:
-                String ObjXMLPrefix() const noexcept { return "<object class_name = \"" + class_name() + "\" id = \"" + Object::to_string() + "\""; }
+                S ObjXMLPrefix() const noexcept { return W("<object class_name = \"") + class_name() + W("\" id = \"") + Object::to_string() + W("\""); }
 
                 /// \brief Compare objects.
                 ///
@@ -126,8 +126,23 @@ namespace pensar_digital
 
                     return std::as_writable_bytes(byte_span);
 				}
+                virtual std::string sclass_name () const
+				{
+					std::string s = typeid(*this).name();
+					s.erase(0, sizeof("class ") - 1);
+					return s;
+				}
 
-                virtual std::string class_name() const { String c = typeid(*this).name(); c.erase(0, sizeof("class ") - 1); return c; }
+                virtual S class_name() const
+                {
+                    std::string s = typeid(*this).name();
+                    s.erase(0, sizeof("class ") - 1);
+                    #ifdef WIDE_CHAR
+					    return pd::to_wstring (s);
+					#else
+                        return s;
+                    #endif  
+                }
 
                 // Clone method. 
                 ObjectPtr clone() const noexcept { return pd::clone<Object>(*this, mdata.mid); }
@@ -163,32 +178,32 @@ namespace pensar_digital
                 }
 
                 // Conversion to json string.
-                inline virtual String json () const noexcept 
+                inline virtual S json () const noexcept 
                 { 
-                    return pd::json<Object> (*this) + " }";
+                    return pd::json<Object> (*this) + W(" }");
                 }
 
-                virtual void read_bin_obj(std::istream& is, const std::endian& byte_order = std::endian::native);
+                virtual void read_bin_obj(InStream& is, const std::endian& byte_order = std::endian::native);
 
-                void read_bin_version(std::istream& is, const Version& version, const std::endian& byte_order = std::endian::native);
+                void read_bin_version(InStream& is, const Version& version, const std::endian& byte_order = std::endian::native);
 
-                virtual std::istream& read (std::istream& is, const IO_Mode amode = BINARY, const std::endian& byte_order = std::endian::native);
+                virtual InStream& read (InStream& is, const IO_Mode amode = BINARY, const std::endian& byte_order = std::endian::native);
 
-                virtual std::ostream& write (std::ostream& os, const IO_Mode amode = BINARY, const std::endian& byte_order = std::endian::native) const;
+                virtual OutStream& write (OutStream& os, const IO_Mode amode = BINARY, const std::endian& byte_order = std::endian::native) const;
 
                 // Conversion to xml string.
-                virtual String xml() const noexcept { return ObjXMLPrefix() + "/>"; }
+                virtual S xml() const noexcept { return ObjXMLPrefix() + W("/>"); }
 
-                XMLNode parse_object_tag(const pensar_digital::cpplib::String& sxml)
+                XMLNode parse_object_tag(const std::string& sxml)
                 {
                     const char* xml = sxml.c_str();
                     XMLCSTR tag = "object";
                     XMLResults* pResults = 0;
                     XMLNode node = XMLNode::parseString(xml, tag, pResults);
-                    String xml_class_name = node.getAttribute("class_name");
-                    if (xml_class_name == class_name())
+                    std::string xml_class_name = node.getAttribute("class_name");
+                    if (xml_class_name == sclass_name())
                     {
-                        String sid = node.getAttribute("id");
+                        std::string sid = node.getAttribute("id");
                         mdata.mid = std::stoi(sid);
                     }
                     else
@@ -197,7 +212,7 @@ namespace pensar_digital
                 }
 
                 // Conversion from xml string.
-                virtual void from_xml(const String& sxml)
+                virtual void from_xml(const std::string& sxml)
                 {
                     parse_object_tag(sxml);
                 }
@@ -205,23 +220,22 @@ namespace pensar_digital
                 bool operator == (const Object& o) const { return   equals(o); }
                 bool operator != (const Object& o) const { return !equals(o); }
 
-                Object& from_json(const String& sjson);
+                Object& from_json(const S& sjson);
 
                 /// Conversion to string.
                 /// \return A string with the object id.
-                template <typename C = char>
-                std::basic_string<C> to_string() const noexcept { return std::to_string(mdata.mid); }
+                S to_string() const noexcept { return pd::to_string(mdata.mid); }
 
                 /// Implicit conversion to string.
                 /// \return A string with the object id.
-                operator String () const noexcept { return to_string(); }
+                operator S () const noexcept { return to_string(); }
 
                 /// Debug string.
                 /// \return A string with the object id.
-                virtual String debug_string() const noexcept
+                virtual S debug_string() const noexcept
                 {
-                    std::stringstream ss;
-                    ss << "id = " << Object::to_string<char>();
+                    SStream ss;
+                    ss << W("id = ") << Object::to_string();
                     return ss.str();
 
                 }
@@ -253,20 +267,20 @@ namespace pensar_digital
 
                 inline static Factory::P get (const Json& j)
                 {
-                    String json_class = j.at("class");
-                    if (json_class != pd::class_name<Object, char>())
-                        throw std::runtime_error("Invalid class name: " + pd::class_name<Object, char>());
-                    Factory::P ptr = get(j.at("id"));
+                    std::string json_class = j.at(W("class"));
+                    if (json_class != pd::class_name<Object>())
+                        throw std::runtime_error(W("Invalid class name: ") + pd::class_name<Object>());
+                    Factory::P ptr = get(j.at(W("id")));
 
-                    VersionPtr v = Version::get(j["VERSION"]);
+                    VersionPtr v = Version::get(j[W("VERSION")]);
 
                     if (*(ptr->VERSION) != *v)
-                        throw std::runtime_error("Factory::parse_json: version mismatch.");
+                        throw std::runtime_error(W("Factory::parse_json: version mismatch."));
 
                     return ptr;
                 }
 
-                inline static Factory::P get (const String& sjson)
+                inline static Factory::P get (const S& sjson)
                 {
                     Json j;
                     Factory::P ptr = get (Data (pd::id<Object>(sjson, &j)));
@@ -283,20 +297,20 @@ namespace pensar_digital
             extern void from_json(const Json& j, Object& o);
             //extern Object nlohmann::from_json (const Json& j);
 
-            inline std::istream& operator >> (std::istream& is, Object& o) 
+            inline InStream& operator >> (InStream& is, Object& o)
             { 
 				return o.read(is, TEXT);
             }
     
-            inline std::ostream& operator << (std::ostream& os, const Object& o) 
+            inline OutStream& operator << (OutStream& os, const Object& o)
             { 
                 return o.write (os, TEXT);
             }
 
-            inline Object& operator >> (const String& sjson, Object& o) { return o.from_json(sjson); }
+            inline Object& operator >> (const S& sjson, Object& o) { return o.from_json(sjson); }
 
-            inline std::istream& operator >> (std::istream& is,       ObjectPtr o) { return is >> *o    ; }
-            inline std::ostream& operator << (std::ostream& os, const ObjectPtr o) { return os << *o    ; }
+            inline InStream&  operator >> ( InStream& is,       ObjectPtr o) { return is >> *o; }
+            inline OutStream& operator << (OutStream& os, const ObjectPtr o) { return os << *o; }
 
             static_assert (std::is_move_constructible_v <Object>);
             static_assert (std::is_move_assignable_v    <Object>);  

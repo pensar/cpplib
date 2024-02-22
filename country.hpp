@@ -2,7 +2,7 @@
 #define COUNTRY_HPP
 
 #include "object.hpp"
-#include "string_def.hpp"
+#include "s.hpp"
 #include "generator.hpp"
 
 namespace pensar_digital

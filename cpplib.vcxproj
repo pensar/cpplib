@@ -73,7 +73,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>c:\tmp\$(ProjectName)\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>c:\tmp\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
-    <IncludePath>C:\mg\prj\external\vcpkg\packages\boost-spirit_x64-windows\include\boost\spirit\home\x3;C:\mg\prj\external\vcpkg\packages\boost-spirit_x64-windows\include\boost\spirit\home;$(VcpkgRoot)\boost-spirit_x64-windows\include\boost;$(IncludePath)</IncludePath>
+    <IncludePath>C:\mg\prj\vcpkg\packages\icu_x64-windows\include;$(VcpkgRoot)\packages\icu_x64-windows\include;C:\mg\prj\external\vcpkg\packages\boost-spirit_x64-windows\include\boost\spirit\home\x3;C:\mg\prj\external\vcpkg\packages\boost-spirit_x64-windows\include\boost\spirit\home;$(VcpkgRoot)\boost-spirit_x64-windows\include\boost;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>c:\tmp\$(ProjectName)\$(Platform)\$(Configuration)\</OutDir>
@@ -164,7 +164,6 @@
     <ClCompile Include="random_util.cpp" />
     <ClCompile Include="error.cpp" />
     <ClCompile Include="s.cpp" />
-    <ClCompile Include="string_util.cpp" />
     <ClCompile Include="system.cpp" />
     <ClCompile Include="sys_user_info.cpp" />
     <ClCompile Include="test\byte_order_test.cpp" />
@@ -221,10 +220,10 @@
     <ClInclude Include="stop_watch.hpp" />
     <ClInclude Include="string_def.hpp" />
     <ClInclude Include="string_types.hpp" />
-    <ClInclude Include="string_util.hpp" />
     <ClInclude Include="system.hpp" />
     <ClInclude Include="sys_user_info.hpp" />
     <ClInclude Include="test\dummy.hpp" />
+    <ClInclude Include="transcoder.hpp" />
     <ClInclude Include="type_util.hpp" />
     <ClInclude Include="version.hpp" />
     <ClInclude Include="wstring_stream_hack.hpp" />

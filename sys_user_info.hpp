@@ -4,7 +4,7 @@
 #define sys_user_infoH
 //---------------------------------------------------------------------------
 
-#include "string_def.hpp"
+#include "s.hpp"
 #include "io_util.hpp"
 #include "path.hpp"
 
@@ -16,7 +16,7 @@ namespace pensar_digital
         template <bool use_exceptions = true>
         Path get_user_home_windows()
         {
-            String home = "";
+            S home = "";
             char* s;
             size_t len;
             errno_t err = _dupenv_s(&s, &len, "USERPROFILE");
@@ -79,7 +79,7 @@ namespace pensar_digital
         template <bool use_exceptions = true>
         Path get_user_home()
         {
-            String home;
+            S home;
 
             #ifdef _WIN32
                         return get_user_home_windows<use_exceptions>();

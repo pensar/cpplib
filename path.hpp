@@ -6,7 +6,7 @@
 #include "object.hpp"
 #include "s.hpp"
 #include "system.hpp"
-#include "string_def.hpp"
+#include "s.hpp"
 #include "memory.hpp"
 #include "constant.hpp"
 #include "version.hpp"
@@ -42,11 +42,11 @@ namespace pensar_digital
         class Path : public fs::path, public Object
         {
             private:
-                inline static PathFactory mfactory = { 3, 10, ".", null_value<Id>()};
+                inline static PathFactory mfactory = { 3, 10, W("."), null_value<Id>()};
             public:
                 inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
 
-            Path(const fs::path& p = ".", const Id& id = null_value<Id>()) : Object(id), fs::path(p) {}
+            Path(const fs::path& p = W("."), const Id& id = null_value<Id>()) : Object(id), fs::path(p) {}
             Path(const std::string& s, const Id& id = null_value<Id>()) : Object(id), fs::path(s) {}
             Path(const char* path, const Id& id = null_value<Id>()) : Object(id), fs::path(path) {}
             Path(const wchar_t* path, const Id& id = null_value<Id>()) : Object(id), fs::path(path) {}
@@ -72,12 +72,12 @@ namespace pensar_digital
 
             PathFactory::P clone(const PathPtr& ptr) { return clone(*ptr); }
            
-            PathFactory::P parse_json(const String& sjson)
+            PathFactory::P parse_json(const S& sjson)
             {
                 auto j = Json::parse(sjson);
-                String json_class = j.at("class");
-                if (json_class != pd::class_name<Path, char>())
-                    throw std::runtime_error("Invalid class name: " + pd::class_name<Path, char>());
+                S json_class = j.at(W("class"));
+                if (json_class != pd::class_name<Path>())
+                    throw std::runtime_error(W("Invalid class name: ") + pd::class_name<Path>());
                 Id id;
                 VersionPtr v;
                 Path p;
@@ -185,8 +185,8 @@ namespace pensar_digital
 
                 if (! has_filename()) 
                 {
-                    std::string s = this->string();
-                    if (s.back() == pd::PATH_SEPARATOR<char>)
+                    S s = this->string();
+                    if (s.back() == System::path_separator())
                     {
 						s.pop_back();
 						*this = s;
@@ -210,14 +210,14 @@ namespace pensar_digital
             }
 
             // Conversion to json string.
-            virtual String json() const noexcept
+            virtual S json() const noexcept
             {
-                std::stringstream ss(pd::json<Path>(*this));
-                ss << ",path:" << this->fs::path::string() << "}";
+                SStream ss(pd::json<Path>(*this));
+                ss << W(",path:") << this->fs::path::string() << W("}");
                 return ss.str();
             }
 
-            virtual std::istream& read(std::istream& is, const IO_Mode amode = TEXT, const std::endian& byte_order = std::endian::native)
+            virtual InStream& read (InStream& is, const IO_Mode amode = TEXT, const std::endian& byte_order = std::endian::native)
             {
                 if (amode == BINARY)
                 {
@@ -230,14 +230,14 @@ namespace pensar_digital
                     Id stream_id;
                     pd::read_json<Path>(is, *this, &stream_id, &v, &j);
                     set_id(stream_id);
-                    *this = j["path"].get<std::string>();
+                    *this = j[W("path")].get<S>();
 
-                    if (*VERSION != *v) throw std::runtime_error("Version mismatch.");
+                    if (*VERSION != *v) throw std::runtime_error(W("Version mismatch."));
                 }
                 return is;
             };
 
-            virtual std::ostream& write(std::ostream& os, const IO_Mode amode = TEXT, const std::endian& byte_order = std::endian::native) const
+            virtual OutStream& write(OutStream& os, const IO_Mode amode = TEXT, const std::endian& byte_order = std::endian::native) const
             {
                 if (amode == BINARY)
                 {
@@ -253,32 +253,32 @@ namespace pensar_digital
             };
 
             // Convertion to xml string.
-            virtual String xml() const noexcept
+            virtual S xml() const noexcept
             {
-                String xml = ObjXMLPrefix() + "><path>";
-                xml += fs::path::string() + "</path>";
-                xml += "</object>";
+                S xml = ObjXMLPrefix() + W("><path>");
+                xml += string<C>() + W("</path>");
+                xml += W("</object>");
                 return xml;
             }
 
             // Convertion from xml string.
-            virtual void from_xml(const String& sxml)
+            virtual void from_xml(const S& sxml)
             {
                 XMLNode node = parse_object_tag(sxml);
-                XMLNode n = node.getChildNode("path");
+                XMLNode n = node.getChildNode(W("path"));
                 if (!n.isEmpty()) *this = n.getText();
             }
 
-            virtual String debug_string() const noexcept
+            virtual S debug_string() const noexcept
             {
-                return Object::debug_string() + " path = " + fs::path::string();
+                return Object::debug_string() + W(" path = ") + string<C>();
             }
 
             // Move assignment operator.
             Path& operator = (Path&& p) noexcept { fs::path::operator = (p); return *this; }
 
-            // Assignment operator for std::string.
-            Path& operator = (const std::string& s) { fs::path::operator = (s); return *this; }
+            // Assignment operator for S.
+            Path& operator = (const S & s) { fs::path::operator = (s); return *this; }
 
             // Assignment operator for const Path&.
             Path& operator = (const Path& p) { fs::path::operator = (p); return *this; }
@@ -290,13 +290,13 @@ namespace pensar_digital
             /// </summary>
             void create_dir () const noexcept
             {
-                if (has_filename()) // Final slash indicates directory. If not present it assumes file.
+                if (has_filename() && has_parent_path ()) // Final slash indicates directory. If not present it assumes file.
 					fs::create_directories (parent_path());
 				else
 					fs::create_directories (*this);
             }
 
-            inline size_t size () const noexcept { return fs::path::string().size(); }
+            inline size_t size () const noexcept { return string<C>().size(); }
 
 
 
@@ -311,15 +311,13 @@ namespace pensar_digital
             // Implicit conversion to std::wstring.
             operator std::wstring() const noexcept { return fs::path::wstring(); }
 
-            template <typename C = char>
-            std::basic_string<C> string () const
+            S s () const
 			{
-				if constexpr (std::is_same_v<C, char>)
-					return fs::path::string();
-				else if constexpr (std::is_same_v<C, wchar_t>)
+                #ifdef WIDE_CHAR 
 					return fs::path::wstring();
-				else
-					throw std::runtime_error("Unsupported character type.");
+                #else
+					return fs::path::string();
+				#endif
 			}
 
             // Implicit conversion to const char* returning a value allocated in the heap using _strdup.
@@ -342,14 +340,14 @@ namespace pensar_digital
             // Conversion from const char* operator.
             Path& operator = (const char* s) { fs::path::operator = (s); return *this; }
 
-            // /= operator for std::string.
-            Path& operator /= (const std::string& s) { fs::path::operator /= (s); return *this; }
+            // /= operator for S.
+            Path& operator /= (const S& s) { fs::path::operator /= (s); return *this; }
 
             // /= operator for const Path&.
             Path& operator /= (const Path& p) { fs::path::operator /= (p); return *this; }
 
-            // + operator for std::string.s
-            Path operator + (const std::string& s) const { Path p = *this; p /= s; return p; }
+            // + operator for S.
+            Path operator + (const S& s) const { Path p = *this; p /= s; return p; }
 
             // == operator 
             bool operator == (const Path& apath) const { return apath.std_path () == this->std_path (); }
@@ -371,42 +369,34 @@ namespace pensar_digital
             using fs::path::value_type;
         };  // class Path
 
-        template <typename C = char>
-        class CPath : public S<C>
+        class CPath : public CS<0, MAX_PATH>
         {
             public:
-                CPath(const S<C>& path = CURRENT_DIR<C>) : S<C>(path) {}
+                using P = CS<0, MAX_PATH>;
+                CPath(const P& path = CURRENT_DIR) : P(path) {}
                 
                 // Constructor from fs::path.
                 //CPath (const fs::path& path) : Str (path.string()) {}
 
-                inline fs::path to_fspath() const noexcept { return fs::path(S<C>::to_string()); }
-                inline Path     to_path() const noexcept { return Path(S<C>::to_string()); }
+                inline fs::path to_fspath() const noexcept { return fs::path(P::to_string()); }
+                inline Path     to_path() const noexcept { return Path(P::to_string()); }
 
                 // Conversion to fs::path operator.
                 operator fs::path() const noexcept { return to_fspath(); }
         };
          
         // path_to_cpath.
-        template <typename C = char>
-        inline CPath<C> path_to_cpath(const Path& path)
+        inline CPath path_to_cpath (const Path& path)
         {
-            if constexpr (std::is_same_v<C, char>)
-				return CPath<C>(path.string());
-			else
-				return CPath<C>(path.wstring());
+			return CPath(path.string());
         }
 
         // cpath_to_path.
-        inline Path cpath_to_path(const CPath<char>& cpath)
+        inline Path cpath_to_path(const CPath& cpath)
         {
             return Path (cpath.to_path());
         }        
 
-        inline Path cpath_to_path(const CPath<wchar_t>& cpath)
-        {
-            return Path (cpath.to_path());
-        }
 
         // Json conversion.
         extern void to_json   (      Json& j, const Path& p);
@@ -415,26 +405,15 @@ namespace pensar_digital
         // Sets TMP environment variable to a temporary directory.
         inline const Path& set_tmp_env_var(const Path& path = fs::temp_directory_path())
         {
-            Path p = "TMP=";
+            Path p = W("TMP=");
             p += path;
-            _putenv(p.cstr());
+            int r = _putenv(p.cstr());
+            if (r != 0)
+				throw std::runtime_error(W("Error setting TMP environment variable."));
             return path;
         }
-        static inline const Path TMP_PATH = set_tmp_env_var("c:\\tmp\\");
-        template<typename C = char>
-        struct TmpDirString
-        {
-            inline static const C* value = TMP_PATH.cstr ();
-        };
-
-        template<>
-        struct TmpDirString<wchar_t>
-        {
-            inline static const wchar_t* value = TMP_PATH.wstr ();
-        };
-
-        template <typename C = char>
-        inline static const C* TMP_DIR = TmpDirString<C>::value;
+        inline static const C* TMP_DIR = W("c:\\tmp\\");
+        inline static const Path TMP_PATH = set_tmp_env_var (TMP_DIR);
     } // namespace cpplib
 } // namespace pensar_digital
-#endif  // CPPLIB_FS_PATH_H
+#endif  // PATH_HPP

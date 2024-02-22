@@ -6,7 +6,7 @@
 
 #include "concept.hpp"
 #include "constant.hpp"
-#include "string_util.hpp"
+#include "s.hpp"
 #include "bytes_util.hpp"
 
 #include <memory> // for std::shared_ptr

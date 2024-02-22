@@ -20,7 +20,7 @@
 #include "s.hpp"
 #include "string_types.hpp"
 #include "version.hpp"
-#include "string_def.hpp"
+#include "s.hpp"
 #include "json_util.hpp"
 #include "io_util.hpp"
 #include "generator.hpp"
@@ -41,72 +41,52 @@ namespace pensar_digital
             static inline const size_t MAX_NAME = MAX_FIRST_NAME + MAX_MIDDLE_NAME + MAX_LAST_NAME + 2;
 
 
-            template <typename C = char>
             class PersonName
             {
             public:
-                typedef CS<0, MAX_FIRST_NAME, C> First;
-                typedef CS<0, MAX_MIDDLE_NAME, C> Middle;
-                typedef CS<0, MAX_LAST_NAME, C> Last;
+                typedef CS<0, MAX_FIRST_NAME> First;
+                typedef CS<0, MAX_MIDDLE_NAME> Middle;
+                typedef CS<0, MAX_LAST_NAME> Last;
 
                 First  mfirst;
                 Middle mmiddle;
                 Last   mlast;
 
-                PersonName(const First& f = empty<C>(), const Middle& m = empty<C>(), const Last& l = empty<C>())
+                constexpr PersonName(const First& f = EMPTY, const Middle& m = EMPTY, const Last& l = EMPTY)
                     : mfirst(f), mmiddle(m), mlast(l) {}
 
-                const CS<0, MAX_NAME, C> name() const
+                const CS<0, MAX_NAME> name() const
                 {
-                    std::basic_string<C> s = mfirst.to_string();
-                    std::basic_string<C> s2 = mfirst.to_string() + SPACE<C> +mlast.to_string();
-                    std::basic_string<C> s3 = mlast.to_string();
+                    S s = mfirst.to_string();
+                    S s2 = mfirst.to_string() + SPACE + mlast.to_string();
+                    S s3 = mlast.to_string();
                     s += mmiddle.empty() ? s3 : s2;
                     return s;
                 }
 
 
 
-                bool operator==(const PersonName<C>& other) const
+                bool operator==(const PersonName& other) const
                 {
                     return mfirst == other.mfirst && mmiddle == other.mmiddle && mlast == other.mlast;
                 }
 
                 inline std::string json() const noexcept
                 {
-                    std::stringstream ss;
-                    ss << "{ \"class\" : \"" << pd::class_name<PersonName<char>>();
-                    ss << ", \"first\" : " << mfirst << ", \"middle\" : " << mmiddle << ", \"last\" : " << mlast << " }";
+                    SStream ss;
+                    ss << W("{ \"class\" : \"") << pd::class_name<PersonName>();
+                    ss << W(", \"first\" : ") << mfirst << W(", \"middle\" : ") << mmiddle << W(", \"last\" : ") << mlast << W(" }");
                     return ss.str();
                 }
             };
 
-            template <typename C = char>
-            struct NullNameStruct
+            inline static const PersonName null_person_name()
             {
-                inline static const PersonName<C> value = { "", "", "" };
-            };
-
-            template<>
-            struct NullNameStruct<wchar_t>
-            {
-                inline static const PersonName<wchar_t> value = { L"", L"", L"" };
-            };
-
-            template <typename C = char>
-            inline static const PersonName<C> null_person_name()
-            {
-                return NullNameStruct<C>::value;
+                return { W(""), W(""), W("") };
             }
 
             // Make PersonName OutputStreamable.
-            inline std::ostream& operator<<(std::ostream& os, const PersonName<char>& name)
-            {
-                os << name.name();
-                return os;
-            }
-
-            inline std::wostream& operator<<(std::wostream& os, const PersonName<wchar_t>& name)
+            inline OutStream& operator<<(OutStream& os, const PersonName& name)
             {
                 os << name.name();
                 return os;
@@ -126,14 +106,14 @@ namespace pensar_digital
                     /// \see https://en.cppreference.com/w/cpp/named_req/StandardLayoutType
                     struct Data : public pd::Data
                     {
-                        PersonName<> mname;
+                        PersonName mname;
                         pd::Date mdate_of_birth; // Format: YYYY-MM-DD
-                        std::array<PhoneNumber<>, MAX_PHONE_NUMBERS> mphones;
+                        std::array<PhoneNumber, MAX_PHONE_NUMBERS> mphones;
                         size_t phones_count = 0;
-                        std::array<Email      <>, MAX_EMAILS       > memails;
+                        std::array<Email, MAX_EMAILS> memails;
                         size_t emails_count = 0;
 
-                        Data(const PersonName<>& name, pd::Date dob = pd::NULL_DATE) : mname(name), mdate_of_birth(dob) {}
+                        Data(const PersonName& name, pd::Date dob = pd::NULL_DATE) : mname(name), mdate_of_birth(dob) {}
                     };
                     Data mdata; //!< Member variable mdata contains the object data.
                     inline static pd::Generator<Person> generator; //!< Static generator object used to generate unique ids for Person objects.
@@ -142,7 +122,7 @@ namespace pensar_digital
                     // Set Factory as friend class to allow access to private members.
                     friend class Factory;
                 public:
-                    inline const static Data NULL_DATA = { null_person_name<>(), pd::NULL_DATE };
+                    inline const static Data NULL_DATA = { null_person_name(), pd::NULL_DATE };
                     typedef Data Datatype;
                     typedef pd::Factory<Person, typename Datatype, const pd::Id> Factory;
                     inline static const pd::VersionPtr VERSION = pd::Version::get(1, 1, 1);
@@ -156,7 +136,7 @@ namespace pensar_digital
                     {
                     }
 
-                    void add_phone(const PhoneNumber<>& phone)
+                    void add_phone(const PhoneNumber& phone)
 					{
 						if (mdata.phones_count < MAX_PHONE_NUMBERS)
 						{
@@ -164,7 +144,7 @@ namespace pensar_digital
 						}
 					}
 
-                    void add_email(const Email<>& email)
+                    void add_email(const Email& email)
                     {
                         if (mdata.emails_count < MAX_EMAILS)
                         {
@@ -180,16 +160,16 @@ namespace pensar_digital
                         return true;
                     }
 
-                    const PersonName<>& name() const { return mdata.mname; }
+                    const PersonName& name() const { return mdata.mname; }
                     inline virtual std::string json() const noexcept
                     {
-                        std::stringstream ss;
+                        SStream ss;
                         ss << pd::json<Person>(*this);
                         //ss << ", \"minitial_value\" : " << mdata.minitial_value << ", \"mvalue\" : " << mdata.mvalue << ", \"mstep\" : " << mdata.mstep << " }";
                         return ss.str();
                     }
 
-                    virtual std::istream& read(std::istream& is, const pd::IO_Mode amode = pd::TEXT, const std::endian& byte_order = std::endian::native)
+                    virtual InStream& read (InStream& is, const pd::IO_Mode amode = pd::TEXT, const std::endian& byte_order = std::endian::native)
                     {
                         if (amode == pd::BINARY)
                         {
@@ -203,22 +183,17 @@ namespace pensar_digital
                             pd::Id id = pd::NULL_ID;
                             pd::VersionPtr v;
                             pd::read_json<Person>(is, *this, &id, &v, &j);
-                            std::string s = j["first"];
+                            std::string s = j[W("first")];
                             mdata.mname.mfirst = s;
-                            s = j["middle"];
+                            s = j[W("middle")];
                             mdata.mname.mmiddle = s;
-                            s = j["last"];
+                            s = j[W("last")];
                             mdata.mname.mlast = s;
                         }
                         return is;
                     };
 
-                    virtual std::wistream& read(std::wistream& is, const pd::IO_Mode amode = pd::TEXT, const std::endian& byte_order = std::endian::native)
-                    {
-                        return is;
-                    }
-
-                    virtual std::ostream& write(std::ostream& os, const pd::IO_Mode amode = pd::TEXT, const std::endian& byte_order = std::endian::native) const
+                    virtual OutStream& write (OutStream& os, const pd::IO_Mode amode = pd::TEXT, const std::endian& byte_order = std::endian::native) const
                     {
                         if (amode == pd::BINARY)
                         {
@@ -233,45 +208,39 @@ namespace pensar_digital
                         return os;
                     };
 
-                    virtual std::wostream& write(std::wostream& os, const pd::IO_Mode amode = pd::TEXT, const std::endian& byte_order = std::endian::native) const
-                    {
-                        return os;
-                    }
-
                     // Convertion to xml string.
                     virtual std::string xml() const noexcept
                     {
-                        std::string xml = ObjXMLPrefix() + ">";
-                        //xml += VERSION->xml(); //todo.
-                        /*
-                        xml += "<initial_value>" + pd::to_string<Id>(mdata.minitial_value, '.') + "</initial_value>";
+                        std::string xml = ObjXMLPrefix() + W(">");
+                        xml += VERSION->xml();
+                        /*xml += mperson_name.xml ();"<initial_value>" + pd::to_string<Id>(mdata.minitial_value, '.') + "</initial_value>";
                         xml += "<value>" + pd::to_string<Id>(mdata.mvalue, '.') + "</value>";
                         xml += "<step>" + pd::to_string<Id>(mdata.mstep, '.') + "</step>";
                         */
-                        xml += "</object>";
+                        xml += W("</object>");
                         return xml;
                     }
 
                     // Convertion from xml string.
-                    virtual void from_xml(const std::string& sxml)
+                    virtual void from_xml(const S& sxml)
                     {
                         XMLNode node = parse_object_tag(sxml);
                         // todo: check version.
 
-                        XMLNode n = node.getChildNode("initial_value");
+                        XMLNode n = node.getChildNode(W("first"));
                         if (!n.isEmpty())
-                            ;// mdata.minitial_value = atoi(n.getText());
+                            mdata.mname.mfirst = n.getText();
 
-                        n = node.getChildNode("value");
+                        n = node.getChildNode("middle");
                         if (!n.isEmpty())
-                            ;// mdata.mvalue = atoi(n.getText());
+                            mdata.mname.mmiddle = n.getText();
 
-                        n = node.getChildNode("step");
+                        n = node.getChildNode("last");
                         if (!n.isEmpty())
-                            ;// mdata.mstep = atoi(n.getText());
+                            mdata.mname.mlast = n.getText();
                     }
 
-                    Person& parse_json(const std::string& s)
+                    Person& parse_json(const S& s)
                     {
                         pd::Json j = pd::Json::parse(s);
                         pd::from_json(j, *this);
@@ -289,7 +258,7 @@ namespace pensar_digital
 
                     inline static Factory::P get(const Json& j)
                     {
-                        String json_class = j.at("class");
+                        S json_class = j.at("class");
                         if (json_class != pd::class_name<Generator<Type, T>>())
                             throw std::runtime_error("Invalid class name: " + pd::class_name<Generator<Type, T>>());
 
@@ -303,7 +272,7 @@ namespace pensar_digital
                         return ptr;
                     }
 
-                    inline static Factory::P get(const String& sjson)
+                    inline static Factory::P get(const S& sjson)
                     {
                         Json j;
                         T id = pd::id<Generator<Type, Id>>(sjson, &j);
