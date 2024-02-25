@@ -4,6 +4,13 @@
 #ifndef JSON_UTIL_HPP
 #define JSON_UTIL_HPP
 
+/*#include <rapidjson/document.h>
+#include <rapidjson/writer.h>
+#include <rapidjson/stringbuffer.h>
+#include <iostream>
+
+using namespace rapidjson;
+*/
 #include "concept.hpp"
 #include "s.hpp"
 #include "header_lib/json.hpp"
