@@ -77,14 +77,9 @@ namespace pensar_digital
             }
             else // json format
             {
-                S stream_class_name;
-				VersionPtr stream_version;
-				Id stream_id;
-                Json j;
-                pd::read_json<Object>(is, *this, &stream_id, &stream_version, &j);
-                mdata.mid = stream_id;
-                if (*VERSION != *stream_version)
-                    throw new std::runtime_error("Object::read: version mismatch.");
+                S sjson;
+                read_all(is, sjson);
+                assign_json(sjson);
             }
             return is;
         };

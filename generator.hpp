@@ -88,6 +88,16 @@ namespace pensar_digital
                 return ss.str();
             }
 
+            inline Generator<Type, T>& assign_json(const S& sjson)
+            {
+                JsonDoc d = parse<Generator<Type, T>>(*this, sjson);
+                mdata.minitial_value =  d["minitial_value"].Get<T>();
+                mdata.mvalue         =  d["mvalue"        ].Get<T>();
+                mdata.mstep          =  d["mstep"         ].Get<T>();
+
+                return *this;
+            }
+
             virtual std::istream& read(std::istream& is, const IO_Mode amode = TEXT, const std::endian& byte_order = std::endian::native)
             {
                 if (amode == BINARY)
@@ -103,13 +113,9 @@ namespace pensar_digital
                 }
                 else // json format
                 {
-                    Json j;
-                    Id id = NULL_ID;
-                    VersionPtr v;
-                    read_json<Generator<Type, T>>(is, *this, &id, &v, &j);
-                    mdata.minitial_value = j["minitial_value" ];
-                    mdata.mvalue         = j["mvalue"];
-                    mdata.mstep          = j["mstep"  ];
+                    S sjson;
+                    read_all (is, sjson);
+                    assign_json (sjson);
                 }
                 return is;
             };
@@ -178,9 +184,7 @@ namespace pensar_digital
 
             Generator<Type, T>& parse_json(const S& s)
 			{
-				Json j = Json::parse(s);
-				from_json<Type, T>(j, *this);
-				return *this;
+			    return assign_json (s);
 			}   
             
             static inline Factory::P  get (T aid = null_value<T>(), T initial_value = 0, T step = 1) noexcept
@@ -211,17 +215,8 @@ namespace pensar_digital
 
             inline static Factory::P get(const S& sjson)
             {
-                Json j;
-                T id = pd::id<Generator<Type, Id>>(sjson, &j);
-                T initial_value = j.at("initial_value");
-                T step          = j.at("step"         );
-                typename Factory::P ptr = get (id, initial_value, step);
-
-                VersionPtr v = Version::get(j);
-
-                // todo: check version compatibility.
-                if (*(ptr->VERSION) != *v)
-                    throw std::runtime_error("Factory::parse_json: version mismatch.");
+                typename Factory::P ptr = get ();
+				ptr->assign_json (sjson);
                 return ptr;
             } // parse_json
 

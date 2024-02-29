@@ -6,7 +6,7 @@
 
 #include "constant.hpp"
 #include "s.hpp"
-#include "header_lib/json.hpp"
+#include "json_util.hpp"
 #include "factory.hpp"
 #include "type_util.hpp"
 
@@ -96,12 +96,32 @@ namespace pensar_digital
                 /// </summary>
                 /// <param name="j"></param>
                 /// <returns></returns>
-                inline static VersionFactory::P get (const Json& j)
+                inline static VersionFactory::P get (const JsonObject& j)
                 {
-                    Id         vid        = j["VERSION"]["id"        ].get<VersionInt> ();
-                    VersionInt vpublic    = j["VERSION"]["mpublic"   ].get<VersionInt> ();
-                    VersionInt vprotected = j["VERSION"]["mprotected"].get<VersionInt> ();
-                    VersionInt vprivate   = j["VERSION"]["mprivate"  ].get<VersionInt> ();
+                    // Check if the json object has the required fields.
+                    if (! j.HasMember (W("class")))
+						throw std::runtime_error("The json object does not have a class node.");
+                    // Get the class name.
+                    S class_name = j[W("class")].GetString();
+
+                    if (class_name != pd::class_name<Version>())    
+                        throw std::runtime_error ("The json is class name for Version does not match.");
+
+                    if (!j.HasMember(W("id")))
+                        throw std::runtime_error("The json object does not have an id node.");
+                    Id vid        = j[W("id")].GetInt ();
+
+                    if (!j.HasMember(W("mpublic")))
+                        throw std::runtime_error("The json object does not have a mpublic node.");
+                    VersionInt vpublic    = j["mpublic"].GetInt ();
+
+                    if (!j.HasMember(W("mprotected")))
+						throw std::runtime_error("The json object does not have an mprotected node.");
+                    VersionInt vprotected = j["mprotected"].GetInt ();
+
+                    if (!j.HasMember(W("mprivate")))
+                        throw std::runtime_error("The json object does not have an mprivate node.");
+                    VersionInt vprivate   = j["mprivate"].GetInt ();
 
                     return get (vpublic, vprotected, vprivate, vid);
                 };
@@ -180,6 +200,37 @@ namespace pensar_digital
         extern OutStream& operator << (OutStream & os, const Version& v);
         extern void to_json(Json& j, const Version& o);
         extern void from_json(const Json& j, Version& o);
+
+
+        // Concept IdentifiableAndVersionable requires T to be Versionable and Identifiable.
+        template <typename T>
+        concept IdentifiableAndVersionable = Versionable<T> && Identifiable<T>;
+
+        template <class T, typename IdType = Id>
+        T& read_json(const S& sjson, T& o, IdType* out_id, VersionPtr* out_v, Json* out_j = nullptr)
+        {
+            *out_id = (id<T>(sjson, out_j));
+            *out_v = Version::get(*out_j);
+            return o;
+        }
+
+        template <class T, typename IdType = Id>
+        InStream& read_json(InStream& is, T& o, IdType* out_id, VersionPtr* out_v, Json* out_j = nullptr)
+        {
+            S sjson;
+            read_json(read_all(is, sjson), o, out_id, out_v, out_j);
+            return is;
+        }
+
+        template <IdentifiableAndVersionable T>
+        S json(const T& o)
+        {
+            SStream ss;
+            ss << W("{ \"class\" : \"") << o.class_name();
+            ss << W("\", \"id\" : ") << o.id() << W(", \"VERSION\": ");
+            ss << *(o.VERSION);
+            return ss.str();
+        }
 
     } // namespace cpplib
 } // namespace pensar_digital

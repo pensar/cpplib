@@ -64,17 +64,17 @@ namespace pensar_digital
                     };
                     inline Factory::P clone(const DummyPtr& ptr) { return ptr->clone (); }
 
+                    inline void assign_json(const S& sjson)
+                    {
+                        JsonDoc d = parse<Dummy>(*this, sjson);
+
+                        set_name ((d["name"].GetString()));
+                    }
+
                     inline static Factory::P parse_json(const S& sjson)
                     {
-                        Json j;
-                        Factory::P ptr = get(pd::id<Dummy>(sjson, &j));
-                        ptr->set_name(j.at("name"));
-                        VersionPtr v = Version::get(j);
-
-                        // todo: check version compatibility.
-                        if (*(ptr->VERSION) != *v)
-                            throw std::runtime_error("Factory::parse_json: version mismatch.");
-
+                        Factory::P ptr = get(NULL_ID);
+						ptr->assign_json (sjson);
                         return ptr;
                     };
 
@@ -118,12 +118,9 @@ namespace pensar_digital
                         }
                         else // json format
                         {
-                            Json j;
-                            Id id;
-                            VersionPtr v;
-                            pd::read_json<Dummy>(is, *this, &id, &v, &j);
-                            set_id (id);
-                            mdata.mname = j[W("name")].get<S>();
+                            S sjson;
+                            read_all (is, sjson);
+                            assign_json (sjson);
                         }
                         return is;
                 };

@@ -11,6 +11,7 @@
 #include "version.hpp"
 #include "json_util.hpp"
 #include "factory.hpp"
+#include "log.hpp"
 
 
 #include <fstream>
@@ -249,7 +250,7 @@ namespace pensar_digital
                 Object& operator=(Object&& o) noexcept { return assign(o); }
 
                 friend void from_json(const Json& j, Object& o);
-                
+
                 static inline Factory::P  get(const Data& data = NULL_DATA)
                 {
                     return mfactory.get(data);
@@ -265,6 +266,7 @@ namespace pensar_digital
                     return get (mdata);
                 };
 
+
                 inline static Factory::P get (const Json& j)
                 {
                     std::string json_class = j.at(W("class"));
@@ -279,17 +281,25 @@ namespace pensar_digital
 
                     return ptr;
                 }
+                
+                inline Object& assign_json(const S& sjson)
+				{
+					JsonDoc d = parse<Object> (*this, sjson);
+
+					return *this;
+				}
 
                 inline static Factory::P get (const S& sjson)
                 {
-                    Json j;
-                    Factory::P ptr = get (Data (pd::id<Object>(sjson, &j)));
-
-                    VersionPtr v = Version::get(j);
-
-                    // todo: check version compatibility.
-                    if (*(ptr->VERSION) != *v)
-                        throw std::runtime_error("Factory::parse_json: version mismatch.");
+                    Factory::P ptr = get ();
+                    ptr->assign_json (sjson);
+                    
+                    // Gets version substring from sjson. From 3 chars after VERSION to 3 chars before the end.
+                    //size_t startPos = sjson.find (W("VERSION")) + 10;
+                    //size_t endPos = sjson.length () - 3;
+                    //size_t length = endPos - startPos + 1;
+                    //S sversion = sjson.substr (startPos, length);
+                    //VersionPtr v = Version::parse_json (sversion);
                     return ptr;
                 } // parse_json
         }; // Object
@@ -307,7 +317,7 @@ namespace pensar_digital
                 return o.write (os, TEXT);
             }
 
-            inline Object& operator >> (const S& sjson, Object& o) { return o.from_json(sjson); }
+            inline Object& operator >> (const S& sjson, Object& o) { return o.assign_json (sjson); }
 
             inline InStream&  operator >> ( InStream& is,       ObjectPtr o) { return is >> *o; }
             inline OutStream& operator << (OutStream& os, const ObjectPtr o) { return os << *o; }
