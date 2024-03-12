@@ -123,55 +123,9 @@ namespace pensar_digital
 
             //FilePtr clone() const  noexcept { return pd::clone<File>(*this, mfullpath, mmode, id()); }
 
-            // Conversion to json string.
-            inline virtual S json() const noexcept
-            {
-                SStream ss;
-                S s = pd::json<File>(*this);
-                ss << W(", \"mfullpath\" : ") << mfullpath.string<C>() << W(" , \"mode\" : ") << mmode;
-                ss << W("\" }");
-                return ss.str();
-            }
-
             inline virtual std::ios_base::openmode get_mode() const noexcept
             {
                 return mmode;
-            }
-
-            inline virtual InStream& read_json(InStream& is)
-            {
-                {
-                    Json j;
-                    VersionPtr v;
-                    Id id;
-                    pd::read_json<File>(is, *this, &id, &v, &j);
-                    set_id(id);
-                    mfullpath = j[W("mfullpath")].get<S>();
-                    mmode = j[W("mode")].get<std::ios_base::openmode>();
-                }
-                return is;
-            };
-
-            // Convertion to xml string.
-            inline virtual S xml() const noexcept
-            {
-                S xml = ObjXMLPrefix() + W("><path>");
-                xml += mfullpath.string<C>() + W("</path><mode>");
-                xml += std::to_string(mmode) + W("</mode>");
-                xml += W("</object>");
-                return xml;
-            }
-
-            // Convertion from xml string.
-            inline virtual void from_xml(const S& sxml)
-            {
-                XMLNode node = parse_object_tag(sxml);
-                XMLNode n = node.getChildNode(W("path"));
-                if (!n.isEmpty()) 
-                    this->mfullpath = n.getText();
-                n = node.getChildNode(W("mode"));
-                if (!n.isEmpty()) 
-                    this->mmode = std::stoi(n.getText());
             }
 
             inline virtual S debug_string() const noexcept
@@ -247,6 +201,11 @@ namespace pensar_digital
 				    *(File::stream_ptr) << content;
                     return *this;
                 }
+
+                FStream& get_stream() 
+				{
+					return File::open();
+				}
 
                 inline S to_string() const noexcept
                 {
@@ -466,12 +425,6 @@ namespace pensar_digital
         // Streaming operators.
         extern InStream&  operator >> (InStream&  is,       File& file);
         extern OutStream& operator << (OutStream& os, const File& file);
-
-        // Json conversion.
-        extern void to_json   (      Json& j, const File& f);
-        extern void from_json (const Json& j,       File& f);
-
-
     } // namespace cpplib
 } // namespace pensar_digital.
 

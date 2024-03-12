@@ -33,39 +33,6 @@ namespace pensar_digital
     namespace cpplib
     {
 
-        /*
-        void to_json(Json& j, const File& f)
-        {
-            j["class"] = f.class_name();
-            j["id"] = f.id();
-            j["mpublic"] = f.VERSION->get_public();
-            j["mprotected"] = f.VERSION->get_protected();
-            j["mprivate"] = f.VERSION->get_private();
-            j["path"] = f.full_path;
-            j["mode"] = f.is_binary() ? "BINARY" : "TEXT";
-        }
-        
-        void from_json(const Json& j, File& f)
-        {
-            S class_name = f.class_name();
-            S json_class = j.at("class");
-            if (class_name == json_class)
-            {
-                f.Object::set_id(j.at("id"));
-                f.full_path = j.at("full_path");
-                if (j.at("mode") == "BINARY")
-                {
-                    f.set_binary_mode ();
-                }
-                else
-                {
-                   f.set_text_mode ();
-                }
-            }
-            else throw new std::runtime_error("Object expected class = " + class_name + " but json has " + json_class);
-        }
-        */
-
         // Create an empty file.
         void create_empty_file(const char* file_full_path)
         {

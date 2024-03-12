@@ -1,0 +1,26 @@
+auto const addr_spec       =   local_part >> "@" >> domain;
+auto const local_part      =   dot_atom | quoted_string | obs_local_part;
+auto const domain          =   dot_atom | domain_literal | obs_domain;
+auto const domain_literal  =   -CFWS >> "[" >> *(FWS >> dcontent) >> FWS >> "]" >> -CFWS;
+auto const dcontent        =   dtext | quoted_pair;
+auto const dtext           =   char_("!-Z") | char_("^-~");
+
+auto const CFWS            =   (+(FWS >> comment) >> FWS) | FWS;
+auto const FWS             =   (*WSP >> CRLF >> +WSP) | obs_FWS;
+auto const comment         =   "(" >> *(FWS >> ccontent) >> FWS >> ")";
+auto const ccontent        =   ctext | quoted_pair | comment;
+auto const ctext           =   char_("!-'") | char_("*-[");
+
+auto const dot_atom        =   -CFWS >> dot_atom_text >> -CFWS;
+auto const dot_atom_text   =   +atext >> *("." >> +atext);
+auto const atext           =   alnum | char_("!#$%&'*+-/=?^_`{|}~");
+
+auto const obs_local_part  =   word >> *("." >> word);
+auto const obs_domain      =   atom >> *("." >> atom);
+auto const obs_dtext       =   obs_NO_WS_CTL | quoted_pair;
+auto const obs_NO_WS_CTL   =   char_("\x01-\x08") | char_("\x0B\x0C") | char_("\x0E-\x1F\x7F");
+auto const obs_ctext       =   obs_NO_WS_CTL;
+auto const obs_FWS         =   +WSP >> *(CRLF >> +WSP);
+auto const obs_body        =   *((*LF *CR *((char_("\x00") / text) *CR *LF)) / CRLF);
+auto const obs_text        =   *LF *CR *obs_char *LF *CR;
+auto const obs_char        =   char_("\x00-\x09") | obs_NO_WS_CTL | VCHAR;

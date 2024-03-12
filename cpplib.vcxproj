@@ -202,9 +202,7 @@
     <ClInclude Include="file.hpp" />
     <ClInclude Include="generator.hpp" />
     <ClInclude Include="clone_util.hpp" />
-    <ClInclude Include="header_lib\json.hpp" />
     <ClInclude Include="io_util.hpp" />
-    <ClInclude Include="json_util.hpp" />
     <ClInclude Include="language.hpp" />
     <ClInclude Include="locale.hpp" />
     <ClInclude Include="log.hpp" />

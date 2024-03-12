@@ -7,7 +7,6 @@
 #include "../../unit-test/test.hpp"
 #include "../s.hpp"
 #include "../object.hpp"
-#include "../json_util.hpp"
 #include "../clone_util.hpp"
 #include "../factory.hpp"
 #include "../string_types.hpp"
@@ -56,28 +55,13 @@ namespace pensar_digital
                     inline static Factory::P get(const Id& aid = NULL_ID, const S& aname = EMPTY)
                     {
                         return factory.get(aid, aname);
-                    };
+                    }
 
                     inline Factory::P clone ()
                     {
                         return get(id  (), get_name ());
-                    };
-                    inline Factory::P clone(const DummyPtr& ptr) { return ptr->clone (); }
-
-                    inline void assign_json(const S& sjson)
-                    {
-                        JsonDoc d = parse<Dummy>(*this, sjson);
-
-                        set_name ((d["name"].GetString()));
                     }
-
-                    inline static Factory::P parse_json(const S& sjson)
-                    {
-                        Factory::P ptr = get(NULL_ID);
-						ptr->assign_json (sjson);
-                        return ptr;
-                    };
-
+                    inline Factory::P clone(const DummyPtr& ptr) { return ptr->clone (); }
                     Dummy& operator = (const Dummy& d) noexcept { assign(d); return *this; }
                     Dummy& operator = (Dummy&& d) noexcept { assign(d); return *this; }
                     using Object::operator ==;// (const Dummy& d) const { return (Object::operator == (d) && (mdata.mname == d.mdata.mname)); }
@@ -99,62 +83,20 @@ namespace pensar_digital
 
                     DummyPtr clone() const  noexcept { return pd::clone<Dummy>(*this, id (), mdata.mname); }
 
-                    // Conversion to json string.
-                    virtual S json() const noexcept
+                    virtual InStream& read(InStream& is, const std::endian& byte_order = std::endian::native)
                     {
-                        SStream ss;
-                        ss << (pd::json<Dummy>(*this));
-                        ss << W(", \"name\" : \"") << mdata.mname << W("\" }");
-                        return ss.str();
-                    }
-
-                    virtual InStream& read (InStream& is, const IO_Mode& amode = TEXT, const std::endian& byte_order = std::endian::native)
-                    {
-                        if (amode == BINARY)
-                        {
-                            Object::read(is, BINARY, byte_order);
-                            read_bin_version(is, *VERSION, byte_order);
-                            is.read((char*)data(), data_size());
-                        }
-                        else // json format
-                        {
-                            S sjson;
-                            read_all (is, sjson);
-                            assign_json (sjson);
-                        }
+                        Object::read(is, byte_order);
+                        read_bin_version(is, *VERSION, byte_order);
+                        is.read((char*)data(), data_size());
                         return is;
-                };
+                    }
 
-                virtual OutStream& write (OutStream& os, const IO_Mode& amode = TEXT, const std::endian& byte_order = std::endian::native) const
+                virtual OutStream& write (OutStream& os, const std::endian& byte_order = std::endian::native) const
                 {
-                    if (amode == BINARY)
-                    {
-                        Object::write (os, amode, byte_order);
-                        VERSION->write(os, amode, byte_order);
+                        Object::write (os, byte_order);
+                        VERSION->write(os, byte_order);
                         os.write((const char*)data(), data_size());
-                    }
-                    else // json format
-                    {
-                        os << json ();
-                    }
                     return os;
-                };
-
-                // Convertion to xml string.
-                virtual S xml() const noexcept
-                {
-                    S xml = ObjXMLPrefix() + ">";
-                    xml += W("<name>") + mdata.mname.to_string () + W("</name>");
-                    xml += W("</object>");
-                    return xml;
-                }
-
-                // Convertion from xml string.
-                virtual void from_xml(const S& sxml)
-                {
-                    XMLNode node = parse_object_tag(sxml);
-                    XMLNode n = node.getChildNode(W("name"));
-                    if (!n.isEmpty()) mdata.mname = n.getText();
                 }
 
                 virtual S get_name() const noexcept { return mdata.mname; }
@@ -173,13 +115,9 @@ namespace pensar_digital
 				    return Object::debug_string() + " name = " + mdata.mname;
                 }
 
-                //friend void to_json(Json& j, const Dummy& d);
-                //friend void from_json(const Json& j, Dummy& d);
             //protected:
                 //virtual bool _equals(const Object& o) const { return Object::_equals(o); }
         };
-        //extern void to_json(Json& j, const Dummy& o);
-        //extern void from_json(const Json& j, Dummy& o);
 
         extern InStream& operator >> (InStream& is, Dummy& o);
         extern OutStream& operator << (OutStream& os, const Dummy& o);

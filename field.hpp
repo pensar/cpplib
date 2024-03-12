@@ -161,7 +161,7 @@ namespace pensar_digital
 			{
 				if (this != &other)
 				{
-					Field<String>::assign(other);
+					Field<S>::assign(other);
 				}
 				return *this;
 			}

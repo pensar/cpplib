@@ -6,10 +6,8 @@
 
 #include "constant.hpp"
 #include "s.hpp"
-#include "header_lib/xmlParser.h"
 #include "clone_util.hpp"
 #include "version.hpp"
-#include "json_util.hpp"
 #include "factory.hpp"
 #include "log.hpp"
 
@@ -76,7 +74,6 @@ namespace pensar_digital
                 // Set Factory as friend class to allow access to private members.
                 friend class Factory;
             protected:
-                S ObjXMLPrefix() const noexcept { return W("<object class_name = \"") + class_name() + W("\" id = \"") + Object::to_string() + W("\""); }
 
                 /// \brief Compare objects.
                 ///
@@ -178,50 +175,16 @@ namespace pensar_digital
                     return true; 
                 }
 
-                // Conversion to json string.
-                inline virtual S json () const noexcept 
-                { 
-                    return pd::json<Object> (*this) + W(" }");
-                }
-
                 virtual void read_bin_obj(InStream& is, const std::endian& byte_order = std::endian::native);
 
                 void read_bin_version(InStream& is, const Version& version, const std::endian& byte_order = std::endian::native);
 
-                virtual InStream& read (InStream& is, const IO_Mode amode = BINARY, const std::endian& byte_order = std::endian::native);
+                virtual  InStream&  read (InStream&  is, const std::endian& byte_order = std::endian::native);
 
-                virtual OutStream& write (OutStream& os, const IO_Mode amode = BINARY, const std::endian& byte_order = std::endian::native) const;
-
-                // Conversion to xml string.
-                virtual S xml() const noexcept { return ObjXMLPrefix() + W("/>"); }
-
-                XMLNode parse_object_tag(const std::string& sxml)
-                {
-                    const char* xml = sxml.c_str();
-                    XMLCSTR tag = "object";
-                    XMLResults* pResults = 0;
-                    XMLNode node = XMLNode::parseString(xml, tag, pResults);
-                    std::string xml_class_name = node.getAttribute("class_name");
-                    if (xml_class_name == sclass_name())
-                    {
-                        std::string sid = node.getAttribute("id");
-                        mdata.mid = std::stoi(sid);
-                    }
-                    else
-                        throw std::runtime_error("Invalid class name");
-                    return node;
-                }
-
-                // Conversion from xml string.
-                virtual void from_xml(const std::string& sxml)
-                {
-                    parse_object_tag(sxml);
-                }
+                virtual OutStream& write (OutStream& os, const std::endian& byte_order = std::endian::native) const;
 
                 bool operator == (const Object& o) const { return   equals(o); }
                 bool operator != (const Object& o) const { return !equals(o); }
-
-                Object& from_json(const S& sjson);
 
                 /// Conversion to string.
                 /// \return A string with the object id.
@@ -249,8 +212,6 @@ namespace pensar_digital
                 /// Move assignment operator
                 Object& operator=(Object&& o) noexcept { return assign(o); }
 
-                friend void from_json(const Json& j, Object& o);
-
                 static inline Factory::P  get(const Data& data = NULL_DATA)
                 {
                     return mfactory.get(data);
@@ -266,64 +227,20 @@ namespace pensar_digital
                     return get (mdata);
                 };
 
-
-                inline static Factory::P get (const Json& j)
-                {
-                    std::string json_class = j.at(W("class"));
-                    if (json_class != pd::class_name<Object>())
-                        throw std::runtime_error(W("Invalid class name: ") + pd::class_name<Object>());
-                    Factory::P ptr = get(j.at(W("id")));
-
-                    VersionPtr v = Version::get(j[W("VERSION")]);
-
-                    if (*(ptr->VERSION) != *v)
-                        throw std::runtime_error(W("Factory::parse_json: version mismatch."));
-
-                    return ptr;
-                }
-                
-                inline Object& assign_json(const S& sjson)
-				{
-					JsonDoc d = parse<Object> (*this, sjson);
-
-					return *this;
-				}
-
-                inline static Factory::P get (const S& sjson)
-                {
-                    Factory::P ptr = get ();
-                    ptr->assign_json (sjson);
-                    
-                    // Gets version substring from sjson. From 3 chars after VERSION to 3 chars before the end.
-                    //size_t startPos = sjson.find (W("VERSION")) + 10;
-                    //size_t endPos = sjson.length () - 3;
-                    //size_t length = endPos - startPos + 1;
-                    //S sversion = sjson.substr (startPos, length);
-                    //VersionPtr v = Version::parse_json (sversion);
-                    return ptr;
-                } // parse_json
         }; // Object
-            extern void to_json(Json& j, const Object& o);
-            extern void from_json(const Json& j, Object& o);
-            //extern Object nlohmann::from_json (const Json& j);
+        
+            extern OutStream& write (const std::vector<ObjectPtr>& v, OutStream& os, const std::endian& byte_order);
+            extern InStream&   read (      std::vector<ObjectPtr>& v, InStream&  is, const std::endian& byte_order);
 
             inline InStream& operator >> (InStream& is, Object& o)
             { 
-				return o.read(is, TEXT);
+				return o.read(is);
             }
     
             inline OutStream& operator << (OutStream& os, const Object& o)
             { 
-                return o.write (os, TEXT);
+                return o.write (os);
             }
-
-            inline Object& operator >> (const S& sjson, Object& o) { return o.assign_json (sjson); }
-
-            inline InStream&  operator >> ( InStream& is,       ObjectPtr o) { return is >> *o; }
-            inline OutStream& operator << (OutStream& os, const ObjectPtr o) { return os << *o; }
-
-            static_assert (std::is_move_constructible_v <Object>);
-            static_assert (std::is_move_assignable_v    <Object>);  
 
             // Dependency class is a Constrainable class used to define dependencies between objects.
             /*template <Versionable MainClass, Versionable RequiredClass>

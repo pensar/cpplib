@@ -21,7 +21,6 @@
 #include "string_types.hpp"
 #include "version.hpp"
 #include "s.hpp"
-#include "json_util.hpp"
 #include "io_util.hpp"
 #include "generator.hpp"
 #include "type_util.hpp" // pd::class_name 
@@ -64,19 +63,9 @@ namespace pensar_digital
                     return s;
                 }
 
-
-
                 bool operator==(const PersonName& other) const
                 {
                     return mfirst == other.mfirst && mmiddle == other.mmiddle && mlast == other.mlast;
-                }
-
-                inline std::string json() const noexcept
-                {
-                    SStream ss;
-                    ss << W("{ \"class\" : \"") << pd::class_name<PersonName>();
-                    ss << W(", \"first\" : ") << mfirst << W(", \"middle\" : ") << mmiddle << W(", \"last\" : ") << mlast << W(" }");
-                    return ss.str();
                 }
             };
 
@@ -161,91 +150,21 @@ namespace pensar_digital
                     }
 
                     const PersonName& name() const { return mdata.mname; }
-                    inline virtual std::string json() const noexcept
+                    virtual InStream& read (InStream& is, const std::endian& byte_order = std::endian::native)
                     {
-                        SStream ss;
-                        ss << pd::json<Person>(*this);
-                        //ss << ", \"minitial_value\" : " << mdata.minitial_value << ", \"mvalue\" : " << mdata.mvalue << ", \"mstep\" : " << mdata.mstep << " }";
-                        return ss.str();
-                    }
-
-                    virtual InStream& read (InStream& is, const pd::IO_Mode amode = pd::TEXT, const std::endian& byte_order = std::endian::native)
-                    {
-                        if (amode == pd::BINARY)
-                        {
-                            Object::read(is, pd::BINARY, byte_order);
-                            read_bin_version(is, *VERSION, byte_order);
-                            is.read((char*)data(), data_size());
-                        }
-                        else // json format
-                        {
-                            pd::Json j;
-                            pd::Id id = pd::NULL_ID;
-                            pd::VersionPtr v;
-                            pd::read_json<Person>(is, *this, &id, &v, &j);
-                            std::string s = j[W("first")];
-                            mdata.mname.mfirst = s;
-                            s = j[W("middle")];
-                            mdata.mname.mmiddle = s;
-                            s = j[W("last")];
-                            mdata.mname.mlast = s;
-                        }
+                        Object::read(is, byte_order);
+                        read_bin_version(is, *VERSION, byte_order);
+                        is.read((char*)data(), data_size());
                         return is;
                     };
 
-                    virtual OutStream& write (OutStream& os, const pd::IO_Mode amode = pd::TEXT, const std::endian& byte_order = std::endian::native) const
+                    virtual OutStream& write (OutStream& os, const std::endian& byte_order = std::endian::native) const
                     {
-                        if (amode == pd::BINARY)
-                        {
-                            Object::write(os, amode, byte_order);
-                            VERSION->write(os, amode, byte_order);
-                            os.write((const char*)data(), data_size());
-                        }
-                        else // json format
-                        {
-                            os << json();
-                        }
+                        Object::write(os, byte_order);
+                        VERSION->write(os, byte_order);
+                        os.write((const char*)data(), data_size());
                         return os;
                     };
-
-                    // Convertion to xml string.
-                    virtual std::string xml() const noexcept
-                    {
-                        std::string xml = ObjXMLPrefix() + W(">");
-                        xml += VERSION->xml();
-                        /*xml += mperson_name.xml ();"<initial_value>" + pd::to_string<Id>(mdata.minitial_value, '.') + "</initial_value>";
-                        xml += "<value>" + pd::to_string<Id>(mdata.mvalue, '.') + "</value>";
-                        xml += "<step>" + pd::to_string<Id>(mdata.mstep, '.') + "</step>";
-                        */
-                        xml += W("</object>");
-                        return xml;
-                    }
-
-                    // Convertion from xml string.
-                    virtual void from_xml(const S& sxml)
-                    {
-                        XMLNode node = parse_object_tag(sxml);
-                        // todo: check version.
-
-                        XMLNode n = node.getChildNode(W("first"));
-                        if (!n.isEmpty())
-                            mdata.mname.mfirst = n.getText();
-
-                        n = node.getChildNode("middle");
-                        if (!n.isEmpty())
-                            mdata.mname.mmiddle = n.getText();
-
-                        n = node.getChildNode("last");
-                        if (!n.isEmpty())
-                            mdata.mname.mlast = n.getText();
-                    }
-
-                    Person& parse_json(const S& s)
-                    {
-                        pd::Json j = pd::Json::parse(s);
-                        pd::from_json(j, *this);
-                        return *this;
-                    }
 
                     /*static inline Factory::P  get(T aid = null_value<T>(), T initial_value = 0, T step = 1) noexcept
                     {
@@ -256,41 +175,8 @@ namespace pensar_digital
                         return get(get_id(), mdata.minitial_value, mdata.mstep);
                     };
 
-                    inline static Factory::P get(const Json& j)
-                    {
-                        S json_class = j.at("class");
-                        if (json_class != pd::class_name<Generator<Type, T>>())
-                            throw std::runtime_error("Invalid class name: " + pd::class_name<Generator<Type, T>>());
 
-                        typename Factory::P ptr = get(j.at("mid"), j.at("initial_value"), j.at("step"));
-
-                        VersionPtr v = Version::get(j["VERSION"]);
-
-                        if (*(ptr->VERSION) != *v)
-                            throw std::runtime_error("Generator::Factory::parse_json: version mismatch.");
-
-                        return ptr;
-                    }
-
-                    inline static Factory::P get(const S& sjson)
-                    {
-                        Json j;
-                        T id = pd::id<Generator<Type, Id>>(sjson, &j);
-                        T initial_value = j.at("initial_value");
-                        T step = j.at("step");
-                        typename Factory::P ptr = get(id, initial_value, step);
-
-                        VersionPtr v = Version::get(j);
-
-                        // todo: check version compatibility.
-                        if (*(ptr->VERSION) != *v)
-                            throw std::runtime_error("Factory::parse_json: version mismatch.");
-                        return ptr;
-                    } // parse_json
                     */
-
-
-                    //friend void from_json(const Json& j, Person& p);
 
                 protected:
                     bool _equals(const Object& other) const noexcept override
@@ -300,44 +186,7 @@ namespace pensar_digital
                             return false;
                         return (std::memcmp(&mdata, &pother->mdata, sizeof(mdata)) == 0);
                     }
-
-                    friend void to_json(pd::Json& j, const Person& p);
-                    friend void from_json(const pd::Json& j, Person& p);
             }; // class Person  
-
-            inline void to_json(pd::Json& j, const Person& p)
-            {
-                j["class"] = p.class_name();
-                j["id"] = p.id();
-                j["first"] = p.mdata.mname.mfirst;
-                j["middle"] = p.mdata.mname.mmiddle;
-                j["last"] = p.mdata.mname.mlast;
-
-                to_json(j, *(p.VERSION));
-            }
-
-            inline void from_json(const pd::Json& j, Person& p)
-            {
-                std::string class_name = p.class_name();
-                std::string  json_class = j.at("class");
-                if (class_name == json_class)
-                {
-                    p.Object::set_id(j.at("id"));
-                    std::string s = j["mfirst"];
-                    p.mdata.mname.mfirst = s;
-                    s = j["mmiddle"];
-                    p.mdata.mname.mmiddle = s;
-                    s = j["mlast"];
-                    p.mdata.mname.mlast = s;
-
-
-                    pd::VersionPtr vp = pd::Version::get(j);
-                    if (*(p.VERSION) != *vp)
-                        throw std::runtime_error("Person::from_json : version mismatch.");
-                }
-                else
-                    throw new std::runtime_error("Person expected class = " + class_name + " but json has " + json_class);
-            }   // from_json
         }       // namespace contact
     }           // namespace cpplib
 }               // namespace pensar_digital

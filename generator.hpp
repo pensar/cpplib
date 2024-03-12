@@ -6,7 +6,6 @@
 
 #include "object.hpp"
 #include "constant.hpp"
-#include "json_util.hpp"
 #include "io_util.hpp"
 
 #include <memory>   // shared_ptr
@@ -79,114 +78,44 @@ namespace pensar_digital
             /// \param val New value to set
             inline virtual void set_value(T val) { mdata.mvalue = val; }
 
-            // Conversion to json string.
-            inline virtual S json() const noexcept
+            virtual std::istream& read(std::istream& is, const std::endian& byte_order = std::endian::native)
             {
-                SStream ss;
-                ss << pd::json<Generator<Type, T>>(*this);
-                ss << ", \"minitial_value\" : " << mdata.minitial_value << ", \"mvalue\" : " << mdata.mvalue << ", \"mstep\" : " << mdata.mstep << " }";
-                return ss.str();
-            }
-
-            inline Generator<Type, T>& assign_json(const S& sjson)
-            {
-                JsonDoc d = parse<Generator<Type, T>>(*this, sjson);
-                mdata.minitial_value =  d["minitial_value"].Get<T>();
-                mdata.mvalue         =  d["mvalue"        ].Get<T>();
-                mdata.mstep          =  d["mstep"         ].Get<T>();
-
-                return *this;
-            }
-
-            virtual std::istream& read(std::istream& is, const IO_Mode amode = TEXT, const std::endian& byte_order = std::endian::native)
-            {
-                if (amode == BINARY)
-                {
                     //read_bin_obj (is, byte_order);
                     //read_bin_version (is, byte_order);
                     //binary_read<decltype (mdata.minitial_value)> (is, mdata.minitial_value, byte_order);
                     //binary_read<decltype (mdata.mvalue        )> (is, mdata.mvalue        , byte_order);   
                     //binary_read<decltype (mdata.mstep         )> (is, mdata.mstep         , byte_order);   
-                    Object::read (is, BINARY, byte_order);
-                    read_bin_version(is, *VERSION, byte_order);
-                    is.read((char*)data(), data_size());
-                }
-                else // json format
-                {
-                    S sjson;
-                    read_all (is, sjson);
-                    assign_json (sjson);
-                }
+                Object::read (is, byte_order);
+                read_bin_version(is, *VERSION, byte_order);
+                is.read((char*)data(), data_size());
                 return is;
             };
 
-            virtual std::wistream& read(std::wistream& is, const IO_Mode amode = TEXT, const std::endian& byte_order = std::endian::native)
+            virtual std::wistream& read(std::wistream& is, const std::endian& byte_order = std::endian::native)
             {
                 return is;
             }
 
-            virtual std::ostream& write(std::ostream& os, const IO_Mode amode = TEXT, const std::endian& byte_order = std::endian::native) const
+            virtual std::ostream& write(std::ostream& os, const std::endian& byte_order = std::endian::native) const
             {
-                if (amode == BINARY)
-                {
-                    Object::write(os, amode, byte_order);
-                    VERSION->write(os, amode, byte_order);
-                    os.write((const char*)data(), data_size());
-                    //binary_write<decltype (mdata.minitial_value)> (os, mdata.minitial_value, byte_order);
-                    //binary_write<decltype (mdata.mvalue)>         (os, mdata.mvalue        , byte_order);
-                    //binary_write<decltype (mdata.mstep )>         (os, mdata.mstep         , byte_order);
-                    //VERSION->write(os, amode, byte_order);
-                }
-                else // json format
-                {
-                    os << json();
-                }
+                Object::write(os, byte_order);
+                VERSION->write(os, byte_order);
+                os.write((const char*)data(), data_size());
+                //binary_write<decltype (mdata.minitial_value)> (os, mdata.minitial_value, byte_order);
+                //binary_write<decltype (mdata.mvalue)>         (os, mdata.mvalue        , byte_order);
+                //binary_write<decltype (mdata.mstep )>         (os, mdata.mstep         , byte_order);
+                //VERSION->write(os, amode, byte_order);
                 return os;
             };
 
-            virtual std::wostream& write(std::wostream& os, const IO_Mode amode = TEXT, const std::endian& byte_order = std::endian::native) const
+            virtual std::wostream& write(std::wostream& os, const std::endian& byte_order = std::endian::native) const
             {
                 return os;
             }
 
             void set_id (const T& aid) { Object::set_id (aid); }
 
-            // Convertion to xml string.
-            virtual S xml() const noexcept
-            {
-                S xml = ObjXMLPrefix() + ">";
-                //xml += VERSION->xml(); //todo.
-                xml += "<initial_value>" + pd::to_string<Id>(mdata.minitial_value, '.') + "</initial_value>";
-                xml += "<value>"         + pd::to_string<Id>(mdata.mvalue, '.') + "</value>";
-                xml += "<step>"          + pd::to_string<Id>(mdata.mstep, '.') + "</step>";
-                xml += "</object>";
-                return xml;
-            }   
-            
-            // Convertion from xml string.
-            virtual void from_xml(const S& sxml)
-            {
-                XMLNode node = parse_object_tag(sxml);
-                // todo: check version.
-
-                XMLNode n = node.getChildNode("initial_value");
-                if (!n.isEmpty())
-                    mdata.minitial_value = atoi(n.getText());
-
-                n = node.getChildNode("value");
-                if (!n.isEmpty())
-                    mdata.mvalue = atoi (n.getText());
-
-                n = node.getChildNode("step");
-				if (!n.isEmpty()) 
-                    mdata.mstep = atoi (n.getText());
-            }
-
-            Generator<Type, T>& parse_json(const S& s)
-			{
-			    return assign_json (s);
-			}   
-            
+           
             static inline Factory::P  get (T aid = null_value<T>(), T initial_value = 0, T step = 1) noexcept
             {
                 return mfactory.get (aid, initial_value, step);
@@ -197,33 +126,7 @@ namespace pensar_digital
                 return get (get_id (), mdata.minitial_value, mdata.mstep);
             };
 
-            inline static Factory::P get(const Json& j)
-            {
-                S json_class = j.at("class");
-                if (json_class != pd::class_name<Generator<Type, T>>())
-                    throw std::runtime_error("Invalid class name: " + pd::class_name<Generator<Type, T>>());
-
-                typename Factory::P ptr = get (j.at("mid"), j.at("initial_value"), j.at("step"));
-
-                VersionPtr v = Version::get(j["VERSION"]);
-
-                if (*(ptr->VERSION) != *v)
-                    throw std::runtime_error("Generator::Factory::parse_json: version mismatch.");
-
-                return ptr;
-            }
-
-            inline static Factory::P get(const S& sjson)
-            {
-                typename Factory::P ptr = get ();
-				ptr->assign_json (sjson);
-                return ptr;
-            } // parse_json
-
-
-            friend void from_json(const Json& j, Generator<Type, T>& g);
-
-        protected:
+         protected:
             bool _equals(const Object& other) const noexcept override
 			{
 				const Generator<Type, T>* pother = dynamic_cast<const Generator<Type, T>*>(&other);
@@ -256,33 +159,7 @@ namespace pensar_digital
       template <class Type, typename T> std::wostream& operator << (std::wostream& os, const Generator<Type, T>& g) { return g.write (os); }
       template <class Type, typename T> std::wistream& operator >> (std::wistream& is,       Generator<Type, T>& g) { return g.read  (is); }
 
-      template <class Type, typename T>
-      void to_json(Json& j, const Generator<Type, T>& g)
-      {
-          j["class"] = g.class_name();
-          j["id"] = g.id();
-          j["mvalue"] = g.get_current();
-          j["mstep"] = g.mdata.mstep;
-
-          to_json(j, *(g.VERSION));
-      }
-
-      template <class Type, typename T>
-      void from_json(const Json& j, Generator<Type, T>& g)
-      {
-          S class_name = g.class_name();
-          S json_class = j.at("class");
-          if (class_name == json_class)
-          {
-              g.Object::set_id(j.at("id"));
-              g.mdata.mvalue = j["mvalue"];
-              g.mdata.mstep = j["mstep"];
-              g.VERSION->from_json(j);
-          }
-          else throw new std::runtime_error("Generator expected class = " + class_name + " but json has " + json_class);
-      }
-
-    } // namespace cpplib;
+     } // namespace cpplib;
 
 } // namespace pensar_digital
 /// \example GeneratorTest.cpp

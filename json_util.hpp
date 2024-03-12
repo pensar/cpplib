@@ -47,35 +47,59 @@ namespace pensar_digital
 		{
 			JsonDoc d;
 			d.Parse(sjson.c_str());
-			return d;
-		}
-
-        template <Identifiable T>
-        JsonDoc parse (T& o, const S& sjson)
-		{
-			JsonDoc d =  parse_json (sjson);
-
             if (d.HasParseError())
             {
                 S err = W("Object::get (const S& sjson) : Invalid json string. Error code = ") + pd::to_string(d.GetParseError());
                 //LOG(ss.str());
                 throw std::runtime_error(err);
             }
-            S class_name = pd::class_name<T>();
-            if (!d.HasMember("class"))
-                throw std::runtime_error(W("Object::get (const S& sjson) : Invalid json string. Missing \"class\""));
-            JsonValue& jv = d["class"];
-            S json_class = jv.GetString();
+			return d;
+		}
 
+        template <Identifiable T>
+        const JsonDoc& parse(T& o, const JsonDoc&  d)
+        {
+            S class_name = pd::class_name<T>();
+            if (!d.HasMember (W("class")))
+                throw std::runtime_error(W("Object::get (const S& sjson) : Invalid json string. Missing \"class\""));
+            S json_class = d[W("class")].GetString ();
+            
             if (json_class != class_name)
                 throw std::runtime_error(W("parse<T> (const S& sjson) : Invalid class name: expected ") + json_class + W(" but sjson had ") + class_name);
 
-            jv = d["id"];
-            Id id = jv.GetInt();
+            Id id = d["id"].GetInt();
 
             o.set_id(id);
 
-			return d;
+            return d;
+        }
+        
+        /// <summary>
+        /// Saves vector of objects to an output stream. and closes the stream.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="os"></param>
+        /// <param name="ops"></param>
+        /// <returns></returns>
+        template <OutputStreamable T>
+        OutStream& save (OutStream os, const std::vector<std::shared_ptr<T>>& v)
+		{
+            os << W("[");
+            for (Id i = 0; i < v.size () - 1; i++)
+            {
+                os << *(v[i]) << W(", ") << std::endl;
+            }
+            os << *(v[v.size () - 1]) << W("]");
+            os.flush ();
+            return os;
+		}
+
+        template <Identifiable T>
+        JsonDoc parse (T& o, const S& sjson)
+		{
+            JsonDoc d =  parse_json(sjson);
+
+			return parse<T> (o, d);
 		}
 
         template<class T>

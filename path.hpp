@@ -72,21 +72,6 @@ namespace pensar_digital
 
             PathFactory::P clone(const PathPtr& ptr) { return clone(*ptr); }
            
-            PathFactory::P parse_json(const S& sjson)
-            {
-                auto j = Json::parse(sjson);
-                S json_class = j.at(W("class"));
-                if (json_class != pd::class_name<Path>())
-                    throw std::runtime_error(W("Invalid class name: ") + pd::class_name<Path>());
-                Id id;
-                VersionPtr v;
-                Path p;
-                pd::read_json<Path>(sjson, p, &id, &v, &j);
-				set_id(id);
-
-                return clone(p);
-            };
-
             // is directory?
             bool is_directory() const noexcept
             {
@@ -209,65 +194,18 @@ namespace pensar_digital
                 return true;
             }
 
-            // Conversion to json string.
-            virtual S json() const noexcept
+             virtual InStream& read (InStream& is, const std::endian& byte_order = std::endian::native)
             {
-                SStream ss(pd::json<Path>(*this));
-                ss << W(",path:") << this->fs::path::string() << W("}");
-                return ss.str();
-            }
-
-            virtual InStream& read (InStream& is, const IO_Mode amode = TEXT, const std::endian& byte_order = std::endian::native)
-            {
-                if (amode == BINARY)
-                {
-                    // todo: implement binary read.
-                }
-                else // json format
-                {
-                    Json j;
-                    VersionPtr v;
-                    Id stream_id;
-                    pd::read_json<Path>(is, *this, &stream_id, &v, &j);
-                    set_id(stream_id);
-                    *this = j[W("path")].get<S>();
-
-                    if (*VERSION != *v) throw std::runtime_error(W("Version mismatch."));
-                }
                 return is;
             };
 
-            virtual OutStream& write(OutStream& os, const IO_Mode amode = TEXT, const std::endian& byte_order = std::endian::native) const
+            virtual OutStream& write(OutStream& os, const std::endian& byte_order = std::endian::native) const
             {
-                if (amode == BINARY)
-                {
-                    Object::write(os, amode, byte_order);
-                    VERSION->write(os, amode, byte_order);
-                    os.write((const char*)data(), data_size());
-                }
-                else // json format
-                {
-                    os << json();
-                }
+                Object::write(os, byte_order);
+                VERSION->write(os, byte_order);
+                os.write((const char*)data(), data_size());
                 return os;
             };
-
-            // Convertion to xml string.
-            virtual S xml() const noexcept
-            {
-                S xml = ObjXMLPrefix() + W("><path>");
-                xml += string<C>() + W("</path>");
-                xml += W("</object>");
-                return xml;
-            }
-
-            // Convertion from xml string.
-            virtual void from_xml(const S& sxml)
-            {
-                XMLNode node = parse_object_tag(sxml);
-                XMLNode n = node.getChildNode(W("path"));
-                if (!n.isEmpty()) *this = n.getText();
-            }
 
             virtual S debug_string() const noexcept
             {

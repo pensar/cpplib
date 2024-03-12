@@ -8,7 +8,6 @@
 #include "memory.hpp"
 #include "constant.hpp"
 #include "concept.hpp"
-#include "json_util.hpp"
 
 #include <string>
 #ifdef _MSC_VER

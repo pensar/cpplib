@@ -6,19 +6,18 @@
 
 #include "constant.hpp"
 #include "s.hpp"
-#include "json_util.hpp"
 #include "factory.hpp"
 #include "type_util.hpp"
 
 #include <iostream> // std::istream, std::ostream
 #include <memory>   // std::shared_ptr
 #include <algorithm> // std::min
+#include <bit>       // std::endian
 
 namespace pensar_digital
 {
     namespace cpplib
     {
-        using Json = nlohmann::json; 
         class Version;
 
         typedef std::shared_ptr<Version> VersionPtr;
@@ -90,41 +89,6 @@ namespace pensar_digital
                 };
 
                 VersionFactory::P clone(const VersionPtr& ptr) { return ptr->clone (); }
-
-                /// <summary>
-                /// To be called when parsing a json object with an embedded VersionPtr object.
-                /// </summary>
-                /// <param name="j"></param>
-                /// <returns></returns>
-                inline static VersionFactory::P get (const JsonObject& j)
-                {
-                    // Check if the json object has the required fields.
-                    if (! j.HasMember (W("class")))
-						throw std::runtime_error("The json object does not have a class node.");
-                    // Get the class name.
-                    S class_name = j[W("class")].GetString();
-
-                    if (class_name != pd::class_name<Version>())    
-                        throw std::runtime_error ("The json is class name for Version does not match.");
-
-                    if (!j.HasMember(W("id")))
-                        throw std::runtime_error("The json object does not have an id node.");
-                    Id vid        = j[W("id")].GetInt ();
-
-                    if (!j.HasMember(W("mpublic")))
-                        throw std::runtime_error("The json object does not have a mpublic node.");
-                    VersionInt vpublic    = j["mpublic"].GetInt ();
-
-                    if (!j.HasMember(W("mprotected")))
-						throw std::runtime_error("The json object does not have an mprotected node.");
-                    VersionInt vprotected = j["mprotected"].GetInt ();
-
-                    if (!j.HasMember(W("mprivate")))
-                        throw std::runtime_error("The json object does not have an mprivate node.");
-                    VersionInt vprivate   = j["mprivate"].GetInt ();
-
-                    return get (vpublic, vprotected, vprivate, vid);
-                };
                 
                 inline static VersionFactory& factory() noexcept { return mfactory; }   
 
@@ -132,15 +96,6 @@ namespace pensar_digital
                 /// \return  The current value of hash
                 virtual inline const Hash hash() const noexcept { return mdata.mid; };
 
-                inline static VersionFactory::P parse_json (const S& sjson)
-                {
-                    Json j;
-                    VersionFactory::P ptr = get();
-                    SStream ss(sjson);
-                    ss >> *ptr;
-                    return ptr;
-                };
-        
                 // Getters.
                 VersionInt get_public    () const noexcept { return mdata.mpublic   ; }
                 VersionInt get_protected () const noexcept { return mdata.mprotected; }
@@ -166,11 +121,7 @@ namespace pensar_digital
                     return pd::to_string (mdata.mpublic) + W(".") + pd::to_string (mdata.mprotected) + W(".") + pd::to_string (mdata.mprivate);
                 }
 
-                // Convertion to xml string.
-                S xml() const noexcept;
-                void from_xml(const S& sxml);
-            
-                InStream& read (InStream& os, const IO_Mode amode = TEXT, const std::endian& byte_order = std::endian::native);
+                InStream& read (InStream& os, const std::endian& byte_order = std::endian::native);
 
                 inline bool operator == (const Version& v) const { return ((mdata.mid == v.mdata.mid) && (mdata.mpublic == v.mdata.mpublic) && (mdata.mprotected == v.mdata.mprotected) && (mdata.mprivate == v.mdata.mprivate)); }
                 inline bool operator != (const Version& v) const { return !(*this == v); }
@@ -188,49 +139,15 @@ namespace pensar_digital
                 S debug_string() const noexcept;
                 inline const Id id() const noexcept { return mdata.mid; }
                 const Hash get_hash() const noexcept;
-                S json() const noexcept;
-                OutStream& write (OutStream& os, const IO_Mode amode = TEXT, const std::endian& byte_order = std::endian::native) const;
-
-            
-                friend void from_json(const Json& j, Version& o);
-
+                OutStream& write (OutStream& os, const std::endian& byte_order = std::endian::native) const;
         }; // class Version
         // Stream operators.
         extern InStream& operator >> (InStream & is, Version& v);
         extern OutStream& operator << (OutStream & os, const Version& v);
-        extern void to_json(Json& j, const Version& o);
-        extern void from_json(const Json& j, Version& o);
-
 
         // Concept IdentifiableAndVersionable requires T to be Versionable and Identifiable.
         template <typename T>
         concept IdentifiableAndVersionable = Versionable<T> && Identifiable<T>;
-
-        template <class T, typename IdType = Id>
-        T& read_json(const S& sjson, T& o, IdType* out_id, VersionPtr* out_v, Json* out_j = nullptr)
-        {
-            *out_id = (id<T>(sjson, out_j));
-            *out_v = Version::get(*out_j);
-            return o;
-        }
-
-        template <class T, typename IdType = Id>
-        InStream& read_json(InStream& is, T& o, IdType* out_id, VersionPtr* out_v, Json* out_j = nullptr)
-        {
-            S sjson;
-            read_json(read_all(is, sjson), o, out_id, out_v, out_j);
-            return is;
-        }
-
-        template <IdentifiableAndVersionable T>
-        S json(const T& o)
-        {
-            SStream ss;
-            ss << W("{ \"class\" : \"") << o.class_name();
-            ss << W("\", \"id\" : ") << o.id() << W(", \"VERSION\": ");
-            ss << *(o.VERSION);
-            return ss.str();
-        }
 
     } // namespace cpplib
 } // namespace pensar_digital

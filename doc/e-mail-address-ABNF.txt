@@ -1,0 +1,42 @@
+addr-spec       =   local-part "@" domain
+local-part      =   dot-atom / quoted-string / obs-local-part
+domain          =   dot-atom / domain-literal / obs-domain
+domain-literal  =   [CFWS] "[" *([FWS] dcontent) [FWS] "]" [CFWS]
+dcontent        =   dtext / quoted-pair
+dtext           =   %d33-90 /          ; Printable US-ASCII
+                    %d94-126 /         ;  characters not including
+                    obs-dtext          ;  "[", "]", or "\"
+
+CFWS            =   (1*([FWS] comment) [FWS]) / FWS
+FWS             =   ([*WSP CRLF] 1*WSP) /  obs-FWS
+comment         =   "(" *([FWS] ccontent) [FWS] ")"
+ccontent        =   ctext / quoted-pair / comment
+ctext           =   %d33-39 /          ; Printable US-ASCII
+                    %d42-91 /          ;  characters not including
+                    %d93-126 /         ;  "(", ")", or "\"
+                    obs-ctext
+
+dot-atom        =   [CFWS] dot-atom-text [CFWS]
+dot-atom-text   =   1*atext *("." 1*atext)
+atext           =   ALPHA / DIGIT /    ; Alphanumeric characters
+                    "!" / "#" /        ; Special characters
+                    "$" / "%" / "&" /
+                    "'" / "*" / "+" /
+                    "-" / "/" / "=" /
+                    "?" / "^" / "_" /
+                    "`" / "{" / "|" /
+                    "}" / "~"
+
+obs-local-part  =   word *("." word)
+obs-domain      =   atom *("." atom)
+obs-dtext       =   obs-NO-WS-CTL / quoted-pair
+obs-NO-WS-CTL   =   %d1-8 /            ; US-ASCII control
+                    %d11 /             ;  characters excluding CR,
+                    %d12 /             ;  LF, and white space
+                    %d14-31 / 
+                    %d127
+obs-ctext       =   obs-NO-WS-CTL
+obs-FWS         =   1*WSP *(CRLF 1*WSP)
+obs-body        =   *((*LF *CR *((%d0 / text) *CR *LF)) / CRLF)
+obs-text        =   *LF *CR *obs-char *LF *CR
+obs-char        =   %d0-9 / obs-NO-WS-CTL / VCHAR

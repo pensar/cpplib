@@ -54,14 +54,6 @@ namespace pensar_digital
                 {
                     return !(*this == other);
                 }
-
-                inline S json() const noexcept
-                {
-                    SStream ss;
-                    ss << W("{ \"class\" : \"") << class_name<PhoneNumber>();
-                    ss << W(", \"country_code\" : ") << mcountry_code << W(", \"area_code\" : ") << mareacode << W(", \"number\" : ") << mnumber << W(" }");
-                    return ss.str();
-                }
             };
         }   // namespace contact
     }       // namespace cpplib

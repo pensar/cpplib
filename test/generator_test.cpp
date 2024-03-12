@@ -70,44 +70,19 @@ namespace pensar_digital
             CHECK_EQ(Id, g.get_id ()        ,          4, "2");
         TEST_END(SetStep)
 
-        TEST(JsonConversion, true)
-            Generator<int> g;
-			Id id = g.get_id ();
-			CHECK_EQ(S, g.json(), "{ \"class\" : \"pensar_digital::cpplib::Generator<int,__int64>\", \"id\" : 0, \"VERSION\": { \"class\" : \"pensar_digital::cpplib::Version\" , \"id\" : 0, \"mpublic\" : 1, \"mprotected\" : 1, \"mprivate\" : 1 }, \"minitial_value\" : 0, \"mvalue\" : 1, \"mstep\" : 1 }", "0");
-			id = g.get_id ();
-			CHECK_EQ(S, g.json(), "{ \"class\" : \"pensar_digital::cpplib::Generator<int,__int64>\", \"id\" : 0, \"VERSION\": { \"class\" : \"pensar_digital::cpplib::Version\" , \"id\" : 0, \"mpublic\" : 1, \"mprotected\" : 1, \"mprivate\" : 1 }, \"minitial_value\" : 0, \"mvalue\" : 2, \"mstep\" : 1 }", "1");
-        TEST_END(JsonConversion)
-
-        TEST(TextStreaming, true)
-            Generator<int> g;
-			SStream ss;
-            Id id = g.get_id ();
-			ss << g;
-			CHECK_EQ(S, ss.str(), "{ \"class\" : \"pensar_digital::cpplib::Generator<int,__int64>\", \"id\" : 0, \"VERSION\": { \"class\" : \"pensar_digital::cpplib::Version\" , \"id\" : 0, \"mpublic\" : 1, \"mprotected\" : 1, \"mprivate\" : 1 }, \"minitial_value\" : 0, \"mvalue\" : 1, \"mstep\" : 1 }", "0");
-            id = g.get_id ();
-            ss.str ("");
-			ss << g;
-			CHECK_EQ(S, ss.str(), "{ \"class\" : \"pensar_digital::cpplib::Generator<int,__int64>\", \"id\" : 0, \"VERSION\": { \"class\" : \"pensar_digital::cpplib::Version\" , \"id\" : 0, \"mpublic\" : 1, \"mprotected\" : 1, \"mprivate\" : 1 }, \"minitial_value\" : 0, \"mvalue\" : 2, \"mstep\" : 1 }", "1");
-            Generator<int> g2;
-            SStream ss2;
-            ss2 << g.json();
-            ss2 >> g2;
-            CHECK_EQ(Generator<int>, g2, g, "2");
-        TEST_END(TextStreaming)
-
-		
+	
         TEST(GeneratorFileBinaryStreaming, true)
             std::ofstream out("c:\\tmp\\test\\GeneratorFileBinaryStreaming\\file_binary_streaming_test.bin", std::ios::binary);
             typedef Generator<Object> G;
             typedef std::shared_ptr<G> GP;
             G g(1);
-            g.write(out, BINARY);
+            g.write(out);
             out.close();
             out.flush();
 
             std::ifstream in("c:\\tmp\\test\\GeneratorFileBinaryStreaming\\file_binary_streaming_test.bin", std::ios::binary);
             GP pg2 = G::get(1);
-            pg2->read(in, BINARY);
+            pg2->read(in);
             in.close();
             G g3(3);
 

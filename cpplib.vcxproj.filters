@@ -182,9 +182,6 @@
     <ClInclude Include="algorithm_util.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="header_lib\json.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="field.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -201,9 +198,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="constraint.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="json_util.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="stop_watch.hpp">

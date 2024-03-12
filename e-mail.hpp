@@ -139,14 +139,6 @@ namespace pensar_digital
                     return !(*this == other);
                 }
 
-                inline S json() const noexcept
-                {
-                    SStream ss;
-                    ss << W("{ \"class\" : \"") << pd::class_name<Email>();
-                    ss << W(", \"local_part\" : ") << mlocal_part.str () << W(", \"domain\" : ") << mdomain << W(" }");
-                    return ss.str();
-                }
-
             };
 
             // Make Email OutputStreamable.

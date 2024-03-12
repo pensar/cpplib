@@ -1,0 +1,28 @@
+addr-spec       =   local-part "@" domain
+local-part      =   dot-atom / quoted-string
+domain          =   dot-atom / domain-literal
+
+domain-literal  =   [CFWS] "[" *([FWS] dcontent) [FWS] "]" [CFWS]
+dcontent        =   dtext / quoted-pair
+dtext           =   %d33-90 /          ; Printable US-ASCII
+                    %d94-126           ;  characters not including
+                                        ;  "[", "]", or "\"
+
+CFWS            =   (1*([FWS] comment) [FWS]) / FWS
+FWS             =   ([*WSP CRLF] 1*WSP)
+comment         =   "(" *([FWS] ccontent) [FWS] ")"
+ccontent        =   ctext / quoted-pair / comment
+ctext           =   %d33-39 /          ; Printable US-ASCII
+                    %d42-91 /          ;  characters not including
+                    %d93-126           ;  "(", ")", or "\"
+
+dot-atom        =   [CFWS] dot-atom-text [CFWS]
+dot-atom-text   =   1*atext *("." 1*atext)
+atext           =   ALPHA / DIGIT /    ; Alphanumeric characters
+                    "!" / "#" /        ; Special characters
+                    "$" / "%" / "&" /
+                    "'" / "*" / "+" /
+                    "-" / "/" / "=" /
+                    "?" / "^" / "_" /
+                    "`" / "{" / "|" /
+                    "}" / "~"
