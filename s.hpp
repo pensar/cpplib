@@ -58,6 +58,7 @@ namespace pensar_digital
         extern const bool INCLUDE_EMPTY_FIELDS;
 
         extern std::wstring to_wstring(const std::string& s);
+        extern std::string  to_string (const std::wstring& s);
 
         // Reads all chars from a istream into a string.
         // \param is the input stream.

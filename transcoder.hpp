@@ -28,7 +28,6 @@ namespace pensar_digital
             static const Encoding UTF16;
             static const Encoding ISO_8859_1;
             static const Encoding WINDOWS_1252;
-            // Add more encodings as needed
 
         private:
             S name;

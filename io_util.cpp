@@ -34,13 +34,20 @@ namespace pensar_digital
     {
 
         // Create an empty file.
-        void create_empty_file(const char* file_full_path)
+        void create_empty_file (const C* file_full_path)
         {
-			std::ofstream fs(file_full_path, std::ios::out);
+    		OutFStream fs(file_full_path, std::ios::out);
             if (!fs.is_open())
             {
-                S serror = "create_file: It was not possible to create file.";
-                throw std::runtime_error(serror + file_full_path);
+                S serror = W("create_file: It was not possible to create file.");
+                #ifdef WIDE_CHAR    
+                    std::string serr = to_string(serror);
+                    S path = file_full_path;
+                    std::string full_path = to_string(path);
+                    throw std::runtime_error(serr + full_path);
+                #else
+                    throw std::runtime_error(serror + file_full_path);
+                #endif
                 fs.close();
             }
 		}

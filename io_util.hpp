@@ -27,7 +27,12 @@ namespace pensar_digital
 #ifdef _MSC_VER
         inline S& windows_read_file (const S& filename, S* s) 
         {
-            HANDLE file = CreateFileA(filename.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+            #ifdef WIDE_CHAR
+                std::string fname = to_string(filename);
+                HANDLE file = CreateFileA(fname.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+            #else
+                HANDLE file = CreateFile(filename.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);    
+            #endif
             if (file == INVALID_HANDLE_VALUE) {
                 // handle error
             }
@@ -40,7 +45,13 @@ namespace pensar_digital
             if (addr == NULL) {
                 // handle error
             }
-            s = new S(addr, file_size);
+            #ifdef WIDE_CHAR
+                std::string* s2 = new std::string (addr, file_size);
+                *s = to_wstring(*s2);
+            #else
+                s = new S(addr, file_size);
+            #endif      
+
             UnmapViewOfFile(addr);
             CloseHandle(file_mapping);
             CloseHandle(file);
@@ -81,8 +92,8 @@ namespace pensar_digital
         template <typename T>
         void binary_write(OutStream& os, const T& t, const size_t& size, const std::endian& byte_order = std::endian::native)
         {
-            os.write((char*)&size, sizeof(size));
-            os.write((char*)&t, size);
+            os.write((C*)&size, sizeof(size));
+            os.write((C*)&t, size);
             
             /*
             if (byte_order == LITTLE_ENDIAN) {
@@ -107,17 +118,18 @@ namespace pensar_digital
         */
 
         template <Sizeofable T>
-        void binary_write (std::ostream& os, const T& t, const std::endian& byte_order = std::endian::native)
+        void binary_write (OutStream& os, const T& t, const std::endian& byte_order = std::endian::native)
         {
-            os.write ((char*)&t, sizeof(t));
+            os.write ((C*)&t, sizeof(t));
 		}
 
         // binary_write for std::basic_string.
         template <typename CharType>
-		void binary_write (std::ostream& os, const std::basic_string<CharType>& s, const std::endian& byte_order = std::endian::native)
+		void binary_write (std::basic_ostream<CharType>& os, const std::basic_string<CharType>& s, const std::endian& byte_order = std::endian::native)
 		{
 			binary_write<size_t> (os, s.size(), byte_order);
-			for (auto&& c : s) {
+			for (auto&& c : s) 
+            {
 				binary_write<CharType> (os, c, byte_order);
 			}
 		}  
@@ -131,9 +143,9 @@ namespace pensar_digital
         template <typename T>
         void binary_read (InStream& is, T& t, const size_t& size, const std::endian& byte_order = std::endian::native)
 		{
-            is.read ((char*)(&size), sizeof(size));
+            is.read ((C*)(&size), sizeof(size));
             //str.resize(size);
-            is.read ((char*)(&t), size);
+            is.read ((C*)(&t), size);
             /*
             t = 0;
 			if (bye_order == LITTLE_ENDIAN) 
@@ -154,13 +166,13 @@ namespace pensar_digital
         }
 
         template <Sizeofable T>
-        void binary_read (std::istream& is, T& t, const std::endian& byte_order = std::endian::native)
+        void binary_read (InStream& is, T& t, const std::endian& byte_order = std::endian::native)
         {
-            is.read ((char*)(&t), sizeof(t));
+            is.read ((C*)(&t), sizeof(t));
         }
 
         template <typename CharType>
-        void binary_read (std::istream& is, std::basic_string<CharType>& s, const std::endian& byte_order = std::endian::native)
+        void binary_read (std::basic_istream<CharType>& is, std::basic_string<CharType>& s, const std::endian& byte_order = std::endian::native)
 		{
 			size_t size;
 			binary_read<size_t> (is, size, byte_order);
@@ -173,7 +185,7 @@ namespace pensar_digital
 			}
 		}
 
-        inline void binary_read (std::istream& is, S& s, const std::endian& byte_order = std::endian::native)
+        inline void binary_read (InStream& is, S& s, const std::endian& byte_order = std::endian::native)
 		{
 			binary_read<S::value_type> (is, s, byte_order);
 		}

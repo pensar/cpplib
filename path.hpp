@@ -11,9 +11,9 @@
 #include "constant.hpp"
 #include "version.hpp"
 #include "concept.hpp"
-#include "json_util.hpp"
 #include "io_util.hpp"
 #include "clone_util.hpp"
+#include "error.hpp"
 
 #include <string>
 #include <cstdio>
@@ -170,7 +170,8 @@ namespace pensar_digital
 
                 if (! has_filename()) 
                 {
-                    S s = this->string();
+
+                    S s = str();
                     if (s.back() == System::path_separator())
                     {
 						s.pop_back();
@@ -203,13 +204,13 @@ namespace pensar_digital
             {
                 Object::write(os, byte_order);
                 VERSION->write(os, byte_order);
-                os.write((const char*)data(), data_size());
+                os.write((const C*)data(), data_size());
                 return os;
             };
 
             virtual S debug_string() const noexcept
             {
-                return Object::debug_string() + W(" path = ") + string<C>();
+                return Object::debug_string() + W(" path = ") + s ();
             }
 
             // Move assignment operator.
@@ -234,7 +235,7 @@ namespace pensar_digital
 					fs::create_directories (*this);
             }
 
-            inline size_t size () const noexcept { return string<C>().size(); }
+            inline size_t size () const noexcept { return s ().size(); }
 
 
 
@@ -298,8 +299,6 @@ namespace pensar_digital
 
             // != operator for const char*.
             bool operator != (const char* s) const { return !(*this == s); }
-            friend void to_json(Json& j, const Path& d);
-            friend void from_json(const Json& j, Path& d);
 
             // Inherited via Object
             inline void set_id(const Id& value) { Object::set_id(value); }
@@ -326,7 +325,7 @@ namespace pensar_digital
         // path_to_cpath.
         inline CPath path_to_cpath (const Path& path)
         {
-			return CPath(path.string());
+			return CPath(path.s());
         }
 
         // cpath_to_path.
@@ -336,10 +335,6 @@ namespace pensar_digital
         }        
 
 
-        // Json conversion.
-        extern void to_json   (      Json& j, const Path& p);
-        extern void from_json (const Json& j,       Path& p);
-
         // Sets TMP environment variable to a temporary directory.
         inline const Path& set_tmp_env_var(const Path& path = fs::temp_directory_path())
         {
@@ -347,7 +342,7 @@ namespace pensar_digital
             p += path;
             int r = _putenv(p.cstr());
             if (r != 0)
-				throw std::runtime_error(W("Error setting TMP environment variable."));
+				runtime_error(W("Error setting TMP environment variable."));
             return path;
         }
         inline static const C* TMP_DIR = W("c:\\tmp\\");

@@ -105,7 +105,7 @@ namespace pensar_digital
             { 
                 if (is_open()) 
                     close();
-                std::string s = mfullpath.string();
+                S s = mfullpath.string();
                
                 return (std::remove(s.c_str ()) == 0);
             }
@@ -130,7 +130,7 @@ namespace pensar_digital
 
             inline virtual S debug_string() const noexcept
             {
-                return Object::debug_string() + W(" path = ") + mfullpath.string<C>();
+                return Object::debug_string() + W(" path = ") + mfullpath.string();
             }
 
             inline File& set_binary_mode() noexcept
@@ -154,9 +154,6 @@ namespace pensar_digital
                 }
                 return *stream_ptr;
             }
-
-            //friend void to_json   (      Json& j, const File& f);
-            friend void from_json (const Json& j,       File& f);
 
         };  // class File   
 

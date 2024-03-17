@@ -29,6 +29,14 @@ namespace pensar_digital
             return converter.from_bytes(s);
         }
 
+        // Converts from std::wstring to std::string.
+        std::string  to_string(const std::wstring& s)
+		{
+			std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+			return converter.to_bytes(s);
+		}
+
+
         S  reverse(const S& s)
         {
             S out;

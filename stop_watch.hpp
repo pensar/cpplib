@@ -69,11 +69,11 @@ namespace pensar_digital
 				elapsed -= milliseconds * 1000000;
 				ELAPSED_TYPE microseconds = elapsed / 1000;
 				elapsed -= microseconds * 1000;
-				S result = pd::pad_left0 (hours, 2) + ":";
-				result += pd::pad_left0 (minutes, 2) + ":";
-				result += pd::pad_left0 (seconds, 2) + ".";
-				result += pd::pad_left0 (milliseconds, 3) + ".";
-				result += pd::pad_left0 (microseconds, 3) + ".";
+				S result = pd::pad_left0 (hours, 2) + W(":");
+				result += pd::pad_left0 (minutes, 2) + W(":");
+				result += pd::pad_left0 (seconds, 2) + W(".");
+				result += pd::pad_left0 (milliseconds, 3) + W(".");
+				result += pd::pad_left0 (microseconds, 3) + W(".");
 				result += pd::pad_left0 (elapsed, 3);
 
 				return result;

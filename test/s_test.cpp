@@ -55,13 +55,13 @@ namespace pensar_digital
             CS<> s;
             CS<> s1;
             CHECK_EQ(CS<>, s, s1, W("0"));
-            s = "abc";
+            s = W("abc");
             CHECK_NOT_EQ(CS<>, s, s1, W("1"));
             CHECK_EQ(CS<>, s, "abc", W("2"));
             CHECK_EQ(size_t, s.length(), 3, W("3"));
             CHECK_EQ(size_t, s.size(), CS<>::MAX_SIZE, W("4"));
 
-            CS s2 = "abc";
+            CS<> s2 = W("abc");
             CHECK_EQ(CS<>, s2.to_string(), W("abc"), W("5"));
             CHECK(s == s2, W("6"));
 

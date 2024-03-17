@@ -48,7 +48,9 @@ namespace pensar_digital
                     OSVERSIONINFO info;
                     ZeroMemory(&info, sizeof(OSVERSIONINFO));
                     info.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-                    std::string s = to_string(info.dwMajorVersion) + "." + to_string(info.dwMinorVersion);
+                    S s = to_string(info.dwMajorVersion);
+                    s += W(".");
+                    s += to_string(info.dwMinorVersion);
                     S r(s.c_str ());
                 return r;
 

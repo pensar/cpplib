@@ -14,6 +14,32 @@ namespace pensar_digital
 {
     namespace cpplib
     {
+        class Exception : public std::exception
+		{
+			public:
+				Exception (const S& message): message (message) {}
+				const C* what_error () const noexcept 
+                { 
+                    #ifdef WIDE_CHAR
+                    std::string s = what();
+                    return to_wstring (s).c_str ();
+                    #else
+                        return what ();
+                    #endif  
+                }
+			private:
+				S message;
+		};
+        
+        inline void runtime_error(const S& message)
+        {
+            #ifdef WIDE_CHAR
+				throw std::runtime_error (to_string (message));
+            #else
+                throw std::runtime_error (message);
+            #endif
+        }
+
         #define INVALID_ARGUMENT(condition,message) \
         if (condition)\
         {\
