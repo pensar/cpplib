@@ -16,7 +16,7 @@ namespace pensar_digital
         template <bool use_exceptions = true>
         Path get_user_home_windows()
         {
-            S home = "";
+            std::string home = "";
             char* s;
             size_t len;
             errno_t err = _dupenv_s(&s, &len, "USERPROFILE");

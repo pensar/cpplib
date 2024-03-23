@@ -36,7 +36,7 @@ namespace pensar_digital
         // Create an empty file.
         void create_empty_file (const C* file_full_path)
         {
-    		OutFStream fs(file_full_path, std::ios::out);
+            InFileStream fs(file_full_path, std::ios::out);
             if (!fs.is_open())
             {
                 S serror = W("create_file: It was not possible to create file.");
@@ -58,10 +58,10 @@ namespace pensar_digital
             exit(255);
         }
 
-        uintmax_t read_file(const std::string& fname, LINE_HANDLER f)
+        uintmax_t read_file(const S& fname, LINE_HANDLER f)
         {
-            std::ifstream fs(fname);
-            std::string line;
+            InFileStream fs(fname);
+            S line;
             int line_count = 0;
             while (std::getline(fs, line))
             {

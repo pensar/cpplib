@@ -217,8 +217,8 @@ namespace pensar_digital
 			}
 		} 
 
-        using LINE_HANDLER = void(*)(const int64_t line_count, const std::string& line);
-        extern uintmax_t read_file(const std::string& fname, LINE_HANDLER f);
+        using LINE_HANDLER = void(*)(const int64_t line_count, const S& line);
+        extern uintmax_t read_file(const S& fname, LINE_HANDLER f);
 
 /*
 #include <fstream>

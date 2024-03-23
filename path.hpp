@@ -171,7 +171,7 @@ namespace pensar_digital
                 if (! has_filename()) 
                 {
 
-                    S s = str();
+                    S s = str ();
                     if (s.back() == System::path_separator())
                     {
 						s.pop_back();
@@ -265,15 +265,13 @@ namespace pensar_digital
             wchar_t * wstr() const { return _wcsdup(fs::path::wstring().c_str()); }
             char* cstr() const { return _strdup(fs::path::string().c_str()); }
 
-            template <typename C = char>
             C* str() const
             {
-                if constexpr (std::is_same_v<C, char>)
-					return cstr();
-				else if constexpr (std::is_same_v<C, wchar_t>)
-					return wstr();
-				else
-				    throw std::runtime_error("Unsupported character type."); 
+                #ifdef WIDE_CHAR 
+                    return wstr();
+                #else
+                    return cstr();
+                #endif  
             }
            
             // Conversion from const char* operator.

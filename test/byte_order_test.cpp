@@ -41,12 +41,12 @@ namespace pensar_digital
                     static_assert (ContainerV<pd::Array<T>, T>);
                     static_assert (ContainerV<std::vector<T>, T>);
 
-                    t.check_equal_collection<std::vector<T>, std::vector<T>>(a3, expected, pd::to_string<decltype(count)>(count++) + ".", __FILE__, __LINE__);
+                    t.check_equal_collection<std::vector<T>, std::vector<T>>(a3, expected, pd::to_string<decltype(count)>(count++) + W("."), sfile (), __LINE__);
 
                     pd::convert<>(b, size, pd::big_address_8_byte_order, pd::native_byte_order);
                     std::memcpy(c.data(), b.data(), b.size());
                     std::vector<T> a5(c.data(), c.data() + c.size());
-                    t.check_equal_collection<std::vector<T>, std::vector<T>>(a5, a6, pd::to_string<decltype(count)>(count++) + ".", __FILE__, __LINE__);
+                    t.check_equal_collection<std::vector<T>, std::vector<T>>(a5, a6, pd::to_string<decltype(count)>(count++) + W("."), sfile(), __LINE__);
                 }
                 else
                 {
@@ -73,9 +73,9 @@ namespace pensar_digital
                     }
                 }
             }
-        };
+        }
 
-        TEST(ByteOrder, true)
+        TEST(ByteOrder1, true)
             std::vector<uint8_t> a1 = { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
             std::vector<uint8_t> a2 = { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
             test_byte_order_conversion<uint8_t > (*this, a1, a2, 0);
@@ -107,6 +107,6 @@ namespace pensar_digital
             std::vector<int64_t > a15 = { -8, -7, -6, -5, -4, -3, -2, -1, 0x00000000, 0x00000001, 0x00000002 ,0x00000003, 0x00000004, 0x00000005, 0x00000006, 0x00000007, 0x00000008 };
             std::vector<uint64_t> a16 = { 0xf8ffffffffffffff, 0xf9ffffffffffffff, 0xfaffffffffffffff, 0xfbffffffffffffff, 0xfcffffffffffffff, 0xfdffffffffffffff, 0xfeffffffffffffff, 0xffffffffffffffff, 0x0000000000000000, 0x0100000000000000, 0x0200000000000000 ,0x0300000000000000, 0x0400000000000000, 0x0500000000000000, 0x0600000000000000, 0x0700000000000000, 0x0800000000000000 };
             test_byte_order_conversion<int64_t, uint64_t>(*this, a15, a16, 7);
-            TEST_END(ByteOrder)
+            TEST_END(ByteOrder1)
     }
 }

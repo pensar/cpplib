@@ -154,7 +154,7 @@ namespace pensar_digital
                     {
                         Object::read(is, byte_order);
                         read_bin_version(is, *VERSION, byte_order);
-                        is.read((char*)data(), data_size());
+                        is.read((C*)data(), data_size());
                         return is;
                     };
 
@@ -162,7 +162,7 @@ namespace pensar_digital
                     {
                         Object::write(os, byte_order);
                         VERSION->write(os, byte_order);
-                        os.write((const char*)data(), data_size());
+                        os.write((const C*)data(), data_size());
                         return os;
                     };
 

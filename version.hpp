@@ -49,11 +49,6 @@ namespace pensar_digital
 				};
                 Data mdata;
 
-                // Setters.
-                void set_public    (VersionInt v) noexcept { mdata.mpublic    = v; }
-                void set_protected (VersionInt v) noexcept { mdata.mprotected = v; }
-                void set_private   (VersionInt v) noexcept { mdata.mprivate   = v; }
-
             public:
                 inline static const VersionInt NULL_VERSION = -1;
                 
@@ -102,6 +97,11 @@ namespace pensar_digital
                 VersionInt get_private   () const noexcept { return mdata.mprivate  ; }
 
                 // Setters.
+
+                // Setters.
+                void set_public(VersionInt v) noexcept { mdata.mpublic = v; }
+                void set_protected(VersionInt v) noexcept { mdata.mprotected = v; }
+                void set_private(VersionInt v) noexcept { mdata.mprivate = v; }
                 inline void set_id (const Id& id) noexcept { mdata.mid = id; }
 
                 bool equals (const Version& v) const noexcept;

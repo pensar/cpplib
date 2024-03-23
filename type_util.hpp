@@ -16,9 +16,13 @@ namespace pensar_digital
         template <class T>
         S class_name() noexcept
         {
-            S s = typeid(T).name();
+            std::string s = typeid(T).name();
             s.erase(0, sizeof(W("class ")) - 1); // remove "class " prefix;
-            return s;
+            #ifdef WIDE_CHAR
+                return to_wstring (s);
+            #else
+                return s;
+            #endif
         }
         
     }   // namespace cpplib

@@ -17,40 +17,40 @@ namespace pensar_digital
         TEST(Get, true)
             Generator<int> g;
             Id expected = 1;
-            CHECK_EQ(Id, g.get_id (), expected++, "0");
-            CHECK_EQ(Id, g.get_id (), expected++, "1");
+            CHECK_EQ(Id, g.get_id (), expected++, W("0"));
+            CHECK_EQ(Id, g.get_id (), expected++, W("1"));
 
             Generator<> g2(1, 1, 2);
             expected = 3;
-            CHECK_EQ(Id, g2.get_id (), expected, "2");
+            CHECK_EQ(Id, g2.get_id (), expected, W("2"));
             expected = 5;
-            CHECK_EQ(Id, g2.get_id (), expected, "3");
+            CHECK_EQ(Id, g2.get_id (), expected, W("3"));
         TEST_END(Get)
 
         TEST(GetNext, true)
             Generator<int> g;
             Id expected = 1;
-            CHECK_EQ(Id, g.next(), expected, "0");
-            CHECK_EQ(Id, g.next(), expected, "1");
+            CHECK_EQ(Id, g.next(), expected, W("0"));
+            CHECK_EQ(Id, g.next(), expected, W("1"));
 
             Generator<> g2(1, 1, 2);
             expected = 3;
-            CHECK_EQ(Id, g2.next(), expected, "2");
-            CHECK_EQ(Id, g2.next(), expected, "3");
+            CHECK_EQ(Id, g2.next(), expected, W("2"));
+            CHECK_EQ(Id, g2.next(), expected, W("3"));
         TEST_END(GetNext)
 
         TEST(GetCurrent, true)
             Generator<int> g;
             Id expected = 0;
-            CHECK_EQ(Id, g.current(),   expected, "0");
-            CHECK_EQ(Id, g.get_id ()        , ++expected, "1");
-            CHECK_EQ(Id, g.current(),   expected, "2");
+            CHECK_EQ(Id, g.current(),   expected, W("0"));
+            CHECK_EQ(Id, g.get_id ()        , ++expected, W("1"));
+            CHECK_EQ(Id, g.current(),   expected, W("2"));
 
             Generator<> g2(1, 1, 2);
             expected = 1;
-            CHECK_EQ(Id, g2.current(), expected, "4");
-            CHECK_EQ(Id, g2.get_id ()        ,        3, "5");
-            CHECK_EQ(Id, g2.current(),        3, "6");
+            CHECK_EQ(Id, g2.current(), expected, W("4"));
+            CHECK_EQ(Id, g2.get_id ()        ,        3, W("5"));
+            CHECK_EQ(Id, g2.current(),        3, W("6"));
         TEST_END(GetCurrent)
         
 
@@ -58,21 +58,21 @@ namespace pensar_digital
             Generator<int> g;
             g.set_value (10);
             Id expected = 10;
-            CHECK_EQ(Id, g.current (),         10, "0");
-            CHECK_EQ(Id, g.get_id ()        , ++expected, "1");
+            CHECK_EQ(Id, g.current (),         10, W("0"));
+            CHECK_EQ(Id, g.get_id ()        , ++expected, W("1"));
         TEST_END(SetValue)
 
 		TEST(SetStep, true)
             Generator<int> g (1, 0, 2);
             Id expected = 0;
-            CHECK_EQ(Id, g.current (),   expected, "0");
-            CHECK_EQ(Id, g.get_id ()        ,          2, "1");
-            CHECK_EQ(Id, g.get_id ()        ,          4, "2");
+            CHECK_EQ(Id, g.current (),   expected, W("0"));
+            CHECK_EQ(Id, g.get_id ()        ,          2, W("1"));
+            CHECK_EQ(Id, g.get_id ()        ,          4, W("2"));
         TEST_END(SetStep)
 
 	
         TEST(GeneratorFileBinaryStreaming, true)
-            std::ofstream out("c:\\tmp\\test\\GeneratorFileBinaryStreaming\\file_binary_streaming_test.bin", std::ios::binary);
+            OutFStream out(W("c:\\tmp\\test\\GeneratorFileBinaryStreaming\\file_binary_streaming_test.bin"), std::ios::binary);
             typedef Generator<Object> G;
             typedef std::shared_ptr<G> GP;
             G g(1);
@@ -80,14 +80,14 @@ namespace pensar_digital
             out.close();
             out.flush();
 
-            std::ifstream in("c:\\tmp\\test\\GeneratorFileBinaryStreaming\\file_binary_streaming_test.bin", std::ios::binary);
+            InFileStream  in(W("c:\\tmp\\test\\GeneratorFileBinaryStreaming\\file_binary_streaming_test.bin"), std::ios::binary);
             GP pg2 = G::get(1);
             pg2->read(in);
             in.close();
             G g3(3);
 
-            CHECK_NOT_EQ(G, g3, g, "0");
-            CHECK_EQ(G, *pg2, g, "1");
+            CHECK_NOT_EQ(G, g3, g, W("0"));
+            CHECK_EQ(G, *pg2, g, W("1"));
 
         TEST_END(GeneratorFileBinaryStreaming)
 
@@ -114,7 +114,7 @@ namespace pensar_digital
             G g2(1);
             Hash h2 = g2.hash();
 
-            CHECK_NOT_EQ(G, g2, g, "0");
+            CHECK_NOT_EQ(G, g2, g, W("0"));
             //CHECK_EQ(G, *p2, g, "1");
             
             

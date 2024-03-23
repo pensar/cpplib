@@ -3,6 +3,7 @@
 
 #include "macros.hpp"
 #include "s.hpp"
+#include "string_def.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -23,43 +24,25 @@ namespace pensar_digital
                 return W("log.txt");
             }
 
-            template <typename C = char>
-            std::basic_fstream<C> _log(default_log_file_name());
 
-            static inline std::wfstream wlog(default_log_file_name());
+            static inline FStream log(default_log_file_name());
 
             static inline bool log_on = true;
             
-            template <typename C = char>
-            inline void enable_log  () {if (! _log<>.is_open ()) _log<>.open (default_log_file_name<C> ()); log_on = true;}
-            template <typename C = char>
-            inline void disable_log () {_log<>.close (); log_on = false;}
-
-            template <>
-            inline void enable_log() { if (!wlog.is_open()) wlog.open(default_log_file_name ()); log_on = true; }
-            template <>
-            inline void disable_log() { wlog.close(); log_on = false; }
-
+            inline void enable_log  () {if (! log.is_open ()) log.open (default_log_file_name ()); log_on = true;}
+            inline void disable_log () {log.close (); log_on = false;}
 
             // Comment the line below if you do not want the log to show where the message was originated.
             #define SHOW_LOCAL
 
             // The name was changed from log to cpplog to avoid conflict with math.h log function.
-            #ifdef SHOW_LOCAL
-                #define cpplog if (pensar_digital::cpplib::log_on) pensar_digital::cpplib::_log<> << FILE_LINE
-            #else
-                #define cpplog if (pensar_digital::cpplib::log_on) pensar_digital::cpplib::_log<>
-            #endif
-            #define LOG(msg) cpplog << msg << std::endl; pensar_digital::cpplib::_log<>.flush ();
-            #define LOG_FLUSH pensar_digital::cpplib::_log<>.flush ();
-
-            #ifdef SHOW_LOCAL
-            #define wcpplog if (pensar_digital::cpplib::log_on) pensar_digital::cpplib::wlog << WFILE_LINE
-            #else
-            #define wcpplog if (pensar_digital::cpplib::log_on) pensar_digital::cpplib::wlog
-            #endif
-            #define WLOG(msg) wcpplog << msg << std::endl; pensar_digital::cpplib::wlog.flush ();
-            #define WLOG_FLUSH pensar_digital::cpplib::wlog.flush ();
+                #ifdef SHOW_LOCAL
+                    #define cpplog if (pensar_digital::cpplib::log_on) pensar_digital::cpplib::log << __LINE__
+                #else
+                    #define cpplog if (pensar_digital::cpplib::log_on) pensar_digital::cpplib::log
+                #endif
+                #define LOG(msg) cpplog << msg << std::endl; pensar_digital::cpplib::log.flush ();
+                #define LOG_FLUSH pensar_digital::cpplib::log.flush ();
         #else
             #ifndef CODEGEAR_BUG
                 #define cpplog \/\/

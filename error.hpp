@@ -18,11 +18,11 @@ namespace pensar_digital
 		{
 			public:
 				Exception (const S& message): message (message) {}
-				const C* what_error () const noexcept 
+				const S what_error () const noexcept 
                 { 
                     #ifdef WIDE_CHAR
                     std::string s = what();
-                    return to_wstring (s).c_str ();
+                    return to_wstring (s);
                     #else
                         return what ();
                     #endif  

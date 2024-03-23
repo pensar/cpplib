@@ -97,7 +97,8 @@ namespace pensar_digital
             inline bool good() const noexcept { return stream_ptr->good(); }
 
             inline const char* c_str() const noexcept 
-            { S s = mfullpath.string().c_str(); // returns safely the null terminated string.
+            { 
+                S s = mfullpath.str();
             }
 
             // Delete the file.
@@ -105,9 +106,8 @@ namespace pensar_digital
             { 
                 if (is_open()) 
                     close();
-                S s = mfullpath.string();
                
-                return (std::remove(s.c_str ()) == 0);
+                return (fs::remove(mfullpath) == 0);
             }
 
                 
@@ -130,7 +130,7 @@ namespace pensar_digital
 
             inline virtual S debug_string() const noexcept
             {
-                return Object::debug_string() + W(" path = ") + mfullpath.string();
+                return Object::debug_string() + W(" path = ") + mfullpath.str();
             }
 
             inline File& set_binary_mode() noexcept
@@ -237,8 +237,8 @@ namespace pensar_digital
 			private:
 
 				inline static const size_t DEFAULT_LENGTH                =     8;
-				inline static const S      DEFAULT_TEXT_FILE_EXTENSION   = "txt";
-                inline static const S      DEFAULT_BINARY_FILE_EXTENSION = "bin";
+				inline static const S      DEFAULT_TEXT_FILE_EXTENSION   = W("txt");
+                inline static const S      DEFAULT_BINARY_FILE_EXTENSION = W("bin");
                 
                 // Extension type. It can be fixed, random, none, numeric sequence, C char sequence, or a function.  
                 enum class ExtensionType { FIXED, RANDOM, NONE, NUMERIC_SEQUENCE, CHAR_SEQUENCE, FUNCTION };
@@ -271,7 +271,7 @@ namespace pensar_digital
                 // Generates a random string of length len.
                 inline static S random_string(const size_t len)
                 {
-					static const S CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+					static const S CHARS = W("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
                     Random<size_t> r(0, CHARS.size() - 1);
 
 					S s;
@@ -289,7 +289,7 @@ namespace pensar_digital
                             // Logs error and throws an exception.
                             S error_msg = W("RandomFileNameGenerator::random_string(): Error: Could not generate a random string after 1000 tries.");
                             LOG(error_msg);
-                            throw std::runtime_error(error_msg);
+                            runtime_error(error_msg);
                         }
 							
                     }
@@ -331,7 +331,7 @@ namespace pensar_digital
 			}
 
             // Generates a random text file name. () operator.
-            inline Path operator() (const S& name_prefix = "", const S& name_suffix = "", const S& extension = DEFAULT_TEXT_FILE_EXTENSION, const Path& path = TMP_DIR)
+            inline Path operator() (const S& name_prefix = W(""), const S& name_suffix = W(""), const S& extension = DEFAULT_TEXT_FILE_EXTENSION, const Path& path = TMP_DIR)
             {
                 return path / (name_prefix + random_string(DEFAULT_LENGTH) + name_suffix + W(".") + get_extension());
             }
@@ -354,29 +354,12 @@ namespace pensar_digital
                     LOG(W("Failed to remove temporary file ") + File::mfullpath.s ());
                 }
 
-                inline void wlog_error()
-                {
-                    Path p = File::mfullpath;
-                    WLOG(L"Failed to remove temporary file " + p.wstring());
-                }
-
-                template <typename Char>
-                void log_err()
-				{
-					LOG("Failed to remove temporary file " + File::mfullpath.string());
-				}
-
-                template <>
-                void log_err<wchar_t>()
-				{
-                    wlog_error();
-                }
                 inline virtual ~TmpTextFile()
                 {
                     // Removes the file. If it is open, it is closed first. If operation fails, a log message is generated.
                     if (!File::remove())
                     {
-                        log_err<C>();
+                        log_error();
                     }
 				}
 		};  // class TmpTextFile
@@ -412,7 +395,7 @@ namespace pensar_digital
 							open ();
 
 						stream_ptr->seekp(0, std::ios::end);
-						stream_ptr->write(reinterpret_cast<const char*>(data), size);
+						stream_ptr->write(reinterpret_cast<const C*>(data), size);
 					}
 					return *this;
                 }

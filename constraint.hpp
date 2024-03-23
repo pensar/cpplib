@@ -16,11 +16,11 @@ namespace pensar_digital
 {
 	namespace cpplib
 	{
-		inline static const S ONLY_DIGITS_REGEX = "^[0-9]*$";
-		inline static const S AT_LEAST_ONE_DIGIT_REGEX = "^[0-9]+$";
-		inline static const S ONLY_LETTERS_REGEX = "^[a-zA-Z]*$";
-		inline static const S ONLY_LETTERS_AND_DIGITS_REGEX = "^[a-zA-Z0-9]*$";
-		inline static const S ONLY_LETTERS_AND_DIGITS_AND_UNDERSCORES_REGEX = "^[a-zA-Z0-9_]*$";
+		inline static const S ONLY_DIGITS_REGEX = W("^[0-9]*$");
+		inline static const S AT_LEAST_ONE_DIGIT_REGEX = W("^[0-9]+$");
+		inline static const S ONLY_LETTERS_REGEX = W("^[a-zA-Z]*$");
+		inline static const S ONLY_LETTERS_AND_DIGITS_REGEX = W("^[a-zA-Z0-9]*$");
+		inline static const S ONLY_LETTERS_AND_DIGITS_AND_UNDERSCORES_REGEX = W("^[a-zA-Z0-9_]*$");
 
 		template <typename L, typename R, typename ResultType, class D>
 		class Operand : public Object
@@ -288,18 +288,18 @@ namespace pensar_digital
 		{
 			private:
 				typedef Constraint<StringConstraint> Base;
-				const std::regex regex;
+				const std::basic_regex <C> regex;
 
 			public:
 				inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
 
 				/// Default constructor
-				StringConstraint (const S& aregex = "", const Id aid = NULL_ID, const S& aname = "") 
+				StringConstraint (const S& aregex = W(""), const Id aid = NULL_ID, const S& aname = W(""))
 					: Base(aid, aname), regex (aregex) { }
 
 				virtual ~StringConstraint() {}
 
-				bool ok(const S& s = "") const noexcept
+				bool ok(const S& s = W("")) const noexcept
 				{ 
 					return std::regex_search (s, regex);
 				};
@@ -319,10 +319,10 @@ namespace pensar_digital
 				inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
 
 				/// Default constructor
-				RangeConstraint (const T& amin, const T& amax, const Id aid = NULL_ID, const S& aname = "") 
+				RangeConstraint (const T& amin, const T& amax, const Id aid = NULL_ID, const S& aname = W("")) 
 					: Base(aid, aname), mmin (amin), mmax (amax) { }
 
-				RangeConstraint (const T& avalue, const Id aid = NULL_ID, const S& aname = "") 
+				RangeConstraint (const T& avalue, const Id aid = NULL_ID, const S& aname = W(""))
 					: Base(aid, aname), mmin (avalue), mmax (avalue) { }	
 
 				virtual ~RangeConstraint() {}

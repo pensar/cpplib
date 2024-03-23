@@ -59,6 +59,16 @@ namespace pensar_digital
 
         extern std::wstring to_wstring(const std::string& s);
         extern std::string  to_string (const std::wstring& s);
+        // Based on #ifdef WIDE_CHAR defines a constexpr function returning __FILE__ as a wide string or a narrow string.
+        
+        inline static constexpr S sfile () 
+        {
+            #ifdef WIDE_CHAR
+                        return __FILEW__;
+            #else
+                        return __FILE__;
+            #endif
+        }
 
         // Reads all chars from a istream into a string.
         // \param is the input stream.

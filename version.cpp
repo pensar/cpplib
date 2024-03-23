@@ -15,7 +15,12 @@ namespace pensar_digital
 	{
 		InStream& operator >> (InStream& is, Version& v)
 		{
-			return is >> v.mdata.mpublic >> v.mdata.mprotected >> v.mdata.mprivate;
+			VersionInt pub, pro, pri;
+			return is >> pub >> pro >> pri;
+			v.set_public (pub);
+			v.set_protected (pro);
+			v.set_private (pri);
+			
 		}
 				
 		OutStream& operator << (OutStream& os, const Version& v)
@@ -50,7 +55,7 @@ namespace pensar_digital
 				binary_read<VersionInt>(is, mdata.mprotected, byte_order);
 				binary_read<VersionInt>(is, mdata.mprivate, byte_order);
 				*/
-				is.read((char*)data(), data_size());
+				is.read((C*)data(), data_size());
 			return is;
 		}
 
@@ -64,7 +69,7 @@ namespace pensar_digital
 				binary_write<VersionInt>(os, mprivate);
 				return os;
 				*/
-				os.write((const char*)data(), data_size());
+				os.write((const C*)data(), data_size());
 			return os;
 		}
 	} // namespace cpplib

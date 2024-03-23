@@ -35,7 +35,7 @@ namespace pensar_digital
                 /** Access name
                  * \return The current value of name
                  */
-                S get_name() { return ""; }
+                S get_name() { return W(""); }
                 /** Access language
                  * \return The current value of language
                  */

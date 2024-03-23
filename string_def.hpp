@@ -18,6 +18,7 @@ namespace pensar_digital
             // define macro W(x) to be used with string literals it just repeats x.
             #define W(x) x
         #endif // WIDE_CHAR 
+ 
     }
 }
 

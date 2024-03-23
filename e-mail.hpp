@@ -10,6 +10,7 @@
 
 #include "contact.hpp"
 #include "s.hpp"
+#include "error.hpp"
 
 namespace x3 = boost::spirit::x3;
 
@@ -42,7 +43,7 @@ namespace pensar_digital
         namespace contact
         {
 
-            inline bool is_valid_local_part(const std::string& local_part)
+            inline bool is_valid_local_part(const S& local_part)
             {
                 auto iter = local_part.begin();
                 return x3::parse(iter, local_part.end(), local_part) && iter == local_part.end();
@@ -71,11 +72,11 @@ namespace pensar_digital
                 {
                     if (!is_valid_local_part(lp))
                     {
-                        throw std::runtime_error("Invalid local part");
+                        runtime_error(W("Invalid local part"));
                     }
                     if (!is_valid_domain(d))
                     {
-                        throw std::runtime_error("Invalid domain");
+                        runtime_error(W("Invalid domain"));
                     }
                     mlocal_part.assign (lp);
                     mdomain.assign (d);

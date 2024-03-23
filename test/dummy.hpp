@@ -74,7 +74,7 @@ namespace pensar_digital
                     virtual void set_id(const Id& aid) noexcept { Object::set_id(aid); }
             
                     // Implements initialize method from Initializable concept.
-                    virtual bool initialize(const Id& aid = NULL_ID, const S& name = "") noexcept
+                    virtual bool initialize(const Id& aid = NULL_ID, const S& name = W("")) noexcept
                     {
                         Object::set_id(aid);
                         mdata.mname = name;
@@ -87,7 +87,7 @@ namespace pensar_digital
                     {
                         Object::read(is, byte_order);
                         read_bin_version(is, *VERSION, byte_order);
-                        is.read((char*)data(), data_size());
+                        is.read((C*)data(), data_size());
                         return is;
                     }
 
@@ -95,7 +95,7 @@ namespace pensar_digital
                 {
                         Object::write (os, byte_order);
                         VERSION->write(os, byte_order);
-                        os.write((const char*)data(), data_size());
+                        os.write((const C*)data(), data_size());
                     return os;
                 }
 
@@ -112,7 +112,7 @@ namespace pensar_digital
                 /// \return A string with the object id.
                 virtual S debug_string() const noexcept
                 {
-				    return Object::debug_string() + " name = " + mdata.mname;
+				    return Object::debug_string() + W(" name = ") + mdata.mname;
                 }
 
             //protected:
