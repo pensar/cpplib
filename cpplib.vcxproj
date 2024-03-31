@@ -73,11 +73,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>c:\out\$(ProjectName)\bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>c:\out\$(ProjectName)\build\$(Platform)\$(Configuration)\</IntDir>
-    <IncludePath>C:\mg\prj\vcpkg\installed\x86-windows\include;C:\mg\prj\vcpkg\packages\boost-concept-check_x86-windows\include;C:\mg\prj\vcpkg\packages\boost-move_x86-windows\include;C:\mg\prj\vcpkg\packages\boost-range_x86-windows\include;C:\mg\prj\vcpkg\packages\boost-integer_x86-windows\include;C:\mg\prj\vcpkg\packages\boost-throw-exception_x86-windows\include;C:\mg\prj\vcpkg\packages\boost-iterator_x86-windows\include;C:\mg\prj\vcpkg\packages\boost-container-hash_x86-windows\include;C:\mg\prj\vcpkg\packages\boost-optional_x86-windows\include;C:\mg\prj\vcpkg\packages\boost-detail_x86-windows\include;C:\mg\prj\vcpkg\packages\boost-exception_x86-windows\include;C:\mg\prj\vcpkg\packages\boost-type-index_x86-windows\include;C:\mg\prj\vcpkg\packages\boost-variant_x86-windows\include;C:\mg\prj\vcpkg\packages\boost-static-assert_x86-windows\include;C:\mg\prj\vcpkg\packages\boost-fusion_x86-windows\include;C:\mg\prj\vcpkg\packages\boost-preprocessor_x86-windows\include;C:\mg\prj\vcpkg\packages\boost-config_x86-windows\include;C:\mg\prj\vcpkg\packages\boost-assert_x86-windows\include;C:\mg\prj\vcpkg\packages\boost-utility_x86-windows\include;C:\mg\prj\vcpkg\packages\boost-type-traits_x86-windows\include;C:\mg\prj\vcpkg\packages\boost-core_x86-windows\include;C:\mg\prj\vcpkg\packages\boost-mpl_x86-windows\include;C:\mg\prj\vcpkg\packages\rapidjson_x86-windows\include;C:\mg\prj\vcpkg\packages\icu_x64-windows\include;$(VcpkgRoot)\packages\icu_x64-windows\include;C:\mg\prj\vcpkg\packages\boost-spirit_x86-windows\include;$(VcpkgRoot)\boost-spirit_x64-windows\include\boost;$(IncludePath)</IncludePath>
+    <IncludePath>$(VcpkgRoot)\installed\x64-windows\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>c:\tmp\$(ProjectName)\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>c:\tmp\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <VcpkgInstalledDir>c:\vcpkg</VcpkgInstalledDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -114,13 +117,15 @@
       <PreprocessorDefinitions>_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\mg\prj\vcpkg\packages\icu_x64-windows\include;C:\mg\prj\vcpkg\packages\rapidjson_x86-windows\include;C:\mg\prj\cpplib\header_lib;C:\mg\prj\unit-test;C:\mg\prj\cpplib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VCPKG_ROOT)\packages\icu_x64-windows\include;C:\vcpkg\packages\python3_x64-windows\include;C:\vcpkg\packages\zlib_x64-windows\include;C:\vcpkg\packages\fmt_x64-windows\include\fmt;C:\mg\prj\unit-test;C:\vcpkg;C:\vcpkg\packages\bzip2_x64-windows\include;C:\mg\prj\cpplib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <BuildStlModules>true</BuildStlModules>
+      <AdditionalUsingDirectories>C:\vcpkg\installed\x64-windows\include;%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\vcpkg\installed\x64-windows\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
