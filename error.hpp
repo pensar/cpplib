@@ -30,15 +30,6 @@ namespace pensar_digital
 			private:
 				S message;
 		};
-        
-        inline void runtime_error(const S& message)
-        {
-            #ifdef WIDE_CHAR
-				throw std::runtime_error (to_string (message));
-            #else
-                throw std::runtime_error (message);
-            #endif
-        }
 
         #define INVALID_ARGUMENT(condition,message) \
         if (condition)\

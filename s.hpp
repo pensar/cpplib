@@ -59,8 +59,19 @@ namespace pensar_digital
 
         extern std::wstring to_wstring(const std::string& s);
         extern std::string  to_string (const std::wstring& s);
-        // Based on #ifdef WIDE_CHAR defines a constexpr function returning __FILE__ as a wide string or a narrow string.
         
+
+        inline void runtime_error(const S& message)
+        {
+            #ifdef WIDE_CHAR
+                throw std::runtime_error(to_string(message));
+            #else
+                throw std::runtime_error(message);
+            #endif
+        }
+
+        
+        // Based on #ifdef WIDE_CHAR defines a constexpr function returning __FILE__ as a wide string or a narrow string.
         inline static constexpr S sfile () 
         {
             #ifdef WIDE_CHAR
@@ -1002,7 +1013,7 @@ namespace pensar_digital
         {
             size_t min_size = lhs.length() + rhs.length() + 1;
             if (N < min_size)
-                throw std::runtime_error (W("CS<N> operator+ (const std::basic_string<Char>& lhs, const CS<N>& rhs) - rhs must be of size > ") + pd::to_string (min_size));
+                runtime_error (W("CS<N> operator+ (const std::basic_string<Char>& lhs, const CS<N>& rhs) - rhs must be of size > ") + pd::to_string (min_size));
             CS<0, N + 1> result;
             std::copy (lhs.begin (), lhs.end (), result.data.begin ());
             std::copy (rhs.data.begin (), rhs.data.begin () + rhs.length (), result.data.begin () + lhs.length ());

@@ -71,7 +71,7 @@ namespace pensar_digital
             CHECK(factory.get_available_count() == 3, W("1. available_count should be 3 but is ") + pd::to_string((int)factory.get_available_count ()));
 			ObjectPtr o  = factory.get ({ 1 });
             CHECK(o->id () == 1, W("0. o->id () should be 1 but is ") + pd::to_string((int)o->id ()))
-            CHECK(factory.get_available_count() == 2, "2. available_count should be 2.");   
+            CHECK(factory.get_available_count() == 2, W("2. available_count should be 2."));   
             ObjectPtr o1 = factory.get({ 2 });
             CHECK(o1->id() == 2, W("3. o1->id () should be 2 but is ") + pd::to_string((int)o->id()))
             CHECK(factory.get_available_count() == 1, W("4. available_count should be 1."));

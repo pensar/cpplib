@@ -20,7 +20,7 @@ namespace pensar_digital
             sp.mark ();
             sp.stop ();
             StopWatch<>::ELAPSED_TYPE elapsed = sp.elapsed ();   
-            CHECK(elapsed >= 10000, "0.");
+            CHECK(elapsed >= 10000, W("0."));
             StopWatch<>::ELAPSED_TYPE mark_elapsed = sp.elapsed_since_mark ();
             S elapsed_formatted = sp.elapsed_formatted ();
             S elapsed_since_mark_formatted = sp.elapsed_since_mark_formatted ();

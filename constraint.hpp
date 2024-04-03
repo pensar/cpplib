@@ -246,7 +246,7 @@ namespace pensar_digital
 									 const R&  aright,
 									 const OpType aop,
 									 const Id aid = NULL_ID, 
-									 const S& aname = "") : Base(aid, aname),
+									 const S& aname = W("")) : Base(aid, aname),
 									 left(aleft), right(aright), op (aop)
 				{
 				}

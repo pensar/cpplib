@@ -57,7 +57,7 @@ namespace pensar_digital
             CHECK_EQ(CS<>, s, s1, W("0"));
             s = W("abc");
             CHECK_NOT_EQ(CS<>, s, s1, W("1"));
-            CHECK_EQ(CS<>, s, "abc", W("2"));
+            CHECK_EQ(CS<>, s, W("abc"), W("2"));
             CHECK_EQ(size_t, s.length(), 3, W("3"));
             CHECK_EQ(size_t, s.size(), CS<>::MAX_SIZE, W("4"));
 
@@ -72,7 +72,7 @@ namespace pensar_digital
             WC w = W("abc");
             static_assert (pd::OutputStreamable<WC>, "W is not OutputStreamable");
 
-            std::string str = W("abc");
+            S str = W("abc");
             CS<> s3 = str;
             CHECK_EQ(CS<>, s3, W("abc"), W("9"));
 

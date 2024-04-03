@@ -14,8 +14,8 @@ namespace pensar_digital
             RandomFileNameGenerator r;
             Path p = r ();
             CHECK_EQ(Path, p.parent_path(), TMP_PATH.copy_without_trailing_separator(), W("0"));
-            std::string filename = p.filename_only().string();
-            CHECK_EQ(std::string, p.extension(), W(".txt"), W("1"));
+            S filename = p.filename_only().str();
+            CHECK_EQ(S, p.extension(), W(".txt"), W("1"));
             CHECK_EQ(size_t, filename.length (), 8, W("2"));
             CHECK(filename.find_first_not_of (W("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")) == S::npos, W("3"));
             

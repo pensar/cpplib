@@ -43,7 +43,7 @@ namespace pensar_digital
 			CHECK(!rc.ok (11 ), W("4"));
             CHECK(!rc.ok (100), W("5"));
 
-            RangeConstraint<char> rc2 (W('A'), W('E'));
+            RangeConstraint<C> rc2 (W('A'), W('E'));
             CHECK( rc2.ok (W('A')), W("6"));
             CHECK( rc2.ok (W('E')), W("7"));
             CHECK( rc2.ok (W('C')), W("8"));
