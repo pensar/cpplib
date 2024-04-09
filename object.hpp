@@ -64,6 +64,7 @@ namespace pensar_digital
                 typedef Factory FactoryType;
 
                 virtual const pd::Data* data() const noexcept { return &mdata; }
+                virtual const BytePtr bytes() const noexcept { return (BytePtr)data(); }
                 virtual size_t data_size() const noexcept { return sizeof(mdata); }
                 /// Set id
                 /// \param val New value to set
@@ -104,7 +105,7 @@ namespace pensar_digital
                 virtual Object& assign(const Object&  o) noexcept { std::memcpy  ((void*)data(), ((Object&)o).data(), data_size ()); return *this; }
                 virtual Object& assign(const Object&& o) noexcept { std::memmove ((void*)data(), ((Object&)o).data(), data_size ()); return *this; }
 
-                inline virtual void bytes (std::vector<std::byte>& v) const noexcept
+                inline virtual void bytes_to_vector (std::vector<std::byte>& v) const noexcept
                 {
                     VERSION->bytes(v);
                     size_t req_size = v.size() + data_size();
@@ -113,7 +114,7 @@ namespace pensar_digital
                     std::copy_n(reinterpret_cast<const std::byte*>(&mdata), data_size(), v.end() - data_size());
                 }
 
-                virtual std::span<const std::byte> bytes() const noexcept { return std::span<const std::byte>((const std::byte*)data (), data_size ()); }
+                virtual std::span<const std::byte> data_as_span_of_bytes() const noexcept { return std::span<const std::byte>((const std::byte*)data (), data_size ()); }
                 
                 /// \brief Uses std::as_writable_bytes to get a span of writable bytes from the object.
                 virtual std::span<std::byte> wbytes() noexcept
