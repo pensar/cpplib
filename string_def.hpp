@@ -8,7 +8,7 @@ namespace pensar_digital
 {
 	namespace cpplib
 	{
-        //#define WIDE_CHAR   ///< Define WIDE_CHAR to use wide char strings. Comment this line to use char strings.
+        #define WIDE_CHAR   ///< Define WIDE_CHAR to use wide char strings. Comment this line to use char strings.
         #ifdef WIDE_CHAR 
             using C = wchar_t;
             // define macro W(x) to be used with string literals it just adds L before x.

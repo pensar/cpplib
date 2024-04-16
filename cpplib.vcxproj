@@ -126,6 +126,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>C:\vcpkg\installed\x64-windows\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -211,6 +212,7 @@
     <ClInclude Include="language.hpp" />
     <ClInclude Include="locale.hpp" />
     <ClInclude Include="log.hpp" />
+    <ClInclude Include="mac_address.hpp" />
     <ClInclude Include="memory.hpp" />
     <ClInclude Include="memory_buffer.hpp" />
     <ClInclude Include="mg.hpp" />

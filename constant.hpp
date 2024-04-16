@@ -4,6 +4,7 @@
 #ifndef constantesHPP
 #define constantesHPP
 //---------------------------------------------------------------------------
+#define _WINSOCKAPI_
 #include <cstdint>
 #include <vector>  
 #include <cstddef> // std::byte

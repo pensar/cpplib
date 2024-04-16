@@ -257,6 +257,9 @@
     <ClInclude Include="transcoder.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="mac_address.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
