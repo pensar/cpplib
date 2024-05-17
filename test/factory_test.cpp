@@ -3,9 +3,9 @@
 // license: MIT (https://opensource.org/licenses/MIT)
 
 #include "../../unit-test/test.hpp"
-#include "../factory.hpp"
-#include "../s.hpp"
-#include "../object.hpp"
+#include "../cpplib/cpp/factory.hpp"
+#include "../cpplib/cpp/s.hpp"
+#include "../cpplib/cpp/object.hpp"
 #include <memory>
 
 namespace pensar_digital

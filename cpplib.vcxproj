@@ -24,6 +24,7 @@
     <ProjectGuid>{a0f8e31b-b73c-4d25-bbb6-7541b57920cc}</ProjectGuid>
     <RootNamespace>cpplib</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>cpplib_test</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -121,12 +122,13 @@
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <BuildStlModules>true</BuildStlModules>
       <AdditionalUsingDirectories>C:\vcpkg\installed\x64-windows\include;%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\vcpkg\installed\x64-windows\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\out\cpp\bin\x64\Debug;C:\vcpkg\installed\x64-windows\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>cpp.lib;ws2_32.lib;;icudt.lib;icuin.lib;icuio.lib;icutu.lib;icuuc.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -151,30 +153,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\unit-test\test.cpp" />
-    <ClCompile Include="bytes_util.cpp" />
-    <ClCompile Include="byte_order.cpp" />
-    <ClCompile Include="constants.cpp" />
-    <ClCompile Include="constraint.cpp" />
-    <ClCompile Include="cpp_lib\xmlParser.cpp" />
-    <ClCompile Include="file.cpp" />
-    <ClCompile Include="generator.cpp" />
-    <ClCompile Include="io_util.cpp" />
-    <ClCompile Include="language.cpp" />
-    <ClCompile Include="locale.cpp" />
-    <ClCompile Include="log.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="memory.cpp" />
-    <ClCompile Include="object.cpp" />
-    <ClCompile Include="path.cpp" />
-    <ClCompile Include="person.cpp" />
-    <ClCompile Include="random_util.cpp" />
-    <ClCompile Include="error.cpp" />
-    <ClCompile Include="s.cpp" />
-    <ClCompile Include="system.cpp" />
-    <ClCompile Include="sys_user_info.cpp" />
     <ClCompile Include="test\byte_order_test.cpp" />
     <ClCompile Include="test\concept_test.cpp" />
-    <ClCompile Include="test\constraint_test.cpp" />
     <ClCompile Include="test\dummy.cpp" />
     <ClCompile Include="test\e-mail_test.cpp" />
     <ClCompile Include="test\factory_test.cpp" />
@@ -186,53 +167,10 @@
     <ClCompile Include="test\person_test.cpp" />
     <ClCompile Include="test\stop_watch_test.cpp" />
     <ClCompile Include="test\s_test.cpp" />
-    <ClCompile Include="version.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\unit-test\test.hpp" />
-    <ClInclude Include="algorithm_util.hpp" />
-    <ClInclude Include="array.hpp" />
-    <ClInclude Include="bytes_util.hpp" />
-    <ClInclude Include="byte_order.hpp" />
-    <ClInclude Include="constant.hpp" />
-    <ClInclude Include="constraint.hpp" />
-    <ClInclude Include="contact.hpp" />
-    <ClInclude Include="country.hpp" />
-    <ClInclude Include="concept.hpp" />
-    <ClInclude Include="date.hpp" />
-    <ClInclude Include="distance.hpp" />
-    <ClInclude Include="e-mail.hpp" />
-    <ClInclude Include="error.hpp" />
-    <ClInclude Include="factory.hpp" />
-    <ClInclude Include="field.hpp" />
-    <ClInclude Include="file.hpp" />
-    <ClInclude Include="generator.hpp" />
-    <ClInclude Include="clone_util.hpp" />
-    <ClInclude Include="io_util.hpp" />
-    <ClInclude Include="language.hpp" />
-    <ClInclude Include="locale.hpp" />
-    <ClInclude Include="log.hpp" />
-    <ClInclude Include="mac_address.hpp" />
-    <ClInclude Include="memory.hpp" />
-    <ClInclude Include="memory_buffer.hpp" />
-    <ClInclude Include="mg.hpp" />
-    <ClInclude Include="object.hpp" />
-    <ClInclude Include="path.hpp" />
-    <ClInclude Include="person.hpp" />
-    <ClInclude Include="phone.hpp" />
-    <ClInclude Include="random_util.hpp" />
-    <ClInclude Include="s.hpp" />
-    <ClInclude Include="stop_watch.hpp" />
-    <ClInclude Include="string_def.hpp" />
-    <ClInclude Include="string_types.hpp" />
-    <ClInclude Include="system.hpp" />
-    <ClInclude Include="sys_user_info.hpp" />
     <ClInclude Include="test\dummy.hpp" />
-    <ClInclude Include="transcoder.hpp" />
-    <ClInclude Include="type_util.hpp" />
-    <ClInclude Include="version.hpp" />
-    <ClInclude Include="wstring_stream_hack.hpp" />
-    <ClInclude Include="xml_util.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />

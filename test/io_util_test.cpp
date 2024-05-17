@@ -2,11 +2,11 @@
 // license: MIT (https://opensource.org/licenses/MIT)
 
 #include "../../unit-test/test.hpp"
-#include "../s.hpp"
-#include "../object.hpp"
-#include "../io_util.hpp"
-#include "../sys_user_info.hpp"
-#include "../file.hpp"
+#include "../cpplib/cpp/s.hpp"
+#include "../cpplib/cpp/object.hpp"
+#include "../cpplib/cpp/io_util.hpp"
+#include "../cpplib/cpp/sys_user_info.hpp"
+#include "../cpplib/cpp/file.hpp"
 
 #include <memory>
 

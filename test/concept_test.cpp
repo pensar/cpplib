@@ -2,9 +2,9 @@
 // license: MIT (https://opensource.org/licenses/MIT)
 
 #include "../../unit-test/test.hpp"
-#include "../s.hpp"
-#include "../object.hpp"
-#include "constraint.hpp"
+#include "../cpp/s.hpp"
+#include "../cpp/concept.hpp"
+#include "../cpp/constraint.hpp"
 
 namespace pensar_digital
 {
@@ -16,13 +16,13 @@ namespace pensar_digital
         class Checkable0
         {
             public:
-                virtual bool ok(Args& ... args) const { return true; }
+                virtual bool ok (Args& ... args) const { return true; }
         };
         
         class Checkable1
         {
             public:
-                virtual bool ok() const noexcept { return true; }
+                virtual bool ok () const noexcept { return true; }
         };
 
         TEST(CheckableConcept, true)

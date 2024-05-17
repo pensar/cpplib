@@ -5,12 +5,12 @@
 #define DUMMY_HPP
 
 #include "../../unit-test/test.hpp"
-#include "../s.hpp"
-#include "../object.hpp"
-#include "../clone_util.hpp"
-#include "../factory.hpp"
-#include "../string_types.hpp"
-#include "../person.hpp"
+#include "../cpplib/cpp/s.hpp"
+#include "../cpplib/cpp/object.hpp"
+#include "../cpplib/cpp/clone_util.hpp"
+#include "../cpplib/cpp/factory.hpp"
+#include "../cpplib/cpp/string_types.hpp"
+#include "../cpplib/cpp/person.hpp"
 
 #include <memory>
 
@@ -57,10 +57,11 @@ namespace pensar_digital
                         return factory.get(aid, aname);
                     }
 
-                    inline Factory::P clone ()
+                    inline Factory::P clone () const noexcept
                     {
                         return get(id  (), get_name ());
                     }
+
                     inline Factory::P clone(const DummyPtr& ptr) { return ptr->clone (); }
                     Dummy& operator = (const Dummy& d) noexcept { assign(d); return *this; }
                     Dummy& operator = (Dummy&& d) noexcept { assign(d); return *this; }
@@ -81,21 +82,21 @@ namespace pensar_digital
                         return true;
                     }
 
-                    DummyPtr clone() const  noexcept { return pd::clone<Dummy>(*this, id (), mdata.mname); }
+                    //DummyPtr clone() const  noexcept { return pd::clone<Dummy>(*this, id (), mdata.mname); }
 
-                    virtual InStream& read(InStream& is, const std::endian& byte_order = std::endian::native)
+                    virtual std::istream& binary_read(std::istream& is, const std::endian& byte_order = std::endian::native)
                     {
-                        Object::read(is, byte_order);
+                        Object::binary_read(is, byte_order);
                         read_bin_version(is, *VERSION, byte_order);
-                        is.read((C*)data(), data_size());
+                        is.read((char*)data(), data_size());
                         return is;
                     }
 
-                virtual OutStream& write (OutStream& os, const std::endian& byte_order = std::endian::native) const
+                virtual std::ostream& binary_write (std::ostream& os, const std::endian& byte_order = std::endian::native) const
                 {
-                        Object::write (os, byte_order);
-                        VERSION->write(os, byte_order);
-                        os.write((const C*)data(), data_size());
+                        Object::binary_write (os, byte_order);
+                        VERSION->binary_write(os, byte_order);
+                        os.write((const char*)data(), data_size());
                     return os;
                 }
 
@@ -119,8 +120,8 @@ namespace pensar_digital
                 //virtual bool _equals(const Object& o) const { return Object::_equals(o); }
         };
 
-        extern InStream& operator >> (InStream& is, Dummy& o);
-        extern OutStream& operator << (OutStream& os, const Dummy& o);
+        inline InStream&  operator >> (InStream&  is,       Dummy& o) { return o.read  (is); }
+        inline OutStream& operator << (OutStream& os, const Dummy& o) { return o.write (os); }
 
     }  // namespace cpplib
 }      // namespace pensar_digital

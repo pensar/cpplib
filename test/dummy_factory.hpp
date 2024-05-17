@@ -4,7 +4,7 @@
 #ifndef DUMMY_FACTORY_HPP
 #define DUMMY_FACTORY_HPP
 
-#include "factory.hpp"
+#include "../cpplib/cpp/factory.hpp"
 #include "dummy.hpp"
 
 namespace pensar_digital

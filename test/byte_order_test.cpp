@@ -2,12 +2,11 @@
 // license: MIT (https://opensource.org/licenses/MIT)
 
 #include "../../unit-test/test.hpp"
-#include "../s.hpp"
-#include "../byte_order.hpp"
-#include "../array.hpp"
+#include "../cpp/s.hpp"
+#include "../cpp/byte_order.hpp"
+#include "../cpp/array.hpp"
 
 #include <span>
-#include <bit>   
 
 
 namespace pensar_digital

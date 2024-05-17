@@ -2,11 +2,11 @@
 // license: MIT (https://opensource.org/licenses/MIT)
 
 #include "../../unit-test/test.hpp"
-#include "../s.hpp"
-#include "../object.hpp"
+#include "../cpplib/cpp/s.hpp"
+#include "../cpplib/cpp/object.hpp"
 #include "dummy_factory.hpp"
-#include "../io_util.hpp"
-#include "../file.hpp"
+#include "../cpplib/cpp/io_util.hpp"
+#include "../cpplib/cpp/file.hpp"
 #include <memory>
 
 #ifdef _MSC_VER
@@ -34,29 +34,28 @@ namespace pensar_digital
             CHECK_EQ(Dummy, *d1, *d,W("1. d != d1"));
         TEST_END(ObjectClone)
 
+        TEST(ObjectBinaryFileStreaming, true)
+			// Creates a vector with 1000 objects
+			std::vector<ObjectPtr> objects;
+            for (Id i = 0; i < 1000; i++)
+            {
+				objects.push_back(pd::Object::get(i));
+			}
+            std::ofstream out (W("c:\\tmp\\test\\ObjectBinaryFileStreaming\\test.bin"), std::ios::binary);
 
-            TEST(ObjectBinaryFileStreaming, true)
-				// Creates a vector with 1000 objects
-				std::vector<ObjectPtr> objects;
-                for (Id i = 0; i < 1000; i++)
-                {
-					objects.push_back(pd::Object::get(i));
-				}
-                OutFStream out (W("c:\\tmp\\test\\ObjectBinaryFileStreaming\\test.bin"), std::ios::binary);
-
-                for (Id i = 0; i < 1000; i++)
-                {
-                    objects[i]->write (out) ;    
-                }
-				out.close();
-                InFileStream in (W("c:\\tmp\\test\\ObjectBinaryFileStreaming\\test.bin"), std::ios::binary);
-                for (Id i = 0; i < 1000; i++)
-                {
-					ObjectPtr o = pd::Object::get();
-					o->read (in);
-                    ObjectPtr o1 = pd::Object::get(i);
-                    CHECK_EQ(Object, *o, *o1, pd::to_string(i));
-                }
-             TEST_END(ObjectBinaryFileStreaming)
+            for (Id i = 0; i < 1000; i++)
+            {
+                objects[i]->binary_write (out) ;
+            }
+			out.close();
+            std::ifstream in (W("c:\\tmp\\test\\ObjectBinaryFileStreaming\\test.bin"), std::ios::binary);
+            for (Id i = 0; i < 1000; i++)
+            {
+				ObjectPtr o = pd::Object::get();
+				o->binary_read (in);
+                ObjectPtr o1 = pd::Object::get(i);
+                CHECK_EQ(Object, *o, *o1, pd::to_string(i));
+            }
+            TEST_END(ObjectBinaryFileStreaming)
     }
 }

@@ -2,9 +2,9 @@
 // license: MIT (https://opensource.org/licenses/MIT)
 
 #include "../../unit-test/test.hpp"
-#include "generator.hpp"
-#include "memory_buffer.hpp"
-#include "concept.hpp"
+#include "../cpplib/cpp/generator.hpp"
+#include "../cpplib/cpp/memory_buffer.hpp"
+#include "../cpplib/cpp/concept.hpp"
 
 #include <sstream>
 
@@ -14,6 +14,7 @@ namespace pensar_digital
     using namespace pensar_digital::unit_test;
     namespace cpplib
     {
+    
         TEST(Get, true)
             Generator<int> g;
             Id expected = 1;
@@ -53,7 +54,6 @@ namespace pensar_digital
             CHECK_EQ(Id, g2.current(),        3, W("6"));
         TEST_END(GetCurrent)
         
-
         TEST(SetValue, true)
             Generator<int> g;
             g.set_value (10);
@@ -72,17 +72,17 @@ namespace pensar_digital
 
 	
         TEST(GeneratorFileBinaryStreaming, true)
-            OutFStream out(W("c:\\tmp\\test\\GeneratorFileBinaryStreaming\\file_binary_streaming_test.bin"), std::ios::binary);
+            std::ofstream out(W("c:\\tmp\\test\\GeneratorFileBinaryStreaming\\file_binary_streaming_test.bin"), std::ios::binary);
             typedef Generator<Object> G;
             typedef std::shared_ptr<G> GP;
             G g(1);
-            g.write(out);
-            out.close();
-            out.flush();
+            g.binary_write(out);
+            out.close ();
+            out.flush ();
 
-            InFileStream  in(W("c:\\tmp\\test\\GeneratorFileBinaryStreaming\\file_binary_streaming_test.bin"), std::ios::binary);
-            GP pg2 = G::get(1);
-            pg2->read(in);
+            std::ifstream  in(W("c:\\tmp\\test\\GeneratorFileBinaryStreaming\\file_binary_streaming_test.bin"), std::ios::binary);
+            GP pg2 = G::get (1);
+            pg2->binary_read  (in);
             in.close();
             G g3(3);
 
@@ -122,5 +122,6 @@ namespace pensar_digital
             //G::Factory::P p4 = buffer.read<G> (3);
             //CHECK_EQ(G, *p4, *p3, "2");
         TEST_END(GeneratorBinaryStreaming)
+        
     }
 }
