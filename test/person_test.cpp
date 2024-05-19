@@ -70,7 +70,6 @@ namespace pensar_digital
 
                 Person p2;
                 CHECK_NOT_EQ(Person, p2, p, W("2"));
-                /*
 
                 buffer.read(&p2);
                 CHECK_EQ(Person, p2, p, W("3"));
@@ -78,7 +77,6 @@ namespace pensar_digital
                 Email expected_email2 = { W("local_part"), W("domain") };
                 Email actual_email2 = p2.data()->memails[0];
                 CHECK_EQ(Email,actual_email2, expected_email2, W("4"));
-                */
 
                 TEST_END(Person)
         }
