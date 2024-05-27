@@ -1,0 +1,164 @@
+# depslib dependency file v1.0
+1679928124 source:c:\mg\prj\cpplib\constants.cpp
+	"constants.hpp"
+
+1679922275 c:\mg\prj\cpplib\constants.hpp
+	<cstdint>
+
+1679927340 source:c:\mg\prj\cpplib\io_util.cpp
+	<windows.h>
+	"io_util.hpp"
+	<sstream>
+	<sys/stat.h>
+	<algorithm>
+	<iostream>
+	<fcntl.h>
+	<unistd.h>
+	<cstring>
+	<fstream>
+	<string>
+
+1679924142 c:\mg\prj\cpplib\io_util.hpp
+	"object.hpp"
+	<string>
+	<filesystem>
+	<experimental/filesystem>
+	<io.h>
+
+1679759819 c:\mg\prj\cpplib\object.hpp
+	"constants.hpp"
+	<iostream>
+
+1679779206 source:c:\mg\prj\cpplib\language.cpp
+	"language.hpp"
+
+1679926585 c:\mg\prj\cpplib\language.hpp
+	"object.hpp"
+	"string_def.hpp"
+	"generator.hpp"
+
+1676061621 c:\mg\prj\cpplib\string_def.hpp
+	<string>
+
+1679926780 c:\mg\prj\cpplib\generator.hpp
+	"object.hpp"
+	"error.hpp"
+
+1679419266 c:\mg\prj\cpplib\error.hpp
+	"string_def.hpp"
+	"object.hpp"
+	<stdexcept>
+	<sstream>
+
+1672739626 source:c:\mg\prj\cpplib\log.cpp
+	"log.hpp"
+
+1679926230 c:\mg\prj\cpplib\log.hpp
+	"macros.hpp"
+	<iostream>
+	<fstream>
+	<string>
+
+1672739626 c:\mg\prj\cpplib\macros.hpp
+
+1679693828 source:c:\mg\prj\cpplib\memory.c
+	<windows.h>
+	<psapi.h>
+	<unistd.h>
+	<sys/resource.h>
+	<mach/mach.h>
+	<fcntl.h>
+	<procfs.h>
+	<stdio.h>
+
+1678381737 source:c:\mg\prj\cpplib\posix_util.cpp
+	"stdafx.h"
+	"posix_util.h"
+	"posix_util.h"
+	<iostream>
+	<fstream>
+	<time.h>
+	<stdlib.h>
+	<sys/types.h>
+	<sys/stat.h>
+	<unistd.h>
+	<windows.h>
+
+1678381749 c:\mg\prj\cpplib\posix_util.h
+	"global_types.h"
+	"mg.hpp"
+	<string>
+
+1672739626 c:\mg\prj\cpplib\global_types.h
+	<stdint.h>
+	<iostream>
+	<fstream>
+	<ios>
+	<string>
+
+1679931550 c:\mg\prj\cpplib\mg.hpp
+
+1672739626 source:c:\mg\prj\cpplib\random_util.cpp
+	"random_util.hpp"
+
+1672739626 c:\mg\prj\cpplib\random_util.hpp
+	<chrono>
+	<random>
+	<cstdlib>
+
+1679926098 source:c:\mg\prj\cpplib\string_util.cpp
+	"string_util.hpp"
+	<iostream>
+
+1672739626 c:\mg\prj\cpplib\string_util.hpp
+	<vcl.h>
+	<string>
+	<vector>
+	<algorithm>
+	<functional>
+	<locale>
+	<cmath>
+	<iomanip>
+	<cctype>
+	<cwctype>
+	<memory>
+	<sstream>
+	<cassert>
+	"log.hpp"
+
+1679930925 source:c:\mg\prj\cpplib\sys_user_info.cpp
+	<windows.h>
+	"sys_user_info.hpp"
+
+1678382939 c:\mg\prj\cpplib\sys_user_info.hpp
+	<string>
+
+1672739626 source:c:\mg\prj\cpplib\system.cpp
+	<string>
+
+1679929993 source:c:\mg\prj\cpplib\main.cpp
+	"..\unit-test\test.hpp"
+
+1679930211 c:\mg\prj\unit-test\test.hpp
+	"..\cpplib\constants.hpp"
+	"..\cpplib\name.hpp"
+	"..\cpplib\generator.hpp"
+	"..\cpplib\macros.hpp"
+	"..\cpplib\string_def.hpp"
+	"..\cpplib\string_util.hpp"
+	"..\cpplib\error.hpp"
+	<string>
+	<stdexcept>
+	<sstream>
+	<unordered_map>
+	<queue>
+	<iostream>
+
+1676918566 c:\mg\prj\cpplib\name.hpp
+	"object.hpp"
+	"string_def.hpp"
+
+1679930612 source:c:\mg\prj\unit-test\test.cpp
+	"test.hpp"
+	"..\cpplib\constants.hpp"
+

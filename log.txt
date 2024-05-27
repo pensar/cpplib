@@ -1,0 +1,2 @@
+576Failed to remove temporary file c:\tmp\text-file-test.txt
+512RandomFileNameGenerator::random_string(): Error: Could not generate a random string after 1000 tries.

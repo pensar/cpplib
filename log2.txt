@@ -1,0 +1,2 @@
+C:\projects\cpplib\test\log_test.cpp	 linha 17	Extremely simple log is cool 
+C:\projects\cpplib\test\log_test.cpp	 linha 18	and efficient.
