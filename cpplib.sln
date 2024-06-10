@@ -7,11 +7,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cpplib_test", "cpplib.vcxpr
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "csk", "..\csk\csk.vcxproj", "{C4930F9C-3A86-40CE-A991-983A4287DE83}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unit-test", "..\unit-test\unit-test.vcxproj", "{05B2FFDF-B0FE-46AB-A363-38CBEA907FA7}"
-	ProjectSection(ProjectDependencies) = postProject
-		{A0F8E31B-B73C-4D25-BBB6-7541B57920CC} = {A0F8E31B-B73C-4D25-BBB6-7541B57920CC}
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cpp", "cpp\cpp.vcxproj", "{6DACBD8F-E351-4FAB-AB8E-C11FBE638CD0}"
 EndProject
 Global
@@ -38,14 +33,6 @@ Global
 		{C4930F9C-3A86-40CE-A991-983A4287DE83}.Release|x64.Build.0 = Release|x64
 		{C4930F9C-3A86-40CE-A991-983A4287DE83}.Release|x86.ActiveCfg = Release|Win32
 		{C4930F9C-3A86-40CE-A991-983A4287DE83}.Release|x86.Build.0 = Release|Win32
-		{05B2FFDF-B0FE-46AB-A363-38CBEA907FA7}.Debug|x64.ActiveCfg = Debug|x64
-		{05B2FFDF-B0FE-46AB-A363-38CBEA907FA7}.Debug|x64.Build.0 = Debug|x64
-		{05B2FFDF-B0FE-46AB-A363-38CBEA907FA7}.Debug|x86.ActiveCfg = Debug|Win32
-		{05B2FFDF-B0FE-46AB-A363-38CBEA907FA7}.Debug|x86.Build.0 = Debug|Win32
-		{05B2FFDF-B0FE-46AB-A363-38CBEA907FA7}.Release|x64.ActiveCfg = Release|x64
-		{05B2FFDF-B0FE-46AB-A363-38CBEA907FA7}.Release|x64.Build.0 = Release|x64
-		{05B2FFDF-B0FE-46AB-A363-38CBEA907FA7}.Release|x86.ActiveCfg = Release|Win32
-		{05B2FFDF-B0FE-46AB-A363-38CBEA907FA7}.Release|x86.Build.0 = Release|Win32
 		{6DACBD8F-E351-4FAB-AB8E-C11FBE638CD0}.Debug|x64.ActiveCfg = Debug|x64
 		{6DACBD8F-E351-4FAB-AB8E-C11FBE638CD0}.Debug|x64.Build.0 = Debug|x64
 		{6DACBD8F-E351-4FAB-AB8E-C11FBE638CD0}.Debug|x86.ActiveCfg = Debug|Win32

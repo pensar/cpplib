@@ -13,6 +13,34 @@
 #include <vector>  
 #include <cstddef> // std::byte
 #include <concepts> // std::signed_integral
+ #include <iostream>     // std::cout   
+ #include <fstream>      // std::ifstream
+ #include <string>       // std::string
+ #include <sstream>      // std::stringstream
+ #include <filesystem>   // std::filesystem
+ #include <algorithm>    // std::find
+ #include <functional>   // std::function
+ #include <memory>       // std::shared_ptr
+ #include <map>          // std::map
+ #include <set>          // std::set
+ #include <list>         // std::list
+ #include <queue>        // std::queue
+ #include <stack>        // std::stack
+ #include <tuple>        // std::tuple
+ #include <variant>      // std::variant
+ #include <optional>     // std::optional
+ #include <any>          // std::any
+ #include <chrono>       // std::chrono
+ #include <thread>       // std::thread
+ #include <mutex>        // std::mutex
+ #include <condition_variable> // std::condition_variable
+ #include <atomic>       // std::atomic
+ #include <future>       // std::future
+ #include <type_traits>  // std::is_same
+ #include <typeinfo>     // std::type_info
+ #include <random>       // std::random_device
+ #include <functional>   // std::function
+ #include <cctype>       // std::tolower
 
 namespace pensar_digital
 {

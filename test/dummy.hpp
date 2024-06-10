@@ -4,13 +4,12 @@
 #ifndef DUMMY_HPP
 #define DUMMY_HPP
 
-#include "../../unit-test/test.hpp"
+#include "..\unit-test\test\test.hpp"
 #include "../cpplib/cpp/s.hpp"
 #include "../cpplib/cpp/object.hpp"
 #include "../cpplib/cpp/clone_util.hpp"
 #include "../cpplib/cpp/factory.hpp"
 #include "../cpplib/cpp/string_types.hpp"
-#include "../cpplib/cpp/person.hpp"
 
 #include <memory>
 
@@ -18,7 +17,6 @@ namespace pensar_digital
 {
     namespace cpplib
     {
-        using namespace pensar_digital::cpplib::contact;
         class Dummy;
 #pragma warning( disable : 4250) // Disable warning C4250: inherits via dominance.
         typedef std::shared_ptr<Dummy> DummyPtr;

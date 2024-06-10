@@ -81,19 +81,10 @@
     <ClInclude Include="constraint.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="contact.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="country.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="date.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="distance.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="e-mail.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="field.hpp">
@@ -103,12 +94,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="file_factory.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="language.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="locale.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="mac_address.hpp">
@@ -194,16 +179,7 @@
     <ClCompile Include="file.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="language.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="locale.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="path.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="person.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="sys_user_info.cpp">
