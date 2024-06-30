@@ -105,6 +105,8 @@ namespace pensar_digital
 				CHECK_EQ(int, value, 0, "15");
 			}
 
+			CommandDoubleFail double_fail;
+
 		}
 		TEST_END(Command)
     }
