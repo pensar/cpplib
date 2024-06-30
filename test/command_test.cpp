@@ -105,6 +105,10 @@ namespace pensar_digital
 				CHECK_EQ(int, value, 0, "15");
 			}
 
+			cmd.remove(fail.id());
+
+			CHECK_EQ(size_t, cmd.count (), 3, "16");
+
 			CommandDoubleFail double_fail;
 
 		}

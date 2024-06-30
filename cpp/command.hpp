@@ -32,14 +32,22 @@ namespace pensar_digital
 		{
 			public:
                 Command (const Id aid = NULL_ID) : Object(aid == NULL_ID ? generator.get_id() : aid) {}
-                //Move constructor
+                
+                // Move constructor
                 Command(Command&&) = default;
+                
+                // Copy constructor
                 Command(const Command&) = default;
-                //Move assignment
+                
+                // Move assignment
                 Command& operator= (Command&&) = default;
+                
+                // Copy assignment
                 Command& operator= (const Command&) = default;
+                
                 //Destructor
                 virtual ~Command () = default;
+                
                 virtual void run () {}
                 virtual void rollback () {}
             private:
@@ -60,10 +68,25 @@ namespace pensar_digital
 
             // Add a command to the list of commands to be executed.
             template <CommandConcept T>
-            void add(std::unique_ptr<T> command)
+            Id add(std::unique_ptr<T> command)
             {
+                Id id = command->id ();
                 commands.push_back(std::move(command));
+                return id;
             }
+
+            void remove (const Id id)
+			{
+				auto it = std::find_if (commands.begin (), commands.end (), [id] (const std::unique_ptr<Command>& command) 
+                {
+					return command->id () == id;
+				});
+
+				if (it != commands.end())
+				{
+					commands.erase(it);
+				}
+			}
 
             size_t count() const
             {
