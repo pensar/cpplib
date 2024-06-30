@@ -158,6 +158,7 @@
     <ClInclude Include="bytes_util.hpp" />
     <ClInclude Include="byte_order.hpp" />
     <ClInclude Include="clone_util.hpp" />
+    <ClInclude Include="command.hpp" />
     <ClInclude Include="concept.hpp" />
     <ClInclude Include="constant.hpp" />
     <ClInclude Include="constraint.hpp" />
@@ -181,8 +182,6 @@
     <ClInclude Include="object.hpp" />
     <ClInclude Include="path.hpp" />
     <ClInclude Include="path_factory.hpp" />
-    <ClInclude Include="person.hpp" />
-    <ClInclude Include="phone.hpp" />
     <ClInclude Include="random_util.hpp" />
     <ClInclude Include="s.hpp" />
     <ClInclude Include="stop_watch.hpp" />
@@ -197,6 +196,7 @@
     <ClInclude Include="wstring_stream_hack.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\test\command.cpp" />
     <ClCompile Include="bytes_util.cpp" />
     <ClCompile Include="byte_order.cpp" />
     <ClCompile Include="constants.cpp" />

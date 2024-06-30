@@ -162,6 +162,7 @@
     <ClCompile Include="test\io_util_test.cpp" />
     <ClCompile Include="test\object_test.cpp" />
     <ClCompile Include="test\path_test.cpp" />
+    <ClCompile Include="test\command_test.cpp" />
     <ClCompile Include="test\stop_watch_test.cpp" />
     <ClCompile Include="test\s_test.cpp" />
   </ItemGroup>
