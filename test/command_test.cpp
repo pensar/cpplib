@@ -11,44 +11,52 @@ namespace pensar_digital
 	using namespace pensar_digital::cpplib;
     namespace cpplib
     {
-        TEST(Command, true)
+		inline static int value = 0;
+		class IncCmd : public Command
 		{
-			static int value = 0;
-			// Arrange
-			class CommandInc : public Command
-			{
-				public:
-					~CommandInc () = default;
-					virtual void run() override { ++value; }
-					virtual void rollback() override { --value; }
-			};
+		public:
+			~IncCmd() = default;
+			void execute  () override { ++value; }
+			void rollback () override { --value; }
+		};
 
-			class CommandDec : public Command
-			{
-				public:
-					~CommandDec() = default;
-					void run() override { --value; }
-					void rollback() override { ++value; }
-			};
+		class DecCmd : public Command
+		{
+		public:
+			~DecCmd() = default;
+			void execute  () override { --value; }
+			void rollback () override { ++value; }
+		};
 
-			class CommandFail : public Command
-			{
-				public:
-					//Destructor
-					~CommandFail() = default;
-					void run() override { throw "cmd.run () error."; }
-					void rollback() override { ; }
-			};
+		class IncFailCmd : public Command
+		{
+		public:
+			~IncFailCmd () = default;
+			void execute  () override { throw "cmdAddFail.run () error."; }
+			void rollback () override { --value; }
+		};
 
-			class CommandDoubleFail : public Command
-			{
-				public:
-					~CommandDoubleFail() = default;
-					void run () override { throw "Double errors."; }// value *= 2; }
-					void rollback () override { value /= 2; }
-			};
+		class DoubleCmd : public Command
+		{
+		public:
+			~DoubleCmd() = default;
+			void execute  () override { value *= 2; }
+			void rollback () override { value /= 2; }
+		};
 
-			CommandInc inc;
+		class DoubleFailCmd : public Command
+		{
+		public:
+			~DoubleFailCmd() = default;
+			void execute  () override { throw "Double errors."; }
+			void rollback () override { value /= 2            ; }
+		};
+
+		TEST(Command, true)
+		{
+			value = 0;
+
+			IncCmd inc;
 			CHECK_EQ(int, value, 0, "0");
 
 			inc.run ();
@@ -57,7 +65,7 @@ namespace pensar_digital
 			inc.rollback ();
 			CHECK_EQ(int, value, 0, "2");
 
-			CommandDec dec;
+			DecCmd dec;
 
 			CHECK_EQ(int, value, 0, "3");
 
@@ -67,34 +75,47 @@ namespace pensar_digital
 			dec.rollback ();
 			CHECK_EQ(int, value, 0, "5");
 			
-			CommandFail fail;
+			IncFailCmd inc_fail;
+			try
+			{
+				inc_fail.run();
+			}
+			catch (...)
+			{
+				CHECK_EQ(int, value, 0, "6");
+			}
+
+		}
+		TEST_END(Command)
+
+		TEST(CompositeCommand, true)
+		{
 			CompositeCommand cmd;
 
-			cmd.add (std::make_unique <CommandInc> (inc));
-			CHECK_EQ(int, value, 0, "6");
-
-			CHECK_EQ(size_t, cmd.count (), 1, "7");
-
-			cmd.run ();
-			CHECK_EQ(int, value, 1, "8");
-
-			value = 0;
-			cmd.add(std::make_unique <CommandDec>(dec));
-			cmd.add(std::make_unique <CommandDec>(dec));
-			CHECK_EQ(size_t, cmd.count (), 3, "9");
-
-			CHECK_EQ(int, value, 0, "10");
+			cmd.add <IncCmd>(IncCmd ());
+			CHECK_EQ(int, value, 0, "0");
+			CHECK_EQ(size_t, cmd.count(), 1, "1");
 
 			cmd.run();
-			CHECK_EQ(int, value, -1, "11");
+			CHECK_EQ(int, value, 1, "2");
 
-			cmd.rollback();
-			CHECK_EQ(int, value, 0, "12");
+			value = 0;
+			cmd.add <DecCmd>(DecCmd ());
+			cmd.add <DecCmd>(DecCmd ());
+			CHECK_EQ(size_t, cmd.count(), 3, "3");
 
-			cmd.add(std::make_unique <CommandFail>(fail));
-			CHECK_EQ(size_t, cmd.count (), 4, "13");
+			CHECK_EQ(int, value, 0, "4");
 
-			CHECK_EQ(int, value, 0, "14");
+			cmd.run();
+			CHECK_EQ(int, value, -1, "5");
+
+			cmd.undo ();
+			CHECK_EQ(int, value, 0, "6");
+
+
+			auto inc_fail_cmd_id = cmd.add <IncFailCmd> (IncFailCmd ());
+			CHECK_EQ(size_t, cmd.count(), 4, "7");
+			CHECK_EQ(int, value, 0, "8");
 
 			try
 			{
@@ -102,16 +123,36 @@ namespace pensar_digital
 			}
 			catch (...)
 			{
-				CHECK_EQ(int, value, 0, "15");
+				CHECK_EQ(int, value, 0, "9");
 			}
 
-			cmd.remove(fail.id());
+			CHECK_EQ(int, value, 0, "9.1");
+			cmd.remove(inc_fail_cmd_id);
+			CHECK_EQ(size_t, cmd.count(), 3, "10");
+			CHECK_EQ(int, value, 0, "10.1");
 
-			CHECK_EQ(size_t, cmd.count (), 3, "16");
+			CHECK_EQ(int, value, 0, "11");
+			cmd.clear ();
+			CHECK_EQ(size_t, cmd.count(), 0, "12");
+			CHECK_EQ(int, value, 0, "13");
+			cmd.run ();
+			CHECK_EQ(int, value, 0, "14");
 
-			CommandDoubleFail double_fail;
+			cmd.add <IncCmd> (IncCmd ());
+			cmd.add <DoubleFailCmd> (DoubleFailCmd ());
+			cmd.add <DoubleCmd>(DoubleCmd());
+			CHECK_EQ(size_t, cmd.count(), 3, "15");
+			CHECK_EQ(int, value, 0, "16");
 
+			try
+			{
+				cmd.run();
+			}
+			catch (...)
+			{
+				CHECK_EQ(int, value, 0, "17");
+			}
 		}
-		TEST_END(Command)
-    }
+		TEST_END(CompositeCommand)
+	}
 }

@@ -25,13 +25,13 @@ namespace pensar_digital
         concept CommandConcept = requires(T t) 
         {
             { t.run ()      } -> std::same_as<void>;
-            { t.rollback () } -> std::same_as<void>;
+            { t.undo () } -> std::same_as<void>;
         } && Identifiable<T>;
 
         class Command : public Object   
 		{
 			public:
-                Command (const Id aid = NULL_ID) : Object(aid == NULL_ID ? generator.get_id() : aid) {}
+                Command (const Id aid = NULL_ID) : Object(aid == NULL_ID ? mgenerator.get_id() : aid), mok(false) {}
                 
                 // Move constructor
                 Command(Command&&) = default;
@@ -47,11 +47,20 @@ namespace pensar_digital
                 
                 //Destructor
                 virtual ~Command () = default;
+
+            protected:
+                // Execute the command. It is a template method guaranteeing that the command sets ok = true if run successfully.
+                virtual void execute  () { mok = true  ; }
                 
-                virtual void run () {}
-                virtual void rollback () {}
+                // Rollback the command. It is a template method guaranteeing that undo only runs if the command was executed successfully.
+                virtual void rollback () { mok = false; }
+            public:
+                void run() { execute (); mok = true; }
+                void undo () { if (mok) rollback (); }
+                bool ok () const { return mok; }
             private:
-                inline static Generator<Command, Id> generator = Generator<Command, Id> ();
+                inline static Generator<Command, Id> mgenerator = Generator<Command, Id> ();
+                bool mok = false;
         };
 
         static_assert(CommandConcept<Command>, "Command is not a CommandConcept.");
@@ -67,25 +76,31 @@ namespace pensar_digital
             bool ok = true;
 
             // Add a command to the list of commands to be executed.
-            template <CommandConcept T>
-            Id add(std::unique_ptr<T> command)
+            template <CommandConcept T, typename... Args>
+            Id add(Args&&... args)
             {
-                Id id = command->id ();
+                auto command = std::make_unique<T>(std::forward<Args>(args)...);
+                Id id = command->id();
                 commands.push_back(std::move(command));
                 return id;
             }
 
-            void remove (const Id id)
-			{
-				auto it = std::find_if (commands.begin (), commands.end (), [id] (const std::unique_ptr<Command>& command) 
-                {
-					return command->id () == id;
-				});
+            void remove(const Id id)
+            {
+                auto it = std::find_if(commands.begin(), commands.end(), [id](const std::unique_ptr<Command>& command)
+                    {
+                        return command->id() == id;
+                    });
 
-				if (it != commands.end())
-				{
-					commands.erase(it);
-				}
+                if (it != commands.end())
+                {
+                    commands.erase(it);
+                }
+            }
+
+            void clear()
+			{
+				commands.clear();
 			}
 
             size_t count() const
@@ -93,7 +108,8 @@ namespace pensar_digital
                 return commands.size();
             }
 
-            virtual void run()
+        protected:
+            virtual void execute ()
             {
                 for (auto& command : commands)
                 {
@@ -104,19 +120,20 @@ namespace pensar_digital
                     catch (...)
                     {
                         ok = false;
-                        rollback();
+                        undo ();
                         break;
                     }
                 }
             }
 
-            void rollback()
+        protected:
+            virtual void rollback()
             {
                 for (auto it = commands.rbegin(); it != commands.rend(); ++it)
                 {
                     try
                     {
-                        (*it)->rollback();
+                        (*it)->undo ();
                     }
                     catch (const std::exception& e)
                     {
