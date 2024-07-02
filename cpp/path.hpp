@@ -71,6 +71,11 @@ namespace pensar_digital
             };
 
             PathFactory::P clone(const PathPtr& ptr) { return clone(*ptr); }
+
+            static bool is_valid (const S& p) noexcept
+			{
+                return true; // Sys::is_valid_path(p);
+			}
            
             // is directory?
             bool is_directory() const noexcept
@@ -172,7 +177,7 @@ namespace pensar_digital
                 {
 
                     S s = str ();
-                    if (s.back() == System::path_separator())
+                    if (s.back() == Sys::path_separator ())
                     {
 						s.pop_back();
 						*this = s;

@@ -92,7 +92,7 @@ namespace pensar_digital
                 UnsupportedVersion (const Version v): Error (W("Unsupported version number: ") + v.to_string ()){};
         };
 
-        inline void log_and_throw(const S& error_msg = W("")) 
+        inline static void log_and_throw(const S& error_msg = W("")) 
         {
             // Log error.
             LOG(error_msg);
