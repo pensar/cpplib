@@ -122,17 +122,6 @@ namespace pensar_digital
                 return get (get_id (), mdata.minitial_value, mdata.mstep);
             };
 
-         protected:
-            bool _equals(const Object& other) const noexcept override
-			{
-				const Generator<Type, T>* pother = dynamic_cast<const Generator<Type, T>*>(&other);
-				if (pother == nullptr)
-					return false;
-				return ((mdata.minitial_value == pother->mdata.minitial_value) && 
-                        (mdata.mvalue         == pother->mdata.mvalue        ) && 
-                        (mdata.mstep          == pother->mdata.mstep         ));
-			}
-      public:
             inline virtual InStream& read(InStream& is) 
             {
                 Object::read(is);   

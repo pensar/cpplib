@@ -82,7 +82,14 @@ namespace pensar_digital
                 /// \return true if they are equal, false otherwise.
                 /// \see equals
                 ///
-                inline virtual bool _equals(const Object& o) const { return ! (std::memcmp (data (), o.data (), data_size ())); }
+                inline virtual bool _equals(const Object& o) const 
+                {
+                    const Object* pother = dynamic_cast<const Object*>(&o);
+                    if (pother == nullptr)
+						return false;
+
+                    return ! (std::memcmp (data (), o.data (), data_size ())); 
+                }
 
             public:
 
@@ -153,10 +160,9 @@ namespace pensar_digital
                 /// \return true if objects have the same id, false otherwise.
                 bool equals(const Object& o) const noexcept
                 {
-                    if (hash() != 
-                        o.hash())
+                    if (hash() != o.hash())
                         return false;
-                        return _equals(o);
+                    return _equals(o);
                 }
 
                 /// Access object id
