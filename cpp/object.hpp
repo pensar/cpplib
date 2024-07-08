@@ -187,8 +187,21 @@ namespace pensar_digital
                 void read_bin_version(std::istream& is, const Version& version, const std::endian& byte_order = std::endian::native);
 
                 virtual  std::istream&  binary_read (std::istream&  is, const std::endian& byte_order = std::endian::native);
+                inline std::istream& bin_read(std::istream& is, const std::endian& byte_order = std::endian::native)
+                {
+                    read_bin_version(is, *VERSION, byte_order);
+                    is.read((char*)data(), data_size());
+                    return is;
+                };
+
 
                 virtual std::ostream& binary_write (std::ostream& os, const std::endian& byte_order = std::endian::native) const;
+                inline std::ostream& bin_write(std::ostream& os, const std::endian& byte_order = std::endian::native) const
+                {
+                    VERSION->binary_write(os, byte_order);
+                    os.write((const char*)data(), data_size());
+                    return os;
+                };
 
                 bool operator == (const Object& o) const { return   equals(o); }
                 bool operator != (const Object& o) const { return !equals(o); }

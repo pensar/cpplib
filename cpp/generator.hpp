@@ -84,6 +84,7 @@ namespace pensar_digital
             /// \param val New value to set
             inline virtual void set_value(T val) { mdata.mvalue = val; }
 
+            /*
             virtual std::istream& binary_read(std::istream& is, const std::endian& byte_order = std::endian::native)
             {
                     //read_bin_obj (is, byte_order);
@@ -108,7 +109,7 @@ namespace pensar_digital
                 //VERSION->write(os, amode, byte_order);
                 return os;
             };
-
+            */
             void set_id (const T& aid) { Object::set_id (aid); }
 
            

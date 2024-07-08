@@ -82,7 +82,7 @@ namespace pensar_digital
 
                     //DummyPtr clone() const  noexcept { return pd::clone<Dummy>(*this, id (), mdata.mname); }
 
-                    virtual std::istream& binary_read(std::istream& is, const std::endian& byte_order = std::endian::native)
+                    /*virtual std::istream& binary_read(std::istream& is, const std::endian& byte_order = std::endian::native)
                     {
                         Object::binary_read(is, byte_order);
                         read_bin_version(is, *VERSION, byte_order);
@@ -90,13 +90,14 @@ namespace pensar_digital
                         return is;
                     }
 
-                virtual std::ostream& binary_write (std::ostream& os, const std::endian& byte_order = std::endian::native) const
+                virtual std::ostream& binary_write(std::ostream& os, const std::endian& byte_order = std::endian::native) const
                 {
                         Object::binary_write (os, byte_order);
                         VERSION->binary_write(os, byte_order);
                         os.write((const char*)data(), data_size());
                     return os;
                 }
+                */
 
                 virtual S get_name() const noexcept { return mdata.mname; }
                 void   set_name(const S& aname) noexcept { mdata.mname = aname; }

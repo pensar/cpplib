@@ -41,6 +41,7 @@ namespace pensar_digital
         std::istream& Object::binary_read (std::istream& is, const std::endian& byte_order)
         {
             //read_bin_obj(is, byte_order);
+            bin_read (is, byte_order);
             read_bin_version(is, *VERSION, byte_order);
             is.read((char*)data (), data_size ());
             return is;
@@ -60,6 +61,7 @@ namespace pensar_digital
         {
             //binary_write     (os, class_name(), byte_order);
             //binary_write<Id> (os, mdata.mid, byte_order);
+            bin_write (os, byte_order);
             VERSION->binary_write (os, byte_order);
             os.write ((const char *)data(), data_size());
             return os;

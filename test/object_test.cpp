@@ -45,14 +45,14 @@ namespace pensar_digital
 
             for (Id i = 0; i < 1000; i++)
             {
-                objects[i]->binary_write (out) ;
+                objects[i]->bin_write (out) ;
             }
 			out.close();
             std::ifstream in (W("c:\\tmp\\test\\ObjectBinaryFileStreaming\\test.bin"), std::ios::binary);
             for (Id i = 0; i < 1000; i++)
             {
 				ObjectPtr o = pd::Object::get();
-				o->binary_read (in);
+				o->bin_read (in);
                 ObjectPtr o1 = pd::Object::get(i);
                 CHECK_EQ(Object, *o, *o1, pd::to_string(i));
             }
