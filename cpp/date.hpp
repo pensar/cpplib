@@ -25,7 +25,7 @@ namespace pensar_digital
         inline static const Date NULL_DATE = Date (0, 0, 0);
 
         // Ensure the class is trivially copyable and standard layout.
-        static_assert (StdLayoutTriviallyCopyable<Date>);
+        static_assert (TriviallyCopyable<Date>);
 
     } // namespace contact
 } // namespace pensar_digital

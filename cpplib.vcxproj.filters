@@ -56,9 +56,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\unit-test\test.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="test\dummy.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>

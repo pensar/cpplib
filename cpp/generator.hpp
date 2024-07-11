@@ -45,7 +45,10 @@ namespace pensar_digital
             using Factory = pd::Factory<G, T, T, T>;
 
             inline static Factory mfactory = { 3, 10, null_value<T>(), 0, 1}; //!< Member variable "factory"
-            inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
+            
+            // Version of the class.
+            inline static const VersionPtr VERSION = pd::Version::get (1, 1, 2);
+            virtual const VersionPtr version () const noexcept { return VERSION; }
 
             /// \brief Constructs a Generator.
             /// \param [in] initial_value Initial value for the generator, defaults to 0.
@@ -150,7 +153,7 @@ namespace pensar_digital
                 Data mdata;
             public:
                 typedef Data Datatype;
-                Data* data() { return &mdata; } 
+                //Data* data() { return &mdata; } 
                 virtual const pd::Data* data() const noexcept { return &mdata; }
                 virtual size_t data_size() const noexcept { return sizeof(mdata); }
       }; // class Generator

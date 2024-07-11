@@ -42,28 +42,16 @@ namespace pensar_digital
         {
             //read_bin_obj(is, byte_order);
             bin_read (is, byte_order);
-            read_bin_version(is, *VERSION, byte_order);
+            read_bin_version(is, *(version ()), byte_order);
             is.read((char*)data (), data_size ());
             return is;
         };
 
-        std::istream& binary_read(std::vector<ObjectPtr>& v, std::istream& is, const std::endian& byte_order)
-        {
-            return is;
-        }
-
-        std::ostream& binary_write(const std::vector<ObjectPtr>& v, std::ostream& os, const std::endian& byte_order)
-        {
-            return os;
-        }
-
         std::ostream& Object::binary_write(std::ostream& os, const std::endian& byte_order) const
         {
-            //binary_write     (os, class_name(), byte_order);
-            //binary_write<Id> (os, mdata.mid, byte_order);
-            bin_write (os, byte_order);
-            VERSION->binary_write (os, byte_order);
-            os.write ((const char *)data(), data_size());
+            bin_write (os, byte_order);                   // Writes Object.
+            version ()->binary_write(os, byte_order);     // Writes the polymorphic Version.
+            os.write ((const char *)data(), data_size()); // Writes the polymorphic data.
             return os;
         };
     }

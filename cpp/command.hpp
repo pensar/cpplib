@@ -30,8 +30,28 @@ namespace pensar_digital
 
         class Command : public Object   
 		{
-			public:
-                Command (const Id aid = NULL_ID) : Object(aid == NULL_ID ? mgenerator.get_id() : aid), mok(false) {}
+            private:
+                using G = Generator<Command, Id>; //!< Generator alias.
+
+                inline static G mgenerator = G();
+                struct Data : public pd::Data
+                {
+                    bool mok = false;
+                };
+                // Asserts Data is a trivially copyable type.
+                static_assert(TriviallyCopyable<Data>, "Data must be a trivially copyable type");
+                Data mdata; //!< Member variable mdata contains the object data.
+            public:
+                typedef Data DataType;
+
+                // Version of the class.
+                inline static const VersionPtr VERSION = pd::Version::get(1, 1, 1);
+                inline virtual const VersionPtr version () const noexcept { return VERSION; }
+
+                typedef Factory FactoryType;
+
+            public:
+                Command (const Id aid = NULL_ID) : Object(aid == NULL_ID ? mgenerator.get_id() : aid) {}
                 
                 // Move constructor
                 Command(Command&&) = default;
@@ -48,19 +68,37 @@ namespace pensar_digital
                 //Destructor
                 virtual ~Command () = default;
 
+                virtual const pd::Data* data() const noexcept { return &mdata; }
+                virtual const BytePtr bytes() const noexcept { return (BytePtr)data(); }
+                virtual size_t data_size() const noexcept { return sizeof(mdata); }
             protected:
                 // Execute the command. It is a template method guaranteeing that the command sets ok = true if run successfully.
-                virtual void execute  () { mok = true  ; }
+                virtual void execute  () { mdata.mok = true  ; }
                 
                 // Rollback the command. It is a template method guaranteeing that undo only runs if the command was executed successfully.
-                virtual void rollback () { mok = false; }
+                virtual void rollback () { mdata.mok = false; }
             public:
-                void run() { execute (); mok = true; }
-                void undo () { if (mok) rollback (); }
-                bool ok () const { return mok; }
-            private:
-                inline static Generator<Command, Id> mgenerator = Generator<Command, Id> ();
-                bool mok = false;
+                void run() { execute (); mdata.mok = true; }
+                void undo () { if (mdata.mok) rollback (); }
+                bool ok () const { return mdata.mok; }
+
+                inline virtual std::ostream& binary_write(std::ostream& os, const std::endian& byte_order) const
+				{
+					Object::binary_write(os, byte_order);
+                    mgenerator.binary_write (os, byte_order);
+					VERSION->binary_write(os, byte_order);
+					os.write((const char*)data(), data_size());
+					return os;
+				};
+
+                inline virtual std::istream& binary_read(std::istream& is, const std::endian& byte_order)
+                {
+                    Object::binary_read(is, byte_order);
+                    mgenerator.binary_read(is, byte_order);
+                    VERSION->binary_read(is, byte_order);
+                    is.read((char*)data(), data_size());
+                    return is;
+                };
         };
 
         static_assert(CommandConcept<Command>, "Command is not a CommandConcept.");
@@ -74,6 +112,26 @@ namespace pensar_digital
             CompositeCommand(const Id aid = NULL_ID) : Command(aid) {}
             virtual ~CompositeCommand() = default;
             bool ok = true;
+
+            inline virtual std::ostream& binary_write(std::ostream& os, const std::endian& byte_order) const
+            {
+				Object::binary_write(os, byte_order);
+				for (const auto& command : commands)
+				{
+					command->binary_write(os, byte_order);
+				}
+				return os;
+			};
+
+            inline virtual std::istream& binary_read(std::istream& is, const std::endian& byte_order)
+			{
+                Object::binary_read(is, byte_order);
+                for (const auto& command : commands)
+                {
+                    command->binary_read(is, byte_order);
+			    }
+                return is;
+            };
 
             // Add a command to the list of commands to be executed.
             template <CommandConcept T, typename... Args>

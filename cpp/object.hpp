@@ -23,6 +23,7 @@
 #include <vector>
 #include <span>
 #include <cstddef>
+#include <bit>
 
 namespace pensar_digital
 {
@@ -46,21 +47,25 @@ namespace pensar_digital
         class Object
         {
             private:
-                /// \brief Class Object::Data is compliant with the StdLayoutTriviallyCopyable concept. 
+                /// \brief Class Object::Data is compliant with the TriviallyCopyable concept. 
                 /// \see https://en.cppreference.com/w/cpp/named_req/TriviallyCopyable  
-                /// \see https://en.cppreference.com/w/cpp/named_req/StandardLayoutType
                 struct Data : public pd::Data
                 {
                     Id mid;         //!< Unique id (among same class).
-                    Data(const Id& id = NULL_ID) noexcept : 
-                        mid(id) {}
+                    Data (const Id& id = NULL_ID) noexcept : mid(id) {}
                 };
+                // Asserts Data is a trivially copyable type.
+                static_assert(TriviallyCopyable<Data>, "Data must be a trivially copyable type");
                 Data mdata; //!< Member variable mdata contains the object data.
             public:
                 inline const static Data NULL_DATA = { NULL_ID};
                 typedef Data DataType;
                 typedef pd::Factory<Object, typename Object::DataType> Factory;
+                
+                // Version of the class.
                 inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
+                virtual const VersionPtr version () const noexcept { return VERSION; }
+
                 typedef Factory FactoryType;
 
                 virtual const pd::Data* data() const noexcept { return &mdata; }
@@ -247,9 +252,53 @@ namespace pensar_digital
                  
         }; // Object
         
-        extern std::istream& binary_read(std::vector<ObjectPtr>& v, std::istream& is, const std::endian& byte_order);
-        extern std::ostream& binary_write(const std::vector<ObjectPtr>& v, std::ostream& os, const std::endian& byte_order);
+        template<typename Container>
+        std::istream& binary_read(Container& c, std::istream& is, const std::endian& byte_order)
+        {
+            // Assuming you have a way to determine the number of elements to read.
+            // For example, reading the size first:
+            size_t size;
+            is.read(reinterpret_cast<char*>(&size), sizeof(size));
+            if (byte_order != std::endian::native) {
+                size = std::bit_cast<size_t>(std::byteswap(std::bit_cast<uint64_t>(size)));
+            }
 
+            // Clear the existing contents of the container
+            c.clear();
+
+            // Reserve capacity if the container supports it (like std::vector)
+            auto* as_vector = dynamic_cast<std::vector<ObjectPtr>*>(&c);
+            if (as_vector) {
+                as_vector->reserve(size);
+            }
+
+            for (size_t i = 0; i < size; ++i) {
+                // Create a new ObjectPtr, read its data, and add it to the container
+                ObjectPtr obj = Object::get ();
+                obj->binary_read(is, byte_order); // Assuming Object has a binary_read method
+                c.insert(c.end(), obj); // Insert the object into the container
+            }
+
+            return is;
+        }
+
+        template<typename Container>
+        std::ostream& binary_write(const Container& c, std::ostream& os, const std::endian& byte_order)
+        {
+			// Write the size of the container first
+			size_t size = c.size();
+			if (byte_order != std::endian::native) {
+				size = std::bit_cast<size_t>(std::byteswap(std::bit_cast<uint64_t>(size)));
+			}
+			os.write(reinterpret_cast<const char*>(&size), sizeof(size));
+
+			// Write each object in the container
+			for (const auto& obj : c) {
+				obj->binary_write(os, byte_order); // Assuming Object has a binary_write method
+			}
+
+			return os;
+		}   
 
         inline InStream& operator >> (InStream& is, Object& o) 
         { 

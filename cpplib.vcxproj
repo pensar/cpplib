@@ -117,7 +117,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <AdditionalIncludeDirectories>$(VCPKG_ROOT)\packages\icu_x64-windows\include;C:\vcpkg\packages\python3_x64-windows\include;C:\vcpkg\packages\zlib_x64-windows\include;C:\vcpkg\packages\fmt_x64-windows\include\fmt;C:\mg\prj\unit-test;C:\vcpkg;C:\vcpkg\packages\bzip2_x64-windows\include;C:\mg\prj\cpplib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <BuildStlModules>true</BuildStlModules>
@@ -167,7 +167,6 @@
     <ClCompile Include="test\s_test.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\unit-test\test.hpp" />
     <ClInclude Include="test\dummy.hpp" />
   </ItemGroup>
   <ItemGroup>

@@ -11,7 +11,7 @@ namespace pensar_digital
     namespace cpplib
     {
         TEST(CS, true)
-            static_assert(StdLayoutTriviallyCopyable<CS<10>>, W("S is not compliant with StdLayoutTriviallyCopyable concept."));
+            static_assert(TriviallyCopyable<CS<10>>, W("S is not compliant with StdLayoutTriviallyCopyable concept."));
             CS<> s;
             CS<> s1;
             CHECK_EQ(CS<>, s, s1, W("0"));

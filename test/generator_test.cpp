@@ -85,9 +85,9 @@ namespace pensar_digital
             pg2->binary_read  (in);
             in.close();
             G g3(3);
-
             CHECK_NOT_EQ(G, g3, g, W("0"));
             CHECK_EQ(G, *pg2, g, W("1"));
+            CHECK_EQ(VersionInt, pg2->version()->get_private (), 2, W("2"));
 
         TEST_END(GeneratorFileBinaryStreaming)
 
@@ -96,8 +96,8 @@ namespace pensar_digital
         static_assert (Identifiable <G>);
         static_assert (Hashable<G>);
         static_assert (TriviallyCopyable <G::DataType>);
-        static_assert (StandardLayout <G::DataType>);
-        static_assert (StdLayoutTriviallyCopyable <G::DataType>);
+        //static_assert (StandardLayout <G::DataType>);
+        static_assert (TriviallyCopyable <G::DataType>);
         static_assert (Persistable<G>);
 
             ObjMemoryBuffer<G> buffer;

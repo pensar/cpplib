@@ -46,7 +46,9 @@ namespace pensar_digital
 {
     namespace cpplib
     {
-        struct Data {}; // Empty struct to be used as a base for all structs that are only data containers for objects.
+        struct Data 
+        {
+        }; // Empty struct to be used as a base for all structs that are only data containers for objects.
 
         using Id         = int_fast64_t; // istream >> unsigned long was not compiling.
         using Hash       = int_fast64_t;

@@ -12,7 +12,7 @@ namespace pensar_digital
     namespace cpplib
     {
         TEST(Path, true)
-            static_assert (StdLayoutTriviallyCopyable<CPath>);
+            static_assert (TriviallyCopyable<CPath>);
             Path path;
             CHECK_EQ (Path, path, CURRENT_DIR, W("0"));
 
