@@ -16,40 +16,40 @@ namespace pensar_digital
 		{
 		public:
 			~IncCmd() = default;
-			void execute  () override { ++value; }
-			void rollback () override { --value; }
+			void _run  () override { ++value; }
+			void _undo () const override { --value; }
 		};
 
 		class DecCmd : public Command
 		{
 		public:
 			~DecCmd() = default;
-			void execute  () override { --value; }
-			void rollback () override { ++value; }
+			void _run  () override { --value; }
+			void _undo () const override { ++value; }
 		};
 
 		class IncFailCmd : public Command
 		{
 		public:
 			~IncFailCmd () = default;
-			void execute  () override { throw "cmdAddFail.run () error."; }
-			void rollback () override { --value; }
+			void _run  () override { throw "cmdAddFail.run () error."; }
+			void _undo () const override { --value; }
 		};
 
 		class DoubleCmd : public Command
 		{
 		public:
 			~DoubleCmd() = default;
-			void execute  () override { value *= 2; }
-			void rollback () override { value /= 2; }
+			void _run  () override { value *= 2; }
+			void _undo () const override { value /= 2; }
 		};
 
 		class DoubleFailCmd : public Command
 		{
 		public:
 			~DoubleFailCmd() = default;
-			void execute  () override { throw "Double errors."; }
-			void rollback () override { value /= 2            ; }
+			void _run  () override { throw "Double errors."; }
+			void _undo () const override { value /= 2            ; }
 		};
 
 		TEST(Command, true)
@@ -62,7 +62,7 @@ namespace pensar_digital
 			inc.run ();
 			CHECK_EQ(int, value, 1, "1");
 
-			inc.rollback ();
+			inc.undo ();
 			CHECK_EQ(int, value, 0, "2");
 
 			DecCmd dec;
@@ -72,7 +72,7 @@ namespace pensar_digital
 			dec.run ();
 			CHECK_EQ(int, value, -1, "4");
 
-			dec.rollback ();
+			dec.undo ();
 			CHECK_EQ(int, value, 0, "5");
 			
 			IncFailCmd inc_fail;

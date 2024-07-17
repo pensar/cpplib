@@ -24,9 +24,14 @@ namespace pensar_digital
         template<typename T>
         concept CommandConcept = requires(T t) 
         {
-            { t.run ()      } -> std::same_as<void>;
-            { t.undo () } -> std::same_as<void>;
+            { t.run () } -> std::same_as<void>;
         } && Identifiable<T>;
+
+        template<typename T>
+        concept UndoableCommandConcept = CommandConcept<T> && requires(T t) 
+		{
+			{ t.undo () } -> std::same_as<void>;
+		};
 
         class Command : public Object   
 		{
@@ -72,14 +77,21 @@ namespace pensar_digital
                 virtual const BytePtr bytes() const noexcept { return (BytePtr)data(); }
                 virtual size_t data_size() const noexcept { return sizeof(mdata); }
             protected:
-                // Execute the command. It is a template method guaranteeing that the command sets ok = true if run successfully.
-                virtual void execute  () { mdata.mok = true  ; }
-                
-                // Rollback the command. It is a template method guaranteeing that undo only runs if the command was executed successfully.
-                virtual void rollback () { mdata.mok = false; }
+                virtual void _run () = 0;
+                virtual void _undo () const = 0;
             public:
-                void run() { execute (); mdata.mok = true; }
-                void undo () { if (mdata.mok) rollback (); }
+                void run () 
+                { 
+                    _run();
+                    mdata.mok = true; 
+                }
+                
+                void undo () const 
+                { 
+                    if (mdata.mok) // If the command was executed successfully, undo it.
+                        _undo (); 
+                }
+
                 bool ok () const { return mdata.mok; }
 
                 inline virtual std::ostream& binary_write(std::ostream& os, const std::endian& byte_order) const
@@ -167,7 +179,7 @@ namespace pensar_digital
             }
 
         protected:
-            virtual void execute ()
+            void _run () override
             {
                 for (auto& command : commands)
                 {
@@ -185,7 +197,7 @@ namespace pensar_digital
             }
 
         protected:
-            virtual void rollback()
+            void _undo () const override
             {
                 for (auto it = commands.rbegin(); it != commands.rend(); ++it)
                 {
