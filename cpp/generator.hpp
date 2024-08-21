@@ -21,15 +21,17 @@ namespace pensar_digital
     {
       /// Generator is meant to be used as unique identifier generator for other classes.
       ///
-      /// Usually this is used as a static member for an entity class in conjunction with the Id mixin class like in the Person class:
+      /// Usually this is used as a static member for an entity class:
       /// \code {.cpp}
-      ///  template <class String = std::wstring, class T = int> class Person : public Name<String>, public Id<T>
+      ///  template <class String = std::wstring, class T = int> class Person : public Object
       ///  {
       ///    public:
-      ///      Person(const String& aname = W("", const T aid = -1): Name<String>(aname), Id<T>((aid == NULL_ID) ? generator.get_id () : aid){};
+      ///      Person(const String& aname = W("", const T aid = -1): Object((aid == NULL_ID) ? generator.get_id () : aid){};
       ///      virtual ~Person(){};
       ///
-      ///    static Generator<T> generator;
+      ///    private:
+      ///       static Generator<T> generator;
+      ///       String name;
       ///
       ///  };
       /// \endcode

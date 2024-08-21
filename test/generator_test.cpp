@@ -115,12 +115,13 @@ namespace pensar_digital
             Hash h2 = g2.hash();
 
             CHECK_NOT_EQ(G, g2, g, W("0"));
-            //CHECK_EQ(G, *p2, g, "1");
+            CHECK_EQ(G, *p2, g, "1");
             
             
             G::Factory::P p3 = buffer.write<Id, Id, Id>(3, 2, 1);
-            //G::Factory::P p4 = buffer.read<G> (3);
-            //CHECK_EQ(G, *p4, *p3, "2");
+            G::Factory::P p4 = nullptr;
+            buffer.read (&p4);
+            CHECK_EQ(G, *p4, *p3, "2");
         TEST_END(GeneratorBinaryStreaming)
         
     }

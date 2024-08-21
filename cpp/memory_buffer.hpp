@@ -231,22 +231,27 @@ namespace pensar_digital
 					}
 				}
 
-                void read (T* p)
+                void read (typename T::Factory::P* p)
                 {
-                    auto offset_it = mindex.find(p->id());
-                    if (offset_it != mindex.end())
+                    if (*p != nullptr)
                     {
-                        // Copy the data from the buffer.
-                        read((BytePtr)(p->data()), offset_it->second + sizeof(Id), DATA_SIZE);
-                    }
-					else
-					{
-						// Reads next data from the buffer.
-                        Id id;
-                        read ((BytePtr)(&id), mread_offset, sizeof(Id));
-                        p->set_id(id);
-                        read((BytePtr)(p->data()), mread_offset, DATA_SIZE);
+                        auto offset_it = mindex.find((*p)->id());
+                        if (offset_it != mindex.end())
+                        {
+                            // Copy the data from the buffer.
+                            read((BytePtr)((*p)->data()), offset_it->second + sizeof(Id), DATA_SIZE);
+                            return;
+                        }
 					}
+                    else
+                    {
+                        (*p) = T::get();
+                    }
+					// Reads next data from the buffer.
+                    Id id;
+                    read ((BytePtr)(&id), mread_offset, sizeof(Id));
+                    (*p)->set_id(id);
+                    read((BytePtr)((*p)->data()), mread_offset, DATA_SIZE);
                 }
 
 
@@ -256,7 +261,7 @@ namespace pensar_digital
                 {
                     typename T::Factory::P p = T::get (args ...); // Create an object using its factory.
                     
-                    read (p.get ());
+                    read (&p);
                     
                     return p;
                 }
