@@ -126,7 +126,7 @@ namespace pensar_digital
                 size_t mwrite_offset; //!< Member variable "offset"
                 size_t mread_offset; //!< Member variable "offset"
                 std::unordered_map<Id, size_t> mindex; //!< Returns the buffer offset in bytes for a given id.
-                inline static const size_t DATA_SIZE = sizeof (T::Datatype); //!< Size of the data.
+                inline static const size_t DATA_SIZE = sizeof (T::DataType); //!< Size of the data.
                 inline static const size_t TOTAL_SIZE = DATA_SIZE + sizeof (Id); //!< Total size includes id size.
 
         public:
@@ -213,6 +213,15 @@ namespace pensar_digital
                     return p;
                 }
 
+                T::Factory::P write () noexcept
+				{
+					typename T::Factory::P p = T::get ();
+                    T obj = *p;
+					write(obj);
+
+					return p;
+				}
+
                 void read (BytePtr dest, const size_t offset, size_t size)
 				{
 					// Check if there is enough data in the buffer.
@@ -235,7 +244,8 @@ namespace pensar_digital
                 {
                     if (*p != nullptr)
                     {
-                        auto offset_it = mindex.find((*p)->id());
+                        Id id = (*p)->id(); 
+                        auto offset_it = mindex.find(id);
                         if (offset_it != mindex.end())
                         {
                             // Copy the data from the buffer.
@@ -248,7 +258,7 @@ namespace pensar_digital
                         (*p) = T::get();
                     }
 					// Reads next data from the buffer.
-                    Id id;
+                    Id id = NULL_ID;
                     read ((BytePtr)(&id), mread_offset, sizeof(Id));
                     (*p)->set_id(id);
                     read((BytePtr)((*p)->data()), mread_offset, DATA_SIZE);
@@ -263,6 +273,16 @@ namespace pensar_digital
                     
                     read (&p);
                     
+                    return p;
+                }
+
+                /// \brief Gets data from the buffer into a factory constructed object. 
+                typename T::Factory::P read ()
+                {
+                    typename T::Factory::P p = T::get (); // Create an object using its factory.
+
+                    read(&p);
+
                     return p;
                 }
         }; // MemoryBuffer

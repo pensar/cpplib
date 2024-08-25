@@ -145,17 +145,17 @@ namespace pensar_digital
                 
                 Factory (const size_t pool_size, const size_t refill_size, const Args& ... args) 
                 { 
-                    ptr = std::make_shared<PoolFactory<T, Args...>>(pool_size, refill_size, args ...); 
+                    mfactory_ptr = std::make_shared<PoolFactory<T, Args...>>(pool_size, refill_size, args ...);
                 };
 
                 virtual ~Factory() { }
 				
-                virtual P get (const Args& ... args) { return ptr->get(args ...); }
-                NewFactory<T, Args...>& get_factory () const { return *ptr.get(); }
+                virtual P get (const Args& ... args) { return mfactory_ptr->get(args ...); }
+                NewFactory<T, Args...>& get_factory () const { return *mfactory_ptr.get(); }
                                 
-				void set_factory (const NewFactory<T, Args...>* afactory) {ptr = afactory; }
+				void set_factory (const NewFactory<T, Args...>* afactory) { mfactory_ptr = afactory; }
 			private:
-                std::shared_ptr<NewFactory<T, Args...>> ptr;
+                std::shared_ptr<NewFactory<T, Args...>> mfactory_ptr;
 		};  
 
     } // namespace cpplib

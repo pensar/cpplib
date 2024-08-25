@@ -257,7 +257,7 @@ namespace pensar_digital
         {
             // Assuming you have a way to determine the number of elements to read.
             // For example, reading the size first:
-            size_t size;
+            size_t size = 0;
             is.read(reinterpret_cast<char*>(&size), sizeof(size));
             if (byte_order != std::endian::native) {
                 size = std::bit_cast<size_t>(std::byteswap(std::bit_cast<uint64_t>(size)));

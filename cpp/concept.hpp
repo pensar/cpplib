@@ -272,7 +272,7 @@ namespace pensar_digital
 		{
 			{t.data()     } -> std::convertible_to<const Data*>;
 			{t.data_size()} -> std::convertible_to<size_t>;
-		} && TriviallyCopyable<typename T::Datatype> && Identifiable<T> && Hashable<T>;
+		} && TriviallyCopyable<typename T::DataType> && Identifiable<T> && Hashable<T>;
 
 		// TriviallyDestructible concept requires a type T that is trivially destructible.
 		template<typename T>

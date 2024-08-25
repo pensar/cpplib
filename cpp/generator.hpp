@@ -154,7 +154,7 @@ namespace pensar_digital
             }; // struct Data
                 Data mdata;
             public:
-                typedef Data Datatype;
+                typedef Data DataType;
                 //Data* data() { return &mdata; } 
                 virtual const pd::Data* data() const noexcept { return &mdata; }
                 virtual size_t data_size() const noexcept { return sizeof(mdata); }
