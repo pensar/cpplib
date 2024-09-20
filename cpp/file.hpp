@@ -333,7 +333,7 @@ namespace pensar_digital
                 return mfile_ptr;
             }
             
-            inline size_t size() const
+            inline size_t size() const noexcept
             {
                 move_to_end();
 
@@ -341,7 +341,8 @@ namespace pensar_digital
                 if (size == -1)
                 {
                     S error_msg = W("TextFile::read(): Error: Could not get file size ");
-                    log_and_throw_if_error(errno, error_msg);
+                    //log_and_throw_if_error(errno, error_msg);
+					LOG(error_msg);
                 }
                 return size;
             }

@@ -34,28 +34,71 @@ namespace pensar_digital
             CHECK_EQ(Dummy, *d1, *d,W("1. d != d1"));
         TEST_END(ObjectClone)
 
-        TEST(ObjectBinaryFileStreaming, true)
+        TEST(ObjectSerialization, true)
+            ObjectPtr o = pd::Object::get(42);
+            MemoryBufferPtr mb = o->bytes();
+
+			ObjectPtr o1 = pd::Object::get();
+			CHECK_NOT_EQ(Object, *o, *o1, W("0. o == o1"));
+
+			o1->assign (*mb);
+			CHECK_EQ(Object, *o, *o1, W("1. o != o1"));
+
+         TEST_END(ObjectSerialization)
+            
+         TEST(ObjectBinaryFileStreaming, true)
 			// Creates a vector with 1000 objects
 			std::vector<ObjectPtr> objects;
-            for (Id i = 0; i < 1000; i++)
+		    const Id N = 1000; 
+            for (Id i = 0; i < N; i++)
             {
 				objects.push_back(pd::Object::get(i));
 			}
-            std::ofstream out (W("c:\\tmp\\test\\ObjectBinaryFileStreaming\\test.bin"), std::ios::binary);
+            std::ofstream out (W ("c:\\tmp\\test\\ObjectBinaryFileStreaming\\test.bin"), std::ios::binary);
 
-            for (Id i = 0; i < 1000; i++)
+            for (Id i = 0; i < N; i++)
             {
-                objects[i]->bin_write (out) ;
+				objects[i]->bin_write(out);
             }
 			out.close();
+
             std::ifstream in (W("c:\\tmp\\test\\ObjectBinaryFileStreaming\\test.bin"), std::ios::binary);
-            for (Id i = 0; i < 1000; i++)
+            for (Id i = 0; i < N; i++)
             {
 				ObjectPtr o = pd::Object::get();
-				o->bin_read (in);
+				o->bin_read(in);
                 ObjectPtr o1 = pd::Object::get(i);
                 CHECK_EQ(Object, *o, *o1, pd::to_string(i));
             }
             TEST_END(ObjectBinaryFileStreaming)
+
+            TEST(ObjectBinaryFileStreaming2, true)
+                // Creates a vector with 1000 objects
+                std::vector<ObjectPtr> objects;
+                const Id N = 1000;
+                for (Id i = 0; i < N; i++)
+                {
+                    objects.push_back(pd::Object::get(i));
+                }
+                std::ofstream out(W("c:\\tmp\\test\\ObjectBinaryFileStreaming\\test.bin"), std::ios::binary);
+
+                for (Id i = 0; i < N; i++)
+                {
+                    MemoryBufferPtr mb = objects[i]->bytes();
+                    out.write((const char*)mb->data(), mb->size());
+                }
+                out.close();
+
+                std::ifstream in(W("c:\\tmp\\test\\ObjectBinaryFileStreaming\\test.bin"), std::ios::binary);
+                for (Id i = 0; i < N; i++)
+                {
+                    ObjectPtr o = pd::Object::get();
+                    MemoryBuffer mb(Object::SIZE);
+                    mb.write (in, mb.size());
+					o->assign(mb);
+                    ObjectPtr o1 = pd::Object::get(i);
+                    CHECK_EQ(Object, *o, *o1, pd::to_string(i));
+                }
+            TEST_END(ObjectBinaryFileStreaming2)
     }
 }

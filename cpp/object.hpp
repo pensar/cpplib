@@ -11,6 +11,7 @@
 #include "factory.hpp"
 #include "log.hpp"
 #include "string_def.hpp"
+#include "memory_buffer.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -32,6 +33,13 @@ namespace pensar_digital
         namespace pd = pensar_digital::cpplib;
         class Object;
         typedef std::shared_ptr<Object> ObjectPtr;
+        
+        inline static void log_throw(const S& error_msg = W("")) 
+        {
+            // Log error.
+            LOG(error_msg);
+            throw std::runtime_error (error_msg);
+        }
 
         template <class T> T& assigns (T& l, const T& r) noexcept 
         { 
@@ -59,18 +67,24 @@ namespace pensar_digital
                 Data mdata; //!< Member variable mdata contains the object data.
             public:
                 inline const static Data NULL_DATA = { NULL_ID};
-                typedef Data DataType;
-                typedef pd::Factory<Object, typename Object::DataType> Factory;
+                using DataType = Data;
+                using Factory = pd::Factory<Object, typename Object::DataType> ;
                 
                 // Version of the class.
                 inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
                 virtual const VersionPtr version () const noexcept { return VERSION; }
 
-                typedef Factory FactoryType;
+                using FactoryType = Factory;
 
                 virtual const pd::Data* data() const noexcept { return &mdata; }
-                virtual const BytePtr bytes() const noexcept { return (BytePtr)data(); }
+                virtual const BytePtr data_bytes() const noexcept { return (BytePtr)data(); }
+
+				inline static constexpr size_t DATA_SIZE = sizeof(mdata);
+                inline static constexpr size_t      SIZE = DATA_SIZE + Version::SIZE;
+				
                 virtual size_t data_size() const noexcept { return sizeof(mdata); }
+				virtual size_t size() const noexcept { return data_size() + version()->size () ; }
+                
                 /// Set id
                 /// \param val New value to set
                 void set_id(const Id& value) { mdata.mid = value; }
@@ -111,13 +125,28 @@ namespace pensar_digital
                 /// Move constructor
                 Object(Object&& o) noexcept { assign(o); }
 
+                Object (MemoryBuffer& mb)
+                {
+					assign (mb);
+                }
+
                 /** Default destructor */
                 virtual ~Object() {}
 
-                virtual Object& assign(const Object&  o) noexcept { std::memcpy  ((void*)data(), ((Object&)o).data(), data_size ()); return *this; }
-                virtual Object& assign(const Object&& o) noexcept { std::memmove ((void*)data(), ((Object&)o).data(), data_size ()); return *this; }
+                virtual Object& assign (const Object&  o) noexcept { std::memcpy  ((void*)data(), ((Object&)o).data(), data_size ()); return *this; }
+                virtual Object& assign (const Object&& o) noexcept { std::memmove ((void*)data(), ((Object&)o).data(), data_size ()); return *this; }
+				virtual Object& assign (MemoryBuffer& mb) 
+				{
+					Version v(mb);
+                    Version v2 = *VERSION;
+					if (v != v2)
+						log_throw(W("Version mismatch."));
+					mb.read_known_size ((BytePtr)(&mdata), DATA_SIZE);
+					return *this;
+				}
 
-                inline virtual void bytes_to_vector (std::vector<std::byte>& v) const noexcept
+                /*
+                inline virtual void bytes_to_vector(ConstBytes& v) const noexcept
                 {
                     VERSION->bytes(v);
                     size_t req_size = v.size() + data_size();
@@ -125,8 +154,18 @@ namespace pensar_digital
 						v.resize(req_size);
                     std::copy_n(reinterpret_cast<const std::byte*>(&mdata), data_size(), v.end() - data_size());
                 }
+                */
 
-                virtual std::span<const std::byte> data_as_span_of_bytes() const noexcept { return std::span<const std::byte>((const std::byte*)data (), data_size ()); }
+				inline virtual MemoryBufferPtr bytes () const noexcept
+				{
+                    MemoryBufferPtr mb = std::make_unique<MemoryBuffer> (SIZE);
+                    MemoryBufferPtr version_bytes = VERSION->bytes();
+                    mb->copy (*version_bytes);
+                    mb->write ((BytePtr(&mdata)), DATA_SIZE);
+                    return mb;
+				}
+
+                inline virtual ByteSpan data_span () const noexcept { return ByteSpan (data_bytes (), data_size()); }
                 
                 /// \brief Uses std::as_writable_bytes to get a span of writable bytes from the object.
                 virtual std::span<std::byte> wbytes() noexcept
@@ -184,6 +223,7 @@ namespace pensar_digital
                 virtual bool initialize (const Data& data) noexcept
                 { 
                     mdata = data;
+                    
                     return true; 
                 }
 
@@ -195,7 +235,7 @@ namespace pensar_digital
                 inline std::istream& bin_read(std::istream& is, const std::endian& byte_order = std::endian::native)
                 {
                     read_bin_version(is, *VERSION, byte_order);
-                    is.read((char*)data(), data_size());
+                    is.read((char*)(&mdata), DATA_SIZE);
                     return is;
                 };
 
@@ -204,11 +244,11 @@ namespace pensar_digital
                 inline std::ostream& bin_write(std::ostream& os, const std::endian& byte_order = std::endian::native) const
                 {
                     VERSION->binary_write(os, byte_order);
-                    os.write((const char*)data(), data_size());
+                    os.write((const char*)(&mdata), DATA_SIZE);
                     return os;
                 };
 
-                bool operator == (const Object& o) const { return   equals(o); }
+                bool operator == (const Object& o) const { return  equals(o); }
                 bool operator != (const Object& o) const { return !equals(o); }
 
                 /// Conversion to string.
@@ -246,7 +286,7 @@ namespace pensar_digital
 				{
 					return mfactory.get(Data (id));
 				};
-                
+
                 inline virtual InStream&  read  (InStream&  is)       { return is >> mdata.mid; }
                 inline virtual OutStream& write (OutStream& os) const { return os <<     id (); }
                  

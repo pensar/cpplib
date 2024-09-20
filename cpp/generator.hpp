@@ -10,6 +10,7 @@
 #include "s.hpp"
 #include "factory.hpp"
 #include "version.hpp"
+#include "error.hpp"
 
 #include <memory>   // shared_ptr
 #include <iosfwd>   // istream, ostream
@@ -39,25 +40,73 @@ namespace pensar_digital
       class Generator : public Object     
       {
         public:
-            typedef Type UsedByType;
-            typedef    T     IdType;
+            using UsedByType = Type;
+            using IdType = T;
 
             using G = Generator<Type, T>; //!< Generator alias.
             using GeneratorPtr = std::shared_ptr<G>;
             using Factory = pd::Factory<G, T, T, T>;
-
             inline static Factory mfactory = { 3, 10, null_value<T>(), 0, 1}; //!< Member variable "factory"
             
             // Version of the class.
             inline static const VersionPtr VERSION = pd::Version::get (1, 1, 2);
             virtual const VersionPtr version () const noexcept { return VERSION; }
+      private:
+          struct Data : public pd::Data
+          {
+              T minitial_value; //!< Generator initial_value.
+              T mvalue; //!< Generator current value.
+              T mstep; //!< Step to increment value.
+              Data(T initial_value = 0, T step = 1) : minitial_value(initial_value), mvalue(initial_value), mstep(step) {}
+          }; // struct Data
+          Data mdata;
+   
+          public:
+
+          using DataType = Data;
+          inline static constexpr size_t DATA_SIZE = sizeof(mdata);
+          inline static constexpr size_t      SIZE = DATA_SIZE + Version::SIZE + Object::SIZE;
+
+          virtual const pd::Data* data() const noexcept { return &mdata; }
+          virtual size_t data_size() const noexcept { return DATA_SIZE; }
+          virtual size_t size() const noexcept { return SIZE; }
+
 
             /// \brief Constructs a Generator.
             /// \param [in] initial_value Initial value for the generator, defaults to 0.
             /// \param [in] astep Step to be used when incrementing the generator, defaults to 1.
             Generator (T aid = null_value<T>(), T initial_value = 0, T step = 1) noexcept : Object(aid == null_value<T>() ? 0 : aid), mdata(initial_value, step) {};
 
+			// Constructor from MemoryBuffer.
+			Generator(MemoryBuffer& mb) noexcept : Object(mb)
+            {
+                assign_without_object (mb);
+            }
             virtual ~Generator () = default;
+
+			virtual G& assign_without_object (MemoryBuffer& mb) noexcept
+			{
+				Version v(mb);
+				if (v != *VERSION) 
+                    log_and_throw (W("assign:Version mismatch"));
+				mb.read_known_size ((BytePtr) &mdata, DATA_SIZE);
+				return *this;
+			}   
+
+            virtual G& assign(MemoryBuffer& mb) noexcept
+            {
+                Object::assign(mb);
+                return assign_without_object (mb);
+            }
+
+            inline virtual MemoryBufferPtr bytes() const noexcept
+            {
+                MemoryBufferPtr mb = std::make_unique<MemoryBuffer>(SIZE);
+				mb->append (*Object::bytes ());
+                mb->append (*VERSION->bytes ());
+				mb->write ((BytePtr(&mdata)), DATA_SIZE);
+				return mb;
+            }
 
             /// \brief Increments value and return the new value.
             /// \return The new value.
@@ -74,7 +123,7 @@ namespace pensar_digital
             /// \brief Initialize a Generator.
             /// \param [in] initial_value Initial value for the generator, defaults to 0.
             /// \param [in] astep Step to be used when incrementing the generator, defaults to 1.
-            virtual bool initialize(T aid = null_value<T>(), T initial_value = 0, T step = 1) noexcept
+            virtual bool initialize (T aid = null_value<T>(), T initial_value = 0, T step = 1) noexcept
             {
                 bool ok = Object::initialize(aid == null_value<T>() ? 0 : aid);
                 mdata.minitial_value = initial_value;
@@ -144,20 +193,6 @@ namespace pensar_digital
             //friend InStream& operator >> <Type, T> (InStream& is, G& p);
             //friend OutStream& operator<< <Type, T> (OutStream& os, const G& p);
 
-        private:
-            struct Data : public pd::Data
-			{
-				T minitial_value; //!< Generator initial_value.
-				T mvalue        ; //!< Generator current value.
-				T mstep         ; //!< Step to increment value.
-                Data(T initial_value = 0, T step = 1) : minitial_value(initial_value), mvalue (initial_value), mstep (step) {}
-            }; // struct Data
-                Data mdata;
-            public:
-                typedef Data DataType;
-                //Data* data() { return &mdata; } 
-                virtual const pd::Data* data() const noexcept { return &mdata; }
-                virtual size_t data_size() const noexcept { return sizeof(mdata); }
       }; // class Generator
 
       /// Makes Generator Streamable.

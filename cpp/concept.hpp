@@ -3,6 +3,7 @@
 
 #include "constant.hpp"
 #include "factory.hpp" // for NewFactory
+#include "memory_buffer.hpp"
 
 #include <concepts>
 #include <iostream>
@@ -199,9 +200,17 @@ namespace pensar_digital
 		template <typename T>
 		concept BinaryStreamable = CharCastable<T> && Sizeofable<T> && Streamable<T>;
 
-		// BinaryConvertible concept requires a public method bytes() returning something convertible to std::span<std::byte>&.
+		// BinaryConvertible concept requires a public method bytes() returning something convertible to MemoryBufferPtr.
 		template <typename T>
-		concept BinaryConvertible = requires(T t) { { t.wbytes () } -> std::convertible_to<std::span<std::byte>>; };
+		concept BinaryConvertible = requires(T t) { { t.bytes() } -> std::convertible_to<MemoryBufferPtr>; };
+
+		// BinaryConstructible concept requires a constructor with this parameter: (MemoryBuffer& bytes) returning something convertible to T.
+		template <typename T>
+		concept BinaryConstructible = requires(MemoryBuffer & bytes) { { T(bytes) } -> std::convertible_to<T>; };
+
+		// BinaryIO concept requires BinaryConvertible and BinaryConstructible.
+		template <typename T>
+		concept BinaryIO = BinaryConvertible<T> && BinaryConstructible<T>;
 		
 		// BinaryOutputtableObject concept requires BinaryConvertible and SizeableIdentifiable.
 		template <class T>
@@ -230,7 +239,7 @@ namespace pensar_digital
 
 		// BinaryReadable concept requires a public method read (std::span<std::byte>& bytes) returning something convertible to T&.
 		template <typename T>
-		concept BinaryReadable = requires(T t, Bytes& bytes) { { t.read (bytes) } -> std::convertible_to<void>; };
+		concept BinaryReadable = requires(T t, std::span<std::byte>& bytes) { { t.read (bytes) } -> std::convertible_to<void>; };
 
 		// ObjectBinaryReadable concept requires a type T with a public method template <class Obj> void read(Obj* p). Where Obj must comply with BinaryReadable.
 		template <typename T, typename Obj>
@@ -267,8 +276,12 @@ namespace pensar_digital
 		concept StdLayoutTriviallyCopyable = StandardLayout<T> && TriviallyCopyable<T>;	
 		// Memcpyasble concept. Requires a function data() returning something convertible to void*. Usually a pointer to std::byte. And a data_size() returning something convertible to size_t.
 
+		// BinaryPersistable concept requires a type T that is trivially copyable and has a public method virtual std::ostream& binary_write (std::ostream& os, const std::endian& byte_order = std::endian::native) const; and a public method virtual std::istream& binary_read (std::istream& is, const std::endian& byte_order = std::endian::native);
+		template <typename T>
+		concept BinaryPersistable = BinaryWriteable<T> && BinaryReadable<T>;
+
 		template <class T>
-		concept Persistable = requires (T t)
+		concept TriviallyPersistable = requires (T t)
 		{
 			{t.data()     } -> std::convertible_to<const Data*>;
 			{t.data_size()} -> std::convertible_to<size_t>;

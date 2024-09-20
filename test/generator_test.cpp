@@ -4,6 +4,8 @@
 #include "..\unit-test\test\test.hpp"
 #include "../cpplib/cpp/generator.hpp"
 #include "../cpplib/cpp/memory_buffer.hpp"
+#include "../cpplib/cpp/binary_memory_buffer.hpp"
+#include "../cpplib/cpp/trivially_persistable_memory_buffer.hpp"
 #include "../cpplib/cpp/concept.hpp"
 
 #include <sstream>
@@ -70,6 +72,15 @@ namespace pensar_digital
             CHECK_EQ(Id, g.get_id ()        ,          4, W("2"));
         TEST_END(SetStep)
 
+	    TEST(GeneratorSerialization, true)
+			using G = Generator<int>;
+            G g;
+		    MemoryBufferPtr mb = g.bytes ();
+		    G g2 (1);
+		    CHECK_NOT_EQ(G, g2, g, W("0"));
+			g2.assign(*mb);
+		    CHECK_EQ(G, g2, g, W("1"));
+		TEST_END(GeneratorSerialization)
 	
         TEST(GeneratorFileBinaryStreaming, true)
             std::ofstream out(W("c:\\tmp\\test\\GeneratorFileBinaryStreaming\\file_binary_streaming_test.bin"), std::ios::binary);
@@ -93,34 +104,31 @@ namespace pensar_digital
 
         TEST(GeneratorBinaryStreaming, true)
             typedef Generator<Object> G;
-        static_assert (Identifiable <G>);
-        static_assert (Hashable<G>);
-        static_assert (TriviallyCopyable <G::DataType>);
-        //static_assert (StandardLayout <G::DataType>);
-        static_assert (TriviallyCopyable <G::DataType>);
-        static_assert (Persistable<G>);
+            static_assert (Identifiable <G>);
+            static_assert (Hashable<G>);
+            static_assert (TriviallyCopyable <G::DataType>);
+            //static_assert (StandardLayout <G::DataType>);
+            static_assert (TriviallyCopyable <G::DataType>);
+            static_assert (TriviallyPersistable<G>);
 
-            ObjMemoryBuffer<G> buffer;
+            TriviallyPersistableMemoryBuffer<G> buffer;
             //G::Factory::P p = G::get (1, 0, 1);
             G g(1);
             Id id = g.get_id ();
-            buffer.write (g);
-            Hash h = g.hash();
+            buffer.write_obj (g);
+            Hash h = g.hash ();
 
-    
-            //G::Factory::P ptr = buffer.read<G, G::IdType, G::IdType, G::IdType>(null_value<T>(), 0, 1);
-
-            G::Factory::P p2 = buffer.read (1);
-            G g2(1);
-            Hash h2 = g2.hash();
+            G::Factory::P p2 = buffer.read_obj (1);
+            G g2 (1);
+            Hash h2 = g2.hash ();
 
             CHECK_NOT_EQ(G, g2, g, W("0"));
             CHECK_EQ(G, *p2, g, "1");
             
             
-            G::Factory::P p3 = buffer.write<Id, Id, Id>(3, 2, 1);
+            G::Factory::P p3 = buffer.write_obj  <Id, Id, Id>(3, 2, 1);
             G::Factory::P p4 = nullptr;
-            buffer.read (&p4);
+            buffer.read_obj (&p4);
             CHECK_EQ(G, *p4, *p3, "2");
         TEST_END(GeneratorBinaryStreaming)
         

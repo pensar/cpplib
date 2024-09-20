@@ -65,9 +65,10 @@ namespace pensar_digital
 
         enum Alignment : int_fast16_t { NULL_ALIGNMENT = -1, BIT8 = 8, BIT16 = 16, BIT32 = 32, BIT64 = 64, BIT128 = 128, BIT256 = 256, BIT512 = 512, BIT1024 = 1024 };
         
-        typedef std::vector<std::byte> Bytes;
-
-        typedef std::byte* BytePtr;
+        using Byte     = std::byte;
+		using Bytes    = std::vector<Byte>;
+        using BytePtr  = Byte*;
+        using ByteSpan = std::span<Byte>;
 
     }   // namespace cpplib
 }       // namespace pensar_digital

@@ -138,6 +138,12 @@
     <ClInclude Include="command.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="span_util.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bool.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="constants.cpp">

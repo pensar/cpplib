@@ -155,6 +155,7 @@
   <ItemGroup>
     <ClInclude Include="algorithm_util.hpp" />
     <ClInclude Include="array.hpp" />
+    <ClInclude Include="bool.hpp" />
     <ClInclude Include="bytes_util.hpp" />
     <ClInclude Include="byte_order.hpp" />
     <ClInclude Include="clone_util.hpp" />
@@ -184,6 +185,7 @@
     <ClInclude Include="path_factory.hpp" />
     <ClInclude Include="random_util.hpp" />
     <ClInclude Include="s.hpp" />
+    <ClInclude Include="span_util.hpp" />
     <ClInclude Include="stop_watch.hpp" />
     <ClInclude Include="stream_util.hpp" />
     <ClInclude Include="string_def.hpp" />

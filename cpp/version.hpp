@@ -8,6 +8,7 @@
 #include "s.hpp"
 #include "factory.hpp"
 #include "type_util.hpp"
+#include "memory_buffer.hpp"
 
 #include <iostream> // std::istream, std::ostream
 #include <memory>   // std::shared_ptr
@@ -54,10 +55,20 @@ namespace pensar_digital
                 
                 typedef Data DataType;
                 virtual const pd::Data* data() const noexcept { return &mdata; }
-                virtual size_t data_size() const noexcept { return sizeof(mdata); }
+				inline static const size_t DATA_SIZE = sizeof(mdata);
+                inline static const size_t SIZE = sizeof(mdata);
+
+                virtual const BytePtr data_bytes () const noexcept { return (BytePtr)data(); }
+                virtual size_t data_size () const noexcept { return sizeof(mdata); }
+				virtual size_t size() const noexcept { return data_size(); }
 
                 Version(const VersionInt& pub = NULL_VERSION, const VersionInt& prot = NULL_VERSION, const VersionInt& priv = NULL_VERSION, const Id& id = null_value<Id>())
                     : mdata (pub, prot, priv, id) {}
+
+				Version (MemoryBuffer& mb) noexcept
+				{
+                    assign (mb);
+				}
 
                 inline static VersionFactory::P get(const VersionInt& pub = pd::Version::NULL_VERSION,
                     const VersionInt& pro = Version::NULL_VERSION,
@@ -69,6 +80,13 @@ namespace pensar_digital
                     
                 inline virtual ~Version() noexcept = default;
 
+				Version& assign (MemoryBuffer& mb) noexcept
+				{
+					mb.read_known_size (reinterpret_cast<BytePtr>(&mdata), DATA_SIZE);
+					return *this;
+				}
+
+                /*
                 inline virtual void bytes(std::vector<std::byte> v) const noexcept
 				{
                     size_t req_size = v.size() + data_size();
@@ -77,7 +95,16 @@ namespace pensar_digital
                     // Adds all bytes from mdata to v.
                     std::copy_n(reinterpret_cast<const std::byte*>(&mdata), data_size(), v.end() - data_size());
                 }
+                */
 
+                inline virtual ByteSpan data_span() const noexcept { return ByteSpan (data_bytes(), data_size()); }
+
+                inline virtual MemoryBufferPtr bytes() const noexcept
+                {
+                    MemoryBufferPtr mb = std::make_unique<MemoryBuffer>(DATA_SIZE);
+					mb->write ((BytePtr)&mdata, DATA_SIZE);
+					return mb;
+                }
                 VersionFactory::P clone () const noexcept
                 {
                     return get (mdata.mpublic, mdata.mprotected, mdata.mprivate, mdata.mid);
