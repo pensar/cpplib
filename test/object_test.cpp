@@ -24,7 +24,7 @@ namespace pensar_digital
         //static_assert(Assignable<Dummy>);
 
         TEST(ObjectClone, true)
-            Factory::P o = pd::Object::get(42);
+            Factory::P o = Object::get(42);
             Factory::P o1 = o->clone ();
             CHECK(*o == *o1,W("0. o == o1 should be true"));
 
@@ -35,10 +35,10 @@ namespace pensar_digital
         TEST_END(ObjectClone)
 
         TEST(ObjectSerialization, true)
-            ObjectPtr o = pd::Object::get(42);
+            ObjectPtr o = Object::get(42);
             MemoryBufferPtr mb = o->bytes();
 
-			ObjectPtr o1 = pd::Object::get();
+			ObjectPtr o1 = Object::get();
 			CHECK_NOT_EQ(Object, *o, *o1, W("0. o == o1"));
 
 			o1->assign (*mb);

@@ -15,189 +15,174 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="clone_util.hpp">
+    <ClInclude Include="..\src\algorithm_util.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="constant.hpp">
+    <ClInclude Include="..\src\array.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="factory.hpp">
+    <ClInclude Include="..\src\bool.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="object.hpp">
+    <ClInclude Include="..\src\byte_order.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="io_util.hpp">
+    <ClInclude Include="..\src\bytes_util.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="s.hpp">
+    <ClInclude Include="..\src\clone_util.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="concept.hpp">
+    <ClInclude Include="..\src\command.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="memory.hpp">
+    <ClInclude Include="..\src\constant.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="version.hpp">
+    <ClInclude Include="..\src\constraint.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="type_util.hpp">
+    <ClInclude Include="..\src\date.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="log.hpp">
+    <ClInclude Include="..\src\defines.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="string_def.hpp">
+    <ClInclude Include="..\src\distance.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="defines.hpp">
+    <ClInclude Include="..\src\error.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="macros.hpp">
+    <ClInclude Include="..\src\factory.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="icu_util.hpp">
+    <ClInclude Include="..\src\field.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="error.hpp">
+    <ClInclude Include="..\src\file.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="generator.hpp">
+    <ClInclude Include="..\src\file_factory.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="algorithm_util.hpp">
+    <ClInclude Include="..\src\icu_util.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="array.hpp">
+    <ClInclude Include="..\src\io_util.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="byte_order.hpp">
+    <ClInclude Include="..\src\log.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="bytes_util.hpp">
+    <ClInclude Include="..\src\mac_address.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="constraint.hpp">
+    <ClInclude Include="..\src\macros.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="date.hpp">
+    <ClInclude Include="..\src\memory_buffer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="distance.hpp">
+    <ClInclude Include="..\src\mg.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="field.hpp">
+    <ClInclude Include="..\src\object.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="file.hpp">
+    <ClInclude Include="..\src\path.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="file_factory.hpp">
+    <ClInclude Include="..\src\path_factory.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="mac_address.hpp">
+    <ClInclude Include="..\src\random_util.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="memory_buffer.hpp">
+    <ClInclude Include="..\src\s.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="mg.hpp">
+    <ClInclude Include="..\src\span_util.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="path.hpp">
+    <ClInclude Include="..\src\stop_watch.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="path_factory.hpp">
+    <ClInclude Include="..\src\stream_util.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="stop_watch.hpp">
+    <ClInclude Include="..\src\string_def.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="stream_util.hpp">
+    <ClInclude Include="..\src\string_types.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="string_types.hpp">
+    <ClInclude Include="..\src\sys_user_info.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="sys_user_info.hpp">
+    <ClInclude Include="..\src\system.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="system.hpp">
+    <ClInclude Include="..\src\transcoder.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="transcoder.hpp">
+    <ClInclude Include="..\src\type_util.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="wstring_stream_hack.hpp">
+    <ClInclude Include="..\src\version.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="random_util.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="command.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="span_util.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="bool.hpp">
+    <ClInclude Include="..\src\wstring_stream_hack.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="constants.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="io_util.cpp">
+    <ClCompile Include="..\src\constants.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="s.cpp">
+    <ClCompile Include="..\src\byte_order.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="memory.cpp">
+    <ClCompile Include="..\src\bytes_util.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="version.cpp">
+    <ClCompile Include="..\src\constraint.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="log.cpp">
+    <ClCompile Include="..\src\error.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="error.cpp">
+    <ClCompile Include="..\src\file.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="generator.cpp">
+    <ClCompile Include="..\src\generator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="byte_order.cpp">
+    <ClCompile Include="..\src\io_util.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="bytes_util.cpp">
+    <ClCompile Include="..\src\log.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="constraint.cpp">
+    <ClCompile Include="..\src\memory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="file.cpp">
+    <ClCompile Include="..\src\object.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="path.cpp">
+    <ClCompile Include="..\src\path.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="sys_user_info.cpp">
+    <ClCompile Include="..\src\random_util.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="system.cpp">
+    <ClCompile Include="..\src\s.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="object.cpp">
+    <ClCompile Include="..\src\sys_user_info.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="random_util.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\command.cpp">
+    <ClCompile Include="..\src\version.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

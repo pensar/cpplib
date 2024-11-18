@@ -168,6 +168,7 @@
     <ClCompile Include="test\version_test.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\command.hpp" />
     <ClInclude Include="test\dummy.hpp" />
   </ItemGroup>
   <ItemGroup>
