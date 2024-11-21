@@ -41,6 +41,7 @@
  #include <random>       // std::random_device
  #include <functional>   // std::function
  #include <cctype>       // std::tolower
+#include <span>         // std::span
 
 namespace pensar_digital
 {
@@ -55,7 +56,7 @@ namespace pensar_digital
         using VersionInt = int_fast16_t;
         using FileSize   = int_fast64_t;
         
-        extern const Id NULL_ID;
+        inline const Id NULL_ID = 0;
         
         template <std::unsigned_integral T>
         constexpr T null_value() { return 0; }

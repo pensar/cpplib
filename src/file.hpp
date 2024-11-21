@@ -8,29 +8,26 @@
 #pragma hdrstop
 #endif
 
+#include <fstream>
+#include <string>
+#include <filesystem>
+#include <cstdio>
+#include <cerrno>
+#include <cstring>
+#include <functional>
+
 #include "s.hpp"
-#include "string_types.hpp"
-#include "system.hpp"
 #include "object.hpp"
-#include "io_util.hpp"
 #include "path.hpp"
 #include "version.hpp"  
 #include "generator.hpp"
-#include "clone_util.hpp"
 #include "memory_buffer.hpp"
 #include "random_util.hpp"
 #include "log.hpp"
 #include "error.hpp"
 #include "icu_util.hpp"
-
-#include <sstream>
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <memory>   // shared_ptr
-#include <stdio.h> // fopen_s, _wfopen_s
-#include <errno.h>
-#include <cerrno>
+#include "constant.hpp"
+#include "encoding.hpp"
 
 namespace pensar_digital
 {
@@ -39,87 +36,211 @@ namespace pensar_digital
         namespace pd = pensar_digital::cpplib;
         namespace fs = std::filesystem;
 
-        class OpenMode : public S 
+        class OpenMode
         {
             public:
-                OpenMode (const S& mode) : S (mode) 
+            using Mode = std::ios::openmode;
+            
+            private:
+                Mode _mode;
+            public:
+                OpenMode(const std::ios::openmode mode) : _mode(mode) {}
+
+                inline bool is_bin_mode  (const Mode mode) const noexcept { return mode & std::ios::binary; }
+                inline bool is_bin_mode  (                   ) const noexcept { return is_bin_mode (_mode)          ; }
+                inline bool is_text_mode (const Mode mode) const noexcept { return ! is_bin_mode (mode)         ; }
+                inline bool is_text_mode (                   ) const noexcept { return !is_bin_mode ()              ; }
+
+                inline const Mode mode() const noexcept { return _mode; }
+
+                inline S to_string () const noexcept 
+                { 
+                    S s;
+					if (_mode & std::ios::in      ) s += W("in");
+                    if (_mode & std::ios::out     ) s += (s.empty() ? W("out"   ) : W(" | out"   ));
+					if (_mode & std::ios::binary  ) s += (s.empty() ? W("binary") : W(" | binary"));
+					if (_mode & std::ios::app     ) s += (s.empty() ? W("app"   ) : W(" | app"   ));
+					if (_mode & std::ios::ate     ) s += (s.empty() ? W("ate"   ) : W(" | ate"   ));
+					if (_mode & std::ios::trunc   ) s += (s.empty() ? W("trunc" ) : W(" | trunc" ));
+                }
+
+                inline const C* c_str() const noexcept { return to_string ().c_str(); }
+
+                inline bool operator == (const OpenMode& mode) const noexcept { return _mode == mode._mode; }
+                inline bool operator != (const OpenMode& mode) const noexcept { return _mode != mode._mode; }
+
+                inline bool operator == (const Mode mode) const noexcept { return _mode == mode; }
+                inline bool operator != (const Mode mode) const noexcept { return _mode != mode; }
+
+
+                // implicit conversion to Mode
+				inline operator Mode() const noexcept { return _mode; }
+
+				// implicit conversion to string
+				inline operator S() const noexcept { return to_string(); }
+
+				// implicit conversion to C*
+				inline operator const C* () const noexcept { return c_str(); }
+            };
+
+
+            class BinMode : public OpenMode
+            {
+                public:
+                    BinMode (const OpenMode::Mode mode) : OpenMode (mode)
+                    {
+                        if (!is_bin_mode (mode))
+                          throw Error(W("BinMode::BinMode (): Error: Invalid binary mode: ") + mode);
+                    }
+            };
+
+            class TextMode : public OpenMode
+            {
+                public:
+                    TextMode (const Mode mode) : OpenMode(mode)
+                    {
+                        if (!is_text_mode(mode))
+                        throw Error(W("TextMode::TextMode(): Error: Invalid text mode: ") + mode);
+                }
+            };
+
+            /*
+            void open(const char* file_name, ios::openmode mode);
+            in          Opens the file to read(default for ifstream)
+            out         Opens the file to write(default for ofstream)
+            binary      Opens the file in binary mode
+            app         Opens the file and appends all the outputs at the end
+            ate         Opens the file and moves the control to the end of the file
+            trunc       Removes the data in the existing file
+            */
+
+            inline static const BinMode BIN_READ   = BinMode (std::ios::binary | std::ios::in                                ); 
+            inline static const BinMode BIN_WRITE  = BinMode (std::ios::binary | std::ios::out                               ); 
+            inline static const BinMode BIN_APPEND = BinMode (std::ios::binary | std::ios::app                               ); 
+            inline static const BinMode BIN_ATE    = BinMode (std::ios::binary | std::ios::ate                               );
+            inline static const BinMode BIN_RW     = BinMode (std::ios::binary | std::ios::in | std::ios::out                );
+            inline static const BinMode BIN_RW_ATE = BinMode (std::ios::binary | std::ios::in | std::ios::out | std::ios::ate);
+
+            inline static const TextMode TEXT_READ   = TextMode (std::ios::in                                );   
+            inline static const TextMode TEXT_WRITE  = TextMode (std::ios::out                               );   
+            inline static const TextMode TEXT_APPEND = TextMode (std::ios::app                               );   
+            inline static const TextMode TEXT_ATE    = TextMode (std::ios::ate                               );
+            inline static const TextMode TEXT_RW     = TextMode (std::ios::in | std::ios::out                );
+            inline static const TextMode TEXT_RW_ATE = TextMode (std::ios::in | std::ios::out | std::ios::ate);
+
+            inline static const BinMode  DEFAULT_BIN_MODE  = BIN_RW;
+            inline static const TextMode DEFAULT_TEXT_MODE = TEXT_RW;
+            inline static const OpenMode DEFAULT_OPEN_MODE = DEFAULT_BIN_MODE;
+
+        /*class COpenMode
+        {
+            private:
+                S _mode;
+            public:
+                COpenMode (const S& mode) : _mode (mode)
 			    {
 				    if (mode.empty())
 					    throw Error (W("OpenMode::OpenMode(): Error: Invalid mode: ") + mode);
 			    }
 
-                inline bool is_bin_mode(const OpenMode mode) noexcept
+                inline bool is_bin_mode(const COpenMode mode) noexcept
                 {
                     // returns true if mode ends with b.
-                    return mode.back() == 'b';
+                    return mode._mode.back() == 'b';
                 }
 
-                inline bool is_text_mode(const OpenMode mode) noexcept
+                inline bool is_bin_mode() noexcept
+                {
+					return is_bin_mode(_mode);
+                }
+
+                inline bool is_text_mode(const COpenMode mode) noexcept
                 {
                     return !is_bin_mode(mode);
                 }
+
+				inline bool is_text_mode() noexcept
+				{
+					return !is_bin_mode();
+				}
+
+				inline const S& mode() const noexcept { return _mode; }
+
+				inline S to_string () const noexcept { return _mode; }
+
+                inline const C* c_str() const noexcept { return _mode.c_str(); }
+
+				inline bool operator == (const COpenMode& mode) const noexcept { return _mode == mode._mode; }
+
+				inline bool operator != (const COpenMode& mode) const noexcept { return _mode != mode._mode; }
+
+				inline bool operator == (const S& mode) const noexcept { return _mode == mode; }
+
+				inline bool operator != (const S& mode) const noexcept { return _mode != mode; }
+
+				inline bool operator == (const C* mode) const noexcept { return _mode == mode; }
+
+				inline bool operator != (const C* mode) const noexcept { return _mode != mode; }    
+
+				// implicit conversion to string
+				inline operator S() const noexcept { return _mode; }
+
+				// implicit conversion to C*
+				inline operator const C* () const noexcept { return _mode.c_str(); }
         };
 
  
-        class BinMode : public OpenMode
+        class CBinMode : public COpenMode
         {
             public:
-                BinMode (const S& mode) : OpenMode (mode) 
+                CBinMode (const S& mode) : COpenMode (mode) 
                 {
 				    if (! is_bin_mode (mode))
-					    throw Error (W("BinMode::BinMode(): Error: Invalid binary mode: ") + mode);
+					    throw Error (W("CBinMode::BinMode(): Error: Invalid binary mode: ") + mode);
                 }
         };
 
-        class TextMode : public OpenMode
+        class CTextMode : public COpenMode
         {
             public:
-                TextMode(const S& mode) : OpenMode(mode)
+                CTextMode(const S& mode) : COpenMode(mode)
                 {
                     if (!is_text_mode(mode))
-                        throw Error(W("TextMode::TextMode(): Error: Invalid text mode: ") + mode);
+                        throw Error(W("CTextMode::CTextMode(): Error: Invalid text mode: ") + mode);
                 }
         };
 
         // Declares a BinMode constant with W("rb") value.
-        inline static const BinMode BIN_READ                = BinMode (W("rb")); // read: Open file for input operations.The file must exist.
-        inline static const BinMode BIN_WRITE               = BinMode (W("wb")); // write: Create an empty file for output operations.If a file with the same name already exists, its contents are discarded and the file is treated as a new empty file.
-        inline static const BinMode BIN_APPEND_OR_CREATE    = BinMode (W("ab")); // append: Open file for output at the end of a file.Output operations always write data at the end of the file, expanding it.Repositioning operations(fseek, fsetpos, rewind) are ignored.The file is created if it does not exist.
-        inline static const BinMode BIN_RW                  = BinMode (W("r+b")); // read / update : Open a file for update(both for input and output).The file must exist.
-        inline static const BinMode BIN_CREATE_OVERWRITE_RW = BinMode (W("w+b")); // write / update : Create an empty file and open it for update(both for input and output).If a file with the same name already exists its contents are discarded and the file is treated as a new empty file.
-        inline static const BinMode BIN_RW_APPEND_OR_CREATE = BinMode (W("a+b")); // append / update : Open a file for update(both for input and output) with all output operations writing data at the end of the file.Repositioning operations(fseek, fsetpos, rewind) affects the next input operations, but output operations move the position back to the end of file.The file is created if it does not exist.
+        inline static const CBinMode CBIN_READ                = CBinMode (W("rb")); // read: Open file for input operations.The file must exist.
+        inline static const CBinMode CBIN_WRITE               = CBinMode (W("wb")); // write: Create an empty file for output operations.If a file with the same name already exists, its contents are discarded and the file is treated as a new empty file.
+        inline static const CBinMode CBIN_APPEND_OR_CREATE    = CBinMode (W("ab")); // append: Open file for output at the end of a file.Output operations always write data at the end of the file, expanding it.Repositioning operations(fseek, fsetpos, rewind) are ignored.The file is created if it does not exist.
+        inline static const CBinMode CBIN_RW                  = CBinMode (W("r+b")); // read / update : Open a file for update(both for input and output).The file must exist.
+        inline static const CBinMode CBIN_CREATE_OVERWRITE_RW = CBinMode (W("w+b")); // write / update : Create an empty file and open it for update(both for input and output).If a file with the same name already exists its contents are discarded and the file is treated as a new empty file.
+        inline static const CBinMode CBIN_RW_APPEND_OR_CREATE = CBinMode (W("a+b")); // append / update : Open a file for update(both for input and output) with all output operations writing data at the end of the file.Repositioning operations(fseek, fsetpos, rewind) affects the next input operations, but output operations move the position back to the end of file.The file is created if it does not exist.
 
-        inline static const TextMode TEXT_READ                = TextMode (W("r"));   // read: Open file for input operations.The file must exist.
-        inline static const TextMode TEXT_WRITE               = TextMode (W("w"));   // write: Create an empty file for output operations.If a file with the same name already exists, its contents are discarded and the file is treated as a new empty file.
-        inline static const TextMode TEXT_APPEND_OR_CREATE    = TextMode (W("a"));   // append: Open file for output at the end of a file.Output operations always write data at the end of the file, expanding it.Repositioning operations(fseek, fsetpos, rewind) are ignored.The file is created if it does not exist.
-        inline static const TextMode TEXT_RW                  = TextMode (W("r+"));  // read / update : Open a file for update(both for input and output).The file must exist.
-        inline static const TextMode TEXT_CREATE_OVERWRITE_RW = TextMode (W("w+"));  // write / update : Create an empty file and open it for update(both for input and output).If a file with the same name already exists its contents are discarded and the file is treated as a new empty file.
-        inline static const TextMode TEXT_RW_APPEND_OR_CREATE = TextMode (W("a+"));  // append / update : Open a file for update(both for input and output) with all output operations writing data at the end of the file.Repositioning operations(fseek, fsetpos, rewind) affects the next input operations, but output operations move the position back to the end of file.The file is created if it does not exist.
+        inline static const CTextMode CTEXT_READ                = CTextMode (W("r"));   // read: Open file for input operations.The file must exist.
+        inline static const CTextMode CTEXT_WRITE               = CTextMode (W("w"));   // write: Create an empty file for output operations.If a file with the same name already exists, its contents are discarded and the file is treated as a new empty file.
+        inline static const CTextMode CTEXT_APPEND_OR_CREATE    = CTextMode (W("a"));   // append: Open file for output at the end of a file.Output operations always write data at the end of the file, expanding it.Repositioning operations(fseek, fsetpos, rewind) are ignored.The file is created if it does not exist.
+        inline static const CTextMode CTEXT_RW                  = CTextMode (W("r+"));  // read / update : Open a file for update(both for input and output).The file must exist.
+        inline static const CTextMode CTEXT_CREATE_OVERWRITE_RW = CTextMode (W("w+"));  // write / update : Create an empty file and open it for update(both for input and output).If a file with the same name already exists its contents are discarded and the file is treated as a new empty file.
+        inline static const CTextMode CTEXT_RW_APPEND_OR_CREATE = CTextMode (W("a+"));  // append / update : Open a file for update(both for input and output) with all output operations writing data at the end of the file.Repositioning operations(fseek, fsetpos, rewind) affects the next input operations, but output operations move the position back to the end of file.The file is created if it does not exist.
 
-        inline static const BinMode  DEFAULT_BIN_MODE  = BIN_RW_APPEND_OR_CREATE;
-        inline static const TextMode DEFAULT_TEXT_MODE = TEXT_RW_APPEND_OR_CREATE;
-        inline static const OpenMode DEFAULT_OPEN_MODE = DEFAULT_BIN_MODE;
+        inline static const CBinMode  CDEFAULT_BIN_MODE  = BIN_RW_APPEND_OR_CREATE;
+        inline static const CTextMode CDEFAULT_TEXT_MODE = TEXT_RW_APPEND_OR_CREATE;
+        inline static const COpenMode CDEFAULT_OPEN_MODE = DEFAULT_BIN_MODE;
+        */
 
         /// \brief File class.
         ///
         class File : public Object
         {
             protected:
-                OpenMode mmode; // Last mode used to open the file.
-                Path     mfullpath; // Full path of the file. 
-                FILE* mfile_ptr;
+                OpenMode      _mode;     // Last mode used to open the file.
+                Path          _fullpath; // Full path of the file. 
+                std::fstream* _file;
             public:
                 inline static const size_t MAX_BUFFER_SIZE = 1024 ^ 3; // 1 GB
                 enum Seek { SET = SEEK_SET, CUR = SEEK_CUR, END = SEEK_END };
-
-                /*
-                inline const static OpenMode INPUT = std::ios::in;
-                inline const static OpenMode OUTPUT = std::ios::out;
-                inline const static OpenMode IN_OUT_ATE_APP_MODE = std::ios::in | std::ios::out | std::ios::ate | std::ios::app;
-			    inline const static OpenMode OUT_TRUNC_MODE = std::ios::out | std::ios::trunc;
-                inline const static OpenMode DEFAULT_MODE = IN_OUT_ATE_APP_MODE;
-                */
-				//inline static const VersionPtr VERSION = Version::get(1, 1, 1); 
 
                 inline S s_io_error_msg (const errno_t error) const
                 {
@@ -138,72 +259,70 @@ namespace pensar_digital
 					return S(msg);
                 }
 
-                decltype(File::mfile_ptr) file_open(const Path& file_name, OpenMode mode)
+                decltype(File::_file)& file_open (const Path& file_name, OpenMode mode)
                 {
-                    errno_t err;
+                    
                     #ifdef WIDE_CHAR
-                        err = _wfopen_s(&mfile_ptr, file_name.c_str(), mode.c_str());
+                        err = _wfopen_s(&_file, file_name.c_str(), mode.c_str());
                     #else
-                        err = fopen_s (&mfile_ptr, file_name.str(), mode.c_str());
+					    _file->open (_fullpath.str (), mode);
                     #endif
 
-                    log_and_throw_if_error(err, W("File::file_open(): Error: Could not open file "));
-                    return mfile_ptr;
+                    if (_file->fail ())
+                        log_and_throw(S(W("File::file_open(): Error: Could not open file ")));
+                    // Sets UTF-8.
+                    //_file->imbue(std::locale("en_US.UTF-8"));
+                    return _file;
                 }
+
         public:
             
             inline File(const Path& full_path = W("."), const Id id = NULL_ID, const OpenMode mode = DEFAULT_OPEN_MODE) :
-                mfullpath(full_path), Object(id), mmode(mode)
+                _fullpath(full_path), Object(id), _mode(mode)
             {
-                mfullpath.create_dir (); // Create the directory if it does not exist.
-
-                mfile_ptr = file_open (mfullpath, mode);
+                _fullpath.create_dir (); // Create the directory if it does not exist.
+				_file = new std::fstream ();
+                file_open (_fullpath, mode);
             }
 
             inline virtual ~File() noexcept
             { 
                 close();
+                free(_file);
             }
 
             inline void close() noexcept 
             { 
                 if (is_open())
                 {
-                    errno_t err = fclose(mfile_ptr);
-                    if (err != 0)
+                    _file->close ();
+                    if (_file->fail ())
                     {
-                        //todo log LOG(W("File::~File(): Error: Could not close file ") + mfullpath.str());
+                        log_and_throw (S("File::~File(): Error: Could not close file ") + _fullpath.str());
                     }
-                    mfile_ptr = nullptr;
                 }
             }
 
-            inline bool exists() const { return mfullpath.exists(); }
+            inline bool exists() const { return _fullpath.exists(); }
 
-            inline const Path& fullpath() const noexcept { return mfullpath; }
+            inline const Path& fullpath() const noexcept { return _fullpath; }
 
-            inline bool is_open() const noexcept { return mfile_ptr != nullptr; }
+            inline bool is_open() const noexcept { return _file->is_open (); }
             
-            inline bool is_bin_read () const noexcept { return mmode == BIN_READ; }
-            inline bool is_bin_write () const noexcept { return mmode == BIN_WRITE; }
-            inline bool is_bin_append_or_create () const noexcept { return mmode == BIN_APPEND_OR_CREATE; }
-            inline bool is_bin_rw () const noexcept { return mmode == BIN_RW; }
-            inline bool is_bin_create_overwrite_rw () const noexcept { return mmode == BIN_CREATE_OVERWRITE_RW; }
-            inline bool is_bin_rw_append_or_create () const noexcept { return mmode == BIN_RW_APPEND_OR_CREATE; }
+            inline bool is_bin_read  () const noexcept { return _mode == BIN_READ  ; }
+            inline bool is_bin_write () const noexcept { return _mode == BIN_WRITE ; }
+            inline bool is_bin_rw    () const noexcept { return _mode == BIN_RW_ATE; }
 
-            inline bool is_text_read () const noexcept { return mmode == TEXT_READ; }
-            inline bool is_text_write () const noexcept { return mmode == TEXT_WRITE; }
-            inline bool is_text_append_or_create () const noexcept { return mmode == TEXT_APPEND_OR_CREATE; }
-            inline bool is_text_rw () const noexcept { return mmode == TEXT_RW; }
-            inline bool is_text_create_overwrite_rw () const noexcept { return mmode == TEXT_CREATE_OVERWRITE_RW; }
-            inline bool is_text_rw_append_or_create () const noexcept { return mmode == TEXT_RW_APPEND_OR_CREATE; }
+            inline bool is_text_read  () const noexcept { return _mode == TEXT_READ  ; }
+            inline bool is_text_write () const noexcept { return _mode == TEXT_WRITE ; }
+            inline bool is_text_rw    () const noexcept { return _mode == TEXT_RW_ATE; }
 
-            inline bool eof() const noexcept { return feof(mfile_ptr) != 0; }
-            inline bool fail() const noexcept { return ferror(mfile_ptr) != 0; }
+            inline bool eof  () const noexcept  { return _file->eof  () != 0; }
+            inline bool fail () const noexcept  { return _file->fail () != 0; }
 
             inline const C* c_str() const noexcept 
             { 
-                S s = mfullpath.str();
+                S s = _fullpath.str();
             }
 
             // Delete the file.
@@ -212,7 +331,7 @@ namespace pensar_digital
                 if (is_open()) 
                     close();
                
-                return (fs::remove(mfullpath) == 0);
+                return (fs::remove(_fullpath) == 0);
             }
 
                 
@@ -220,22 +339,22 @@ namespace pensar_digital
             // Implements initialize method from Initializable concept.
             inline virtual bool initialize(const Path& afull_path = CURRENT_DIR, const Id id = NULL_ID, const OpenMode mode = DEFAULT_OPEN_MODE) noexcept
             {
-                mfullpath = afull_path;
-                mmode = mode;
+                _fullpath = afull_path;
+                _mode = mode;
                 Object::set_id(id);
                 return true;
             }
 
-            //FilePtr clone() const  noexcept { return pd::clone<File>(*this, mfullpath, mmode, id()); }
+            //FilePtr clone() const  noexcept { return pd::clone<File>(*this, _fullpath, _mode, id()); }
 
             inline virtual OpenMode get_mode() const noexcept
             {
-                return mmode;
+                return _mode;
             }
 
             inline virtual S debug_string() const noexcept
             {
-                return Object::debug_string() + W(" path = ") + mfullpath.str();
+                return Object::debug_string() + W(" path = ") + _fullpath.str();
             }
 
             inline void log_if_error (const errno_t error, const S& error_msg = W("")) const noexcept
@@ -243,7 +362,7 @@ namespace pensar_digital
                 if (error != 0)
                 { 
                     // Log error.
-                    S errmsg = error_msg + W(" in file ") + mfullpath.to_string() + W (" ") + s_io_error_msg (error);
+                    S errmsg = error_msg + W(" in file ") + _fullpath.to_string() + W (" ") + s_io_error_msg (error);
                     LOG(errmsg);
                 }
             }
@@ -253,35 +372,36 @@ namespace pensar_digital
                 if (error != 0)
                 {
                     // Log error.
-                    S errmsg = error_msg + W(" in file ") + mfullpath.to_string() + W(" ") + s_io_error_msg(error);
+                    S errmsg = error_msg + W(" in file ") + _fullpath.to_string() + W(" ") + s_io_error_msg(error);
                     LOG(errmsg);
                     throw Error (errmsg);
                 }
             }
 
-            inline void move_cursor (const long pos, const Seek seek = Seek::SET) const
+            inline void move_cursor (FILE* f, const long pos, const Seek seek = Seek::SET) const
 			{
-				errno_t err = fseek(mfile_ptr, pos, seek);
+				errno_t err = fseek (f, pos, seek);
                 if (err != 0)
 				{
 					S error_msg = W("File::move_cursor(): Error: Could not move cursor to position.");
                     log_and_throw_if_error(err, error_msg);
 				}
 			}
-            inline void move_to_start () const
+
+            inline void move_to_start (FILE* f) const
             {
                     
-                move_cursor (0, Seek::SET);
+                move_cursor (f, 0, Seek::SET);
             }
 
-            inline void move_to_end () const
+            inline void move_to_end (FILE* f) const
 			{
-				move_cursor (0, Seek::END); 
+				move_cursor (f, 0, Seek::END); 
             }  
 
-            long position() const
+            long position (FILE* f) const
 			{
-				long pos = ftell (mfile_ptr);
+				long pos = ftell (f);
 				if (pos == -1) 
 				{
 					S error_msg = W("File::position(): Error: Could not get file position ");
@@ -290,54 +410,59 @@ namespace pensar_digital
 				return pos;
 			}
             
-            inline void set_binary_mode() noexcept
+            inline void set_binary_mode (FILE* f) noexcept
             {
                 long pos = 0;
                 if (is_open())
 				{
                     // Gets the current position in the file.
-                    long pos = position ();
+                    long pos = position (f);
 					close();
 				}
 
-                mmode = BIN_RW;
+                _mode = BIN_RW;
                 open();
                 if (pos > 0)
-					move_cursor (pos);
+					move_cursor (f, pos);
             }
 
-            inline void set_text_mode()
+            inline void set_text_mode (FILE* f)
             {
                 long pos = 0;
 				if (is_open())
                 {
 					// Gets the current position in the file.
-					long pos = position();
+					long pos = position (f);
 					close();
 				}
 
-                mmode = TEXT_RW;
+                _mode = TEXT_RW;
                 open();
                 if (pos > 0)
-                    move_cursor (pos);
+                    move_cursor (f, pos);
             }
 
             // Opens the file if necessary and returns the file stream.
-            inline decltype(mfile_ptr) open (const OpenMode& mode = DEFAULT_OPEN_MODE) 
+            inline decltype(_file)& open (const OpenMode& mode = DEFAULT_OPEN_MODE) 
             {
-                mmode = mode;
+                _mode = mode;
                 if (!is_open())
                 {
-                    mfile_ptr = file_open (mfullpath, mmode);
+                    _file->open (_fullpath, _mode);
                 }
-                return mfile_ptr;
+                return _file;
             }
             
             inline size_t size() const noexcept
             {
-                move_to_end();
+				return fs::file_size(_fullpath);
+            }
 
-                long size = ftell(mfile_ptr);
+            inline size_t size (FILE* f) const noexcept
+            {
+                move_to_end (f);
+
+                long size = ftell(f);
                 if (size == -1)
                 {
                     S error_msg = W("TextFile::read(): Error: Could not get file size ");
@@ -347,10 +472,10 @@ namespace pensar_digital
                 return size;
             }
 
-            decltype(mfile_ptr) get_stream()
+            decltype(_file)& get_stream()
             {
                 open();
-                return mfile_ptr;
+                return _file;
             }
 
         };  // class File   
@@ -364,14 +489,22 @@ namespace pensar_digital
                     const TextMode mode = DEFAULT_TEXT_MODE, const Id id = NULL_ID) : File(full_path, id, mode)
                 {
                     if (File::exists())
-                        append (content);
-                    else
                     {
-                        open ();
-                        move_to_start ();
-                        write (content);
+                        if (content != EMPTY)
+                            append(content);
+                        else
+                        {
+                            open (mode);
+                            //move_to_start();
+                        }
                     }
-                    File::close ();
+                    else // file does not exist.
+                    {
+							open (mode);
+							//move_to_start();
+                            write(content);
+                            File::close();
+                    }
                 }
 
                 //TextFile(const Path& full_path, const S& content = empty<C> (), const Id aid = NULL_ID) :
@@ -381,17 +514,41 @@ namespace pensar_digital
 
                 inline virtual ~TextFile() = default;
     
-                inline TextFile& write(const S& content)
+                virtual bool get_char(C* c)
+                {
+					if (!is_open() || !_mode.is_text_mode())
+						return false;
+
+					*c = _file->get();
+					return *c != EOF;
+                }
+
+                inline bool read_line(std::string& line)
+                {
+                    if (!is_open() || !_mode.is_text_mode ())
+                        return false;
+
+                    std::ifstream file_stream(_fullpath.str());
+                    if (!file_stream.is_open())
+                        return false;
+
+                    if (std::getline(file_stream, line))
+                        return true;
+
+                    return false;
+                }
+
+                inline TextFile& write (const S& content)
                 {
 					// Writes content.
 					if (! File::is_open()) 
 						File::open ();
                     
                     // Writes content.
-                    errno_t err = fwrite(content.c_str(), sizeof(C), content.size(), mfile_ptr) != content.size();
-                    if (err != 0)
+					_file->write(content.c_str(), content.size());
+                    if (fail ())
 					{
-						log_and_throw_if_error (err, W("TextFile::write(): Error: Could not write to the file "));
+						log_and_throw (S(W("TextFile::write(): Error: Could not write to the file ")));
 					}
 					
                     return *this;
@@ -402,18 +559,18 @@ namespace pensar_digital
                     if (! File::is_open()) 
                         File::open ();
 
-                    move_to_end ();
+                    //move_to_end ();
 				    write (content);
 
                     return *this;
                 }
 
-                inline S to_string() const noexcept
+                inline S fullpath_to_string() const noexcept
                 {
-                    return File::mfullpath.to_string ();
+                    return File::_fullpath.to_string ();
                 }
 
-                // Implicit conversion to string.
+                // Implicit converts _fullpath to string.
                 inline operator S() const noexcept
                 {
                     return to_string();
@@ -436,8 +593,8 @@ namespace pensar_digital
                     // Initializes the buffer with zeros.
                     memset(content, 0, count + 1);
 
-					move_to_start ();
-					size_t read_count = fread (content, sizeof(C), count, mfile_ptr);
+					//move_to_start ();
+					size_t read_count = _file->read (content, count).gcount();
                     if (read_count != count)
 					{
                         // Frees the buffer.    
@@ -446,6 +603,7 @@ namespace pensar_digital
 						S error_msg = W("TextFile::read(): Error: Could not read the file ");
                         log_and_throw (error_msg);
 					}
+
                     // Disables warning C6001: Using uninitialized memory 'content'.
                     #pragma warning(suppress:6001)
                     return S(content);
@@ -565,16 +723,16 @@ namespace pensar_digital
 			public:
 				inline static const VersionPtr VERSION = Version::get(1, 1, 1);
                 inline TmpTextFile (const S& file_name = EMPTY, const S& content = EMPTY, const Id id = null_value<Id>()) : 
-                    TextFile(TMP_PATH / file_name, content, TEXT_CREATE_OVERWRITE_RW, id)
+                    TextFile(TMP_PATH / file_name, content, TEXT_RW, id)
                 {
 				}
 
                 inline TmpTextFile (const C* file_name = EMPTY, const C* content = EMPTY, const Id id = null_value<Id>())
-                    : TextFile (S(file_name), S(content), TEXT_CREATE_OVERWRITE_RW, id) {}
+                    : TextFile (S(file_name), S(content), TEXT_RW, id) {}
 
                 inline void log_error()
                 {
-                    LOG(W("Failed to remove temporary file ") + File::mfullpath.s ());
+                    LOG(W("Failed to remove temporary file ") + File::_fullpath.s ());
                 }
 
                 inline virtual ~TmpTextFile()
@@ -616,11 +774,11 @@ namespace pensar_digital
                     if ((data != nullptr) && (size > 0))
 					{
 						if (! is_open()) 
-							open ();
+							open (BIN_RW_ATE);
 
-						move_to_end ();
-                        size_t bytes_written = fwrite (reinterpret_cast<const char*>(data), sizeof(std::byte), size, mfile_ptr);
-                        if (bytes_written != size)
+						//move_to_end ();
+						_file->write(reinterpret_cast<const char*>(data), size);
+                        if (_file->fail ())
 						{
 							S error_msg = W("BinaryFile::append(): Error: Could not append data to the file ");
 							log_and_throw_if_error(errno, error_msg);

@@ -4,17 +4,28 @@
 #ifndef ICU_UTIL_HPP
 #define ICU_UTIL_HPP 
 
-#include "defines.hpp"
-#include "error.hpp"
-#include "log.hpp"
-#include "s.hpp"
+// ICU headers.
+#include <unicode/ucsdet.h>
+#include <unicode/utypes.h>
+#include <unicode/ucnv.h>
+#include <unicode/ustring.h>
+#include <unicode/ucnv.h>
+
+// std c++ headers.
+#include <string>
+#include <fstream>
+#include <vector>
+#include <iostream>
 
 #include <stdio.h>
 #include <string.h>
 
-#include <unicode/ustring.h>
-#include <unicode/ucnv.h>
-#include <string>
+// cpplib headers.
+#include "error.hpp"
+#include "log.hpp"
+#include "s.hpp"
+
+#include "encoding.hpp"
 
 
 namespace pensar_digital
@@ -241,11 +252,155 @@ namespace pensar_digital
                 ucnv_close(convFromUTF32);
 
                 return result;
-            }
+			}   // utf32_to_utf8
 
-        }
-    }
-}
+			inline bool check_bom (const std::vector<char>& buffer, Encoding& encoding)
+			{
+                bool detected = true;
+                if (buffer.size () >= 4)
+                {
+                    if (buffer[0] == 0x00 && buffer[1] == 0x00 && buffer[2] == 0xFE && buffer[3] == 0xFF)
+                    {
+                        encoding = UTF_32_BE_BOM;
+                    }
+                    else if (buffer[0] == 0xFF && buffer[1] == 0xFE && buffer[2] == 0x00 && buffer[3] == 0x00)
+                    {
+                        encoding = UTF_32_LE_BOM;
+                    }
+                }
+                else
+                    if (buffer.size() >= 3)
+                    {
+                        if (buffer[0] == 0xEF && buffer[1] == 0xBB && buffer[2] == 0xBF)
+                        {
+                            encoding = UTF_8_BOM;
+                        }
+                    }
+                    else
+                        if (buffer.size() >= 2)
+                        {
+                            if (buffer[0] == 0xFE && buffer[1] == 0xFF)
+                            {
+                                encoding = UTF_16_BE_BOM;
+                            }
+                            else if (buffer[0] == 0xFF && buffer[1] == 0xFE)
+                            {
+                                encoding = UTF_16_LE_BOM;
+                            }
+                        }
+                        else
+                            detected = false;
+                return detected;
+			}
+
+            inline Encoding s_encoding_to_encoding(const std::string& s_encoding)
+            {
+				if (s_encoding == "ASCII")
+				{
+					return ASCII;
+				}
+				else if (s_encoding == "UTF-8")
+				{
+					return UTF_8;
+				}
+				else if (s_encoding == "UTF-8-BOM")
+				{
+					return UTF_8_BOM;
+				}
+				else if (s_encoding == "UTF-16-BE")
+				{
+					return UTF_16_BE;
+				}
+				else if (s_encoding == "UTF-16-BE-BOM")
+				{
+					return UTF_16_BE_BOM;
+				}
+				else if (s_encoding == "UTF-16-LE")
+				{
+					return UTF_16_LE;
+				}
+				else if (s_encoding == "UTF-16-LE-BOM")
+				{
+					return UTF_16_LE_BOM;
+				}
+				else if (s_encoding == "UTF-32-BE")
+				{
+					return UTF_32_BE;
+				}
+				else if (s_encoding == "UTF-32-BE-BOM")
+				{
+					return UTF_32_BE_BOM;
+				}
+				else if (s_encoding == "UTF-32-LE")
+				{
+					return UTF_32_LE;
+				}
+				else if (s_encoding == "UTF-32-LE-BOM")
+				{
+					return UTF_32_LE_BOM;
+				}
+				else
+				{
+					throw std::runtime_error("Error: Unknown encoding " + s_encoding);
+				}
+			}
+
+            inline Encoding detect_encoding (const std::string& file_name)
+            {
+                // Read the file content into a buffer
+                std::ifstream file_stream(file_name, std::ios::binary);
+                if (!file_stream.is_open())
+                {
+                    throw std::runtime_error("Error: Could not open file " + file_name);
+                }
+
+                std::vector<char> buffer((std::istreambuf_iterator<char>(file_stream)), std::istreambuf_iterator<char>());
+                file_stream.close();
+
+                // Check for BOM
+                Encoding bom_encoding;
+                if (check_bom (buffer, bom_encoding))
+                {
+                    return bom_encoding;
+                }
+
+                // Use ICU to detect the encoding
+                UErrorCode error = U_ZERO_ERROR;
+                UCharsetDetector* csd = ucsdet_open(&error);
+                if (U_FAILURE(error))
+                {
+                    throw std::runtime_error("Error: Could not open ICU charset detector");
+                }
+
+                ucsdet_setText(csd, buffer.data(), buffer.size(), &error);
+                if (U_FAILURE(error))
+                {
+                    ucsdet_close(csd);
+                    throw std::runtime_error("Error: Could not set text for ICU charset detector");
+                }
+
+                const UCharsetMatch* match = ucsdet_detect(csd, &error);
+                if (U_FAILURE(error))
+                {
+                    ucsdet_close(csd);
+                    throw std::runtime_error("Error: Could not detect charset");
+                }
+
+                const char* detected_encoding = ucsdet_getName(match, &error);
+                if (U_FAILURE(error))
+                {
+                    ucsdet_close(csd);
+                    throw std::runtime_error("Error: Could not get detected charset name");
+                }
+
+                std::string s_encoding(detected_encoding);
+                ucsdet_close(csd);
+
+                return s_encoding_to_encoding (detected_encoding);
+            }
+		}   // namespace icu
+	}   // namespace cpplib
+}   // namespace pensar_digital::cpplib
 
 
 #endif // ICU_UTIL_HPP

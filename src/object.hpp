@@ -13,18 +13,19 @@
 #include "string_def.hpp"
 #include "memory_buffer.hpp"
 
-#include <fstream>
 #include <sstream>
 #include <iostream>
 #include <memory> // for std::shared_ptr
-#include <concepts>
-#include <exception>
+
 #include <string>
 #include <typeinfo> // for typeid
 #include <vector>
 #include <span>
 #include <cstddef>
 #include <bit>
+#include <cstring>
+
+#include <bit> // for std::byteswap
 
 namespace pensar_digital
 {
@@ -292,6 +293,8 @@ namespace pensar_digital
                  
         }; // Object
         
+
+        /*
         template<typename Container>
         std::istream& binary_read(Container& c, std::istream& is, const std::endian& byte_order)
         {
@@ -300,7 +303,7 @@ namespace pensar_digital
             size_t size = 0;
             is.read(reinterpret_cast<char*>(&size), sizeof(size));
             if (byte_order != std::endian::native) {
-                size = std::bit_cast<size_t>(std::byteswap(std::bit_cast<uint64_t>(size)));
+                size = std::bit_cast<size_t>(std::byteswap<uint64_t>(std::bit_cast<uint64_t>(size)));
             }
 
             // Clear the existing contents of the container
@@ -325,10 +328,28 @@ namespace pensar_digital
         template<typename Container>
         std::ostream& binary_write(const Container& c, std::ostream& os, const std::endian& byte_order)
         {
+            // Write the size of the container first
+            size_t size = c.size();
+            if (byte_order != std::endian::native) {
+                size = std::bit_cast<size_t>(byteswap(std::bit_cast<uint64_t>(size)));
+            }
+            os.write(reinterpret_cast<const char*>(&size), sizeof(size));
+
+            // Write each object in the container
+            for (const auto& obj : c) {
+                obj->binary_write(os, byte_order); // Assuming Object has a binary_write method
+            }
+
+            return os;
+        }
+
+        template<typename Container>
+        std::ostream& binary_write(const Container& c, std::ostream& os, const std::endian& byte_order)
+        {
 			// Write the size of the container first
 			size_t size = c.size();
 			if (byte_order != std::endian::native) {
-				size = std::bit_cast<size_t>(std::byteswap(std::bit_cast<uint64_t>(size)));
+				size = std::bit_cast<size_t>(byteswap(std::bit_cast<uint64_t>(size)));
 			}
 			os.write(reinterpret_cast<const char*>(&size), sizeof(size));
 
@@ -339,6 +360,7 @@ namespace pensar_digital
 
 			return os;
 		}   
+        */
 
         inline InStream& operator >> (InStream& is, Object& o) 
         { 

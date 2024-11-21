@@ -165,6 +165,8 @@
     <ClInclude Include="constraint.hpp" />
     <ClInclude Include="date.hpp" />
     <ClInclude Include="distance.hpp" />
+    <ClInclude Include="encoding.hpp" />
+    <ClInclude Include="endian.hpp" />
     <ClInclude Include="error.hpp" />
     <ClInclude Include="factory.hpp" />
     <ClInclude Include="defines.hpp" />

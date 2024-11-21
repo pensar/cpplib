@@ -144,6 +144,12 @@
     <ClInclude Include="bool.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="encoding.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="endian.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="constants.cpp">
