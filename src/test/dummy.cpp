@@ -1,5 +1,5 @@
 #include "dummy.hpp"
-#include "../cpplib/cpp/s.hpp" 
+#include "../s.hpp" 
 
 namespace pensar_digital
 {

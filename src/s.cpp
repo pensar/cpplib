@@ -1,3 +1,4 @@
+
 #include "defines.hpp"
 #ifdef CODE_GEAR
 #pragma hdrstop
@@ -10,6 +11,9 @@
 #endif
 
 #include <iostream>
+#include <string>
+#include <locale>
+
 #include "s.hpp"
 #include "icu_util.hpp"
 
@@ -27,7 +31,7 @@ namespace pensar_digital
 
         std::wstring to_wstring(const std::string& s)
         {
-           return icu::to_wstring(s);
+           return pensar_digital::cpplib::icu::to_wstring(s);
         }
 
         // Converts from std::wstring to std::string.

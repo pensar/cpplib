@@ -2,10 +2,11 @@
 // author : Mauricio Gomes
 // license: MIT (https://opensource.org/licenses/MIT)
 
-#include "..\unit-test\test\test.hpp"
-#include "../cpplib/cpp/factory.hpp"
-#include "../cpplib/cpp/s.hpp"
-#include "../cpplib/cpp/object.hpp"
+#include "../../../unit-test/src/test.hpp"
+
+#include "../factory.hpp"
+#include "../s.hpp"
+#include "../object.hpp"
 #include <memory>
 
 namespace pensar_digital

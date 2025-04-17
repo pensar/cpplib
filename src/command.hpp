@@ -57,8 +57,8 @@ namespace pensar_digital
             /// \see https://en.cppreference.com/w/cpp/named_req/TriviallyCopyable  
             struct Data : public pd::Data
             {
-                Bool mok = Bool::BOOL_NULL;
-                Data(const Bool ok = Bool::BOOL_NULL) noexcept : mok (ok) {}
+                Bool mok = Bool::UNKNOWN;
+                Data(const Bool ok = Bool::UNKNOWN) noexcept : mok (ok) {}
             };
             // Asserts Data is a trivially copyable type.
             static_assert(TriviallyCopyable<Data>, "Data must be a trivially copyable type");
@@ -66,7 +66,7 @@ namespace pensar_digital
             
             public:
 
-            inline const static Data NULL_DATA = { Bool::BOOL_NULL };
+            inline const static Data NULL_DATA = { Bool::UNKNOWN };
             using DataType = Data;
             using Factory =  pd::Factory<Command, Id, typename Command::DataType>;
 

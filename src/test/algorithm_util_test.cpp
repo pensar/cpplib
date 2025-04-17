@@ -1,57 +1,45 @@
-// $Id$
+// author : Mauricio Gomes
+// license: MIT (https://opensource.org/licenses/MIT)#include "../algorithm_util.hpp"
+
+#include <unordered_map>
+#include <cctype>	// std::isdigit
+#include <functional>	// std::bind2nd
 
 
-#include <boost/test/unit_test.hpp>
+#include "../../../unit-test/src/test.hpp"
+#include "../version.hpp"
+#include "../algorithm_util.hpp"
 
-#include "algorithm_util.hpp"
-#include <map>
-#include <string>
+#include "../s.hpp"
 
-typedef std::pair<int, std::string> MapEntry;
-struct IsDigit : public std::unary_function<MapEntry, bool>
+namespace pensar_digital
 {
-  bool operator() (MapEntry p) {return isdigit (p.second[0]);}
-};
+	namespace test = pensar_digital::unit_test;
+	using namespace pensar_digital::unit_test;
+	namespace cpplib
+	{
+		TEST(algorithm_util, true)
+			std::unordered_map<int, std::string> map;
+			map[0] = "a";
+			map[1] = "1";
+			map[2] = "c";
+			
+			//cpplib::erase_if<Map::key_type, Map::mapped_type, Map::key_compare, Map::allocator_type, std::map, IsDigit> (map, IsDigit());
+			erase_if(map, std::isdigit);
 
-typedef std::map<int, std::string> Map;
+			test::CHECK_EQ(std::string, map[0], "a", "0");
+			CHECK_EQ(W("c"), map[2]);
+			CHECK_EQ(2u, map.size());
+			std::vector<int> v(3);
+			v[0] = 0;
+			v[1] = 1;
+			v[2] = 2;
 
-struct EqualToOne : public std::unary_function<MapEntry, bool>
-{
-  bool operator() (int i) {return i == 1;}
-};
+			pd::erase_if(v, std::bind2nd(std::equal_to<int>(), 1));
 
-namespace pd = pensar_digital::cpplib;
-
-BOOST_AUTO_TEST_SUITE(algorithm_util_suite)
-
-BOOST_AUTO_TEST_CASE(erase_if_map)
-{
-	Map map;
-	map[0] = "a";
-	map[1] = "1";
-	map[2] = "c";
-
-    //cpplib::erase_if<Map::key_type, Map::mapped_type, Map::key_compare, Map::allocator_type, std::map, IsDigit> (map, IsDigit());
-    pd::erase_if (map, IsDigit());
-
-    BOOST_CHECK_EQUAL ("a", map[0]);
-	BOOST_CHECK_EQUAL ("c", map[2]);
-	BOOST_CHECK_EQUAL (2u  , map.size ());
+			CHECK_EQ(0, v[0]);
+			CHECK_EQ(2, v[1]);
+			CHECK_EQ(2u, v.size());
+			END_TEST(algorithm_util);
+	}
 }
-
-BOOST_AUTO_TEST_CASE(erase_if)
-{
-	std::vector<int> v(3);
-	v[0] = 0;
-	v[1] = 1;
-	v[2] = 2;
-
-    pd::erase_if (v, std::bind2nd(std::equal_to<int>(), 1));
-
-    BOOST_CHECK_EQUAL (0, v[0]);
-	BOOST_CHECK_EQUAL (2, v[1]);
-	BOOST_CHECK_EQUAL (2u, v.size ());
-}
-
-BOOST_AUTO_TEST_SUITE_END ()
-

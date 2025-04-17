@@ -16,11 +16,11 @@ namespace pensar_digital
 {
 	namespace cpplib
 	{
-		inline static const S ONLY_DIGITS_REGEX = W("^[0-9]*$");
-		inline static const S AT_LEAST_ONE_DIGIT_REGEX = W("^[0-9]+$");
-		inline static const S ONLY_LETTERS_REGEX = W("^[a-zA-Z]*$");
-		inline static const S ONLY_LETTERS_AND_DIGITS_REGEX = W("^[a-zA-Z0-9]*$");
-		inline static const S ONLY_LETTERS_AND_DIGITS_AND_UNDERSCORES_REGEX = W("^[a-zA-Z0-9_]*$");
+		static const S ONLY_DIGITS_REGEX = W("^[0-9]*$");
+		static const S AT_LEAST_ONE_DIGIT_REGEX = W("^[0-9]+$");
+		static const S ONLY_LETTERS_REGEX = W("^[a-zA-Z]*$");
+		static const S ONLY_LETTERS_AND_DIGITS_REGEX = W("^[a-zA-Z0-9]*$");
+		static const S ONLY_LETTERS_AND_DIGITS_AND_UNDERSCORES_REGEX = W("^[a-zA-Z0-9_]*$");
 
 		template <typename L, typename R, typename ResultType, class D>
 		class Operand : public Object

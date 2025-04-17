@@ -1,7 +1,7 @@
 // author : Mauricio Gomes
 // license: MIT (https://opensource.org/licenses/MIT)
 
-#include "pch.h"
+
 #include "framework.h"
 
 #include "test.hpp"

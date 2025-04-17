@@ -4,12 +4,12 @@
 #ifndef DUMMY_HPP
 #define DUMMY_HPP
 
-#include "..\unit-test\test\test.hpp"
-#include "../cpplib/cpp/s.hpp"
-#include "../cpplib/cpp/object.hpp"
-#include "../cpplib/cpp/clone_util.hpp"
-#include "../cpplib/cpp/factory.hpp"
-#include "../cpplib/cpp/string_types.hpp"
+#include "../../../unit-test/src/test.hpp"
+#include "../s.hpp"
+#include "../object.hpp"
+#include "../clone_util.hpp"
+#include "../factory.hpp"
+#include "../string_types.hpp"
 
 #include <memory>
 

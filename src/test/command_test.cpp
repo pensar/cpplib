@@ -1,17 +1,15 @@
 // author : Mauricio Gomes
 // license: MIT (https://opensource.org/licenses/MIT)
 
-#include "../unit-test/test/test.hpp"
-#include "../cpp/command.hpp"
-#include "../cpp/memory_buffer.hpp"
-#include "../cpp/binary_memory_buffer.hpp"
+#include "../../../unit-test/src/test.hpp"
+#include "../command.hpp"
+#include "../memory_buffer.hpp"
+#include "../binary_memory_buffer.hpp"
 
 
 namespace pensar_digital
 {
-	namespace test = pensar_digital::unit_test;
 	using namespace pensar_digital::unit_test;
-	using namespace pensar_digital::cpplib;
 	namespace cpplib
 	{
 		inline static int value = 0;

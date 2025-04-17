@@ -5,7 +5,6 @@
 #define MEMORY_BUFFER_HPP
 
 #include "constant.hpp"
-#include "s.hpp"
 
 #include <memory> // for std::shared_ptr
 #include <concepts>
@@ -46,6 +45,12 @@ namespace pensar_digital
                 mbuffer = std::span<std::byte>(new std::byte[initial_size], initial_size);
             }
 
+			MemoryBuffer(BytePtr bp, size_t size) : MemoryBuffer()
+			{
+				// Copy the data to the buffer.
+				write (bp, size);
+			}
+
             /** Default destructor */
             virtual ~MemoryBuffer()
             {
@@ -80,6 +85,7 @@ namespace pensar_digital
             /// \brief Available data to read from the buffer.
             const size_t ravailable() const noexcept { return mwrite_offset - mread_offset; }
 
+			/// \brief Write data to the buffer.
             void write(const BytePtr data, const size_t size) noexcept
             {
                 // Check if there is enough space in the buffer.

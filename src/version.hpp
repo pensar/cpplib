@@ -85,6 +85,11 @@ namespace pensar_digital
 					mb.read_known_size (reinterpret_cast<BytePtr>(&mdata), DATA_SIZE);
 					return *this;
 				}
+                
+                inline virtual void write(MemoryBuffer& mb)
+                {
+                    mb.write((BytePtr)(&mdata), DATA_SIZE);
+                }
 
                 /*
                 inline virtual void bytes(std::vector<std::byte> v) const noexcept

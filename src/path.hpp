@@ -6,7 +6,7 @@
 #include "object.hpp"
 #include "s.hpp"
 #include "system.hpp"
-#include "s.hpp"
+
 #include "memory.hpp"
 #include "constant.hpp"
 #include "version.hpp"
@@ -19,20 +19,15 @@
 #include <cstdio>
 #include <stdlib.h>
 
-#ifdef _MSC_VER
 #include <io.h>
 #include <windows.h>
 #include <filesystem>
-#else
-#include <experimental/filesystem>
-#endif
 
 namespace pensar_digital
 {
     namespace cpplib
     {
         namespace fs = std::filesystem;
-        namespace pd = pensar_digital::cpplib;  
 
         class Path;
         typedef std::shared_ptr<Path> PathPtr;

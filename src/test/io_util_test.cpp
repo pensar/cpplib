@@ -1,19 +1,17 @@
 // author : Mauricio Gomes
 // license: MIT (https://opensource.org/licenses/MIT)
 
-#include "..\unit-test\test\test.hpp"
-
-#include "../cpplib/cpp/s.hpp"
-#include "../cpplib/cpp/object.hpp"
-#include "../cpplib/cpp/io_util.hpp"
-#include "../cpplib/cpp/sys_user_info.hpp"
-#include "../cpplib/cpp/file.hpp"
+#include "../../../unit-test/src/test.hpp"
+#include "../s.hpp"
+#include "../object.hpp"
+#include "../io_util.hpp"
+#include "../sys_user_info.hpp"
+#include "../file.hpp"
 
 #include <memory>
 
 namespace pensar_digital
 {
-    namespace test = pensar_digital::unit_test;
     using namespace pensar_digital::unit_test;
     namespace cpplib
     {

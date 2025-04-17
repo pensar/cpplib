@@ -1,2 +1,3 @@
-577Failed to remove temporary file c:\tmp\text-file-test.txt
+40Version mismatch.
+emporary file c:\tmp\text-file-test.txt
 512RandomFileNameGenerator::random_string(): Error: Could not generate a random string after 1000 tries.

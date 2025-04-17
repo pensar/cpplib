@@ -10,8 +10,8 @@ namespace pensar_digital
     namespace cpplib
     {
         template<
-           typename T,
-           typename Alloc,
+			typename T,
+			typename Alloc = std::allocator<T>,
            template<typename, typename> class Container,
            typename Predicate
         >
@@ -22,10 +22,10 @@ namespace pensar_digital
         }
 
         template<
-           typename Key,
-           typename T,
-           typename Compare,
-           typename Alloc,
+			typename Key,
+			typename T,
+			typename Compare = std::less<Key>,
+			typename Alloc = std::allocator<std::pair<const Key, T> >,
            template<typename, typename, typename, typename> class MapClass,
            typename Predicate
         >

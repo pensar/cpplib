@@ -1,7 +1,7 @@
 #ifndef ENCODE_HPP
 #define ENCODE_HPP
 
-#include "s.hpp"
+#include "cs.hpp"
 #include "bool.hpp"
 #include "array.hpp"
 #include "endian.hpp"

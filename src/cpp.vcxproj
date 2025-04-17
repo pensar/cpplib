@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -59,20 +59,32 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\Default.props" />
+    <Import Project="..\..\DefaultProperties.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\Default.props" />
+    <Import Project="..\..\DefaultProperties.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\Default.props" />
+    <Import Project="..\..\DefaultProperties.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\Default.props" />
+    <Import Project="..\..\DefaultProperties.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>c:\out\$(ProjectName)\bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>c:\out\$(ProjectName)\build\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ExecutablePath>c:\out\$(ProjectName)\bin\$(Platform)\$(Configuration)\</ExecutablePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -116,18 +128,26 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard>stdcpp23</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <EnableModules>true</EnableModules>
+      <BuildStlModules>true</BuildStlModules>
+      <AdditionalIncludeDirectories>$(VCPKG_ROOT)\packages\icu_x64-windows\include;C:\vcpkg\packages\python3_x64-windows\include;C:\vcpkg\packages\zlib_x64-windows\include;C:\vcpkg\packages\fmt_x64-windows\include\fmt;C:\mg\prj\unit-test;C:\vcpkg;C:\vcpkg\packages\bzip2_x64-windows\include;d:\mg\prj\cpplib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalUsingDirectories>$(VCPKG_ROOT)\installed\x64-windows\include;%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
+      <AdditionalHeaderUnitDependencies>
+      </AdditionalHeaderUnitDependencies>
     </ClCompile>
     <Link>
       <SubSystem>
       </SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Lib />
+    <ProjectReference />
     <Lib>
-      <AdditionalLibraryDirectories>C:\vcpkg\installed\x64-windows\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>ws2_32.lib;icudt.lib;icuin.lib;icuio.lib;icutu.lib;icuuc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(VCPKG_ROOT)\installed\x64-windows\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
@@ -143,6 +163,8 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <EnableModules>true</EnableModules>
+      <BuildStlModules>true</BuildStlModules>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -153,71 +175,56 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="algorithm_util.hpp" />
+    <ClInclude Include="..\src\algorithm_util.hpp" />
+    <ClInclude Include="..\src\bool.hpp" />
+    <ClInclude Include="..\src\bytes_util.hpp" />
+    <ClInclude Include="..\src\byte_order.hpp" />
+    <ClInclude Include="..\src\clone_util.hpp" />
+    <ClInclude Include="..\src\constant.hpp" />
+    <ClInclude Include="..\src\constraint.hpp" />
+    <ClInclude Include="..\src\date.hpp" />
+    <ClInclude Include="..\src\defines.hpp" />
+    <ClInclude Include="..\src\distance.hpp" />
+    <ClInclude Include="..\src\factory.hpp" />
+    <ClInclude Include="..\src\macros.hpp" />
+    <ClInclude Include="..\src\memory_buffer.hpp" />
+    <ClInclude Include="..\src\mg.hpp" />
+    <ClInclude Include="..\src\s.hpp" />
+    <ClInclude Include="..\src\string_def.hpp" />
+    <ClInclude Include="..\src\string_types.hpp" />
+    <ClInclude Include="..\src\version.hpp" />
     <ClInclude Include="array.hpp" />
-    <ClInclude Include="bool.hpp" />
-    <ClInclude Include="bytes_util.hpp" />
-    <ClInclude Include="byte_order.hpp" />
-    <ClInclude Include="clone_util.hpp" />
-    <ClInclude Include="command.hpp" />
+    <ClInclude Include="code_util.hpp" />
     <ClInclude Include="concept.hpp" />
-    <ClInclude Include="constant.hpp" />
-    <ClInclude Include="constraint.hpp" />
-    <ClInclude Include="date.hpp" />
-    <ClInclude Include="distance.hpp" />
+    <ClInclude Include="cs.hpp" />
     <ClInclude Include="encoding.hpp" />
     <ClInclude Include="endian.hpp" />
-    <ClInclude Include="error.hpp" />
-    <ClInclude Include="factory.hpp" />
-    <ClInclude Include="defines.hpp" />
-    <ClInclude Include="field.hpp" />
     <ClInclude Include="file.hpp" />
-    <ClInclude Include="file_factory.hpp" />
-    <ClInclude Include="generator.hpp" />
     <ClInclude Include="icu_util.hpp" />
     <ClInclude Include="io_util.hpp" />
     <ClInclude Include="log.hpp" />
-    <ClInclude Include="macros.hpp" />
-    <ClInclude Include="mac_address.hpp" />
     <ClInclude Include="memory.hpp" />
-    <ClInclude Include="memory_buffer.hpp" />
-    <ClInclude Include="mg.hpp" />
     <ClInclude Include="object.hpp" />
     <ClInclude Include="path.hpp" />
-    <ClInclude Include="path_factory.hpp" />
     <ClInclude Include="random_util.hpp" />
-    <ClInclude Include="s.hpp" />
-    <ClInclude Include="span_util.hpp" />
-    <ClInclude Include="stop_watch.hpp" />
-    <ClInclude Include="stream_util.hpp" />
-    <ClInclude Include="string_def.hpp" />
-    <ClInclude Include="string_types.hpp" />
-    <ClInclude Include="system.hpp" />
-    <ClInclude Include="sys_user_info.hpp" />
-    <ClInclude Include="transcoder.hpp" />
+    <ClInclude Include="statistic.hpp" />
     <ClInclude Include="type_util.hpp" />
-    <ClInclude Include="version.hpp" />
-    <ClInclude Include="wstring_stream_hack.hpp" />
+    <ClInclude Include="windows\io_util_windows.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\test\command.cpp" />
-    <ClCompile Include="bytes_util.cpp" />
-    <ClCompile Include="byte_order.cpp" />
-    <ClCompile Include="constants.cpp" />
-    <ClCompile Include="constraint.cpp" />
-    <ClCompile Include="error.cpp" />
-    <ClCompile Include="file.cpp" />
-    <ClCompile Include="generator.cpp" />
+    <ClCompile Include="..\src\bytes_util.cpp" />
+    <ClCompile Include="..\src\byte_order.cpp" />
+    <ClCompile Include="..\src\constants.cpp" />
+    <ClCompile Include="..\src\constraint.cpp" />
+    <ClCompile Include="..\src\error.cpp" />
+    <ClCompile Include="..\src\generator.cpp" />
+    <ClCompile Include="..\src\log.cpp" />
+    <ClCompile Include="..\src\memory.cpp" />
+    <ClCompile Include="..\src\object.cpp" />
+    <ClCompile Include="..\src\random_util.cpp" />
+    <ClCompile Include="..\src\s.cpp" />
+    <ClCompile Include="..\src\version.cpp" />
     <ClCompile Include="io_util.cpp" />
-    <ClCompile Include="log.cpp" />
-    <ClCompile Include="memory.cpp" />
-    <ClCompile Include="object.cpp" />
-    <ClCompile Include="path.cpp" />
-    <ClCompile Include="random_util.cpp" />
-    <ClCompile Include="s.cpp" />
-    <ClCompile Include="system.cpp" />
-    <ClCompile Include="sys_user_info.cpp" />
-    <ClCompile Include="version.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

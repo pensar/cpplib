@@ -8,6 +8,8 @@ namespace pensar_digital
 {
 	namespace cpplib
 	{
+		struct Endian;
+
 		// Endian has 4 int_fast8_t values: UNKNOWN = -1, LITTLE = std::endian::little, BIG = std::endian::big, NATIVE = std::endian::native.
 		struct Endian
 		{

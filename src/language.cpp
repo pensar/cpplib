@@ -1,4 +1,4 @@
-#include "pch.h"
+
 #include "language.hpp"
 
 namespace pensar_digital

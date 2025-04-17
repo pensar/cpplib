@@ -29,6 +29,7 @@
 #include "constant.hpp"
 #include "encoding.hpp"
 
+
 namespace pensar_digital
 {
     namespace cpplib
@@ -36,6 +37,8 @@ namespace pensar_digital
         namespace pd = pensar_digital::cpplib;
         namespace fs = std::filesystem;
 
+        class TextMode;
+        class BinMode;
         class OpenMode
         {
             public:
@@ -64,7 +67,13 @@ namespace pensar_digital
 					if (_mode & std::ios::trunc   ) s += (s.empty() ? W("trunc" ) : W(" | trunc" ));
                 }
 
-                inline const C* c_str() const noexcept { return to_string ().c_str(); }
+                inline const C* c_str() const noexcept 
+                {
+
+					// Allocates a buffer with the size of to_string () + 1.
+					C* buffer = new C[to_string().size() + 1];
+                    return buffer; 
+                }
 
                 inline bool operator == (const OpenMode& mode) const noexcept { return _mode == mode._mode; }
                 inline bool operator != (const OpenMode& mode) const noexcept { return _mode != mode._mode; }
@@ -80,8 +89,27 @@ namespace pensar_digital
 				inline operator S() const noexcept { return to_string(); }
 
 				// implicit conversion to C*
-				inline operator const C* () const noexcept { return c_str(); }
-            };
+		        inline operator const C* () const noexcept { return c_str(); }
+                
+                // Open mode constants.
+                static const BinMode BIN_READ;
+                static const BinMode BIN_WRITE;
+                static const BinMode BIN_APPEND;
+                static const BinMode BIN_ATE;
+                static const BinMode BIN_RW;
+                static const BinMode BIN_RW_ATE;
+
+                static const TextMode TEXT_READ;
+                static const TextMode TEXT_WRITE;
+                static const TextMode TEXT_APPEND;
+                static const TextMode TEXT_ATE;
+                static const TextMode TEXT_RW;
+                static const TextMode TEXT_RW_ATE;
+
+                static const BinMode  DEFAULT_BIN_MODE;
+                static const TextMode DEFAULT_TEXT_MODE;
+                static const OpenMode DEFAULT_OPEN_MODE;
+        };
 
 
             class BinMode : public OpenMode
@@ -104,131 +132,23 @@ namespace pensar_digital
                 }
             };
 
-            /*
-            void open(const char* file_name, ios::openmode mode);
-            in          Opens the file to read(default for ifstream)
-            out         Opens the file to write(default for ofstream)
-            binary      Opens the file in binary mode
-            app         Opens the file and appends all the outputs at the end
-            ate         Opens the file and moves the control to the end of the file
-            trunc       Removes the data in the existing file
-            */
+            inline const BinMode OpenMode::BIN_READ = BinMode(std::ios::binary | std::ios::in);
+            inline const BinMode OpenMode::BIN_WRITE = BinMode(std::ios::binary | std::ios::out);
+            inline const BinMode OpenMode::BIN_APPEND = BinMode(std::ios::binary | std::ios::app);
+            inline const BinMode OpenMode::BIN_ATE = BinMode(std::ios::binary | std::ios::ate);
+            inline const BinMode OpenMode::BIN_RW = BinMode(std::ios::binary | std::ios::in | std::ios::out);
+            inline const BinMode OpenMode::BIN_RW_ATE = BinMode(std::ios::binary | std::ios::in | std::ios::out | std::ios::ate);
 
-            inline static const BinMode BIN_READ   = BinMode (std::ios::binary | std::ios::in                                ); 
-            inline static const BinMode BIN_WRITE  = BinMode (std::ios::binary | std::ios::out                               ); 
-            inline static const BinMode BIN_APPEND = BinMode (std::ios::binary | std::ios::app                               ); 
-            inline static const BinMode BIN_ATE    = BinMode (std::ios::binary | std::ios::ate                               );
-            inline static const BinMode BIN_RW     = BinMode (std::ios::binary | std::ios::in | std::ios::out                );
-            inline static const BinMode BIN_RW_ATE = BinMode (std::ios::binary | std::ios::in | std::ios::out | std::ios::ate);
+            inline const TextMode OpenMode::TEXT_READ = TextMode(std::ios::in);
+            inline const TextMode OpenMode::TEXT_WRITE = TextMode(std::ios::out);
+            inline const TextMode OpenMode::TEXT_APPEND = TextMode(std::ios::app);
+            inline const TextMode OpenMode::TEXT_ATE = TextMode(std::ios::ate);
+            inline const TextMode OpenMode::TEXT_RW = TextMode(std::ios::in | std::ios::out);
+            inline const TextMode OpenMode::TEXT_RW_ATE = TextMode(std::ios::in | std::ios::out | std::ios::ate);
 
-            inline static const TextMode TEXT_READ   = TextMode (std::ios::in                                );   
-            inline static const TextMode TEXT_WRITE  = TextMode (std::ios::out                               );   
-            inline static const TextMode TEXT_APPEND = TextMode (std::ios::app                               );   
-            inline static const TextMode TEXT_ATE    = TextMode (std::ios::ate                               );
-            inline static const TextMode TEXT_RW     = TextMode (std::ios::in | std::ios::out                );
-            inline static const TextMode TEXT_RW_ATE = TextMode (std::ios::in | std::ios::out | std::ios::ate);
-
-            inline static const BinMode  DEFAULT_BIN_MODE  = BIN_RW;
-            inline static const TextMode DEFAULT_TEXT_MODE = TEXT_RW;
-            inline static const OpenMode DEFAULT_OPEN_MODE = DEFAULT_BIN_MODE;
-
-        /*class COpenMode
-        {
-            private:
-                S _mode;
-            public:
-                COpenMode (const S& mode) : _mode (mode)
-			    {
-				    if (mode.empty())
-					    throw Error (W("OpenMode::OpenMode(): Error: Invalid mode: ") + mode);
-			    }
-
-                inline bool is_bin_mode(const COpenMode mode) noexcept
-                {
-                    // returns true if mode ends with b.
-                    return mode._mode.back() == 'b';
-                }
-
-                inline bool is_bin_mode() noexcept
-                {
-					return is_bin_mode(_mode);
-                }
-
-                inline bool is_text_mode(const COpenMode mode) noexcept
-                {
-                    return !is_bin_mode(mode);
-                }
-
-				inline bool is_text_mode() noexcept
-				{
-					return !is_bin_mode();
-				}
-
-				inline const S& mode() const noexcept { return _mode; }
-
-				inline S to_string () const noexcept { return _mode; }
-
-                inline const C* c_str() const noexcept { return _mode.c_str(); }
-
-				inline bool operator == (const COpenMode& mode) const noexcept { return _mode == mode._mode; }
-
-				inline bool operator != (const COpenMode& mode) const noexcept { return _mode != mode._mode; }
-
-				inline bool operator == (const S& mode) const noexcept { return _mode == mode; }
-
-				inline bool operator != (const S& mode) const noexcept { return _mode != mode; }
-
-				inline bool operator == (const C* mode) const noexcept { return _mode == mode; }
-
-				inline bool operator != (const C* mode) const noexcept { return _mode != mode; }    
-
-				// implicit conversion to string
-				inline operator S() const noexcept { return _mode; }
-
-				// implicit conversion to C*
-				inline operator const C* () const noexcept { return _mode.c_str(); }
-        };
-
- 
-        class CBinMode : public COpenMode
-        {
-            public:
-                CBinMode (const S& mode) : COpenMode (mode) 
-                {
-				    if (! is_bin_mode (mode))
-					    throw Error (W("CBinMode::BinMode(): Error: Invalid binary mode: ") + mode);
-                }
-        };
-
-        class CTextMode : public COpenMode
-        {
-            public:
-                CTextMode(const S& mode) : COpenMode(mode)
-                {
-                    if (!is_text_mode(mode))
-                        throw Error(W("CTextMode::CTextMode(): Error: Invalid text mode: ") + mode);
-                }
-        };
-
-        // Declares a BinMode constant with W("rb") value.
-        inline static const CBinMode CBIN_READ                = CBinMode (W("rb")); // read: Open file for input operations.The file must exist.
-        inline static const CBinMode CBIN_WRITE               = CBinMode (W("wb")); // write: Create an empty file for output operations.If a file with the same name already exists, its contents are discarded and the file is treated as a new empty file.
-        inline static const CBinMode CBIN_APPEND_OR_CREATE    = CBinMode (W("ab")); // append: Open file for output at the end of a file.Output operations always write data at the end of the file, expanding it.Repositioning operations(fseek, fsetpos, rewind) are ignored.The file is created if it does not exist.
-        inline static const CBinMode CBIN_RW                  = CBinMode (W("r+b")); // read / update : Open a file for update(both for input and output).The file must exist.
-        inline static const CBinMode CBIN_CREATE_OVERWRITE_RW = CBinMode (W("w+b")); // write / update : Create an empty file and open it for update(both for input and output).If a file with the same name already exists its contents are discarded and the file is treated as a new empty file.
-        inline static const CBinMode CBIN_RW_APPEND_OR_CREATE = CBinMode (W("a+b")); // append / update : Open a file for update(both for input and output) with all output operations writing data at the end of the file.Repositioning operations(fseek, fsetpos, rewind) affects the next input operations, but output operations move the position back to the end of file.The file is created if it does not exist.
-
-        inline static const CTextMode CTEXT_READ                = CTextMode (W("r"));   // read: Open file for input operations.The file must exist.
-        inline static const CTextMode CTEXT_WRITE               = CTextMode (W("w"));   // write: Create an empty file for output operations.If a file with the same name already exists, its contents are discarded and the file is treated as a new empty file.
-        inline static const CTextMode CTEXT_APPEND_OR_CREATE    = CTextMode (W("a"));   // append: Open file for output at the end of a file.Output operations always write data at the end of the file, expanding it.Repositioning operations(fseek, fsetpos, rewind) are ignored.The file is created if it does not exist.
-        inline static const CTextMode CTEXT_RW                  = CTextMode (W("r+"));  // read / update : Open a file for update(both for input and output).The file must exist.
-        inline static const CTextMode CTEXT_CREATE_OVERWRITE_RW = CTextMode (W("w+"));  // write / update : Create an empty file and open it for update(both for input and output).If a file with the same name already exists its contents are discarded and the file is treated as a new empty file.
-        inline static const CTextMode CTEXT_RW_APPEND_OR_CREATE = CTextMode (W("a+"));  // append / update : Open a file for update(both for input and output) with all output operations writing data at the end of the file.Repositioning operations(fseek, fsetpos, rewind) affects the next input operations, but output operations move the position back to the end of file.The file is created if it does not exist.
-
-        inline static const CBinMode  CDEFAULT_BIN_MODE  = BIN_RW_APPEND_OR_CREATE;
-        inline static const CTextMode CDEFAULT_TEXT_MODE = TEXT_RW_APPEND_OR_CREATE;
-        inline static const COpenMode CDEFAULT_OPEN_MODE = DEFAULT_BIN_MODE;
-        */
+            inline const BinMode  OpenMode::DEFAULT_BIN_MODE = BIN_RW;
+            inline const TextMode OpenMode::DEFAULT_TEXT_MODE = TEXT_RW;
+            inline const OpenMode OpenMode::DEFAULT_OPEN_MODE = DEFAULT_BIN_MODE;
 
         /// \brief File class.
         ///
@@ -277,7 +197,7 @@ namespace pensar_digital
 
         public:
             
-            inline File(const Path& full_path = W("."), const Id id = NULL_ID, const OpenMode mode = DEFAULT_OPEN_MODE) :
+            inline File(const Path& full_path = W("."), const Id id = NULL_ID, const OpenMode mode = OpenMode::DEFAULT_BIN_MODE) :
                 _fullpath(full_path), Object(id), _mode(mode)
             {
                 _fullpath.create_dir (); // Create the directory if it does not exist.
@@ -309,13 +229,13 @@ namespace pensar_digital
 
             inline bool is_open() const noexcept { return _file->is_open (); }
             
-            inline bool is_bin_read  () const noexcept { return _mode == BIN_READ  ; }
-            inline bool is_bin_write () const noexcept { return _mode == BIN_WRITE ; }
-            inline bool is_bin_rw    () const noexcept { return _mode == BIN_RW_ATE; }
+            inline bool is_bin_read  () const noexcept { return _mode == OpenMode::BIN_READ  ; }
+            inline bool is_bin_write () const noexcept { return _mode == OpenMode::BIN_WRITE ; }
+            inline bool is_bin_rw    () const noexcept { return _mode == OpenMode::BIN_RW_ATE; }
 
-            inline bool is_text_read  () const noexcept { return _mode == TEXT_READ  ; }
-            inline bool is_text_write () const noexcept { return _mode == TEXT_WRITE ; }
-            inline bool is_text_rw    () const noexcept { return _mode == TEXT_RW_ATE; }
+            inline bool is_text_read  () const noexcept { return _mode == OpenMode::TEXT_READ  ; }
+            inline bool is_text_write () const noexcept { return _mode == OpenMode::TEXT_WRITE ; }
+            inline bool is_text_rw    () const noexcept { return _mode == OpenMode::TEXT_RW_ATE; }
 
             inline bool eof  () const noexcept  { return _file->eof  () != 0; }
             inline bool fail () const noexcept  { return _file->fail () != 0; }
@@ -337,7 +257,7 @@ namespace pensar_digital
                 
 
             // Implements initialize method from Initializable concept.
-            inline virtual bool initialize(const Path& afull_path = CURRENT_DIR, const Id id = NULL_ID, const OpenMode mode = DEFAULT_OPEN_MODE) noexcept
+            inline virtual bool initialize(const Path& afull_path = CURRENT_DIR, const Id id = NULL_ID, const OpenMode mode = OpenMode::DEFAULT_OPEN_MODE) noexcept
             {
                 _fullpath = afull_path;
                 _mode = mode;
@@ -420,7 +340,7 @@ namespace pensar_digital
 					close();
 				}
 
-                _mode = BIN_RW;
+                _mode = OpenMode::BIN_RW;
                 open();
                 if (pos > 0)
 					move_cursor (f, pos);
@@ -436,14 +356,14 @@ namespace pensar_digital
 					close();
 				}
 
-                _mode = TEXT_RW;
+                _mode = OpenMode::TEXT_RW;
                 open();
                 if (pos > 0)
                     move_cursor (f, pos);
             }
 
             // Opens the file if necessary and returns the file stream.
-            inline decltype(_file)& open (const OpenMode& mode = DEFAULT_OPEN_MODE) 
+            inline decltype(_file)& open (const OpenMode& mode = OpenMode::DEFAULT_OPEN_MODE)
             {
                 _mode = mode;
                 if (!is_open())
@@ -486,7 +406,7 @@ namespace pensar_digital
             public:
                 inline static const VersionPtr VERSION = Version::get(1, 1, 1);
                 TextFile(const Path& full_path, const S& content = EMPTY,
-                    const TextMode mode = DEFAULT_TEXT_MODE, const Id id = NULL_ID) : File(full_path, id, mode)
+                    const TextMode mode = OpenMode::DEFAULT_TEXT_MODE, const Id id = NULL_ID) : File(full_path, id, mode)
                 {
                     if (File::exists())
                     {
@@ -580,7 +500,7 @@ namespace pensar_digital
                 inline S read() 
                 {
 					if (! File::is_open()) 
-						open (TEXT_READ);
+						open (OpenMode::TEXT_READ);
 
 					// Gets the file size in bytes.
                     size_t file_size = size ();
@@ -723,12 +643,12 @@ namespace pensar_digital
 			public:
 				inline static const VersionPtr VERSION = Version::get(1, 1, 1);
                 inline TmpTextFile (const S& file_name = EMPTY, const S& content = EMPTY, const Id id = null_value<Id>()) : 
-                    TextFile(TMP_PATH / file_name, content, TEXT_RW, id)
+                    TextFile(TMP_PATH / file_name, content, OpenMode::TEXT_RW, id)
                 {
 				}
 
                 inline TmpTextFile (const C* file_name = EMPTY, const C* content = EMPTY, const Id id = null_value<Id>())
-                    : TextFile (S(file_name), S(content), TEXT_RW, id) {}
+                    : TextFile (S(file_name), S(content), OpenMode::TEXT_RW, id) {}
 
                 inline void log_error()
                 {
@@ -752,7 +672,7 @@ namespace pensar_digital
 				inline static const VersionPtr VERSION = Version::get(1, 1, 1);
 			private:
                 inline BinaryFile (const Path&                   full_path,
-                            const OpenMode mode                     = DEFAULT_BIN_MODE, 
+                            const OpenMode mode                     = OpenMode::DEFAULT_BIN_MODE,
                             const BytePtr                 data      = nullptr, 
                             const size_t                  size      = 0,
                             const Id                      id        = null_value<Id>()
@@ -762,7 +682,7 @@ namespace pensar_digital
 				}
 
                 inline BinaryFile (const Path& full_path, const BytePtr data = nullptr, const size_t size = 0, const Id id = null_value<Id>()) 
-                    : BinaryFile(full_path, DEFAULT_BIN_MODE, data, size, id)
+                    : BinaryFile(full_path, OpenMode::DEFAULT_BIN_MODE, data, size, id)
                 {
 				}
 
@@ -774,7 +694,7 @@ namespace pensar_digital
                     if ((data != nullptr) && (size > 0))
 					{
 						if (! is_open()) 
-							open (BIN_RW_ATE);
+							open (OpenMode::BIN_RW_ATE);
 
 						//move_to_end ();
 						_file->write(reinterpret_cast<const char*>(data), size);

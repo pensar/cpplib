@@ -5,33 +5,36 @@
 #define ARRAY_HPP
 
 #include "concept.hpp"
-#include "error.hpp"
+
+#include "cs.hpp"
 
 namespace pensar_digital
 {
     namespace cpplib
     {
+        using S = std::basic_string<C>;
+
         template <typename T>
-        class DynamicArray
+        class Array
         {
         private:
             T* marray;
-            size_t msize;    
+            size_t msize;
         public:
             // Define value_type as T.
             typedef T value_type;
 
-            DynamicArray(size_t size): msize(size) { marray = new T[size]; }
-            ~DynamicArray() { delete[] marray; }
+            Array(size_t size) : msize(size) { marray = new T[size]; }
+            ~Array() { delete[] marray; }
 
             //T& operator[] (const size_t index) const { return marray[index]; }
             //T& at (const size_t index) const { return marray[index]; }
             constexpr T& operator[] (const size_t index) const { return marray[index]; }
             constexpr T& at(const size_t index) const { return marray[index]; }
 
-            [[nodiscard]] constexpr T* data () const noexcept { return marray; }
+            [[nodiscard]] constexpr T* data() const noexcept { return marray; }
 
-            [[nodiscard]] constexpr size_t size () const noexcept { return msize; }
+            [[nodiscard]] constexpr size_t size() const noexcept { return msize; }
         };
 
 		// A StdLayoutTriviallyCopyable version of Array.

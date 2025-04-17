@@ -1,6 +1,7 @@
 // author : Mauricio Gomes
 // license: MIT (https://opensource.org/licenses/MIT)
 
+
 #include "object.hpp"
 #include "version.hpp"
 
@@ -50,7 +51,8 @@ namespace pensar_digital
         std::ostream& Object::binary_write(std::ostream& os, const std::endian& byte_order) const
         {
             bin_write (os, byte_order);                   // Writes Object.
-            version ()->binary_write(os, byte_order);     // Writes the polymorphic Version.
+            VersionPtr v = version();
+            v->binary_write(os, byte_order);     // Writes the polymorphic Version.
             os.write ((const char *)data(), data_size()); // Writes the polymorphic data.
             return os;
         };

@@ -1,42 +1,38 @@
 // $Id$
 
-#include <boost/test/unit_test.hpp>
+#include "../../../unit-test/src/test.hpp"
 
-#include "log.hpp"
-#include "io_util.h"
-#include "filesystem_util.h"
+#include "../io_util.hpp"
 
-namespace pd = pensar_digital::cpplib;
+#include "../log.hpp"
 
-BOOST_AUTO_TEST_SUITE(log_suite)
+#include "../file.hpp"
 
-BOOST_AUTO_TEST_CASE(log_test)
+namespace pensar_digital
 {
-    #ifdef LOG_ON
+    using namespace pensar_digital::unit_test;
+    namespace cpplib
+    {
+#ifdef LOG_ON
 
-    cpplog << "Extremely simple log is cool " << std::endl;
-    cpplog << "and efficient." << std::endl;
+        TEST(Log, true)
+        enable_log();
+        LOG(W("Logging is cool and efficient."));
 
-    std::ifstream ifs ("log.txt");
-    BOOST_CHECK (ifs.is_open ());
+        Path p1(default_log_file_name ());
 
-    ifs.close ();
-    pd::disable_log ();
+        CHECK(p1.exists (), "0");
 
-    fs::path p1 ("log.txt");
-    fs::path p2 ("log2.txt");
-    fs::remove (p2);
-    fs::copy_file (p1, p2);
-    fs::remove (p1);
+        disable_log();
+        p1.remove();
 
-    cpplog << "nope";
-    BOOST_CHECK(! pd::file_exists ("log.txt"));
+        LOG(W("nope"));
+        CHECK(!p1.exists(), "1");
 
-    pd::enable_log ();
-    cpplog << "nope" << std::endl;
-    BOOST_CHECK(pd::file_exists ("log.txt"));
-
-    #endif
+        enable_log();
+        LOG(W("nope"));
+        CHECK(p1.exists(), "2");
+#endif
+		TEST_END(Log)
+    }
 }
-
-BOOST_AUTO_TEST_SUITE_END ()

@@ -1,12 +1,12 @@
 // author : Mauricio Gomes
 // license: MIT (https://opensource.org/licenses/MIT)
 
-#include "..\unit-test\test\test.hpp"
-#include "../cpplib/cpp/s.hpp"
-#include "../cpplib/cpp/object.hpp"
+#include "../../../unit-test/src/test.hpp"
+#include "../s.hpp"
+#include "../object.hpp"
 #include "dummy_factory.hpp"
-#include "../cpplib/cpp/io_util.hpp"
-#include "../cpplib/cpp/file.hpp"
+#include "../io_util.hpp"
+#include "../file.hpp"
 #include <memory>
 
 #ifdef _MSC_VER

@@ -5,11 +5,11 @@
 #define ICU_UTIL_HPP 
 
 // ICU headers.
-#include <unicode/ucsdet.h>
-#include <unicode/utypes.h>
-#include <unicode/ucnv.h>
-#include <unicode/ustring.h>
-#include <unicode/ucnv.h>
+#include "C:/vcpkg/packages/icu_x64-windows/include/unicode/ucsdet.h"
+#include "C:/vcpkg/packages/icu_x64-windows/include/unicode/utypes.h"
+#include "C:/vcpkg/packages/icu_x64-windows/include/unicode/ucnv.h"
+#include "C:/vcpkg/packages/icu_x64-windows/include/unicode/ustring.h"
+
 
 // std c++ headers.
 #include <string>

@@ -1,5 +1,5 @@
-#include "log.hpp"
 
+#include "log.hpp"
 namespace pensar_digital
 {
     namespace cpplib

@@ -3,7 +3,6 @@
 
 #ifndef BYTES_UTIL_HPP_INCLUDED
 #define BYTES_UTIL_HPP_INCLUDED
-
 #include "constant.hpp"
 #include "concept.hpp"
 

@@ -1,19 +1,17 @@
 // author : Mauricio Gomes
 // license: MIT (https://opensource.org/licenses/MIT)
 
-#include "..\unit-test\test\test.hpp"
-#include "../cpp/s.hpp"
-#include "../cpp/byte_order.hpp"
-#include "../cpp/array.hpp"
+#include "../../../unit-test/src/test.hpp"
+#include "../s.hpp"
+#include "../byte_order.hpp"
+#include "../array.hpp"
 
 #include <span>
 
 
 namespace pensar_digital
 {
-    namespace test = pensar_digital::unit_test;
     using namespace pensar_digital::unit_test;
-    namespace pd = pensar_digital::cpplib;
     namespace cpplib
     {
         

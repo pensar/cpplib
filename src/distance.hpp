@@ -1,103 +1,64 @@
 #ifndef DISTANCE_HPP_INCLUDED
 #define DISTANCE_HPP_INCLUDED
 
-#include <string>
-#include <set>
-#include <vector>
-#include <limits>
-#include <map>
+#undef min // avoid conflict with std::min
+#include <algorithm> // std::min
+#include "s.hpp"
 
-#include "error.hpp"
-#include "log.hpp"
 
 namespace pensar_digital
 {
     namespace cpplib
     {
-        namespace pd = pensar_digital::cpplib;
+        namespace pd = pensar_digital::cpplib;   
 
         /// Levenshtein Distance Algorithm
         // adapted from Anders Sewerin Johansen code.
-        template<typename S = std::string>
-        int distance (const S& source, const S& target)
-        {
-            //cpplog << "source = " << source << " " << "target = " << target << std::endl;
-            //LOG_FLUSH
-            // Step 1
-            const int n = source.length ();
-            const int m = target.length ();
 
+#include <algorithm>
+#include <vector>
+
+        inline int distance(const S& source, const S& target) {
+            const int n = source.length();
+            const int m = target.length();
             if (n == 0) return m;
             if (m == 0) return n;
 
-            typedef std::vector< std::vector<int> > Tmatrix;
+            // Use three rows to handle transposition
+            std::vector<int> row1(m + 1);  // i-2
+            std::vector<int> row2(m + 1);  // i-1
+            std::vector<int> row3(m + 1);  // i
 
-            Tmatrix matrix(n+1);
-
-            // Size the vectors in the 2.nd dimension. Unfortunately C++ doesn't
-            // allow for allocation on declaration of 2.nd dimension of vec of vec
-            for (int i = 0; i <= n; i++)
-            {
-                matrix[i].resize(m+1);
+            for (int j = 0; j <= m; j++) {
+                row2[j] = j;  // Initialize row2 as first row
             }
 
-            // Step 2
-            for (int i = 0; i <= n; i++)
-            {
-                matrix[i][0]=i;
-            }
+            for (int i = 1; i <= n; i++) {
+                row3[0] = i;
 
-            for (int j = 0; j <= m; j++)
-            {
-                matrix[0][j]=j;
-            }
+                for (int j = 1; j <= m; j++) {
+                    const char s_i = source[i - 1];
+                    const char t_j = target[j - 1];
+                    int cost = (s_i == t_j) ? 0 : 1;
 
-            // Step 3
-            for (int i = 1; i <= n; i++)
-            {
-                const char s_i = source[i-1];
+                    row3[j] = std::min(std::min(row3[j - 1] + 1, row2[j] + 1), row2[j - 1] + cost);
 
-                // Step 4
-                for (int j = 1; j <= m; j++)
-                {
-                  const char t_j = target[j-1];
-
-                  // Step 5
-                  int cost;
-                  cost = (s_i == t_j) ? 0 : 1;
-
-                  // Step 6
-                  const int above = matrix[i-1][j];
-                  const int left = matrix[i][j-1];
-                  const int diag = matrix[i-1][j-1];
-
-                  int cell = std::min (above + 1, std::min(left + 1, diag + cost));
-
-                  // Step 6A: Cover transposition, in addition to deletion,
-                  // insertion and substitution. This step is taken from:
-                  // Berghel, Hal ; Roach, David : "An Extension of Ukkonen's
-                  // Enhanced Dynamic Programming ASM Algorithm"
-                  // (http://www.acm.org/~hlb/publications/asm/asm.html)
-
-                  if (i>2 && j>2)
-                  {
-                    int trans=matrix[i-2][j-2]+1;
-                    if (source[i-2]!=t_j) trans++;
-                    if (s_i!=target[j-2]) trans++;
-                    if (cell>trans) cell=trans;
-                  }
-
-                  matrix[i][j]=cell;
+                    // Transposition: requires i-2 data
+                    if (i > 1 && j > 1 && s_i == target[j - 2] && t_j == source[i - 2]) {
+                        row3[j] = std::min(row3[j], row1[j - 2] + 1);
+                    }
                 }
+
+                // Rotate rows: row1 <- row2 <- row3
+                row1 = row2;
+                row2 = row3;
             }
 
-            // Step 7
-            //cpplog << "dist = " << matrix[n][m] << std::endl;
-            //LOG_FLUSH
-            return matrix[n][m];
-        };
+            return row2[m];  // row2 holds the final result after last iteration
+        }
+ #ifndef LESS_DIFF
+#define LESS_DIFF
 
-        template <typename S = std::string>
         struct LessDistance
         {
             S reference;
@@ -107,24 +68,25 @@ namespace pensar_digital
             bool operator () (const S& left, const S& right)
             {
                 //cpplog << "left = " << left << " right = " << right << std::endl;
-                return pd::distance<S> (left, reference) < pd::distance<S> (right, reference);
+                return pd::distance (left, reference) < pd::distance (right, reference);
             }
         };
+#endif 
 
-        template <typename S = std::string, class Container = std::vector<S>>
+        template <class Container = std::vector<S>>
         typename Container::value_type min_distance (const S& s, const Container& c)
         {
             INVALID_ARGUMENT(c.size () == 0, "c.size () = 0");
 
             typename Container::const_iterator it = c.begin ();
             typename Container::value_type min = *it;
-            int min_dist = pd::distance<S> (min, s);
-            for (; it != c.end (); ++it)
+            int min_dist = pd::distance (min, s);
+            for (const auto& it : c)
             {
-                int dist = pd::distance<S> (*it, s);
+                int dist = pd::distance (it, s);
                 if (dist < min_dist)
                 {
-                    min = *it;
+                    min = it;
                     min_dist = dist;
                 }
             }
@@ -132,44 +94,45 @@ namespace pensar_digital
             return min;
         }
 
-        template <class Container = std::vector<char*>>
-        typename Container::value_type min_distance (const char* s, const Container& c)
+        template <class Container = std::vector<C*>>
+        typename Container::value_type min_distance (const C* s, const Container& c)
         {
-            return min_distance (std::string(s), c);
+            return min_distance (S(s), c);
         }
 
-        template <typename S = std::string, class Container = std::map<std::string, std::string>>
+        template <class Container = std::map<S, S>>
         typename Container::value_type min_distance_map_key (const S& s, const Container& c, int max_distance = std::numeric_limits<int>::max())
         {
             INVALID_ARGUMENT(c.size () == 0, "c.size () = 0");
 
             typename Container::const_iterator it = c.begin ();
-            std::pair<typename Container::key_type, typename Container::mapped_type> min(it->first, it->second);
-            int min_dist = pd::distance<S> (min.first, s);
+            std::pair<typename Container::key_type, typename Container::mapped_type> minimum(it->first, it->second);
+            int min_dist = pd::distance (minimum.first, s);
             for (; it != c.end (); ++it)
             {
-                int dist = pd::distance<S> (it->first, s);
+                int dist = pd::distance (it->first, s);
                 if (dist < min_dist)
                 {
-                    min = *it;
+                    minimum = *it;
                     min_dist = dist;
                 }
             }
 
             std::pair<typename Container::key_type, typename Container::mapped_type> nope;
-            return (min_dist <= max_distance) ? min : nope;
+            return (min_dist <= max_distance) ? minimum : nope;
         }
 
-        template <typename S = std::string, class Container = std::vector<S>, class OutContainer = std::vector<S>>
+        template <class Container = std::vector<S>, class OutContainer = std::vector<S>>
         void min_distance (const S& s, const Container& c, OutContainer& out, unsigned max_elements = 0)
         {
             INVALID_ARGUMENT(c.size () == 0, "c.size () = 0");
-            LessDistance<S> ld (s);
-            typedef std::multiset<S, LessDistance<S>> MSet;
+            LessDistance ld (s);
+            using MSet = std::multiset<S, LessDistance>;
             MSet mset (ld);
-            for (typename Container::const_iterator it = c.begin (); it != c.end (); ++it)
+
+            for (const auto& it : mset)
             {
-                mset.insert (*it);
+                mset.insert (it);
             }
             if (max_elements == 0)
                 std::copy (mset.begin (), mset.end (), std::back_inserter(out));
@@ -182,11 +145,14 @@ namespace pensar_digital
             }
         }
 
-        template <class Container = std::vector<char*>, class OutContainer = std::vector<char*>>
-        void min_distance (const char* s, const Container& c, OutContainer& out, unsigned max_elements = 0)
+
+        template <class Container = std::vector<C*>, class OutContainer = std::vector<C*>>
+        void min_distance (const C* s, const Container& c, OutContainer& out, unsigned max_elements = 0)
         {
-            min_distance (std::string(s), c, out, max_elements);
+            min_distance (S(s), c, out, max_elements);
         }
+ 
+
     }   // namespace cpplib
 }       // namespace pensar_digital
 
