@@ -8,7 +8,7 @@ namespace pensar_digital
 {
 	namespace cpplib
 	{
-				// Bool has 3 int_fast8_t states: BOOL_NULL = -1, FALSE = 0, TRUE = 1.
+				// Bool has 3 int_fast8_t states: BOOL_NULL = -1, FALSE = 0, TRUE = 1 .
 				struct Bool
 				{
 					int_fast8_t mvalue;

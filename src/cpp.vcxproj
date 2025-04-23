@@ -195,6 +195,7 @@
     <ClInclude Include="..\src\version.hpp" />
     <ClInclude Include="array.hpp" />
     <ClInclude Include="code_util.hpp" />
+    <ClInclude Include="command.hpp" />
     <ClInclude Include="concept.hpp" />
     <ClInclude Include="cs.hpp" />
     <ClInclude Include="encoding.hpp" />

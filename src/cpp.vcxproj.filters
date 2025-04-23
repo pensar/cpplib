@@ -120,6 +120,9 @@
     <ClInclude Include="statistic.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="command.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\constants.cpp">
