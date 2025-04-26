@@ -11,14 +11,31 @@ namespace pensar_digital
 				// Bool has 3 int_fast8_t states: BOOL_NULL = -1, FALSE = 0, TRUE = 1 .
 				struct Bool
 				{
-					int_fast8_t mvalue;
 
 					static const int_fast8_t UNKNOWN = -1;
 					static const int_fast8_t F = 0;
 					static const int_fast8_t T = 1;
 
+					int_fast8_t mvalue = UNKNOWN;
+					
 					// Default constructor
 					Bool() = default;
+
+					// Default copy constructor
+					Bool(const Bool&) = default;
+					
+					// Default move constructor
+					Bool(Bool&&) = default;
+					
+					// Default copy assignment operator
+					Bool& operator=(const Bool&) = default;
+					
+					// Default move assignment operator
+					Bool& operator=(Bool&&) = default;
+					
+					// Default destructor
+					~Bool() = default;
+
 
 					// Conversion from int_fast8_t
 					constexpr Bool(int_fast8_t value) : mvalue(value) {}
@@ -31,6 +48,9 @@ namespace pensar_digital
 
 					// Conversion to int_fast8_t
 					constexpr operator int_fast8_t() const { return mvalue; }
+
+					// Compare operator
+					constexpr bool operator==(const Bool& other) const { return mvalue == other.mvalue; }
 				};
 
 				static_assert(std::is_trivially_copyable<Bool>::value, "Bool must be trivially copyable.");

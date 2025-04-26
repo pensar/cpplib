@@ -205,10 +205,13 @@
     <ClInclude Include="io_util.hpp" />
     <ClInclude Include="log.hpp" />
     <ClInclude Include="memory.hpp" />
+    <ClInclude Include="multiplatform.hpp" />
     <ClInclude Include="object.hpp" />
     <ClInclude Include="path.hpp" />
     <ClInclude Include="random_util.hpp" />
     <ClInclude Include="statistic.hpp" />
+    <ClInclude Include="sysinfo.hpp" />
+    <ClInclude Include="system.hpp" />
     <ClInclude Include="type_util.hpp" />
     <ClInclude Include="windows\io_util_windows.hpp" />
   </ItemGroup>

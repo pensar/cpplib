@@ -30,8 +30,10 @@
     <ClCompile Include="..\src\test\main.cpp" />
     <ClCompile Include="..\src\test\object_test.cpp" />
     <ClCompile Include="..\src\test\version_test.cpp" />
+    <ClCompile Include="code_util_test.cpp" />
     <ClCompile Include="path_test.cpp" />
     <ClCompile Include="random_util_test.cpp" />
+    <ClCompile Include="s_test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\test\dummy.hpp" />

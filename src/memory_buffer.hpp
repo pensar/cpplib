@@ -51,6 +51,13 @@ namespace pensar_digital
 				write (bp, size);
 			}
 
+            // Memory buffer constructor that takes a trivially copyable type as input argument.
+			template <class T> requires std::is_trivially_copyable_v<T>
+            MemoryBuffer(const T* t) : MemoryBuffer()
+            {
+                write(t, sizeof(T));
+            }
+
             /** Default destructor */
             virtual ~MemoryBuffer()
             {

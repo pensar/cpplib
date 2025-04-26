@@ -123,6 +123,15 @@
     <ClInclude Include="command.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="system.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sysinfo.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="multiplatform.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\constants.cpp">

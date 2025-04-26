@@ -54,6 +54,12 @@
     <ClCompile Include="random_util_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="code_util_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="s_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\test\dummy.hpp">

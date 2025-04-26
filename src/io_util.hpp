@@ -3,7 +3,7 @@
 #ifndef IO_UTIL_HPP
 #define IO_UTIL_HPP
 
-#include "code_util.hpp"
+#include "multiplatform.hpp"
 #include "defines.hpp"
 #include "s.hpp"
 #include "memory.hpp"
@@ -12,17 +12,22 @@
 #include "icu_util.hpp"
 #include "log.hpp"
 #include "error.hpp"
+
+#include "code_util.hpp"
+
         // Include platform-specific implementation
 #include INCLUDE(io_util)
 
 // or "linux/io_util_linux.hpp" 
 // or "android/io_util_android.hpp" or other platforms
 
-namespace pensar_digital {
-    namespace cpplib {
+namespace pensar_digital 
+{
+    namespace cpplib 
+    {
 
         using LINE_HANDLER = void(*)(const int64_t line_count, const S& line);
-        // Forward declaration
+
         Result<S> get_exe_full_path();
 
 

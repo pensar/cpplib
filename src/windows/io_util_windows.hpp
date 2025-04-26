@@ -4,6 +4,8 @@
 #ifndef WINDOWS_IO_UTIL_HPP
 #define WINDOWS_IO_UTIL_HPP
 #include "../io_util.hpp"
+#include "../code_util.hpp"
+#include "../s.hpp"
 
 #include <string>
 #include <io.h>
@@ -16,6 +18,21 @@ namespace pensar_digital
     {
         namespace fs = std::filesystem;
         using LINE_HANDLER = void(*)(const int64_t line_count, const S& line);
+
+		// Get the full path of the executable.
+		inline Result<S> get_exe_full_path()
+		{
+			// Get the full path of the executable.
+			C buffer[MAX_PATH];
+			if (GetModuleFileNameA(NULL, buffer, MAX_PATH) == 0)
+			{
+				return Result<S>(W("Error getting executable path"));
+			}
+			// Convert to wide string.  
+			S exe_path(buffer);
+            Result<S> r = exe_path;
+			return r;
+		}
 
 
         inline S& read_file (const S& filename, S* s) 

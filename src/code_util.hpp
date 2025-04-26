@@ -1,62 +1,105 @@
 #ifndef CODE_UTIL_HPP
 #define CODE_UTIL_HPP
 
-#include "s.hpp"
+#include "cs.hpp"
+#include "bool.hpp"
 
 namespace pensar_digital 
 {
     namespace cpplib 
     {
+        template <typename T>
+        struct Result 
+        {
+			using ErrorMessageType = CS<0, 256>;
+			using ResultType = T;
+            T mresult;
+            Bool mok = Bool::T;
+            ErrorMessageType merror_message = EMPTY;
 
-#if defined(_WIN32) || defined(_WIN64)
-#define _PLATFORM_FOLDER windows
-#define _PLATFORM_SUFFIX windows
-#define _INCLUDE_PATH(base_name) _STRINGIFY(windows/base_name##_windows.hpp)
-#define INCLUDE(base_name) _INCLUDE_PATH(base_name)
-#elif defined(__linux__)
-#define _PLATFORM_FOLDER linux
-#define _PLATFORM_SUFFIX linux
-#define _INCLUDE_PATH(base_name) _STRINGIFY(linux/base_name##_linux.hpp)
-#define INCLUDE(base_name) _INCLUDE_PATH(base_name)
-#elif defined(__APPLE__) && defined(TARGET_OS_IPHONE)
-#define _PLATFORM_FOLDER ios
-#define _PLATFORM_SUFFIX ios
-#define _INCLUDE_PATH(base_name) _STRINGIFY(ios/base_name##_ios.hpp)
-#define INCLUDE(base_name) _INCLUDE_PATH(base_name)
-#elif defined(__ANDROID__)
-#define _PLATFORM_FOLDER android
-#define _PLATFORM_SUFFIX android
-#define _INCLUDE_PATH(base_name) _STRINGIFY(android/base_name##_android.hpp)
-#define INCLUDE(base_name) _INCLUDE_PATH(base_name)
-#else
-#error "Unsupported platform"
-#endif
+			// Default constructor
+            Result() = default;
+            
+			// Default copy constructor
+			Result(const Result&) = default;
+			
+			// Default move constructor
+			Result(Result&&) = default;
+			
+			Result(ResultType rt, Bool ok = Bool::T, ErrorMessageType err = EMPTY) : mresult(rt), mok(ok), merror_message(err) {}
 
-        // Helper macro for stringification
-#define _STRINGIFY(x) #x
+			Result(ErrorMessageType err, ResultType r = T{}) : mresult(r), mok(Bool::F), merror_message(err) {}
 
+			// Default copy assignment operator
+			Result& operator=(const Result&) = default;
 
-
-        template <typename ResultType>
-        struct Result {
-            ResultType mresult;
-            bool mok;
-            S merror_message;
-
-            Result(ResultType result, bool ok, S error_message)
-                : mresult(result), mok(ok), merror_message(error_message) {
-            }
+			// Default move assignment operator
+			Result& operator=(Result&&) = default;
+			
+			// Default destructor
+			~Result() = default;
+            
+			// Implicit conversion from ErrorMessageType
+			Result(const ErrorMessageType& error_message) : merror_message(error_message), mok(Bool::F) {}
+			Result(const C* error_message) : merror_message(CS<0, 256>(error_message)), mok(Bool::F) {}
 
             // Implicit conversion to bool
-            operator bool() const { return mok; }
+            operator Bool() const { return mok; }
 
             // Implicit conversion to ResultType
-            operator ResultType() const { return mresult; }
+            operator T() const { return mresult; }
 
-            // Implicit conversion to S
-            operator S() const { return merror_message; }
+            // Implicit conversion to ErrorMessageType
+			operator ErrorMessageType() const { return merror_message; }
+            
+
+			// == operator
+			bool operator==(const T& other) const
+			{
+				return mresult == other;
+			}
+
+			// != operator
+			bool operator!=(const T& other) const
+			{
+				return !(*this == other);
+			}
+
+			// < operator
+			bool operator<(const T& other) const
+			{
+				return mresult < other;
+			}
+
+			// = operator for ResultType.
+			Result& operator=(const T& other)
+			{
+				mresult = other;
+				return *this;
+			}
+
+			// = operator for Bool.
+			Result& operator=(const Bool& other)
+			{
+				mok = other;
+				return *this;
+			}
+
+			// = operator for ErrorMessageType.
+			Result& operator=(const ErrorMessageType& other)
+			{
+				merror_message = other;
+				mok = Bool::F;
+				return *this;
+			}
+
+			// ! operator
+			bool operator!() const
+			{
+				return !mok;
+			}
         };
-
+		static_assert(std::is_trivially_copyable<Result<int>>::value, "Result<int> must be trivially copyable.");
     }  // namespace cpplib
 }  // namespace pensar_digital
 
