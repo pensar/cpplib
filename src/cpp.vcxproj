@@ -207,6 +207,7 @@
     <ClInclude Include="memory.hpp" />
     <ClInclude Include="multiplatform.hpp" />
     <ClInclude Include="object.hpp" />
+    <ClInclude Include="obj_memory_buffer.hpp" />
     <ClInclude Include="path.hpp" />
     <ClInclude Include="random_util.hpp" />
     <ClInclude Include="statistic.hpp" />

@@ -30,7 +30,7 @@ namespace pensar_digital
         class MemoryBuffer
         {
             public:
-                typedef size_t Offset;
+                using Offset = size_t;
             protected:
                 std::span<std::byte> mbuffer; //!< Buffer.
                 Offset mwrite_offset;         //!< Write offset.
@@ -49,6 +49,13 @@ namespace pensar_digital
 			{
 				// Copy the data to the buffer.
 				write (bp, size);
+			}
+
+            // Copy constructor.
+			MemoryBuffer(const MemoryBuffer& mb) : MemoryBuffer()
+			{
+				// Copy the data to the buffer.
+				write(mb.mbuffer.data(), mb.size());
 			}
 
             // Memory buffer constructor that takes a trivially copyable type as input argument.
@@ -78,13 +85,13 @@ namespace pensar_digital
             const size_t count() const noexcept { return mindex.size(); }
 
             /// \brief Returns the buffer write offset in bytes.
-            const size_t woffset() const noexcept { return mwrite_offset; }
+            const Offset woffset() const noexcept { return mwrite_offset; }
 
             /// \brief Returns the data size in bytes.
 			const size_t data_size() const noexcept { return mwrite_offset; }
 
             /// \brief Returns the buffer read offset in bytes.
-            const size_t roffset() const noexcept { return mread_offset; }
+            const Offset roffset() const noexcept { return mread_offset; }
 
             /// \brief Available space in the buffer in bytes.  
             const size_t wavailable() const noexcept { return mbuffer.size() - mwrite_offset; }
@@ -165,7 +172,7 @@ namespace pensar_digital
 				read(dest, mread_offset, size);
 			}   
 
-            MemoryBuffer& copy (MemoryBuffer& mb, const size_t offset = 0)
+            MemoryBuffer& copy (MemoryBuffer& mb, const Offset offset = 0)
 			{
 				// Check if there is enough space in the buffer.
 				if (wavailable() < mb.size())

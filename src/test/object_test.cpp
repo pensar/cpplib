@@ -35,10 +35,10 @@ namespace pensar_digital
         TEST_END(ObjectClone)
 
         TEST(ObjectSerialization, true)
-            ObjectPtr o = pd::Object::get(42);
-            MemoryBufferPtr mb = o->bytes();
+            auto o = pd::Object::get(42);
+            MemoryBufferPtr mb = *o;
 
-			ObjectPtr o1 = pd::Object::get();
+			auto o1 = pd::Object::get();
 			CHECK_NOT_EQ(Object, *o, *o1, W("0. o == o1"));
 
 			o1->assign (*mb);

@@ -165,11 +165,17 @@ namespace pensar_digital
 
 				virtual MemoryBufferPtr bytes () const noexcept
 				{
-                    MemoryBufferPtr mb = std::make_unique<MemoryBuffer> (SIZE);
-                    MemoryBufferPtr version_bytes = VERSION->bytes();
+                    MemoryBufferPtr mb = std::make_unique<MemoryBuffer> (size ());
+                    MemoryBufferPtr version_bytes = version ()->bytes();
                     mb->copy (*version_bytes);
-                    mb->write ((BytePtr(&mdata)), DATA_SIZE);
+                    mb->write ((BytePtr(&mdata)), data_size ());
                     return mb;
+				}
+
+                // Implicit convertion to MemoryBufferPtr.
+				inline operator MemoryBufferPtr () const noexcept
+				{
+					return bytes();
 				}
 
                 virtual ByteSpan data_span () const noexcept { return ByteSpan (data_bytes (), data_size()); }

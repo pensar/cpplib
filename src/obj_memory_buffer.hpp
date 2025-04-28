@@ -1,8 +1,8 @@
 // author : Mauricio Gomes
 // license: MIT (https://opensource.org/licenses/MIT)
 
-#ifndef BINARY_MEMORY_BUFFER_HPP
-#define BINARY_MEMORY_BUFFER_HPP
+#ifndef OBJ_MEMORY_BUFFER_HPP
+#define OBJ_MEMORY_BUFFER_HPP
 
 #include "constant.hpp"
 #include "s.hpp"
@@ -32,12 +32,12 @@ namespace pensar_digital
     /// Memory buffer to deal with binary data for BinaryIO types.
     /// </summary>
         template <BinaryIO T>
-        class BinaryMemoryBuffer : public MemoryBuffer
+        class ObjMemoryBuffer : public MemoryBuffer
         {
         public:
 
             /// \brief Adds data to the buffer. 
-            void write_obj (const T& obj) noexcept
+            void add (const T& obj) noexcept
             {
 
                 //std::span<std::byte>&& data = std::move(obj.span_bytes());
@@ -62,19 +62,19 @@ namespace pensar_digital
             }
 
             template <typename... Args> requires FactoryConstructible<T, Args...>
-            T::Factory::P write_obj (Args&&... args) noexcept
+            T::Factory::P CreateAndAddObj (Args&&... args) noexcept
             {
                 typename T::Factory::P p = T::get(std::forward<Args>(args)...);
-                write_obj (*p);
+                add (*p);
 
                 return p;
             }
 
-            T::Factory::P write_obj () noexcept
+            T::Factory::P CreateAndAddObj() noexcept
             {
                 typename T::Factory::P p = T::get();
                 T obj = *p;
-                write_obj(obj);
+                add(obj);
 
                 return p;
             }
@@ -125,8 +125,8 @@ namespace pensar_digital
 
                 return p;
             }
-        }; // BinaryMemoryBuffer
+        }; // ObjMemoryBuffer
 	} // cpplib
 } // pensar_digital
 
-#endif // BINARY_MEMORY_BUFFER_HPP
+#endif // OBJ_MEMORY_BUFFER_HPP

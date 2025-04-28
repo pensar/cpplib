@@ -200,24 +200,24 @@ namespace pensar_digital
 		template <typename T>
 		concept BinaryStreamable = CharCastable<T> && Sizeofable<T> && Streamable<T>;
 
-		// BinaryConvertible concept requires a public method bytes() returning something convertible to MemoryBufferPtr.
+		// MemoryBufferPtrConvertible concept requires a public method bytes() returning something convertible to MemoryBufferPtr.
 		template <typename T>
-		concept BinaryConvertible = requires(T t) { { t.bytes() } -> std::convertible_to<MemoryBufferPtr>; };
+		concept MemoryBufferPtrConvertible = requires(T t) { { t.bytes() } -> std::convertible_to<MemoryBufferPtr>; };
 
 		// BinaryConstructible concept requires a constructor with this parameter: (MemoryBuffer& bytes) returning something convertible to T.
 		template <typename T>
 		concept BinaryConstructible = requires(MemoryBuffer & bytes) { { T(bytes) } -> std::convertible_to<T>; };
 
-		// BinaryIO concept requires BinaryConvertible and BinaryConstructible.
+		// BinaryIO concept requires MemoryBufferPtrConvertible and BinaryConstructible.
 		template <typename T>
-		concept BinaryIO = BinaryConvertible<T> && BinaryConstructible<T>;
+		concept BinaryIO = MemoryBufferPtrConvertible<T> && BinaryConstructible<T>;
 		
-		// BinaryOutputtableObject concept requires BinaryConvertible and SizeableIdentifiable.
+		// BinaryOutputtableObject concept requires MemoryBufferPtrConvertible and SizeableIdentifiable.
 		template <class T>
-		concept BinaryWriteableObject = BinaryConvertible<T> && Sizeofable<T>;
+		concept BinaryWriteableObject = MemoryBufferPtrConvertible<T> && Sizeofable<T>;
 
 		template <typename T>
-		concept BinaryStreamableObject = BinaryConvertible<T> && Streamable<T>;
+		concept BinaryStreamableObject = MemoryBufferPtrConvertible<T> && Streamable<T>;
 
 		// BinaryWriteable concept requires a public method write (std::span<std::byte>& wbytes).
 		template <typename T>

@@ -4,7 +4,7 @@
 #include "../../../unit-test/src/test.hpp"
 #include "../command.hpp"
 #include "../memory_buffer.hpp"
-#include "../binary_memory_buffer.hpp"
+#include "../obj_memory_buffer.hpp"
 
 
 namespace pensar_digital
@@ -255,19 +255,19 @@ namespace pensar_digital
 		TEST(CompositeCommandBinaryStreaming, false)
 			using Cmd = CompositeCommand;
 
-			BinaryMemoryBuffer<Cmd> buffer;
+			ObjMemoryBuffer<Cmd> buffer;
 			Cmd cmd;
 			Cmd cmd2;
 			CHECK_NOT_EQ(Cmd, cmd, cmd2, W("0"));
 
-			buffer.write_obj(cmd);
+			buffer.add(cmd);
 
 			Cmd::Factory::P p = buffer.read_obj();
 
 			CHECK_EQ(Cmd, *p, cmd, "1");
 
 
-			Cmd::Factory::P p3 = buffer.write_obj();
+			Cmd::Factory::P p3 = buffer.CreateAndAddObj();
 			Cmd::Factory::P p4 = nullptr;
 			buffer.read_obj(&p4);
 			CHECK_EQ(Cmd, *p4, *p3, "2");
