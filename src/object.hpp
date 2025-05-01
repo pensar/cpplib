@@ -12,6 +12,7 @@
 #include "log.hpp"
 #include "string_def.hpp"
 #include "memory_buffer.hpp"
+#include "equal.hpp"
 
 #include <sstream>
 #include <iostream>
@@ -94,23 +95,6 @@ namespace pensar_digital
                 
                 // Set Factory as friend class to allow access to private members.
                 friend class Factory;
-            protected:
-
-                /// \brief Compare objects.
-                ///
-                /// \param The object to be compared with.
-                /// \return true if they are equal, false otherwise.
-                /// \see equals
-                ///
-                inline virtual bool _equals(const Object& o) const 
-                {
-                    const Object* pother = dynamic_cast<const Object*>(&o);
-                    if (pother == nullptr)
-						return false;
-
-                    return ! (std::memcmp (data (), o.data (), data_size ())); 
-                }
-
             public:
 
                 /// Default constructor.
@@ -210,14 +194,9 @@ namespace pensar_digital
                 // Clone method. 
                 ObjectPtr clone() const noexcept { return pd::clone<Object>(*this, mdata.mid); }
                 
-                /// Check if passed object equals self.
-                /// Derived classes must implement the _equals method. The hash compare logic is made on equals.
-                /// _equals is called from template method equals and should only implement the specific comparison.
-                /// \see _equals
-                /// \return true if objects have the same id, false otherwise.
                 virtual bool equals(const Object& o) const noexcept
                 {
-                    return _equals(o);
+                    return equal<Object>(*this, o);
                 }
 
                 /// Access object id

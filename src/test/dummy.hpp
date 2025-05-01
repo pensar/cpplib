@@ -10,7 +10,7 @@
 #include "../clone_util.hpp"
 #include "../factory.hpp"
 #include "../string_types.hpp"
-
+#include "../equal.hpp"
 #include <memory>
 
 namespace pensar_digital
@@ -80,6 +80,10 @@ namespace pensar_digital
                         return true;
                     }
 
+					virtual bool equals(const Object& o) const noexcept
+					{
+						return (equal<const Dummy>(*this, *dynamic_cast<const Dummy*>(&o)));
+					}
                     //DummyPtr clone() const  noexcept { return pd::clone<Dummy>(*this, id (), mdata.mname); }
 
                     /*virtual std::istream& binary_read(std::istream& is, const std::endian& byte_order = std::endian::native)
@@ -114,9 +118,6 @@ namespace pensar_digital
                 {
 				    return Object::debug_string() + W(" name = ") + mdata.mname;
                 }
-
-            //protected:
-                //virtual bool _equals(const Object& o) const { return Object::_equals(o); }
         };
 
         inline InStream&  operator >> (InStream&  is,       Dummy& o) { return o.read  (is); }
