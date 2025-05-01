@@ -201,8 +201,14 @@ namespace pensar_digital
 
             MemoryBuffer& append (MemoryBuffer& mb)
             {
-                return copy(mb, 0);
+                return copy(mb, mwrite_offset);
             }
+
+			MemoryBuffer& append(const BytePtr data, const size_t size)
+			{
+				write(data, size);
+				return *this;
+			}
         }; // MemoryBuffer
 
 

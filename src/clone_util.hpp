@@ -16,6 +16,14 @@ namespace pensar_digital
             NewFactory<T, Args...> factory;
             return factory.get(args...);
         }
+
+        // CloneableConcept any class T with a T::Ptr clone (); method. where T::Ptr is a shared_ptr <T>.
+		template <typename T>
+		concept CloneableConcept = requires (T t)
+		{
+			{ t.clone() } -> std::convertible_to<typename T::Ptr>;
+		};
+
 	} // namespace cpplib
 } // namespace pensar_digital
 #endif // CLONE_UTIL_HPP

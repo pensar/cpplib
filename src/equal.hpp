@@ -3,47 +3,67 @@
 
 #include "concept.hpp"
 #include "constant.hpp"
+#include <type_traits>
+#include <cstring>
 
 namespace pensar_digital
 {
-	namespace cpp
-	{
-		// HasStdLayoutTriviallyCopyableData concept.
-		template <class T>
-		concept HasStdLayoutTriviallyCopyableData = requires (T t)
-		{
-			{ t.data() } -> std::convertible_to<const pensar_digital::cpplib::Data*>;
-			{ t.data_size() } -> std::convertible_to<size_t>;
-		} && pensar_digital::cpplib::TriviallyCopyable<typename T::DataType>;
+    namespace cpplib
+    {
+        // HasStdLayoutTriviallyCopyableData concept.
+        template <class T>
+        concept HasStdLayoutTriviallyCopyableData = requires (T t)
+        {
+            { t.data() } -> std::convertible_to<const pensar_digital::cpplib::Data*>;
+            { t.data_size() } -> std::convertible_to<size_t>;
+        }&& pensar_digital::cpplib::TriviallyCopyable<typename T::DataType>;
 
-		template <class T>
-		concept TriviallyHashComparable = HasStdLayoutTriviallyCopyableData<T> && pensar_digital::cpplib::Hashable<T>;
+        // TriviallyHashComparable concept.
+        template <class T>
+        concept TriviallyHashComparable = HasStdLayoutTriviallyCopyableData<T> && pensar_digital::cpplib::Hashable<T>;
 
-		/// \brief Compares two objects of the same type for equality.
-		/// \param lhs The left-hand side object.
-		/// \param rhs The right-hand side object.
-		/// \return true if the objects are equal, false otherwise.
-		template <HasStdLayoutTriviallyCopyableData T>
-		bool trivially_equal(const T& l, const T& r)
-		{
-			const T* lp = dynamic_cast<const T*>(&l);
-			const T* rp = dynamic_cast<const T*>(&r);
-			if ((lp == nullptr) && (rp == nullptr))
-				return true;
-			if (((lp == nullptr) && (rp != nullptr)) || ((lp != nullptr) && (rp == nullptr)))
-				return false;
+        // Tag types for dispatch.
+        struct HashComparableTag {};
+        struct DataComparableTag {};
+		struct TriviallyComparableTag {};
 
-			return !(std::memcmp(l.data(), r.data(), l.data_size()));
-		}
+        // Type trait to select the appropriate tag.
+        template <class T>
+        using EqualDispatchTag = std::conditional_t<TriviallyHashComparable<T>, HashComparableTag, std::conditional_t<HasStdLayoutTriviallyCopyableData<T>, TriviallyComparableTag, DataComparableTag>>;
 
-		template <TriviallyHashComparable T>
-		bool equal(const T& l, const T& r)
-		{
-			if (l.hash() != r.hash())
-				return false;
-			return trivially_equal<T>(l, r);
-		}
+        // Implementation for StdLayoutTriviallyCopyable.
+        template <StdLayoutTriviallyCopyable T>
+        bool equal_impl(const T& l, const T& r, TriviallyComparableTag)
+        {
+            if (&l == &r) // Same object
+                return true;
+            return std::memcmp(l, r, sizeof(l)) == 0;
+        }
 
-	}
+        // Implementation for HasStdLayoutTriviallyCopyableData (no hash).
+        template <HasStdLayoutTriviallyCopyableData T>
+        bool equal_impl(const T& l, const T& r, DataComparableTag)
+        {
+            if (&l == &r) // Same object
+                return true;
+            return std::memcmp(l.data(), r.data(), l.data_size()) == 0;
+        }
+
+        // Implementation for TriviallyHashComparable (uses hash).
+        template <TriviallyHashComparable T>
+        bool equal_impl(const T& l, const T& r, HashComparableTag)
+        {
+            if (l.hash() != r.hash())
+                return false;
+            return equal_impl(l, r, DataComparableTag{}); // Fall back to memcmp
+        }
+
+        // Public interface: single equal function.
+        template <HasStdLayoutTriviallyCopyableData T>
+        bool equal(const T& l, const T& r)
+        {
+            return equal_impl(l, r, EqualDispatchTag<T>{});
+        }
+    }
 }
-#endif	// EQUAL_HPP
+#endif // EQUAL_HPP

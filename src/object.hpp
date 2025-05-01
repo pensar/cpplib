@@ -33,7 +33,7 @@ namespace pensar_digital
     {
         namespace pd = pensar_digital::cpplib;
         class Object;
-        typedef std::shared_ptr<Object> ObjectPtr;
+        using ObjectPtr = std::shared_ptr<Object>;
         
         inline static void log_throw(const S& error_msg = W("")) 
         {
@@ -167,8 +167,8 @@ namespace pensar_digital
 				{
                     MemoryBufferPtr mb = std::make_unique<MemoryBuffer> (size ());
                     MemoryBufferPtr version_bytes = version ()->bytes();
-                    mb->copy (*version_bytes);
-                    mb->write ((BytePtr(&mdata)), data_size ());
+                    mb->append (*version_bytes);
+                    mb->append ((BytePtr(&mdata)), data_size ());
                     return mb;
 				}
 
@@ -215,10 +215,8 @@ namespace pensar_digital
                 /// _equals is called from template method equals and should only implement the specific comparison.
                 /// \see _equals
                 /// \return true if objects have the same id, false otherwise.
-                bool equals(const Object& o) const noexcept
+                virtual bool equals(const Object& o) const noexcept
                 {
-                    if (hash() != o.hash())
-                        return false;
                     return _equals(o);
                 }
 

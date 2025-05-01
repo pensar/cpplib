@@ -19,6 +19,9 @@
 #include "factory.hpp"
 #include "bool.hpp"
 #include "memory_buffer.hpp"
+#include "clone_util.hpp"
+#include "equal.hpp"
+
 
 namespace pensar_digital
 {
@@ -29,13 +32,13 @@ namespace pensar_digital
         concept CommandConcept = requires(T t)
         {
             { t.run() } -> std::same_as<void>;
-        }&& Identifiable<T>;
+        }&& Identifiable<T> && CloneableConcept<T>;
 
         template<class T>
         concept DerivedCommandConcept = requires(T t)
 		{
 			{ t._run() } -> std::same_as<void>;
-		};
+		}&& CloneableConcept<T>;
 
         template<typename T>
         concept UndoableCommandConcept = CommandConcept<T> && requires(T t)
@@ -44,11 +47,9 @@ namespace pensar_digital
         };
 
         template<class T>
-        concept DerivedUndoableCommandConcept = requires(T t)
-        {
-            { t._undo() } -> std::same_as<void>;
-        };
+		concept DerivedUndoableCommandConcept = DerivedCommandConcept<T> && UndoableCommandConcept<T>;
 
+        namespace pd = pensar_digital::cpplib;
         class Command : public Object
         {
             private:
@@ -61,10 +62,11 @@ namespace pensar_digital
                 Data(const Bool ok = Bool::UNKNOWN) noexcept : mok (ok) {}
             };
             // Asserts Data is a trivially copyable type.
-            static_assert(TriviallyCopyable<Data>, "Data must be a trivially copyable type");
+            static_assert(StdLayoutTriviallyCopyable<Data>, "Data must be a trivially copyable type");
             Data mdata; //!< Member variable mdata contains the object data
             
             public:
+            using Ptr = std::shared_ptr<Command>;
 
             inline const static Data NULL_DATA = { Bool::UNKNOWN };
             using DataType = Data;
@@ -128,6 +130,14 @@ namespace pensar_digital
                 return true;
             }
 
+			virtual bool equals(const Object& o) const noexcept
+			{
+				const Command* pother = dynamic_cast<const Command*>(&o);
+				if (pother == nullptr)
+					return false;
+				return equal<Command> (*this, *pother);
+			}
+
             virtual Command& assign_without_object(MemoryBuffer& mb) noexcept
             {
                 Version v (mb);
@@ -173,11 +183,12 @@ namespace pensar_digital
 
             protected:
 
-			virtual void _run() = 0;
-            virtual void _undo() const = 0;
+                virtual void _run()  {}
+                virtual void _undo() const  {}
                     
             public:
-
+				using Ptr = std::shared_ptr<Command>;
+				virtual Ptr clone() const noexcept { return pd::clone<Command>(*this, id()); } //!< Clones the command.
             virtual void run () 
             {
                 _run();
@@ -212,6 +223,8 @@ namespace pensar_digital
 				~NullCommand() = default;
 				void _run() { }
 				void _undo() const { }
+				
+				virtual Command::Ptr clone() const noexcept { return pd::clone<NullCommand>(*this); }
         };
         inline static const NullCommand NULL_CMD = NullCommand();
 
@@ -315,7 +328,6 @@ namespace pensar_digital
             {
                 return mfactory.get (aid);
             }
-            
             void _run()
 			{
 				for (int_fast8_t i = 0; i < mdata.mindex; ++i)
@@ -337,7 +349,18 @@ namespace pensar_digital
 			/// </summary>
 			/// <param name="cmd">Pointer to the command to be added.</param>
 			void add (Command* cmd) { mdata.add (cmd); }
-		};
+
+            Command::Ptr clone() const noexcept
+            {
+                CompositeCommand* pcc = (CompositeCommand*)pd::clone<CompositeCommand>(*this, id()).get();
+                // Clone all commands and add to the newly created composite.
+                for (size_t i = 0; i < mdata.mindex; ++i)
+                {
+                    pcc->add((Command*)mdata.mcommands[i]->clone().get ());
+                }
+				return (Ptr)pcc;
+            }
+        };
  
     }
 }

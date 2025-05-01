@@ -40,7 +40,6 @@ namespace pensar_digital
             void add (const T& obj) noexcept
             {
 
-                //std::span<std::byte>&& data = std::move(obj.span_bytes());
 				MemoryBufferPtr mb = obj.bytes ();  
 
                 // Check if the id already exists.

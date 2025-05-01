@@ -200,6 +200,7 @@
     <ClInclude Include="cs.hpp" />
     <ClInclude Include="encoding.hpp" />
     <ClInclude Include="endian.hpp" />
+    <ClInclude Include="equal.hpp" />
     <ClInclude Include="file.hpp" />
     <ClInclude Include="icu_util.hpp" />
     <ClInclude Include="io_util.hpp" />
