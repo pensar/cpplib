@@ -152,6 +152,13 @@ namespace pensar_digital
 					mb.write ((BytePtr)(&mdata), DATA_SIZE);
 					return *this;
 				}
+
+				inline Object& object_write (MemoryBuffer& mb) noexcept
+				{
+                    VERSION->write(mb);
+                    mb.write((BytePtr)(&mdata), DATA_SIZE);
+					return *this;
+                }
                 /*
                 inline virtual void bytes_to_vector(ConstBytes& v) const noexcept
                 {
