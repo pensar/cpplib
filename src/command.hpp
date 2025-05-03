@@ -153,9 +153,9 @@ namespace pensar_digital
                 Object::assign(mb);
                 return assign_without_object(mb);
             }
-            inline virtual MemoryBufferPtr bytes() const noexcept
+            inline virtual MemoryBuffer::Ptr bytes() const noexcept
             {
-				MemoryBufferPtr mb = std::make_unique<MemoryBuffer>(SIZE);  
+				MemoryBuffer::Ptr mb = std::make_unique<MemoryBuffer>(SIZE);  
                 mb->append (*Object::bytes());
 				mb->append (*VERSION->bytes());
                 mb->write((BytePtr(&mdata)), DATA_SIZE);
@@ -304,11 +304,11 @@ namespace pensar_digital
 
             public:
 
-			inline virtual MemoryBufferPtr bytes() const noexcept
+			inline virtual MemoryBuffer::Ptr bytes() const noexcept
 			{
 				ByteSpan obs = Object::data_span();
-				MemoryBufferPtr mb = std::make_unique<MemoryBuffer>(SIZE);
-				MemoryBufferPtr version_bytes = VERSION->bytes();
+				MemoryBuffer::Ptr mb = std::make_unique<MemoryBuffer>(SIZE);
+				MemoryBuffer::Ptr version_bytes = VERSION->bytes();
 				mb->write(obs.data(), obs.size());
 				mb->append(*version_bytes);
 				mb->write(data_bytes(), data_size());

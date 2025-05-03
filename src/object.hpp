@@ -71,21 +71,23 @@ namespace pensar_digital
                 inline const static Data NULL_DATA = { NULL_ID};
                 using DataType = Data;
                 using Factory = pd::Factory<Object, typename Object::DataType> ;
-                
+                inline virtual pd::Data* get_null_data() const noexcept { return (pd::Data*)(&NULL_DATA); }
                 // Version of the class.
                 inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
                 virtual const VersionPtr version () const noexcept { return VERSION; }
 
                 using FactoryType = Factory;
+				inline const BytePtr object_data_bytes() const noexcept { return (BytePtr)&mdata; }
+				inline const size_t object_data_size() const noexcept { return sizeof(mdata); }
 
                 virtual const pd::Data* data() const noexcept { return &mdata; }
-                virtual const BytePtr data_bytes() const noexcept { return (BytePtr)data(); }
+                virtual const BytePtr data_bytes() const noexcept { return (BytePtr)&mdata; }
 
 				inline static constexpr size_t DATA_SIZE = sizeof(mdata);
                 inline static constexpr size_t      SIZE = DATA_SIZE + Version::SIZE;
 				
                 virtual size_t data_size() const noexcept { return sizeof(mdata); }
-				virtual size_t size() const noexcept { return data_size() + version()->size () ; }
+				virtual size_t size() const noexcept { return data_size() + Version::SIZE ; }
                 
                 /// Set id
                 /// \param val New value to set
@@ -96,7 +98,7 @@ namespace pensar_digital
                 // Set Factory as friend class to allow access to private members.
                 friend class Factory;
             public:
-
+                
                 /// Default constructor.
                 Object(const Data& data = NULL_DATA) noexcept
                 {
@@ -112,7 +114,7 @@ namespace pensar_digital
 
                 Object (MemoryBuffer& mb)
                 {
-					assign (mb);
+					object_assign (mb);
                 }
 
                 /** Default destructor */
@@ -123,12 +125,26 @@ namespace pensar_digital
 				virtual Object& assign (MemoryBuffer& mb) 
 				{
 					Version v(mb);
-                    Version v2 = *VERSION;
+                    Version v2 = *version ();
 					if (v != v2)
 						log_throw(W("Version mismatch."));
-					mb.read_known_size ((BytePtr)(&mdata), DATA_SIZE);
+					mb.read_known_size (data_bytes(), size ());
 					return *this;
 				}
+
+				Object& object_assign(MemoryBuffer& mb) noexcept
+				{
+                    Version v(mb);
+                    if (v != *VERSION)
+                        log_throw(W("Version mismatch."));
+                    mb.read_known_size(object_data_bytes(), DATA_SIZE);
+                    return *this;
+                }
+
+				Object& object_assign(const Object& o) noexcept {
+                    mdata = o.mdata;
+                    return *this;
+                }
 
 				inline virtual Object& write (MemoryBuffer& mb) noexcept
 				{
@@ -146,18 +162,25 @@ namespace pensar_digital
                     std::copy_n(reinterpret_cast<const std::byte*>(&mdata), data_size(), v.end() - data_size());
                 }
                 */
-
-				virtual MemoryBufferPtr bytes () const noexcept
+            MemoryBuffer::Ptr object_bytes() const noexcept
+			{
+				MemoryBuffer::Ptr mb = std::make_unique<MemoryBuffer>(SIZE);
+				mb->append(*VERSION->bytes());
+				mb->append((BytePtr)(&mdata), DATA_SIZE);
+				return mb;
+			}
+			/// \brief Returns a MemoryBuffer::Ptr with the object data.
+				virtual MemoryBuffer::Ptr bytes () const noexcept
 				{
-                    MemoryBufferPtr mb = std::make_unique<MemoryBuffer> (size ());
-                    MemoryBufferPtr version_bytes = version ()->bytes();
+                    MemoryBuffer::Ptr mb = std::make_unique<MemoryBuffer> (size ());
+                    MemoryBuffer::Ptr version_bytes = version ()->bytes();
                     mb->append (*version_bytes);
                     mb->append ((BytePtr(&mdata)), data_size ());
                     return mb;
 				}
 
-                // Implicit convertion to MemoryBufferPtr.
-				inline operator MemoryBufferPtr () const noexcept
+                // Implicit convertion to MemoryBuffer::Ptr.
+				inline operator MemoryBuffer::Ptr () const noexcept
 				{
 					return bytes();
 				}
@@ -194,6 +217,19 @@ namespace pensar_digital
                 // Clone method. 
                 ObjectPtr clone() const noexcept { return pd::clone<Object>(*this, mdata.mid); }
                 
+				inline virtual Object* get_obj() const noexcept
+				{
+					return ((Object*)(&(*(mfactory.get(NULL_DATA)))));
+				}
+                
+                /*inline virtual Object* clone() const noexcept
+                {
+                    Object* o = get_obj();
+                    o->assign(*this);
+					return o;
+                }
+                */
+
                 virtual bool equals(const Object& o) const noexcept
                 {
                     return equal<Object>(*this, o);
@@ -281,7 +317,15 @@ namespace pensar_digital
                 inline virtual OutStream& write (OutStream& os) const { return os <<     id (); }
                  
         }; // Object
-        
+        // CloneableConcept any class T with a T::Ptr clone (); method. where T::Ptr is a shared_ptr <T>.
+        /*
+        template <typename T>
+        concept CloneableConcept = requires (T t)
+        {
+            { t.clone() } -> std::convertible_to<Object*>;
+        };
+        */
+
 
         /*
         template<typename Container>

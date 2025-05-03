@@ -40,7 +40,7 @@ namespace pensar_digital
             void add (const T& obj) noexcept
             {
 
-				MemoryBufferPtr mb = obj.bytes ();  
+				MemoryBuffer::Ptr mb = obj.bytes ();  
 
                 // Check if the id already exists.
                 auto offset_it = this->mindex.find(obj.id());

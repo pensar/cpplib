@@ -75,7 +75,7 @@ namespace pensar_digital
 	    TEST(GeneratorSerialization, true)
 			using G = Generator<int>;
             G g;
-		    MemoryBufferPtr mb = g.bytes ();
+		    MemoryBuffer::Ptr mb = g.bytes ();
 		    G g2 (1);
 		    CHECK_NOT_EQ(G, g2, g, W("0"));
 			g2.assign(*mb);

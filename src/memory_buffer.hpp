@@ -5,6 +5,9 @@
 #define MEMORY_BUFFER_HPP
 
 #include "constant.hpp"
+#include "concept.hpp"
+
+#include "factory.hpp"
 
 #include <memory> // for std::shared_ptr
 #include <concepts>
@@ -24,13 +27,12 @@ namespace pensar_digital
 {
     namespace cpplib
     { 
-        class MemoryBuffer;
-		using MemoryBufferPtr = std::unique_ptr<MemoryBuffer>;
 
         class MemoryBuffer
         {
             public:
                 using Offset = size_t;
+                using Ptr = std::unique_ptr<MemoryBuffer>;
             protected:
                 std::span<std::byte> mbuffer; //!< Buffer.
                 Offset mwrite_offset;         //!< Write offset.
@@ -172,7 +174,7 @@ namespace pensar_digital
 				read(dest, mread_offset, size);
 			}   
 
-            MemoryBuffer& copy (MemoryBuffer& mb, const Offset offset = 0)
+            MemoryBuffer& copy (const MemoryBuffer& mb, const Offset offset = 0)
 			{
 				// Check if there is enough space in the buffer.
 				if (wavailable() < mb.size())
@@ -199,18 +201,70 @@ namespace pensar_digital
 				return *this;
 			}
 
-            MemoryBuffer& append (MemoryBuffer& mb)
+            inline MemoryBuffer& append (const MemoryBuffer& mb)
             {
                 return copy(mb, mwrite_offset);
             }
 
-			MemoryBuffer& append(const BytePtr data, const size_t size)
+			inline MemoryBuffer& append(const BytePtr data, const size_t size)
 			{
 				write(data, size);
 				return *this;
 			}
+
+			// += operator
+            inline MemoryBuffer& operator+=(const MemoryBuffer& mb)
+            {
+                return append (mb);
+            }
+
+            template <HasStdLayoutTriviallyCopyableData T>
+			MemoryBuffer& append(const T& t)
+			{
+				write(t.data_bytes (), T::DATA_SIZE);
+				return *this;
+			}
         }; // MemoryBuffer
 
+        // MemoryBufferPtrConvertible concept requires a public method bytes() returning something convertible to MemoryBuffer::Ptr.
+        template <typename T>
+        concept MemoryBufferPtrConvertible = requires(T t) { { t.bytes() } -> std::convertible_to<MemoryBuffer::Ptr>; };
+
+        // BinaryConstructible concept requires a constructor with this parameter: (MemoryBuffer& bytes) returning something convertible to T.
+        template <typename T>
+        concept BinaryConstructible = requires(MemoryBuffer & bytes) { { T(bytes) } -> std::convertible_to<T>; };
+
+        // BinaryIO concept requires MemoryBufferPtrConvertible and BinaryConstructible.
+        template <typename T>
+        concept BinaryIO = MemoryBufferPtrConvertible<T> && BinaryConstructible<T>;
+
+        // BinaryOutputtableObject concept requires MemoryBufferPtrConvertible and SizeableIdentifiable.
+        template <class T>
+        concept BinaryWriteableObject = MemoryBufferPtrConvertible<T> && Sizeofable<T>;
+
+        template <typename T>
+        concept BinaryStreamableObject = MemoryBufferPtrConvertible<T> && Streamable<T>;
+        // ObjectBinaryWriteable concept requires a type T with a public method write<Obj> (const Obj& object). Where Obj must comply with BinaryWriteableObject.
+        template <typename T, typename Obj>
+        concept ObjectBinaryWriteable = requires(T t, const Obj & object)
+        {
+            { t.template write<Obj>(object) } -> std::convertible_to<void>;
+        }&& BinaryWriteableObject<Obj>;
+
+        // FactoryObjectBinaryWriteable concept requires a type T with a public method write<Obj> (const Obj& object). Where Obj must comply with BinaryOutputtableObject.
+        template <typename T, typename Obj, typename... Args>
+        concept FactoryObjectBinaryWriteable = requires(T t, const Obj & object)
+        {
+            { t.template write<Obj, Args...>(object) } -> std::convertible_to<void>;
+        }&& ObjectBinaryWriteable<T, Obj>&& FactoryConstructible<Obj, Args ...>;
+
+        // BinaryWriteable concept requires a public method write (std::span<std::byte>& wbytes).
+        template <typename T>
+        concept BinaryWriteable = requires(T t, std::span<std::byte>&wbytes) { { t.write(wbytes) } -> std::convertible_to<void>; };
+
+        // BinaryPersistable concept requires a type T that is trivially copyable and has a public method virtual std::ostream& binary_write (std::ostream& os, const std::endian& byte_order = std::endian::native) const; and a public method virtual std::istream& binary_read (std::istream& is, const std::endian& byte_order = std::endian::native);
+        template <typename T>
+        concept BinaryPersistable = BinaryWriteable<T> && BinaryReadable<T>;
 
 /*
         template <class T>

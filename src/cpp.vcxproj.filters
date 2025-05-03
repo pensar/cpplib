@@ -72,9 +72,6 @@
     <ClInclude Include="concept.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="object.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="memory.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -138,6 +135,12 @@
     <ClInclude Include="equal.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="generator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="object.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\constants.cpp">
@@ -153,9 +156,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\error.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\generator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\log.cpp">

@@ -10,14 +10,6 @@ namespace pensar_digital
 {
     namespace cpplib
     {
-        // HasStdLayoutTriviallyCopyableData concept.
-        template <class T>
-        concept HasStdLayoutTriviallyCopyableData = requires (T t)
-        {
-            { t.data() } -> std::convertible_to<const pensar_digital::cpplib::Data*>;
-            { t.data_size() } -> std::convertible_to<size_t>;
-        }&& pensar_digital::cpplib::TriviallyCopyable<typename T::DataType>;
-
         // TriviallyHashComparable concept.
         template <class T>
         concept TriviallyHashComparable = HasStdLayoutTriviallyCopyableData<T> && pensar_digital::cpplib::Hashable<T>;

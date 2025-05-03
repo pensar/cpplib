@@ -19,7 +19,7 @@ namespace pensar_digital
 
 		TEST(VersionSerialization, true)
 			VersionPtr v = Version::get(2, 3, 4);
-			MemoryBufferPtr mb = v->bytes();
+			MemoryBuffer::Ptr mb = v->bytes();
 			VersionPtr v1 = Version::get();
 			CHECK_NOT_EQ(Version, *v, *v1, W("0. v == v1"));
 			v1->assign(*mb);

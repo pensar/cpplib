@@ -54,13 +54,14 @@ namespace pensar_digital
                 inline static const VersionInt NULL_VERSION = -1;
                 
                 typedef Data DataType;
-                virtual const pd::Data* data() const noexcept { return &mdata; }
+                inline virtual const pd::Data* data() const noexcept { return &mdata; }
 				inline static const size_t DATA_SIZE = sizeof(mdata);
                 inline static const size_t SIZE = sizeof(mdata);
 
-                virtual const BytePtr data_bytes () const noexcept { return (BytePtr)data(); }
-                virtual size_t data_size () const noexcept { return sizeof(mdata); }
-				virtual size_t size() const noexcept { return data_size(); }
+                inline const BytePtr version_data_bytes () const noexcept { return (BytePtr)&mdata; }
+                inline virtual const BytePtr data_bytes() const noexcept { return (BytePtr)data(); }
+                inline virtual size_t data_size () const noexcept { return sizeof(mdata); }
+				inline virtual size_t size() const noexcept { return data_size(); }
 
                 Version(const VersionInt& pub = NULL_VERSION, const VersionInt& prot = NULL_VERSION, const VersionInt& priv = NULL_VERSION, const Id& id = null_value<Id>())
                     : mdata (pub, prot, priv, id) {}
@@ -104,9 +105,9 @@ namespace pensar_digital
 
                 virtual ByteSpan data_span() const noexcept { return ByteSpan (data_bytes(), data_size()); }
 
-                inline virtual MemoryBufferPtr bytes() const noexcept
+                inline virtual MemoryBuffer::Ptr bytes() const noexcept
                 {
-                    MemoryBufferPtr mb = std::make_unique<MemoryBuffer>(DATA_SIZE);
+                    MemoryBuffer::Ptr mb = std::make_unique<MemoryBuffer>(DATA_SIZE);
 					mb->write ((BytePtr)&mdata, DATA_SIZE);
 					return mb;
                 }

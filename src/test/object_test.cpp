@@ -36,12 +36,12 @@ namespace pensar_digital
 
         TEST(ObjectSerialization, true)
             auto o = pd::Object::get(42);
-            MemoryBufferPtr mb = *o;
+            MemoryBuffer::Ptr mb = *o;
 
 			auto o1 = pd::Object::get();
 			CHECK_NOT_EQ(Object, *o, *o1, W("0. o == o1"));
 
-			o1->assign (*mb);
+			o1->object_assign (*mb);
 			CHECK_EQ(Object, *o, *o1, W("1. o != o1"));
 
          TEST_END(ObjectSerialization)
@@ -84,7 +84,7 @@ namespace pensar_digital
 
                 for (Id i = 0; i < N; i++)
                 {
-                    MemoryBufferPtr mb = objects[i]->bytes();
+                    MemoryBuffer::Ptr mb = objects[i]->bytes();
                     out.write((const char*)mb->data(), mb->size());
                 }
                 out.close();
@@ -95,7 +95,7 @@ namespace pensar_digital
                     ObjectPtr o = pd::Object::get();
                     MemoryBuffer mb(Object::SIZE);
                     mb.write (in, mb.size());
-					o->assign(mb);
+					o->object_assign(mb);
                     ObjectPtr o1 = pd::Object::get(i);
                     CHECK_EQ(Object, *o, *o1, pd::to_string(i));
                 }

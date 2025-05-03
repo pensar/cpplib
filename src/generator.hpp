@@ -67,11 +67,10 @@ namespace pensar_digital
           inline static constexpr size_t DATA_SIZE = sizeof(mdata);
           inline static constexpr size_t      SIZE = DATA_SIZE + Version::SIZE + Object::SIZE;
 
-          virtual const pd::Data* data() const noexcept { return &mdata; }
-          virtual size_t data_size() const noexcept { return DATA_SIZE; }
-          virtual size_t size() const noexcept { return SIZE; }
-
-
+          inline const   pd::Data* generator_data     () const noexcept { return &mdata   ; }
+		  inline const BytePtr generator_data_bytes() const noexcept { return (BytePtr)&mdata; }
+		  inline static const Data NULL_DATA = { null_value<T>(), null_value<T>() }; //!< Null data.
+          inline virtual pd::Data* get_null_data() const noexcept { return (pd::Data*)(&NULL_DATA); }
             /// \brief Constructs a Generator.
             /// \param [in] initial_value Initial value for the generator, defaults to 0.
             /// \param [in] astep Step to be used when incrementing the generator, defaults to 1.
@@ -80,34 +79,39 @@ namespace pensar_digital
 			// Constructor from MemoryBuffer.
 			Generator(MemoryBuffer& mb) noexcept : Object(mb)
             {
-                assign_without_object (mb);
+                assign (mb);
             }
             virtual ~Generator () = default;
 
-			virtual G& assign_without_object (MemoryBuffer& mb) noexcept
-			{
-				Version v(mb);
-				if (v != *VERSION) 
-                    log_and_throw (W("assign:Version mismatch"));
-				mb.read_known_size ((BytePtr) &mdata, DATA_SIZE);
-				return *this;
-			}   
-
-            virtual G& assign(MemoryBuffer& mb) noexcept
+            inline G& generator_assign(MemoryBuffer& mb) noexcept
             {
-                Object::assign(mb);
-                return assign_without_object (mb);
+                object_assign (mb);
+                assign (mb);
+				return *this;
             }
 
-            inline virtual MemoryBufferPtr bytes() const noexcept
+			inline virtual Object& assign(MemoryBuffer& mb) noexcept
+			{
+				return generator_assign (mb);
+			}
+
+            inline virtual MemoryBuffer::Ptr bytes() const noexcept
             {
-                MemoryBufferPtr mb = std::make_unique<MemoryBuffer>(SIZE);
-				mb->append (*Object::bytes ());
-                mb->append (*VERSION->bytes ());
+                MemoryBuffer::Ptr mb = std::make_unique<MemoryBuffer>(SIZE);
+				mb->append (object_data_bytes (), Object::DATA_SIZE);
+                mb->append (VERSION->version_data_bytes (), Version::DATA_SIZE);
 				mb->write ((BytePtr(&mdata)), DATA_SIZE);
 				return mb;
             }
 
+            inline MemoryBuffer::Ptr generator_bytes() const noexcept
+            {
+                MemoryBuffer::Ptr mb = std::make_unique<MemoryBuffer>(SIZE);
+                mb->append(object_data_bytes(), Object::DATA_SIZE);
+                mb->append(VERSION->version_data_bytes(), Version::DATA_SIZE);
+                mb->write(generator_data_bytes (), DATA_SIZE);
+                return mb;
+            }
             /// \brief Increments value and return the new value.
             /// \return The new value.
             inline virtual T get_id () { mdata.mvalue += mdata.mstep; return mdata.mvalue; }

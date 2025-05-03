@@ -202,6 +202,7 @@
     <ClInclude Include="endian.hpp" />
     <ClInclude Include="equal.hpp" />
     <ClInclude Include="file.hpp" />
+    <ClInclude Include="generator.hpp" />
     <ClInclude Include="icu_util.hpp" />
     <ClInclude Include="io_util.hpp" />
     <ClInclude Include="log.hpp" />
@@ -223,7 +224,6 @@
     <ClCompile Include="..\src\constants.cpp" />
     <ClCompile Include="..\src\constraint.cpp" />
     <ClCompile Include="..\src\error.cpp" />
-    <ClCompile Include="..\src\generator.cpp" />
     <ClCompile Include="..\src\log.cpp" />
     <ClCompile Include="..\src\memory.cpp" />
     <ClCompile Include="..\src\object.cpp" />

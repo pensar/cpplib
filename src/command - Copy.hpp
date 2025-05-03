@@ -131,11 +131,11 @@ namespace pensar_digital
             //Destructor
             virtual ~Command () = default;
 
-            inline virtual MemoryBufferPtr bytes() noexcept
+            inline virtual MemoryBuffer::Ptr bytes() noexcept
             {
                 ByteSpan obs = Object::data_span();
-                MemoryBufferPtr mb = std::make_unique<MemoryBuffer> (SIZE);
-                MemoryBufferPtr version_bytes = VERSION->bytes();
+                MemoryBuffer::Ptr mb = std::make_unique<MemoryBuffer> (SIZE);
+                MemoryBuffer::Ptr version_bytes = VERSION->bytes();
                 mb->write  (obs.data(), obs.size());
 				mb->append (version_bytes);
 				mb->write  (data_bytes(), data_size());
@@ -243,9 +243,9 @@ namespace pensar_digital
                 return Factory(3, 10, NULL_ID, cmds... );
             }
             
-            virtual MemoryBufferPtr bytes() const noexcept
+            virtual MemoryBuffer::Ptr bytes() const noexcept
 			{
-				MemoryBufferPtr mb = Object::bytes();
+				MemoryBuffer::Ptr mb = Object::bytes();
                 std::apply([&mb](auto&&... cmd) { ((mb->append(cmd.bytes()), true) && ...); }, commands);
                 return mb;
                 //return Object::bytes() + std::apply([](auto&&... cmd) { return (cmd.bytes(), ...); }, commands);

@@ -3,7 +3,6 @@
 
 #include "constant.hpp"
 #include "factory.hpp" // for NewFactory
-#include "memory_buffer.hpp"
 
 #include <concepts>
 #include <iostream>
@@ -200,42 +199,6 @@ namespace pensar_digital
 		template <typename T>
 		concept BinaryStreamable = CharCastable<T> && Sizeofable<T> && Streamable<T>;
 
-		// MemoryBufferPtrConvertible concept requires a public method bytes() returning something convertible to MemoryBufferPtr.
-		template <typename T>
-		concept MemoryBufferPtrConvertible = requires(T t) { { t.bytes() } -> std::convertible_to<MemoryBufferPtr>; };
-
-		// BinaryConstructible concept requires a constructor with this parameter: (MemoryBuffer& bytes) returning something convertible to T.
-		template <typename T>
-		concept BinaryConstructible = requires(MemoryBuffer & bytes) { { T(bytes) } -> std::convertible_to<T>; };
-
-		// BinaryIO concept requires MemoryBufferPtrConvertible and BinaryConstructible.
-		template <typename T>
-		concept BinaryIO = MemoryBufferPtrConvertible<T> && BinaryConstructible<T>;
-		
-		// BinaryOutputtableObject concept requires MemoryBufferPtrConvertible and SizeableIdentifiable.
-		template <class T>
-		concept BinaryWriteableObject = MemoryBufferPtrConvertible<T> && Sizeofable<T>;
-
-		template <typename T>
-		concept BinaryStreamableObject = MemoryBufferPtrConvertible<T> && Streamable<T>;
-
-		// BinaryWriteable concept requires a public method write (std::span<std::byte>& wbytes).
-		template <typename T>
-		concept BinaryWriteable = requires(T t, std::span<std::byte>& wbytes) { { t.write (wbytes) } -> std::convertible_to<void>; };
-
-		// ObjectBinaryWriteable concept requires a type T with a public method write<Obj> (const Obj& object). Where Obj must comply with BinaryWriteableObject.
-		template <typename T, typename Obj>
-		concept ObjectBinaryWriteable = requires(T t, const Obj & object)
-		{
-			{ t.template write<Obj>(object) } -> std::convertible_to<void>;
-		}&& BinaryWriteableObject<Obj>;
-
-		// FactoryObjectBinaryWriteable concept requires a type T with a public method write<Obj> (const Obj& object). Where Obj must comply with BinaryOutputtableObject.
-		template <typename T, typename Obj, typename... Args>
-		concept FactoryObjectBinaryWriteable = requires(T t,const Obj& object)
-		{ 
-			{ t.template write<Obj, Args...> (object) } -> std::convertible_to<void>;
-		} && ObjectBinaryWriteable<T, Obj> && FactoryConstructible<Obj, Args ...>;
 
 		// BinaryReadable concept requires a public method read (std::span<std::byte>& bytes) returning something convertible to T&.
 		template <typename T>
@@ -276,9 +239,14 @@ namespace pensar_digital
 		concept StdLayoutTriviallyCopyable = StandardLayout<T> && TriviallyCopyable<T>;	
 		// Memcpyasble concept. Requires a function data() returning something convertible to void*. Usually a pointer to std::byte. And a data_size() returning something convertible to size_t.
 
-		// BinaryPersistable concept requires a type T that is trivially copyable and has a public method virtual std::ostream& binary_write (std::ostream& os, const std::endian& byte_order = std::endian::native) const; and a public method virtual std::istream& binary_read (std::istream& is, const std::endian& byte_order = std::endian::native);
 		template <typename T>
-		concept BinaryPersistable = BinaryWriteable<T> && BinaryReadable<T>;
+		concept HasStdLayoutTriviallyCopyableData = requires (T t)
+		{
+			{ t.data() } -> std::convertible_to<const Data*>;
+			{ t.data_size() } -> std::convertible_to<size_t>;
+			{ T::DATA_SIZE } -> std::convertible_to<size_t>;
+			{ T::SIZE } -> std::convertible_to<size_t>;
+		}&& TriviallyCopyable<typename T::DataType>&& StdLayoutTriviallyCopyable<typename T::DataType>;
 
 		template <class T>
 		concept TriviallyPersistable = requires (T t)
