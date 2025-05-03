@@ -146,14 +146,14 @@ namespace pensar_digital
                     return *this;
                 }
 
-				inline virtual Object& write (MemoryBuffer& mb) noexcept
+				inline virtual const Object& write (MemoryBuffer& mb) const noexcept
 				{
 					VERSION->write (mb);
 					mb.write ((BytePtr)(&mdata), DATA_SIZE);
 					return *this;
 				}
 
-				inline Object& object_write (MemoryBuffer& mb) noexcept
+				inline const Object& object_write (MemoryBuffer& mb) const noexcept
 				{
                     VERSION->write(mb);
                     mb.write((BytePtr)(&mdata), DATA_SIZE);
