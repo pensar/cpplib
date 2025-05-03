@@ -1,7 +1,8 @@
 // author : Mauricio Gomes
 // license: MIT (https://opensource.org/licenses/MIT)
 
-#include "../../../unit-test/src/test.hpp"
+#include "../../../unit_test/src/test.hpp"
+
 #include "../command.hpp"
 #include "../memory_buffer.hpp"
 #include "../obj_memory_buffer.hpp"

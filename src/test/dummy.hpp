@@ -4,7 +4,7 @@
 #ifndef DUMMY_HPP
 #define DUMMY_HPP
 
-#include "../../../unit-test/src/test.hpp"
+#include "../../../../unit_test/src/test.hpp"
 #include "../s.hpp"
 #include "../object.hpp"
 #include "../clone_util.hpp"

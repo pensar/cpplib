@@ -1,6 +1,7 @@
 // $Id$
 
-#include "../../../unit-test/src/test.hpp"
+#include "../../../unit_test/src/test.hpp"
+
 
 #include "../io_util.hpp"
 
