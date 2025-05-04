@@ -128,7 +128,7 @@ namespace pensar_digital
                     Version v2 = *version ();
 					if (v != v2)
 						log_throw(W("Version mismatch."));
-					mb.read_known_size (data_bytes(), size ());
+					mb.read_known_size (data_bytes(), data_size ());
 					return *this;
 				}
 
