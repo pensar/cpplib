@@ -41,10 +41,10 @@ namespace pensar_digital
                 inline static VersionFactory mfactory = { 3, 10, 1, 1, 1, null_value<Id>() };
                 struct Data : public pd::Data
 				{
-					VersionInt mpublic;
+                    Id         mid;
+                    VersionInt mpublic;
 					VersionInt mprotected;
 					VersionInt mprivate;
-					Id         mid;
                     Data (const VersionInt& pub = NULL_VERSION, const VersionInt& prot = NULL_VERSION, const VersionInt& priv = NULL_VERSION, const Id& aid = null_value<Id>())
 						: mpublic(pub), mprotected(prot), mprivate(priv), mid(aid == null_value<Id>() ? 0 : aid) {}
 				};
