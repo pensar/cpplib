@@ -67,6 +67,14 @@ namespace pensar_digital
                 write(t, sizeof(T));
             }
 
+            // += operator for StdLayoutTriviallyCopyableData types.    
+			template <HasStdLayoutTriviallyCopyableData T>
+			MemoryBuffer& operator+=(const T& t)
+			{
+				write(t.data_bytes(), T::DATA_SIZE);
+				return *this;
+			}
+
             /** Default destructor */
             virtual ~MemoryBuffer()
             {
@@ -193,7 +201,7 @@ namespace pensar_digital
                 mindex[mwrite_offset] = mb.size();
                 
                 // Copy the data to the buffer.
-				memcpy(mbuffer.data() + mwrite_offset, mb.mbuffer.data() + offset, mb.size());
+				memcpy(mbuffer.data() + mwrite_offset, mb.mbuffer.data(), mb.size());
 
 				// Update the offset.
 				mwrite_offset += mb.size();
