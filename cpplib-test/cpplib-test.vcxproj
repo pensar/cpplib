@@ -29,6 +29,7 @@
     <ClCompile Include="..\src\test\log_test.cpp" />
     <ClCompile Include="..\src\test\main.cpp" />
     <ClCompile Include="..\src\test\object_test.cpp" />
+    <ClCompile Include="..\src\test\stop_watch_test.cpp" />
     <ClCompile Include="..\src\test\version_test.cpp" />
     <ClCompile Include="code_util_test.cpp" />
     <ClCompile Include="path_test.cpp" />

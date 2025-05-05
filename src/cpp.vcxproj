@@ -213,6 +213,7 @@
     <ClInclude Include="path.hpp" />
     <ClInclude Include="random_util.hpp" />
     <ClInclude Include="statistic.hpp" />
+    <ClInclude Include="stop_watch.hpp" />
     <ClInclude Include="sysinfo.hpp" />
     <ClInclude Include="system.hpp" />
     <ClInclude Include="type_util.hpp" />

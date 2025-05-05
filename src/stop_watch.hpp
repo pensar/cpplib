@@ -5,6 +5,7 @@
 #define STOP_WATCH_HPP_INCLUDED
 
 #include "object.hpp"
+#include "s.hpp"
 #include <chrono>
 
 namespace pensar_digital
@@ -25,6 +26,11 @@ namespace pensar_digital
 			bool mrunning;
 		public:
 			typedef long long ELAPSED_TYPE;
+			static const ELAPSED_TYPE H = 3600000000000;
+			static const ELAPSED_TYPE M = 60000000000;
+			static const ELAPSED_TYPE S = 1000000000;
+			static const ELAPSED_TYPE MS = 1000000;
+			static const ELAPSED_TYPE MICRO_SECOND = 1000;
 
 			// Constructor
 			StopWatch(bool start_now = true) 
@@ -56,20 +62,21 @@ namespace pensar_digital
 				return std::chrono::duration_cast<Resolution> (std::chrono::steady_clock::now() - ZERO).count();
 			}
 
-			S elapsed_formatted(ELAPSED_TYPE elapsed_nanoseconds)
+			pensar_digital::cpplib::S elapsed_formatted(ELAPSED_TYPE elapsed_nanoseconds)
 			{
 				ELAPSED_TYPE elapsed = elapsed_nanoseconds;
-				ELAPSED_TYPE hours = elapsed / 3600000000000;
-				elapsed -= hours * 3600000000000;
-				ELAPSED_TYPE minutes = elapsed / 60000000000;
-				elapsed -= minutes * 60000000000;
-				ELAPSED_TYPE seconds = elapsed / 1000000000;
-				elapsed -= seconds * 1000000;
-				ELAPSED_TYPE milliseconds = elapsed / 1000000;
-				elapsed -= milliseconds * 1000000;
-				ELAPSED_TYPE microseconds = elapsed / 1000;
-				elapsed -= microseconds * 1000;
-				S result = pd::pad_left0 (hours, 2) + W(":");
+				ELAPSED_TYPE hours = elapsed / H;
+				elapsed -= hours * H;
+				ELAPSED_TYPE minutes = elapsed / M;
+				elapsed -= minutes * M;
+				ELAPSED_TYPE seconds = elapsed / S;
+				elapsed -= seconds * S;
+				ELAPSED_TYPE milliseconds = elapsed / MS;
+				elapsed -= milliseconds * MS;
+				ELAPSED_TYPE microseconds = elapsed / MICRO_SECOND;
+				elapsed -= microseconds * MICRO_SECOND;
+
+				pensar_digital::cpplib::S result = pd::pad_left0 (hours, 2) + W(":");
 				result += pd::pad_left0 (minutes, 2) + W(":");
 				result += pd::pad_left0 (seconds, 2) + W(".");
 				result += pd::pad_left0 (milliseconds, 3) + W(".");
@@ -80,11 +87,11 @@ namespace pensar_digital
 			}
 
 			// Get elapsed as a formatted string (hh:mm:ss.mmm)
-			S elapsed_formatted ()
+			pensar_digital::cpplib::S elapsed_formatted ()
 			{
 				return elapsed_formatted (elapsed ());
 			}
-			S elapsed_since_mark_formatted ()
+			pensar_digital::cpplib::S elapsed_since_mark_formatted ()
 			{
 				return elapsed_formatted(elapsed_since_mark ());
 			}
