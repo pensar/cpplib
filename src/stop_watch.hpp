@@ -72,6 +72,8 @@ namespace pensar_digital
 				ELAPSED_TYPE seconds = elapsed / S;
 				elapsed -= seconds * S;
 				ELAPSED_TYPE milliseconds = elapsed / MS;
+				if (milliseconds > 1000)
+					std::cerr << "Warning: milliseconds > 1000" << std::endl;
 				elapsed -= milliseconds * MS;
 				ELAPSED_TYPE microseconds = elapsed / MICRO_SECOND;
 				elapsed -= microseconds * MICRO_SECOND;
