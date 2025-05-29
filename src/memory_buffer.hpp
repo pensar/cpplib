@@ -32,7 +32,7 @@ namespace pensar_digital
         {
             public:
                 using Offset = size_t;
-                using Ptr = std::unique_ptr<MemoryBuffer>;
+                using Ptr    = std::unique_ptr<MemoryBuffer>;
             protected:
                 std::span<std::byte> mbuffer; //!< Buffer.
                 Offset mwrite_offset;         //!< Write offset.

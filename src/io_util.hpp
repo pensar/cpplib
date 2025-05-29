@@ -15,11 +15,14 @@
 
 #include "code_util.hpp"
 
-        // Include platform-specific implementation
+// Detects and includes platform-specific implementation header.
+// Examples:
+// #include "windows/io_util_windows.hpp"
+// #include "linux/io_util_linux.hpp" 
+// #include "android/io_util_android.hpp" or other platforms
 #include INCLUDE(io_util)
 
-// or "linux/io_util_linux.hpp" 
-// or "android/io_util_android.hpp" or other platforms
+
 
 namespace pensar_digital 
 {

@@ -32,6 +32,7 @@
     <ClCompile Include="..\src\test\stop_watch_test.cpp" />
     <ClCompile Include="..\src\test\version_test.cpp" />
     <ClCompile Include="code_util_test.cpp" />
+    <ClCompile Include="memory_buffer_test.cpp" />
     <ClCompile Include="path_test.cpp" />
     <ClCompile Include="random_util_test.cpp" />
     <ClCompile Include="s_test.cpp" />
