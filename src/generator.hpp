@@ -49,8 +49,8 @@ namespace pensar_digital
             inline static Factory mfactory = { 3, 10, null_value<T>(), 0, 1}; //!< Member variable "factory"
             
             // Version of the class.
-            inline static const VersionPtr VERSION = pd::Version::get (1, 1, 2);
-            virtual const VersionPtr version () const noexcept { return VERSION; }
+            inline static const Version::Ptr VERSION = pd::Version::get (1, 1, 2);
+            virtual const Version::Ptr version () const noexcept { return VERSION; }
       private:
           struct Data : public pd::Data
           {
@@ -86,7 +86,8 @@ namespace pensar_digital
             inline G& generator_assign(MemoryBuffer& mb) noexcept
             {
                 object_assign (mb);
-                assign (mb);
+                VERSION->assign (mb);
+				mb.read_known_size((BytePtr)(&mdata), DATA_SIZE);
 				return *this;
             }
 
@@ -98,7 +99,7 @@ namespace pensar_digital
             inline virtual MemoryBuffer::Ptr bytes() const noexcept
             {
                 MemoryBuffer::Ptr mb = std::make_unique<MemoryBuffer>(SIZE);
-				mb->append (object_data_bytes (), Object::DATA_SIZE);
+				mb->append (object_bytes ());
                 mb->append (VERSION->version_data_bytes (), Version::DATA_SIZE);
 				mb->write ((BytePtr(&mdata)), DATA_SIZE);
 				return mb;

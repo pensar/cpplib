@@ -10,11 +10,17 @@ namespace pensar_digital
   namespace cpplib
   {
       using DefaultRandomGeneratorType = unsigned long long int;
-      template <typename T = DefaultRandomGeneratorType>
-      class CustomRandomGenerator 
+      
+      inline DefaultRandomGeneratorType seed()
       {
-      public:
-          typedef T result_type;
+          return std::chrono::system_clock::now().time_since_epoch().count();
+      }
+
+      template <typename T = DefaultRandomGeneratorType>
+      class CustomRandomGenerator
+      {
+        public:
+          using result_type = T;
           
           #undef min  // Undefine the macro min defined in windows.h to avoid conflict with the member function min.
 
@@ -33,8 +39,6 @@ namespace pensar_digital
       };
 
       using RandGen = CustomRandomGenerator<>;
-      extern DefaultRandomGeneratorType seed ();
-      extern RandGen get_generator ();
     
     template <typename T = DefaultRandomGeneratorType, class Distribution = std::uniform_int_distribution<T>, class RandomGenerator = RandGen>
     class Random 
@@ -77,7 +81,15 @@ namespace pensar_digital
         int _max;
     };
 
-    extern Random<> random_generator;
+    inline RandGen get_generator()
+    {
+        static RandGen random_generator(seed())
+            ;
+
+        return random_generator;
+    }
+
+    inline RandGen random_generator = get_generator ();
   }
 }
 

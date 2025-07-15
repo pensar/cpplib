@@ -1,15 +1,14 @@
 // author : Mauricio Gomes
 // license: MIT (https://opensource.org/licenses/MIT)
 
-#include "../../../../unit_test/src/test.hpp"
+#include "../../unit_test/src/test.hpp"
 
 
 #include "../src/s.hpp"
 
 namespace pensar_digital
 {
-    namespace test = pensar_digital::unit_test;
-    using namespace pensar_digital::unit_test;
+	using namespace pensar_digital::unit_test;
     namespace cpplib
     {
         TEST(CS, true)

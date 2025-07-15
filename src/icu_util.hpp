@@ -17,13 +17,14 @@
 #include <vector>
 #include <iostream>
 
+#include <exception>
+
 #include <stdio.h>
 #include <string.h>
 
 // cpplib headers.
-#include "error.hpp"
+#include "string_def.hpp"
 #include "log.hpp"
-#include "s.hpp"
 
 #include "encoding.hpp"
 
@@ -53,16 +54,18 @@ namespace pensar_digital
 
                     if (U_FAILURE(status)) 
                     {
-                        S msg = W("convert_utf8_to_uchar: Failed to convert error message");
+                        std::basic_string<C> msg = W("convert_utf8_to_uchar: Failed to convert error message");
                         LOG(msg);
-                        throw Error {msg};
+                        throw msg;
                     }
                 }
                 else 
                 {
-                    S msg = W("convert_utf8_to_uchar: destination buffer is too small. Required size = ") + pd::to_string(destLen) + " but it was " + pd::to_string(destCapacity);
-                    LOG(msg);
-                    throw Error {msg};
+                    std::stringstream msg;
+                    msg << "convert_utf8_to_uchar: destination buffer is too small. Required size = " << destLen << " but it was " << destCapacity;
+					std::basic_string<C> error = W(msg.str());
+                    LOG(error);
+                    throw error;
                 }
             }
 
@@ -72,9 +75,11 @@ namespace pensar_digital
                 // Gets msg length and throws an error if it is too big.
                 if (strlen(msg) > BUFFER_SIZE)
                 {
-                    S error = W("char_ptr_to_uchar_ptr: Message is too big to be converted to UChar string. Max. size = ") + pd::to_string(BUFFER_SIZE);
+                    std::stringstream msg;
+                    msg << "char_ptr_to_uchar_ptr: Message is too big to be converted to UChar string. Max. size = " << BUFFER_SIZE;
+                    std::basic_string<C> error = W(msg.str());
                     LOG(error);
-                    throw Error {error};
+                    throw error;
                 }
                 convert_utf8_to_uchar (msg, out, BUFFER_SIZE); // Convert to UChar string
             }
@@ -90,9 +95,9 @@ namespace pensar_digital
                 u_strToWCS(wcharMsg, BUFFER_SIZE, NULL, uMsg, -1, &status);
                 if ( !U_SUCCESS(status)) 
                 {
-                    S error = W("char_ptr_to_wchar_ptr: Error converting UChar to wchar_t");
+                    std::basic_string<C> error = W("char_ptr_to_wchar_ptr: Error converting UChar to wchar_t");
                     LOG(error);
-                    throw Error {error};
+                    throw error;
                 }
             }
 
@@ -134,9 +139,9 @@ namespace pensar_digital
                 UConverter* conv = ucnv_open("utf-8", &status);
                 if (U_FAILURE(status))
                 {
-                    S error = W("pd::icu::utf16_to_utf8: Error getting converter.");
+                    std::basic_string<C> error = W("pd::icu::utf16_to_utf8: Error getting converter.");
                     LOG(error);
-                    throw Error{ error };
+                    throw error;
                 }
 
                 // Convert std::wstring to UChar*
@@ -145,9 +150,9 @@ namespace pensar_digital
                 size_t slen = s.length();
                 if (slen > max_int32_t)
                 {
-                    S error = W("pd::icu::utf16_to_utf8: Error converting string. Buffer size is too big.");
+                    std::basic_string<C> error = W("pd::icu::utf16_to_utf8: Error converting string. Buffer size is too big.");
                     LOG(error);
-                    throw Error{ error };
+                    throw error;
                 }
                 uint32_t len = static_cast<uint32_t>(slen); 
                 // Calculate the required buffer size for the UTF-8 string
@@ -164,7 +169,7 @@ namespace pensar_digital
                 {
                     S error = W("pd::icu::utf16_to_utf8: Error converting string.");
                     LOG(error);
-                    throw Error{ error };
+                    throw error;
                 }
 
                 std::string result(dest, destLen); // Construct the result string
@@ -193,7 +198,7 @@ namespace pensar_digital
                 {
                     S error = W("1. pd::icu::utf32_to_utf8: Failed to open UTF-8 converter.");
                     LOG(error);
-                    throw Error{ error };
+                    throw error;
                 }
 
                 UConverter* convFromUTF32 = ucnv_open("UTF-32", &status);
@@ -202,7 +207,7 @@ namespace pensar_digital
                     ucnv_close(convToUTF8); // Ensure the first converter is closed before throwing
                     S error = W("2. pd::icu::utf32_to_utf8: Failed to open UTF-32 converter.");
                     LOG(error);
-                    throw Error{ error };
+                    throw error;
                 }
                 
                 size_t slen = s.length();
@@ -210,7 +215,7 @@ namespace pensar_digital
                 {
                     S error = W("pd::icu::utf32_to_utf8: Error converting string. Buffer size is too big.");
                     LOG(error);
-                    throw Error{ error };
+                    throw error;
                 }
                 int32_t srcLength = static_cast<int32_t>(slen);
 
@@ -225,7 +230,7 @@ namespace pensar_digital
                     ucnv_close(convFromUTF32);
                     S error = W("pd::icu::utf32_to_utf8: Failed to calculate buffer size for UTF-8 string.");
                     LOG(error);
-                    throw Error{ error };
+                    throw error;
                 }
 
                 // Allocate buffer for the UTF-8 string
@@ -242,7 +247,7 @@ namespace pensar_digital
                     ucnv_close(convFromUTF32);
                     S error = W("pd::icu::to_string: Failed to convert string from UTF-32 to UTF-8.");
                     LOG(error);
-                    throw Error{ error };
+                    throw error;
                 }
 
                 std::string result(utf8String, utf8Length); // Construct the result string

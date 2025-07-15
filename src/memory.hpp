@@ -4,6 +4,13 @@
 #include "constant.hpp"
 #include <cstring> // memcpy
 
+// Detects and includes platform-specific implementation header.
+// Examples:
+// #include "windows/io_util_windows.hpp"
+// #include "linux/io_util_linux.hpp" 
+// #include "android/io_util_android.hpp" or other platforms
+//#include INCLUDE(memory)
+
 namespace pensar_digital
 {
 	namespace cpplib

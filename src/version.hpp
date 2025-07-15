@@ -5,7 +5,6 @@
 #define VERSION_HPP_INCLUDED
 
 #include "constant.hpp"
-#include "s.hpp"
 #include "factory.hpp"
 #include "type_util.hpp"
 #include "memory_buffer.hpp"
@@ -20,38 +19,38 @@ namespace pensar_digital
     namespace cpplib
     {
         class Version;
-
-        typedef std::shared_ptr<Version> VersionPtr;
-        
-        // Versionable concept requires a inline static const Version public member named VERSION convertible to VersionPtr.
+        // Versionable concept requires a inline static const Version public member named VERSION convertible to Version::Ptr.
         template <typename T>
         concept Versionable = requires (T t)
         {
-            {t.VERSION} noexcept -> std::convertible_to<VersionPtr>;
+            {t.VERSION} noexcept -> std::convertible_to<Version::Ptr>;
         };
-
-        typedef Factory<Version, const VersionInt&,
-            const VersionInt&,
-            const VersionInt&,
-            const Id&> VersionFactory;
 
         class Version   
         {
+            public:
+                using Int = int_fast16_t;
+                using Ptr = std::shared_ptr<Version>;
             private:
+
+                typedef Factory<Version, const Version::Int&,
+                    const Version::Int&,
+                    const Version::Int&,
+                    const Id&> VersionFactory;
                 inline static VersionFactory mfactory = { 3, 10, 1, 1, 1, null_value<Id>() };
                 struct Data : public pd::Data
 				{
                     Id         mid;
-                    VersionInt mpublic;
-					VersionInt mprotected;
-					VersionInt mprivate;
-                    Data (const VersionInt& pub = NULL_VERSION, const VersionInt& prot = NULL_VERSION, const VersionInt& priv = NULL_VERSION, const Id& aid = null_value<Id>())
+                    Int mpublic;
+					Int mprotected;
+					Int mprivate;
+                    Data (const Int& pub = NULL_VERSION, const Int& prot = NULL_VERSION, const Int& priv = NULL_VERSION, const Id& aid = null_value<Id>())
 						: mpublic(pub), mprotected(prot), mprivate(priv), mid(aid == null_value<Id>() ? 0 : aid) {}
 				};
                 Data mdata;
 
             public:
-                inline static const VersionInt NULL_VERSION = -1;
+                inline static const Int NULL_VERSION = -1;
                 
                 typedef Data DataType;
                 inline virtual const pd::Data* data() const noexcept { return &mdata; }
@@ -63,7 +62,7 @@ namespace pensar_digital
                 inline virtual size_t data_size () const noexcept { return sizeof(mdata); }
 				inline virtual size_t size() const noexcept { return data_size(); }
 
-                Version(const VersionInt& pub = NULL_VERSION, const VersionInt& prot = NULL_VERSION, const VersionInt& priv = NULL_VERSION, const Id& id = null_value<Id>())
+                Version(const Int& pub = NULL_VERSION, const Int& prot = NULL_VERSION, const Int& priv = NULL_VERSION, const Id& id = null_value<Id>())
                     : mdata (pub, prot, priv, id) {}
 
 				Version (MemoryBuffer& mb) noexcept
@@ -71,9 +70,9 @@ namespace pensar_digital
                     assign (mb);
 				}
 
-                inline static VersionFactory::P get(const VersionInt& pub = pd::Version::NULL_VERSION,
-                    const VersionInt& pro = Version::NULL_VERSION,
-                    const VersionInt& pri = Version::NULL_VERSION,
+                inline static VersionFactory::P get(const Int& pub = pd::Version::NULL_VERSION,
+                    const Int& pro = Version::NULL_VERSION,
+                    const Int& pri = Version::NULL_VERSION,
                     const Id& aid = null_value<Id>())
                 {
                     return mfactory.get (pub, pro, pri, aid);
@@ -103,7 +102,7 @@ namespace pensar_digital
                 }
                 */
 
-                virtual ByteSpan data_span() const noexcept { return ByteSpan (data_bytes(), data_size()); }
+                inline virtual ByteSpan data_span() const noexcept { return ByteSpan (data_bytes(), data_size()); }
 
                 inline virtual MemoryBuffer::Ptr bytes() const noexcept
                 {
@@ -111,12 +110,12 @@ namespace pensar_digital
 					mb->write ((BytePtr)&mdata, DATA_SIZE);
 					return mb;
                 }
-                VersionFactory::P clone () const noexcept
+                inline VersionFactory::P clone () const noexcept
                 {
                     return get (mdata.mpublic, mdata.mprotected, mdata.mprivate, mdata.mid);
                 };
 
-                VersionFactory::P clone(const VersionPtr& ptr) { return ptr->clone (); }
+                inline VersionFactory::P clone(const Ptr& ptr) { return ptr->clone (); }
                 
                 inline static VersionFactory& factory() noexcept { return mfactory; }   
 
@@ -125,21 +124,17 @@ namespace pensar_digital
                 virtual inline const Hash hash() const noexcept { return mdata.mid; };
 
                 // Getters.
-                VersionInt get_public    () const noexcept { return mdata.mpublic   ; }
-                VersionInt get_protected () const noexcept { return mdata.mprotected; }
-                VersionInt get_private   () const noexcept { return mdata.mprivate  ; }
+                inline Int get_public    () const noexcept { return mdata.mpublic   ; }
+                inline Int get_protected () const noexcept { return mdata.mprotected; }
+                inline Int get_private   () const noexcept { return mdata.mprivate  ; }
 
                 // Setters.
-
-                // Setters.
-                void set_public(VersionInt v) noexcept { mdata.mpublic = v; }
-                void set_protected(VersionInt v) noexcept { mdata.mprotected = v; }
-                void set_private(VersionInt v) noexcept { mdata.mprivate = v; }
+                inline void set_public(Int v) noexcept { mdata.mpublic = v; }
+                inline void set_protected(Int v) noexcept { mdata.mprotected = v; }
+                inline void set_private(Int v) noexcept { mdata.mprivate = v; }
                 inline void set_id (const Id& id) noexcept { mdata.mid = id; }
 
-                bool equals (const Version& v) const noexcept;
-	
-                inline virtual bool initialize (const VersionInt& pub = NULL_VERSION, const VersionInt& prot = NULL_VERSION, const VersionInt& priv = NULL_VERSION, const Id& aid = null_value<Id>()) noexcept
+                inline virtual bool initialize (const Int& pub = NULL_VERSION, const Int& prot = NULL_VERSION, const Int& priv = NULL_VERSION, const Id& aid = null_value<Id>()) noexcept
                 {
                     mdata.mpublic    = pub ;
                     mdata.mprotected = prot;
@@ -149,38 +144,82 @@ namespace pensar_digital
                     return true;
 			    }
 
-                S to_string () const noexcept
+                inline S to_s (Int number)const noexcept
                 {
-                    return pd::to_string (mdata.mpublic) + W(".") + pd::to_string (mdata.mprotected) + W(".") + pd::to_string (mdata.mprivate);
+                    OutStringStream ss;
+                    ss << number;
+                    S s = ss.str();
+                    //if (number < 0) inserts a minus sign at the beginning of the string.
+                    if (number < 0)
+                        s.insert(s.begin(), W('-'));
+
+                    return s;
                 }
 
-                virtual std::istream& binary_read(std::istream& is, const std::endian& byte_order);
+
+                inline S to_string () const noexcept
+                {
+                    return to_s (mdata.mpublic) + W(".") + to_s (mdata.mprotected) + W(".") + to_s (mdata.mprivate);
+                }
 
                 inline bool operator == (const Version& v) const { return ((mdata.mid == v.mdata.mid) && (mdata.mpublic == v.mdata.mpublic) && (mdata.mprotected == v.mdata.mprotected) && (mdata.mprivate == v.mdata.mprivate)); }
                 inline bool operator != (const Version& v) const { return !(*this == v); }
 
                 // Implicit conversion to string.
-                operator S() const noexcept { return to_string (); }
+                inline operator S() const noexcept { return to_string (); }
 
-                friend std::istream& operator >> (std::istream& is, Version& v);
+                inline friend std::istream& operator >> (std::istream& is, Version& v);
 
-                S class_name() const
+                inline S class_name() const
                 {
                     return pd::class_name<Version> ();
                 }
-                
-                S debug_string() const noexcept;
+               
                 inline const Id id() const noexcept { return mdata.mid; }
-                const Hash get_hash() const noexcept;
-                virtual std::ostream& binary_write(std::ostream& os, const std::endian& byte_order) const;
-        }; // class Version
-        // Stream operators.
-        extern InStream& operator >> (InStream & is, Version& v);
-        extern OutStream& operator << (OutStream & os, const Version& v);
 
+                inline S debug_string() const noexcept
+                {
+                    return S();
+                }
+
+                inline bool equals(const Version& v) const noexcept
+                {
+                    static_assert (Hashable<Version>);
+                    return (v.id() == id()) && (v.mdata.mprivate == mdata.mprivate) && (v.mdata.mprotected == mdata.mprotected) && (v.mdata.mpublic == mdata.mpublic);
+                }
+
+                inline const Hash get_hash() const noexcept
+                {
+                    return Hash(897896785686); // todo: implement hash.
+                }
+
+                inline std::istream& binary_read(std::istream& is, const std::endian& byte_order)
+                {
+                    return is.read((char*)(&mdata), DATA_SIZE);
+                }
+
+                inline std::ostream& binary_write(std::ostream& os, const std::endian& byte_order) const
+                {
+                    return os.write((const char*)(&mdata), DATA_SIZE);
+                }
+        }; // class Version
         // Concept IdentifiableAndVersionable requires T to be Versionable and Identifiable.
         template <typename T>
         concept IdentifiableAndVersionable = Versionable<T> && Identifiable<T>;
+        inline InStream& operator >> (InStream& is, Version& v)
+        {
+            Version::Int pub, pro, pri;
+            return is >> pub >> pro >> pri;
+            v.set_public(pub);
+            v.set_protected(pro);
+            v.set_private(pri);
+
+        }
+
+        inline OutStream& operator << (OutStream& os, const Version& v)
+        {
+            return os << v.get_public() << W(".") << v.get_protected() << W(".") << v.get_private();
+        }
 
     } // namespace cpplib
 } // namespace pensar_digital

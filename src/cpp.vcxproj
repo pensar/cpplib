@@ -214,12 +214,14 @@
     <ClInclude Include="encoding.hpp" />
     <ClInclude Include="endian.hpp" />
     <ClInclude Include="equal.hpp" />
+    <ClInclude Include="error.hpp" />
     <ClInclude Include="file.hpp" />
     <ClInclude Include="generator.hpp" />
     <ClInclude Include="icu_util.hpp" />
     <ClInclude Include="io_util.hpp" />
     <ClInclude Include="log.hpp" />
     <ClInclude Include="memory.hpp" />
+    <ClInclude Include="meta.hpp" />
     <ClInclude Include="multiplatform.hpp" />
     <ClInclude Include="object.hpp" />
     <ClInclude Include="obj_memory_buffer.hpp" />
@@ -231,20 +233,6 @@
     <ClInclude Include="system.hpp" />
     <ClInclude Include="type_util.hpp" />
     <ClInclude Include="windows\io_util_windows.hpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\src\bytes_util.cpp" />
-    <ClCompile Include="..\src\byte_order.cpp" />
-    <ClCompile Include="..\src\constants.cpp" />
-    <ClCompile Include="..\src\constraint.cpp" />
-    <ClCompile Include="..\src\error.cpp" />
-    <ClCompile Include="..\src\log.cpp" />
-    <ClCompile Include="..\src\memory.cpp" />
-    <ClCompile Include="..\src\object.cpp" />
-    <ClCompile Include="..\src\random_util.cpp" />
-    <ClCompile Include="..\src\s.cpp" />
-    <ClCompile Include="..\src\version.cpp" />
-    <ClCompile Include="io_util.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

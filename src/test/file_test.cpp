@@ -1,8 +1,8 @@
 // author : Mauricio Gomes
 // license: MIT (https://opensource.org/licenses/MIT)
 
-#include "..\unit-test\test\test.hpp"
-#include "../cpplib/cpp/file.hpp"
+#include "../../../unit_test/src/test.hpp"
+#include "../file.hpp"
 
 namespace pensar_digital
 {
@@ -37,8 +37,11 @@ namespace pensar_digital
                 CHECK(file.exists(), W("0"));
                 S s = file.read();
                 CHECK_EQ(S, s, W("blah"), W("1"));
-			}   
-            CHECK(! p.exists(), W("2"));
+
+				// Deletes the file.
+                CHECK(file.remove(), W("2"));
+            }   
+            CHECK(! p.exists(), W("0"));
         TEST_END(TextFile)
     }
 }

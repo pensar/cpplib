@@ -2,7 +2,6 @@
 #define LOG_H_INCLUDED
 
 #include "macros.hpp"
-#include "s.hpp"
 #include "string_def.hpp"
 
 #include <iostream>

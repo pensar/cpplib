@@ -4,7 +4,7 @@
 #ifndef ERROR_HPP_INCLUDED
 #define ERROR_HPP_INCLUDED
 
-#include "s.hpp"
+#include "string_def.hpp"
 #include "object.hpp"
 #include "version.hpp"
 #include "log.hpp"
@@ -56,7 +56,7 @@ namespace pensar_digital
         class Error : public Object
         {
             public:
-                inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
+                inline static const Version::Ptr VERSION = pd::Version::get (1, 1, 1);
                 Error (const S& error_msg, const Id aid = 0): Object (aid), error_message (error_msg) {}
 
             const S& get_error_message () const { return error_message; } ;
@@ -88,7 +88,7 @@ namespace pensar_digital
         class UnsupportedVersion : public Error
         {
             public:
-                inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
+                inline static const Version::Ptr VERSION = pd::Version::get (1, 1, 1);
                 UnsupportedVersion (const Version v): Error (W("Unsupported version number: ") + v.to_string ()){};
         };
 

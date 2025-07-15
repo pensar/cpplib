@@ -9,6 +9,8 @@
 
 #include "concept.hpp"
 
+#include "icu_util.hpp"
+
 
 #include <array>
 #include <algorithm>
@@ -23,46 +25,6 @@ namespace pensar_digital
 {
     namespace cpplib
     {
-
-        inline static const C* EMPTY = W("");
-        inline static const C  SPACE = W(' ');
-        inline static const C* CURRENT_DIR = W(".");
-        inline static const C* DEFAULT_TXT_FILE_EXTENSION = W(".txt");
-        inline static const C* DEFAULT_BIN_FILE_EXTENSION = W(".bin");
-        inline static const C* DOUBLE_QUOTES = W("\"");
-
-        inline static const C NULL_CHAR = W('\0');
-
-        using S                = std::basic_string<C>;
-        using SView            = std::basic_string_view<C>;
-        using SIter            = std::basic_string<C>::iterator;
-        using SConstIter       = std::basic_string<C>::const_iterator;
-        using InStream         = std::basic_istream<C>;
-        using OutStream        = std::basic_ostream<C>;
-        using SStream          = std::basic_stringstream<C>;
-        using InStreamBuf      = std::basic_streambuf<C>;
-		using OutStreamBuf     = std::basic_streambuf<C>;
-        using InStreamBufIter  = std::istreambuf_iterator<C>;
-		using OutStreamBufIter = std::ostreambuf_iterator<C>;
-        using InStringStream   = std::basic_istringstream<C>;
-		using OutStringStream  = std::basic_ostringstream<C>;
-        using InFStream        = std::basic_ifstream<C>;
-        using OutFStream       = std::basic_ofstream<C>;
-        using FStream          = std::basic_fstream<C>;
-        using InFileBuf        = std::basic_filebuf<C>;
-        using InFileBufIter    = std::istreambuf_iterator<C>;
-        using OutFileBuf       = std::basic_filebuf<C>;
-        using OutFileBufIter   = std::ostreambuf_iterator<C>;
-
-        extern const bool PAD_RIGHT;
-        extern const bool PAD_LEFT;
-        extern const bool TRIM_ELEMENTS;
-        extern const bool INCLUDE_EMPTY_FIELDS;
-
-        extern std::wstring to_wstring(const std::string& s);
-        extern std::string  to_string (const std::wstring& s);
-        
-
         inline void runtime_error(const S& message)
         {
             #ifdef WIDE_CHAR
@@ -72,7 +34,6 @@ namespace pensar_digital
             #endif
         }
 
-        
         // Based on #ifdef WIDE_CHAR defines a constexpr function returning __FILE__ as a wide string or a narrow string.
         inline static constexpr S sfile () 
         {
@@ -330,8 +291,85 @@ namespace pensar_digital
             return out;
         }
 
-        extern void troca_char(C* c, const std::locale& loc = std::locale());
-
+        inline void troca_char(C* c, const std::locale& loc = std::locale(W("")))
+        {
+            //T ch = std::use_facet<std::ctype<T> >(loc).tolower (*c);
+            switch (*c)
+            {
+            case W('á'):
+            case W('à'):
+            case W('ã'):
+            case W('ä'):
+            case W('â'):
+                *c = W('a');
+                break;
+            case W('é'):
+            case W('è'):
+            case W('ë'):
+            case W('ê'):
+                *c = W('e');
+                break;
+            case W('í'):
+            case W('ì'):
+            case W('ï'):
+            case W('î'):
+                *c = W('i');
+                break;
+            case W('ó'):
+            case W('ò'):
+            case W('õ'):
+            case W('ö'):
+            case W('ô'):
+                *c = W('o');
+                break;
+            case W('ú'):
+            case W('ù'):
+            case W('ü'):
+            case W('û'):
+                *c = W('u');
+                break;
+            case W('ç'):
+                *c = W('c');
+                break;
+            case W('Á'):
+            case W('À'):
+            case W('Ã'):
+            case W('Ä'):
+            case W('Â'):
+                *c = W('A');
+                break;
+            case W('É'):
+            case W('È'):
+            case W('Ë'):
+            case W('Ê'):
+                *c = W('E');
+                break;
+            case W('Í'):
+            case W('Ì'):
+            case W('Ï'):
+            case W('Î'):
+                *c = W('I');
+                break;
+            case W('Ó'):
+            case W('Ò'):
+            case W('Õ'):
+            case W('Ö'):
+            case W('Ô'):
+                *c = W('O');
+                break;
+            case W('Ú'):
+            case W('Ù'):
+            case W('Ü'):
+            case W('Û'):
+                *c = W('U');
+                break;
+            case W('Ç'):
+                *c = W('C');
+                break;
+            default:
+                break;
+            }
+        }
 
         /// Remove accents from string s (replacing for example ã for a).
         inline void remove_accents(S& s)
@@ -372,8 +410,9 @@ namespace pensar_digital
         template<typename T = char>
         inline S copy_remove_accents(S s)
         {
-            remove_accents(s);
-            return s;
+            S s2 = s;
+            remove_accents(s2);
+            return s2;
         }
 
         /// Remove all occurrences of string s from target.
@@ -407,48 +446,7 @@ namespace pensar_digital
             return target;
         }
 
-        /*
-        //This code failed to convert accented chars.
-        void to_upper(std::basic_string<char>& s);
-        void to_upper(std::basic_string<wchar_t>& s);
-        void to_lower(std::basic_string<char>& s);
-        void to_lower(std::basic_string<wchar_t>& s);
-        */
-
-        //This code failed to convert accented chars because the locale implementation does not support it.
-        /*
-        template<typename C>
-        void to_upper (S& s, const std::locale& loc = std::locale ())
-        {
-            typename S::iterator p;
-            for (p = s.begin (); p != s.end (); ++p)
-            {
-                *p = std::use_facet<std::ctype<C> >(loc).toupper (*p);
-            }
-        }
-
-        template<typename C = char>
-        void to_lower(S& s, const std::locale& loc = std::locale ())
-        {
-            typename S::iterator p;
-            for (p = s.begin (); p != s.end (); ++p)
-            {
-                *p = std::use_facet<std::ctype<C> >(loc).tolower (*p);
-            }
-        }
-        */
-
-        extern std::string  reverse(const std::string& s);
-        extern std::wstring reverse(const std::wstring& s);
-
-        extern void to_upper(std::string& s);
-        extern void to_upper(std::wstring& s);
-        extern void to_lower(std::string& s);
-        extern void to_lower(std::wstring& s);
-
-        extern std::string upper(const std::string& s);
-        extern std::string lower(const std::string& s);
-
+  
         /// Removes all instances of substring p from s.
         template<typename C = char>
         inline void remove_substr(S& s, const S& p)
@@ -503,8 +501,13 @@ namespace pensar_digital
             return f;
         }
 
+        inline std::wstring to_wstring(const std::string& s)
+        {
+            return pensar_digital::cpplib::icu::to_wstring(s);
+        }
+
         template<typename IntType = int, bool use_grouping_char = false>
-        inline S to_string(IntType number, C grouping_char = W(','))
+        S to_string(IntType number, C grouping_char = W(','))
         {
             OutStringStream ss;
             ss << number;
@@ -513,41 +516,41 @@ namespace pensar_digital
             if (number < 0)
                 s.insert(s.begin(), W('-'));
 
-            return use_grouping_char ? insert_grouping_char (s, grouping_char) : s;
+            return use_grouping_char ? insert_grouping_char(s, grouping_char) : s;
         }
 
         template<bool use_grouping_char = false>
-        inline S to_string(size_t number, typename C grouping_char = W(','))
+        S to_string(size_t number, typename C grouping_char = W(','))
         {
             return to_string <size_t, use_grouping_char>(number, grouping_char);
         }
 
         template<bool use_grouping_char = false>
-        inline S to_string(int number, C grouping_char = W(','))
+        S to_string(int number, C grouping_char = W(','))
         {
             return to_string <int, use_grouping_char>(number, grouping_char);
         }
 
         template<bool use_grouping_char = false>
-        inline S to_string(long number, C grouping_char = W(','))
+        S to_string(long number, C grouping_char = W(','))
         {
             return to_string <long, use_grouping_char>(number, grouping_char);
         }
 
         template<bool use_grouping_char = false>
-        inline S to_string(long long int number, C grouping_char = W(','))
+        S to_string(long long int number, C grouping_char = W(','))
         {
             return to_string <long long int, use_grouping_char>(number, grouping_char);
         }
 
         template<bool use_grouping_char = false>
-        inline S to_string(unsigned int number, C grouping_char = W(','))
+        S to_string(unsigned int number, C grouping_char = W(','))
         {
             return to_string <unsigned int, use_grouping_char, C>(number, grouping_char);
         }
 
         template<bool use_grouping_char = false>
-        inline S to_string(unsigned long int number, C grouping_char = W(','))
+        S to_string(unsigned long int number, C grouping_char = W(','))
         {
             return to_string <unsigned long int, use_grouping_char>(number, grouping_char);
         }
@@ -561,8 +564,8 @@ namespace pensar_digital
         // todo: use use_grouping.
         inline S to_string(double number, unsigned num_decimals /*= 2*/, bool use_grouping/* = true*/, C grouping_char = W(','), C decimal_separator = W(','))
         {
-            long long int integer_part = (long long) trunc (number);
-            S s = to_string (integer_part);
+            long long int integer_part = (long long)trunc(number);
+            S s = to_string(integer_part);
             SStream ss;
             ss << std::fixed << std::setprecision(num_decimals) << number;
             S s1 = ss.str();
@@ -576,10 +579,19 @@ namespace pensar_digital
             pad(decimal_part, W('0'), num_decimals);
             return s + decimal_part;
         }
+        // Converts from std::wstring to std::string.
+        inline std::string  to_string(const std::wstring& s)
+        {
+#ifdef WINDOWS
+            return icu::utf16_to_utf8(s);
+#else
+            return icu::utf32_to_utf8(s);
+#endif
+        }
 
         inline S pad_left0(long long int number, const unsigned n = 4)
         {
-            return pad_copy(to_string<false>(number).c_str(), W('0'), n, PAD_LEFT);
+            return pad_copy(pd::to_string<decltype(number), false>(number).c_str(), W('0'), n, PAD_LEFT);
         }
 
         /// Remove extension from file name.
@@ -602,93 +614,442 @@ namespace pensar_digital
         }
 
         //---------------------------------------------------------
-        extern void remove_accent (C* c) noexcept;
+        //----------------------------------------------------------------------
+ 
+ 
 
-        inline C remove_accent(const C c) noexcept
+        inline S  reverse(const S& s)
         {
-            C ch = c;
-            remove_accent (&ch);
-            return ch;
+            S out;
+            for (typename S::const_reverse_iterator i = s.crbegin(); i != s.crend(); ++i)
+            {
+                out += *i;
+            }
+            return out;
         }
 
-        inline bool equal (const C c, const C c2, bool case_sensitive = false, bool accent_sensitive = false) noexcept
+        inline void to_upper(S& s)
         {
-            if (case_sensitive)
+            for (S::iterator p = s.begin(); p != s.end(); ++p)
             {
-                if (accent_sensitive)
-                {
-                    return c == c2;
-                }
+                if (*p >= W('a') && *p <= W('z'))
+                    *p = W('A') + (*p - W('a'));
                 else
                 {
-                    return remove_accent (c) == remove_accent (c2);
+                    switch (*p)
+                    {
+                    case W('á'):
+                        *p = W('Á');
+                        break;
+                    case W('à'):
+                        *p = W('À');
+                        break;
+                    case W('ã'):
+                        *p = W('Ã');
+                        break;
+                    case W('ä'):
+                        *p = W('Ä');
+                        break;
+                    case W('â'):
+                        *p = W('Â');
+                        break;
+                    case W('é'):
+                        *p = W('É');
+                        break;
+                    case W('è'):
+                        *p = W('È');
+                        break;
+                    case W('ë'):
+                        *p = W('Ë');
+                        break;
+                    case W('ê'):
+                        *p = W('Ê');
+                        break;
+                    case W('í'):
+                        *p = W('Í');
+                        break;
+                    case W('ì'):
+                        *p = W('Ì');
+                        break;
+                    case W('ï'):
+                        *p = W('Ï');
+                        break;
+                    case W('î'):
+                        *p = W('Î');
+                        break;
+                    case W('ó'):
+                        *p = W('Ó');
+                        break;
+                    case W('ò'):
+                        *p = W('Ò');
+                        break;
+                    case W('õ'):
+                        *p = W('Õ');
+                        break;
+                    case W('ö'):
+                        *p = W('Ö');
+                        break;
+                    case W('ô'):
+                        *p = W('Ô');
+                        break;
+                    case W('ú'):
+                        *p = W('Ú');
+                        break;
+                    case W('ù'):
+                        *p = W('Ù');
+                        break;
+                    case W('ü'):
+                        *p = W('Ü');
+                        break;
+                    case W('û'):
+                        *p = W('Û');
+                        break;
+                    case W('Ç'):
+                        *p = W('ç');
+                        break;
+                    case W('Ñ'):
+                        *p = W('ñ');
+                        break;
+                    default:
+                        break;
+                    }
+                }
+            } //for
+        };
+
+        inline void to_lower(S& s)
+        {
+            for (S::iterator p = s.begin(); p != s.end(); ++p)
+            {
+                if (*p >= W('A') && *p <= W('Z'))
+                    *p = W('a') + (*p - W('A'));
+                else
+                {
+                    switch (*p)
+                    {
+                    case W('Á'):
+                        *p = W('á');
+                        break;
+                    case W('À'):
+                        *p = W('à');
+                        break;
+                    case W('Ã'):
+                        *p = W('ã');
+                        break;
+                    case W('Ä'):
+                        *p = W('ä');
+                        break;
+                    case W('Â'):
+                        *p = W('â');
+                        break;
+                    case W('É'):
+                        *p = W('é');
+                        break;
+                    case W('È'):
+                        *p = W('è');
+                        break;
+                    case W('Ë'):
+                        *p = W('ë');
+                        break;
+                    case W('Ê'):
+                        *p = W('ê');
+                        break;
+                    case W('Í'):
+                        *p = W('í');
+                        break;
+                    case W('Ì'):
+                        *p = W('ì');
+                        break;
+                    case W('Ï'):
+                        *p = W('ï');
+                        break;
+                    case W('Î'):
+                        *p = W('î');
+                        break;
+                    case W('Ó'):
+                        *p = W('ó');
+                        break;
+                    case W('Ò'):
+                        *p = W('ò');
+                        break;
+                    case W('Õ'):
+                        *p = W('õ');
+                        break;
+                    case W('Ö'):
+                        *p = W('ö');
+                        break;
+                    case W('Ô'):
+                        *p = W('ô');
+                        break;
+                    case W('Ú'):
+                        *p = W('ú');
+                        break;
+                    case W('Ù'):
+                        *p = W('ù');
+                        break;
+                    case W('Ü'):
+                        *p = W('ü');
+                        break;
+                    case W('Û'):
+                        *p = W('û');
+                        break;
+                    case W('Ç'):
+                        *p = W('ç');
+                        break;
+                    case W('Ñ'):
+                        *p = W('ñ');
+                        break;
+                    default:
+                        break;
+                    }
                 }
             }
+        };
+
+        inline S upper(const S& s)
+        {
+            S r = s;
+            to_upper(r);
+            return r;
+        }
+
+        inline S lower(const S& s)
+        {
+            S r = s;
+            to_lower(r);
+            return r;
+        }
+
+        /*void troca_char(wchar_t* c, const std::locale& loc)
+        {
+            //T ch = std::use_facet<std::ctype<T> >(loc).tolower (*c);
+            switch (*c)
+            {
+                // According to codepage ISO/IEC 8859-1
+            case L'\u00C0'): // A com crase.
+            case L'\u00C1'): // A com agudo.
+            case L'\u00C2'): // A com circunflexo.
+            case L'\u00C3'): // A com til.
+            case L'\u00C4'): // A com trema.
+            case L'\u00C5'): // A com bolinha de angstron.
+                *c = L'A');
+                break;
+            case L'\u00C8'):  // E com crase.
+            case L'\u00C9'):  // E com agudo.
+            case L'\u00CA'):  // E com circunflexo.
+            case L'\u00CB'):  // E com trema.
+                *c = L'E');
+                break;
+            case L'\u00CC'):  // I com crase.
+            case L'\u00CD'):  // I com agudo.
+            case L'\u00CE'):  // I com circunflexo.
+            case L'\u00CF'):  // I com trema.
+                *c = L'I');
+                break;
+            case L'\u00D2'): // O com crase.
+            case L'\u00D3'): // O com agudo.
+            case L'\u00D4'): // O com circunflexo.
+            case L'\u00D5'): // O com til.
+            case L'\u00D6'): // O com trema.
+                *c = L'O');
+                break;
+            case L'\u00D9'): // U com crase.
+            case L'\u00DA'): // U com agudo.
+            case L'\u00DB'): // U com circunflexo.
+            case L'\u00DC'): // U com trema.
+                *c = L'U');
+                break;
+            case L'\u00C7'): // C cidilha.
+                *c = L'C');
+                break;
+            case L'\u00D1'): // N com til
+                *c = L'N');
+                break;
+            case L'\u00E0'): // a com crase.
+            case L'\u00E1'): // a com agudo.
+            case L'\u00E2'): // a com circunflexo.
+            case L'\u00E3'): // a com til.
+            case L'\u00E4'): // a com trema.
+                *c = L'a');
+                break;
+            case L'\u00E8'):  // e com crase.
+            case L'\u00E9'):  // e com agudo.
+            case L'\u00EA'):  // e com circunflexo.
+            case L'\u00EB'):  // e com trema.
+                *c = L'e');
+                break;
+            case L'\u00EC'):  // i com crase.
+            case L'\u00ED'):  // i com agudo.
+            case L'\u00EE'):  // i com circunflexo.
+            case L'\u00EF'):  // i com trema.
+                *c = L'i');
+                break;
+            case L'\u00F2'): // o com crase.
+            case L'\u00F3'): // o com agudo.
+            case L'\u00F4'): // o com circunflexo.
+            case L'\u00F5'): // o com til.
+            case L'\u00F6'): // o com trema.
+                *c = L'o');
+                break;
+            case L'\u00E7'): // c cidilha.
+                *c = L'c');
+                break;
+            case L'\u00F1'): // n com til
+                *c = L'n');
+                break;
+            case L'\u00F9'): // u com crase.
+            case L'\u00FA'): // u com agudo.
+            case L'\u00FB'): // u com circunflexo.
+            case L'\u00FC'): // u com trema.
+                *c = L'u');
+                break;
+            default:
+                break;
+            }
+        }
+        */
+#ifdef CODE_GEAR
+        /*void __fastcall split(const AnsiString& as, char c, std::vector<AnsiString>* v, bool trim_elements)
+        {
+            S s = as.c_str();
+            S::size_type i = 0;
+            S::size_type j = s.find(c);
+
+            if (j == S::npos)
+                v->push_back(as);
             else
+                while (j != S::npos)
+                {
+                    S aux = s.substr(i, j - i);
+                    if (trim_elements)
+                        trim(aux);
+                    AnsiString s1 = aux.c_str();
+                    v->push_back(s1);
+                    i = ++j;
+                    j = s.find(c, j);
+
+                    if (j == S::npos)
+                    {
+                        aux = s.substr(i, s.length());
+                        if (trim_elements)
+                            trim(aux);
+                        s1 = aux.c_str();
+                        v->push_back(s1);
+                    }
+                }
+        }
+
+        AnsiString __fastcall only_digits(const AnsiString& s)
+        {
+            AnsiString d = "";
+            for (int i = 1; i <= s.Length(); i++)
             {
-                if (accent_sensitive)
-                {
-                    return std::tolower (c) == std::tolower (c2);
-                }
-                else
-                {
-                    return std::tolower (remove_accent (c)) == std::tolower (remove_accent (c2));
-                }
+                if (isdigit(s[i]))
+                    d += s[i];
             }
+            return d;
         }
 
-        inline bool less (const C c, const C c2, bool case_sensitive = false, bool accent_sensitive = false) noexcept
+        AnsiString __fastcall remove_acentos(const AnsiString& s)
         {
-            if (case_sensitive)
+            AnsiString sem_acentos = s;
+            for (int i = 1; i <= s.Length(); ++i)
             {
-                if (accent_sensitive)
-                {
-                    return c < c2;
-                }
-                else
-                {
-                    return remove_accent (c) < remove_accent (c2);
-                }
+                troca_char<char>(&sem_acentos[i]);
             }
-            else
+            return sem_acentos;
+        }*/
+#endif
+        //----------------------------------------------------------------------
+
+
+        /*void remove_accent(wchar_t* c) noexcept
+        {
+            //T ch = std::use_facet<std::ctype<T> >(loc).tolower (*c);
+            switch (*c)
             {
-                if (accent_sensitive)
-                {
-                    return std::tolower (c) < std::tolower (c2);
-                }
-                else
-                {
-                    return std::tolower (remove_accent (c)) < std::tolower (remove_accent (c2));
-                }
+                // According to codepage ISO/IEC 8859-1
+            case L'\u00C0'): // A com crase.
+            case L'\u00C1'): // A com agudo.
+            case L'\u00C2'): // A com circunflexo.
+            case L'\u00C3'): // A com til.
+            case L'\u00C4'): // A com trema.
+            case L'\u00C5'): // A com bolinha de angstron.
+                *c = L'A');
+                break;
+            case L'\u00C8'):  // E com crase.
+            case L'\u00C9'):  // E com agudo.
+            case L'\u00CA'):  // E com circunflexo.
+            case L'\u00CB'):  // E com trema.
+                *c = L'E');
+                break;
+            case L'\u00CC'):  // I com crase.
+            case L'\u00CD'):  // I com agudo.
+            case L'\u00CE'):  // I com circunflexo.
+            case L'\u00CF'):  // I com trema.
+                *c = L'I');
+                break;
+            case L'\u00D2'): // O com crase.
+            case L'\u00D3'): // O com agudo.
+            case L'\u00D4'): // O com circunflexo.
+            case L'\u00D5'): // O com til.
+            case L'\u00D6'): // O com trema.
+                *c = L'O');
+                break;
+            case L'\u00D9'): // U com crase.
+            case L'\u00DA'): // U com agudo.
+            case L'\u00DB'): // U com circunflexo.
+            case L'\u00DC'): // U com trema.
+                *c = L'U');
+                break;
+            case L'\u00C7'): // C cidilha.
+                *c = L'C');
+                break;
+            case L'\u00D1'): // N com til
+                *c = L'N');
+                break;
+            case L'\u00E0'): // a com crase.
+            case L'\u00E1'): // a com agudo.
+            case L'\u00E2'): // a com circunflexo.
+            case L'\u00E3'): // a com til.
+            case L'\u00E4'): // a com trema.
+                *c = L'a');
+                break;
+            case L'\u00E8'):  // e com crase.
+            case L'\u00E9'):  // e com agudo.
+            case L'\u00EA'):  // e com circunflexo.
+            case L'\u00EB'):  // e com trema.
+                *c = L'e');
+                break;
+            case L'\u00EC'):  // i com crase.
+            case L'\u00ED'):  // i com agudo.
+            case L'\u00EE'):  // i com circunflexo.
+            case L'\u00EF'):  // i com trema.
+                *c = L'i');
+                break;
+            case L'\u00F2'): // o com crase.
+            case L'\u00F3'): // o com agudo.
+            case L'\u00F4'): // o com circunflexo.
+            case L'\u00F5'): // o com til.
+            case L'\u00F6'): // o com trema.
+                *c = L'o');
+                break;
+            case L'\u00E7'): // c cidilha.
+                *c = L'c');
+                break;
+            case L'\u00F1'): // n com til
+                *c = L'n');
+                break;
+            case L'\u00F9'): // u com crase.
+            case L'\u00FA'): // u com agudo.
+            case L'\u00FB'): // u com circunflexo.
+            case L'\u00FC'): // u com trema.
+                *c = L'u');
+                break;
+            default:
+                break;
             }
-        }
-
-        inline bool not_equal (const C c, const C c2, bool case_sensitive = false, bool accent_sensitive = false) noexcept
-        {
-            return !equal(c, c2, case_sensitive, accent_sensitive);
-        }
-
-        template <typename C = char>
-        inline bool greater (const C c, const C c2, bool case_sensitive = false, bool accent_sensitive = false) noexcept
-        {
-            return !less (c, c2, case_sensitive, accent_sensitive) && !equal (c, c2, case_sensitive, accent_sensitive);
-        }
-
-        inline bool less_equal (const C c, const C c2, bool case_sensitive = false, bool accent_sensitive = false) noexcept
-        {
-            return less (c, c2, case_sensitive, accent_sensitive) || equal (c, c2, case_sensitive, accent_sensitive);
-        }
-
-        inline bool greater_equal (const C c, const C c2, bool case_sensitive = false, bool accent_sensitive = false) noexcept
-        {
-            return greater (c, c2, case_sensitive, accent_sensitive) || equal (c, c2, case_sensitive, accent_sensitive);
-        }
-        
-        inline static const bool ADD_NULL_AT_END              =  true;  ///< Add null character at the end of the string.
-        inline static const bool DO_NOT_ADD_NULL_AT_END       = false;  ///< Do not add null character at the end of the string.
-        inline static const bool FILL_NULL_BEFORE_COPY        =  true;  ///< Fill dest memory with null characters before copying the data.
-        inline static const bool DO_NOT_FILL_NULL_BEFORE_COPY = false;  ///< Do not fill dest memory with null characters before copying the data.
-
+        }*/
 
     }   // namespace cpplib
 }       // namespace pensar_digital

@@ -76,7 +76,12 @@ namespace pensar_digital
             }
 
         } // convert
-        extern void convert(const std::span<std::byte>& from_data, std::span<std::byte>& to_data, const ByteOrder& from, const ByteOrder& to) noexcept;
+        
+        inline void convert(const std::span<std::byte>& from_data, std::span<std::byte>& to_data, const ByteOrder& from, const ByteOrder& to) noexcept
+        {
+
+        } // convert
+
 
     } // namespace cpplib
 } // namespace pensar_digital

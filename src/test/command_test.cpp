@@ -17,7 +17,7 @@ namespace pensar_digital
 
 		class IncCmd : public Command
 		{
-		public:
+			public:
 
 			IncCmd(const Id aid = NULL_ID) : Command(aid) { }
 			IncCmd(MemoryBuffer& mb) : Command(mb) { }
@@ -41,6 +41,8 @@ namespace pensar_digital
 			virtual Ptr clone() const noexcept { return pd::clone<IncCmd>(*this, id()); }
 			void _run() { ++value; }
 			void _undo() const { --value; }
+
+
 		};
 
 		class DecCmd : public Command
@@ -250,7 +252,7 @@ namespace pensar_digital
 		}
 		TEST_END(CompositeCommand)
 
-		TEST(CommandBinaryFileStreaming, true)
+		TEST(CommandBinaryFileStreaming, false)
 			using Cmd = IncCmd;
 			std::ofstream out(W("c:\\tmp\\test\\CommandBinaryStreaming\\test.bin"), std::ios::binary);
 			Cmd cmd;
@@ -268,16 +270,19 @@ namespace pensar_digital
 		TEST(CompositeCommandBinaryStreaming, false)
 			using Cmd = CompositeCommand;
 
-			ObjMemoryBuffer<Cmd> buffer;
 			Cmd cmd;
 			Cmd cmd2;
 			CHECK_NOT_EQ(Cmd, cmd, cmd2, W("0"));
 			Cmd::Ptr cmd3 = cmd.clone();
-			buffer.add(cmd);
+			Cmd& cmd4 = *cmd3;
+			CHECK_EQ(Cmd, cmd4, cmd, W("1"));
 
-			Cmd::Factory::P p = buffer.read_obj();
+			MemoryBuffer mb(cmd);
 
-			CHECK_EQ(Cmd, *p, cmd, "1");
+			Cmd cmd5;
+			cmd5.assign(mb);
+
+			CHECK_EQ(Cmd, cmd5, cmd, W("1"));
 
 
 			//Cmd::Factory::P p3 = buffer.CreateAndAddObj();

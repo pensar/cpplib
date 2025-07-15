@@ -12,22 +12,22 @@ namespace pensar_digital
 	namespace cpplib
 	{
 		TEST(Version, true)
-			VersionPtr v = Version::get(2, 3, 4);
+			Version::Ptr v = Version::get(2, 3, 4);
 		CHECK_EQ(Version, v->get_public(), 2, W("0. public    != 2"));
 		CHECK_EQ(Version, v->get_protected(), 3, W("1. protected != 3"));
 		CHECK_EQ(Version, v->get_private(), 4, W("2. private   != 4"));
 		TEST_END(Version)
 
 		TEST(VersionSerialization, true)
-			VersionPtr v = Version::get(2, 3, 4);
+			Version::Ptr v = Version::get(2, 3, 4);
 			MemoryBuffer::Ptr mb = v->bytes();
-			VersionPtr v1 = Version::get();
+			Version::Ptr v1 = Version::get();
 			CHECK_NOT_EQ(Version, *v, *v1, W("0. v == v1"));
 			v1->assign(*mb);
 			CHECK_EQ(Version, *v, *v1, W("1. v != v1"));
-			CHECK_EQ(VersionInt, v->get_public(), 2, W("2. public    != 2"));
-			CHECK_EQ(VersionInt, v->get_protected(), 3, W("3. protected != 3"));
-			CHECK_EQ(VersionInt, v->get_private(), 4, W("4. private   != 4"));
+			CHECK_EQ(Version::Int, v->get_public(), 2, W("2. public    != 2"));
+			CHECK_EQ(Version::Int, v->get_protected(), 3, W("3. protected != 3"));
+			CHECK_EQ(Version::Int, v->get_private(), 4, W("4. private   != 4"));
 		TEST_END(VersionSerialization)
 
 	}

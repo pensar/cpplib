@@ -73,8 +73,8 @@ namespace pensar_digital
             using Factory =  pd::Factory<Command, Id, typename Command::DataType>;
 
             // Version of the class.
-            inline static const VersionPtr VERSION = pd::Version::get(1, 1, 1);
-            virtual const VersionPtr version() const noexcept { return VERSION; }
+            inline static const Version::Ptr VERSION = pd::Version::get(1, 1, 1);
+            virtual const Version::Ptr version() const noexcept { return VERSION; }
 
             using FactoryType = Factory;
 
@@ -163,32 +163,45 @@ namespace pensar_digital
                 return mb;
 			}
 
+
+            virtual std::ostream& child_binary_write(std::ostream& os, const std::endian& byte_order = std::endian::native) const 
+            { 
+                return os; 
+            }
+
+            virtual std::istream& child_binary_read(std::istream& is, const std::endian& byte_order = std::endian::native) 
+            { 
+                return is; 
+            }
+
             inline virtual std::ostream& binary_write(std::ostream& os, const std::endian& byte_order = std::endian::native) const
 			{
 				Object::binary_write (os, byte_order);
-				//VERSION->binary_write (os, byte_order);
-				//os.write((char*)&mdata, DATA_SIZE);
+				VERSION->binary_write (os, byte_order);
+				os.write((char*)&mdata, DATA_SIZE);
 				mgenerator.binary_write(os, byte_order);
+				child_binary_write(os, byte_order); // Call to child class binary_write.
 				return os;
 			}
 
 			inline virtual std::istream& binary_read(std::istream& is, const std::endian& byte_order = std::endian::native)
 			{
 				Object::binary_read(is, byte_order);
-				//VERSION->binary_read(is, byte_order);
-				//is.read((char*)&mdata, DATA_SIZE);
+				VERSION->binary_read(is, byte_order);
 				mgenerator.binary_read(is, byte_order);
-				return is;
+                is.read((char*)&mdata, DATA_SIZE);
+				child_binary_read(is, byte_order); // Call to child class binary_read.
+                return is;
 			}
 
             protected:
 
-                virtual void _run()  {}
-                virtual void _undo() const  {}
+                inline virtual void _run()  {}
+                inline virtual void _undo() const  {}
                     
             public:
 				using Ptr = std::shared_ptr<Command>;
-				virtual Ptr clone() const noexcept { return pd::clone<Command>(*this, id()); } //!< Clones the command.
+				inline Ptr clone() const noexcept { return pd::clone<Command>(*this, id()); } //!< Clones the command.
             virtual void run () 
             {
                 _run();
@@ -243,13 +256,13 @@ namespace pensar_digital
 		{
             public:
 			inline static const size_t MAX_COMMANDS = 10;
-	    	
+            using Ptr = std::shared_ptr<CompositeCommand>;
             private:
                 struct Data : public pd::Data
                 {
                     std::array<Command*, MAX_COMMANDS> mcommands; //!< Member variable "commands" contains the list of commands to be executed.
                     size_t mindex = 0;
-					void add(Command* cmd) 
+					void add(Command* cmd)
                     {
 						if (mindex >= MAX_COMMANDS)
 						{
@@ -267,7 +280,7 @@ namespace pensar_digital
                         }
                     }
                 };
-                static_assert(TriviallyCopyable<Data>, "Data must be a trivially copyable type");
+                static_assert(StdLayoutTriviallyCopyable<Data>, "Data must be a standard layout and trivially copyable type");
                 Data mdata; //!< Member variable mdata contains the object data.
             public:
                 inline const static Data NULL_DATA = {};
@@ -276,8 +289,8 @@ namespace pensar_digital
             using Factory = pd::Factory<CompositeCommand, Id>;
 
             // Version of the class.
-            inline static const VersionPtr VERSION = pd::Version::get(1, 1, 1);
-            virtual const VersionPtr version() const noexcept { return VERSION; }
+            inline static const Version::Ptr VERSION = pd::Version::get(1, 1, 1);
+            virtual const Version::Ptr version() const noexcept { return VERSION; }
 
             using FactoryType = Factory;
 
@@ -304,16 +317,19 @@ namespace pensar_digital
 
             public:
 
-			inline virtual MemoryBuffer::Ptr bytes() const noexcept
-			{
-				ByteSpan obs = Object::data_span();
-				MemoryBuffer::Ptr mb = std::make_unique<MemoryBuffer>(SIZE);
-				MemoryBuffer::Ptr version_bytes = VERSION->bytes();
-				mb->write(obs.data(), obs.size());
-				mb->append(*version_bytes);
-				mb->write(data_bytes(), data_size());
+                      
+            virtual Command& assign(MemoryBuffer& mb) noexcept
+            {
+                return *this;
+            }
+            inline virtual MemoryBuffer::Ptr bytes() const noexcept
+            {
+                MemoryBuffer::Ptr mb = std::make_unique<MemoryBuffer>(SIZE);  
+				mb->append(*Object::bytes());
+                mb->append(*VERSION->bytes());
+                mb->write((BytePtr(&mdata)), DATA_SIZE);
 				return mb;
-			}
+            }
 
             // Implements initialize method from Initializable concept.
             virtual bool initialize (const Id id) noexcept
@@ -350,16 +366,57 @@ namespace pensar_digital
 			/// <param name="cmd">Pointer to the command to be added.</param>
 			void add (Command* cmd) { mdata.add (cmd); }
 
-            Command::Ptr clone() const noexcept
+            Ptr clone () const noexcept 
             {
-                CompositeCommand* pcc = (CompositeCommand*)pd::clone<CompositeCommand>(*this, id()).get();
+				// Create a new CompositeCommand instance using Ptr and make_shared with the current id and mdata.
+				Ptr pcc = std::make_shared<CompositeCommand>(id());
+                pcc->mdata.mindex = mdata.mindex;
+
                 // Clone all commands and add to the newly created composite.
                 for (size_t i = 0; i < mdata.mindex; ++i)
                 {
                     pcc->add((Command*)mdata.mcommands[i]->clone().get ());
                 }
-				return (Ptr)pcc;
+				return pcc;
             }
+
+            virtual bool equals(const Object& o) const noexcept
+            {
+                const CompositeCommand* pother = dynamic_cast<const CompositeCommand*>(&o);
+                if (pother == nullptr)
+                    return false;
+                if (o.id () != id ())
+					return false;
+                for (size_t i = 0; i < mdata.mindex; ++i)
+                {
+                    if (!mdata.mcommands[i]->equals(*pother->mdata.mcommands[i]))
+                        return false;
+				}
+                return true;
+            }
+            inline virtual std::istream& binary_read(std::istream& is, const std::endian& byte_order = std::endian::native)
+            {
+                Object::binary_read(is, byte_order);
+				VERSION->binary_read(is, byte_order);
+				is.read((char*)(&mdata), DATA_SIZE);
+				for (size_t i = 0; i < mdata.mindex; ++i)
+				{
+					mdata.mcommands[i] = new Command ();
+					mdata.mcommands[i]->binary_read(is, byte_order);
+				}
+				return is;
+			}
+
+            inline virtual std::ostream& binary_write(std::ostream& os, const std::endian& byte_order = std::endian::native) const
+            {
+                Object::binary_write(os, byte_order);
+                VERSION->binary_write(os, byte_order);
+				for (size_t i = 0; i < mdata.mindex; ++i)
+                {
+                    mdata.mcommands[i]->binary_write(os, byte_order);
+				}
+                return os;
+			}
         };
  
     }

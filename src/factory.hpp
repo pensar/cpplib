@@ -19,7 +19,7 @@ namespace pensar_digital
             public:
                 //using I = std::conditional<Interfaceable<T>, typename T::I, T>::type; // Interface type
                 typedef typename std::shared_ptr<T> P; // Pointer type.
-                //inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
+                //inline static const Version::Ptr VERSION = pd::Version::get (1, 1, 1);
                 virtual ~NewFactory (){}
                 virtual P get(const Args& ... args) const { return std::make_shared<T> (args ...); }
 
@@ -31,7 +31,7 @@ namespace pensar_digital
         {
             public:
                 using P = NewFactory<T, Args...>::P;
-                //inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
+                //inline static const Version::Ptr VERSION = pd::Version::get (1, 1, 1);
                 MockupFactory(T* amockup_pointer) : mockup_pointer(amockup_pointer) { };
                 virtual ~MockupFactory() {}
                 virtual P get(const Args& ... args) const { std::shared_ptr<T> ptr(mockup_pointer); return ptr; }
@@ -70,7 +70,7 @@ namespace pensar_digital
 					available_count += count;
 				}
         public:
-            //inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
+            //inline static const Version::Ptr VERSION = pd::Version::get (1, 1, 1);
             PoolFactory (const size_t initial_pool_size, const size_t a_refill_size, const Args& ... args) :
                          available_count (0), 
                          refill_size(a_refill_size)
@@ -127,7 +127,7 @@ namespace pensar_digital
             private:
                 using P = NewFactory<T, Args...>::P;
             public:
-            //inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
+            //inline static const Version::Ptr VERSION = pd::Version::get (1, 1, 1);
                 SingletonFactory (const Args& ... args) : singleton (std::make_shared<T>(args ...)) { };
 				virtual ~SingletonFactory () {}
                 virtual P get (const Args& ... args) const { return singleton; }
@@ -141,7 +141,7 @@ namespace pensar_digital
 		{
 			public:
                 using P = NewFactory<T, Args...>::P;
-                //inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
+                //inline static const Version::Ptr VERSION = pd::Version::get (1, 1, 1);
                 
                 Factory (const size_t pool_size, const size_t refill_size, const Args& ... args) 
                 { 

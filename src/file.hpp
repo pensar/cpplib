@@ -104,6 +104,7 @@ namespace pensar_digital
                 static const TextMode TEXT_APPEND;
                 static const TextMode TEXT_ATE;
                 static const TextMode TEXT_RW;
+                static const TextMode TEXT_RWA; // It will create the file if it does not exist.
                 static const TextMode TEXT_RW_ATE;
 
                 static const BinMode  DEFAULT_BIN_MODE;
@@ -144,10 +145,11 @@ namespace pensar_digital
             inline const TextMode OpenMode::TEXT_APPEND = TextMode(std::ios::app);
             inline const TextMode OpenMode::TEXT_ATE = TextMode(std::ios::ate);
             inline const TextMode OpenMode::TEXT_RW = TextMode(std::ios::in | std::ios::out);
+            inline const TextMode OpenMode::TEXT_RWA = TextMode(std::ios::in | std::ios::out | std::ios::app); 
             inline const TextMode OpenMode::TEXT_RW_ATE = TextMode(std::ios::in | std::ios::out | std::ios::ate);
 
             inline const BinMode  OpenMode::DEFAULT_BIN_MODE = BIN_RW;
-            inline const TextMode OpenMode::DEFAULT_TEXT_MODE = TEXT_RW;
+            inline const TextMode OpenMode::DEFAULT_TEXT_MODE = TEXT_RWA;
             inline const OpenMode OpenMode::DEFAULT_OPEN_MODE = DEFAULT_BIN_MODE;
 
         /// \brief File class.
@@ -251,7 +253,7 @@ namespace pensar_digital
                 if (is_open()) 
                     close();
                
-                return (fs::remove(_fullpath) == 0);
+                return fs::remove(_fullpath);
             }
 
                 
@@ -404,7 +406,7 @@ namespace pensar_digital
         {
             private:
             public:
-                inline static const VersionPtr VERSION = Version::get(1, 1, 1);
+                inline static const Version::Ptr VERSION = Version::get(1, 1, 1);
                 TextFile(const Path& full_path, const S& content = EMPTY,
                     const TextMode mode = OpenMode::DEFAULT_TEXT_MODE, const Id id = NULL_ID) : File(full_path, id, mode)
                 {
@@ -458,7 +460,7 @@ namespace pensar_digital
                     return false;
                 }
 
-                inline TextFile& write (const S& content)
+                inline TextFile& write (const S& content, bool flushes = true)
                 {
 					// Writes content.
 					if (! File::is_open()) 
@@ -469,6 +471,16 @@ namespace pensar_digital
                     if (fail ())
 					{
 						log_and_throw (S(W("TextFile::write(): Error: Could not write to the file ")));
+					}
+
+					if (flushes)
+					{
+						// Flushes the file.
+						_file->flush();
+						if (fail())
+						{
+							log_and_throw(S(W("TextFile::write(): Error: Could not flush the file ")));
+						}
 					}
 					
                     return *this;
@@ -514,7 +526,8 @@ namespace pensar_digital
                     memset(content, 0, count + 1);
 
 					//move_to_start ();
-					size_t read_count = _file->read (content, count).gcount();
+					_file->seekg(0, std::ios::beg);
+                    size_t read_count = _file->read(content, count).gcount();
                     if (read_count != count)
 					{
                         // Frees the buffer.    
@@ -641,14 +654,14 @@ namespace pensar_digital
         class TmpTextFile : public TextFile
         {
 			public:
-				inline static const VersionPtr VERSION = Version::get(1, 1, 1);
+				inline static const Version::Ptr VERSION = Version::get(1, 1, 1);
                 inline TmpTextFile (const S& file_name = EMPTY, const S& content = EMPTY, const Id id = null_value<Id>()) : 
-                    TextFile(TMP_PATH / file_name, content, OpenMode::TEXT_RW, id)
+                    TextFile(TMP_PATH / file_name, content, OpenMode::DEFAULT_TEXT_MODE, id)
                 {
 				}
 
                 inline TmpTextFile (const C* file_name = EMPTY, const C* content = EMPTY, const Id id = null_value<Id>())
-                    : TextFile (S(file_name), S(content), OpenMode::TEXT_RW, id) {}
+                    : TextFile (S(file_name), S(content), OpenMode::DEFAULT_TEXT_MODE, id) {}
 
                 inline void log_error()
                 {
@@ -669,7 +682,7 @@ namespace pensar_digital
         {
 			private:
 			public:
-				inline static const VersionPtr VERSION = Version::get(1, 1, 1);
+				inline static const Version::Ptr VERSION = Version::get(1, 1, 1);
 			private:
                 inline BinaryFile (const Path&                   full_path,
                             const OpenMode mode                     = OpenMode::DEFAULT_BIN_MODE,
@@ -701,7 +714,7 @@ namespace pensar_digital
                         if (_file->fail ())
 						{
 							S error_msg = W("BinaryFile::append(): Error: Could not append data to the file ");
-							log_and_throw_if_error(errno, error_msg);
+						 log_and_throw_if_error(errno, error_msg);
 						}
 					}
 					return *this;

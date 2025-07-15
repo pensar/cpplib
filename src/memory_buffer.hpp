@@ -67,6 +67,23 @@ namespace pensar_digital
                 write(t, sizeof(T));
             }
 
+			// Memory buffer constructor for StdLayoutTriviallyCopyableData types.
+			template <HasStdLayoutTriviallyCopyableData T>
+			MemoryBuffer(const T& t) : MemoryBuffer()
+			{
+				// Write the data to the buffer.
+				write(t.data_bytes(), T::DATA_SIZE);
+			}
+            
+            // Memory buffer constructor for StdLayoutTriviallyCopyableData types with default constructors.
+            template <HasStdLayoutTriviallyCopyableData T>
+            MemoryBuffer() : MemoryBuffer()
+            {
+                // Write the data to the buffer.
+				T t;
+                write(t.data_bytes(), T::DATA_SIZE);
+            }
+
             // += operator for StdLayoutTriviallyCopyableData types.    
 			template <HasStdLayoutTriviallyCopyableData T>
 			MemoryBuffer& operator+=(const T& t)
@@ -110,7 +127,7 @@ namespace pensar_digital
             const size_t ravailable() const noexcept { return mwrite_offset - mread_offset; }
 
 			/// \brief Write data to the buffer.
-            void write(const BytePtr data, const size_t size) noexcept
+            Offset write(const BytePtr data, const size_t size) noexcept
             {
                 // Check if there is enough space in the buffer.
                 if (wavailable() < size)
@@ -130,17 +147,19 @@ namespace pensar_digital
                 
                 // Update the index.
                 mindex[mwrite_offset] = size;
-
+				Offset offset = mwrite_offset;
                 // Update the offset.
                 mwrite_offset += size;
-
+				return offset;
             }
 
-            void write (std::ifstream& in, const size_t size)
+            Offset write (std::ifstream& in, const size_t size)
             {
                 in.read((char*)(mbuffer.data() + mwrite_offset), size);
 				mindex[mwrite_offset] = size;
+				Offset offset = mwrite_offset;
 				mwrite_offset += size;
+				return offset;
             }
 
             void read (BytePtr dest, const Offset offset, size_t size)
@@ -180,9 +199,21 @@ namespace pensar_digital
 			void read_known_size(BytePtr dest, const size_t size)
 			{
 				read(dest, mread_offset, size);
-			}   
+			}
 
-            MemoryBuffer& copy (const MemoryBuffer& mb, const Offset offset = 0)
+			template <StdLayoutTriviallyCopyable T>
+			void read(T* t, Offset offset)
+			{
+				read(t, offset, sizeof(T));
+			}
+
+			template <HasStdLayoutTriviallyCopyableData T>
+            void read_into_data(T* t, Offset offset)
+            {
+                read(t->data_bytes(), offset, T::DATA_SIZE);
+            }
+
+            Offset copy (const MemoryBuffer& mb, const Offset offset = 0)
 			{
 				// Check if there is enough space in the buffer.
 				if (wavailable() < mb.size())
@@ -199,38 +230,44 @@ namespace pensar_digital
 
                 // Update the index.
                 mindex[mwrite_offset] = mb.size();
-                
                 // Copy the data to the buffer.
 				memcpy(mbuffer.data() + mwrite_offset, mb.mbuffer.data(), mb.size());
 
 				// Update the offset.
 				mwrite_offset += mb.size();
 
-				return *this;
+				return offset;
 			}
 
-            inline MemoryBuffer& append (const MemoryBuffer& mb)
+            inline Offset append (const MemoryBuffer& mb)
             {
                 return copy(mb, mwrite_offset);
             }
 
-			inline MemoryBuffer& append(const BytePtr data, const size_t size)
+			inline Offset append(const MemoryBuffer::Ptr& mb)
+            {
+                if (!mb)
+                {
+                    throw std::runtime_error("MemoryBuffer::append: null pointer.");
+                }
+                return append(*mb);
+			}
+
+			inline Offset append(const BytePtr data, const size_t size)
 			{
-				write(data, size);
-				return *this;
+				return write(data, size);
 			}
 
 			// += operator
-            inline MemoryBuffer& operator+=(const MemoryBuffer& mb)
+            inline Offset operator+=(const MemoryBuffer& mb)
             {
                 return append (mb);
             }
 
             template <HasStdLayoutTriviallyCopyableData T>
-			MemoryBuffer& append(const T& t)
+			Offset append(const T& t)
 			{
-				write(t.data_bytes (), T::DATA_SIZE);
-				return *this;
+				return write(t.data_bytes (), T::DATA_SIZE);
 			}
         }; // MemoryBuffer
 

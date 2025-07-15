@@ -1,10 +1,10 @@
 // author : Mauricio Gomes
 // license: MIT (https://opensource.org/licenses/MIT)
-#include "../../unit-test/test/test.hpp"
+#include "../../unit_test/src/test.hpp"
 
 #include "../src/generator.hpp"
 #include "../src/memory_buffer.hpp"
-#include "../src/binary_memory_buffer.hpp"
+
 #include "../src/trivially_persistable_memory_buffer.hpp"
 #include "../src/concept.hpp"
 
@@ -75,7 +75,7 @@ namespace pensar_digital
 	    TEST(GeneratorSerialization, true)
 			using G = Generator<int>;
             G g;
-		    MemoryBufferPtr mb = g.bytes ();
+		    MemoryBuffer::Ptr mb = g.bytes ();
 		    G g2 (1);
 		    CHECK_NOT_EQ(G, g2, g, W("0"));
 			g2.assign(*mb);
@@ -98,7 +98,7 @@ namespace pensar_digital
             G g3(3);
             CHECK_NOT_EQ(G, g3, g, W("0"));
             CHECK_EQ(G, *pg2, g, W("1"));
-            CHECK_EQ(VersionInt, pg2->version()->get_private (), 2, W("2"));
+            CHECK_EQ(Version::Int, pg2->version()->get_private (), 2, W("2"));
 
         TEST_END(GeneratorFileBinaryStreaming)
 
@@ -107,30 +107,27 @@ namespace pensar_digital
             static_assert (Identifiable <G>);
             static_assert (Hashable<G>);
             static_assert (TriviallyCopyable <G::DataType>);
-            //static_assert (StandardLayout <G::DataType>);
+            static_assert (StandardLayout <G::DataType>);
             static_assert (TriviallyCopyable <G::DataType>);
             static_assert (TriviallyPersistable<G>);
+			static_assert (HasStdLayoutTriviallyCopyableData<G>);
 
-            TriviallyPersistableMemoryBuffer<G> buffer;
+            
             //G::Factory::P p = G::get (1, 0, 1);
             G g(1);
+            //Constructs a MemoryBuffer using constructor for StdLayoutTriviallyCopyableData types.
+            MemoryBuffer buffer(g);
             Id id = g.get_id ();
-            buffer.write_obj (g);
+            using Offset = MemoryBuffer::Offset;
+            Offset offset = buffer.append<G> (g);
             Hash h = g.hash ();
 
-            G::Factory::P p2 = buffer.read_obj (1);
-            G g2 (1);
-            Hash h2 = g2.hash ();
-
+            G g2;
             CHECK_NOT_EQ(G, g2, g, W("0"));
-            CHECK_EQ(G, *p2, g, "1");
+            buffer.read_into_data<G>(&g2, offset);
+            CHECK_EQ(G, g2, g, "1");
             
-            
-            G::Factory::P p3 = buffer.write_obj  <Id, Id, Id>(3, 2, 1);
-            G::Factory::P p4 = nullptr;
-            buffer.read_obj (&p4);
-            CHECK_EQ(G, *p4, *p3, "2");
-        TEST_END(GeneratorBinaryStreaming)
+          TEST_END(GeneratorBinaryStreaming)
         
     }
 }

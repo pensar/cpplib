@@ -25,6 +25,7 @@
     <ClCompile Include="..\src\test\constraint_test.cpp" />
     <ClCompile Include="..\src\test\distance_test.cpp" />
     <ClCompile Include="..\src\test\factory_test.cpp" />
+    <ClCompile Include="..\src\test\file_test.cpp" />
     <ClCompile Include="..\src\test\io_util_test.cpp" />
     <ClCompile Include="..\src\test\log_test.cpp" />
     <ClCompile Include="..\src\test\main.cpp" />
@@ -32,6 +33,7 @@
     <ClCompile Include="..\src\test\stop_watch_test.cpp" />
     <ClCompile Include="..\src\test\version_test.cpp" />
     <ClCompile Include="code_util_test.cpp" />
+    <ClCompile Include="generator_test.cpp" />
     <ClCompile Include="memory_buffer_test.cpp" />
     <ClCompile Include="path_test.cpp" />
     <ClCompile Include="random_util_test.cpp" />
@@ -155,7 +157,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>test.lib;cpp.lib;ws2_32.lib;icudt.lib;icuin.lib;icuio.lib;icutu.lib;icuuc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;icudt.lib;icuin.lib;icuio.lib;icutu.lib;icuuc.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\out\cpp\bin\x64\Debug;C:\vcpkg\installed\x64-windows\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <ProjectReference>
@@ -183,6 +185,9 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

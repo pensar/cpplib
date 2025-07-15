@@ -39,7 +39,7 @@ namespace pensar_digital
             private:
                 inline static PathFactory mfactory = { 3, 10, W("."), null_value<Id>()};
             public:
-                inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
+                inline static const Version::Ptr VERSION = pd::Version::get (1, 1, 1);
 
             Path(const fs::path& p = W("."), const Id& id = null_value<Id>()) : Object(id), fs::path(p) {}
             Path(const std::string& s, const Id& id = null_value<Id>()) : Object(id), fs::path(s) {}

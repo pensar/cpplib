@@ -37,6 +37,168 @@ namespace pensar_digital
         using OutFileBufIter = std::ostreambuf_iterator<C>;
 
 
+        inline void remove_accent(C* c) noexcept
+        {
+            //T ch = std::use_facet<std::ctype<T> >(loc).tolower (*c);
+            switch (*c)
+            {
+            case W('á'):
+            case W('à'):
+            case W('ã'):
+            case W('ä'):
+            case W('â'):
+                *c = W('a');
+                break;
+            case W('é'):
+            case W('è'):
+            case W('ë'):
+            case W('ê'):
+                *c = W('e');
+                break;
+            case W('í'):
+            case W('ì'):
+            case W('ï'):
+            case W('î'):
+                *c = W('i');
+                break;
+            case W('ó'):
+            case W('ò'):
+            case W('õ'):
+            case W('ö'):
+            case W('ô'):
+                *c = W('o');
+                break;
+            case W('ú'):
+            case W('ù'):
+            case W('ü'):
+            case W('û'):
+                *c = W('u');
+                break;
+            case W('ç'):
+                *c = W('c');
+                break;
+            case W('Á'):
+            case W('À'):
+            case W('Ã'):
+            case W('Ä'):
+            case W('Â'):
+                *c = W('A');
+                break;
+            case W('É'):
+            case W('È'):
+            case W('Ë'):
+            case W('Ê'):
+                *c = W('E');
+                break;
+            case W('Í'):
+            case W('Ì'):
+            case W('Ï'):
+            case W('Î'):
+                *c = W('I');
+                break;
+            case W('Ó'):
+            case W('Ò'):
+            case W('Õ'):
+            case W('Ö'):
+            case W('Ô'):
+                *c = W('O');
+                break;
+            case W('Ú'):
+            case W('Ù'):
+            case W('Ü'):
+            case W('Û'):
+                *c = W('U');
+                break;
+            case W('Ç'):
+                *c = W('C');
+                break;
+            default:
+                break;
+            }
+        }
+
+
+        inline C copy_remove_accent(const C c) noexcept
+        {
+            C ch = c;
+            remove_accent(&ch);
+            return ch;
+        }
+
+        inline bool equal(const C c, const C c2, bool case_sensitive = false, bool accent_sensitive = false) noexcept
+        {
+            if (case_sensitive)
+            {
+                if (accent_sensitive)
+                {
+                    return c == c2;
+                }
+                else
+                {
+                    return copy_remove_accent(c) == copy_remove_accent(c2);
+                }
+            }
+            else
+            {
+                if (accent_sensitive)
+                {
+                    return std::tolower(c) == std::tolower(c2);
+                }
+                else
+                {
+                    return std::tolower(copy_remove_accent(c)) == std::tolower(copy_remove_accent(c2));
+                }
+            }
+        }
+
+        inline bool less(const C c, const C c2, bool case_sensitive = false, bool accent_sensitive = false) noexcept
+        {
+            if (case_sensitive)
+            {
+                if (accent_sensitive)
+                {
+                    return c < c2;
+                }
+                else
+                {
+                    return copy_remove_accent(c) < copy_remove_accent(c2);
+                }
+            }
+            else
+            {
+                if (accent_sensitive)
+                {
+                    return std::tolower(c) < std::tolower(c2);
+                }
+                else
+                {
+                    return std::tolower(copy_remove_accent(c)) < std::tolower(copy_remove_accent(c2));
+                }
+            }
+        }
+
+        inline bool not_equal(const C c, const C c2, bool case_sensitive = false, bool accent_sensitive = false) noexcept
+        {
+            return !equal(c, c2, case_sensitive, accent_sensitive);
+        }
+
+        template <typename C = char>
+        inline bool greater(const C c, const C c2, bool case_sensitive = false, bool accent_sensitive = false) noexcept
+        {
+            return !less(c, c2, case_sensitive, accent_sensitive) && !equal(c, c2, case_sensitive, accent_sensitive);
+        }
+
+        inline bool less_equal(const C c, const C c2, bool case_sensitive = false, bool accent_sensitive = false) noexcept
+        {
+            return less(c, c2, case_sensitive, accent_sensitive) || equal(c, c2, case_sensitive, accent_sensitive);
+        }
+
+        inline bool greater_equal(const C c, const C c2, bool case_sensitive = false, bool accent_sensitive = false) noexcept
+        {
+            return greater(c, c2, case_sensitive, accent_sensitive) || equal(c, c2, case_sensitive, accent_sensitive);
+        }
+
+
         template<size_t MIN = 0, size_t MAX = 20> //, typename Encoding = icu::UnicodeString>
         class CS
         {
@@ -382,7 +544,7 @@ namespace pensar_digital
         {
             size_t min_size = lhs.length() + rhs.length() + 1;
             if (N < min_size)
-                runtime_error(W("CS<N> operator+ (const std::basic_string<Char>& lhs, const CS<N>& rhs) - rhs must be of size > ") + pd::to_string(min_size));
+                std::runtime_error("CS<N> operator+ (const std::basic_string<Char>& lhs, const CS<N>& rhs) - rhs must be of size > " + std::to_string(min_size));
             CS<0, N + 1> result;
             std::copy(lhs.begin(), lhs.end(), result.data.begin());
             std::copy(rhs.data.begin(), rhs.data.begin() + rhs.length(), result.data.begin() + lhs.length());

@@ -58,10 +58,10 @@ namespace pensar_digital
   
         using Id         = int_fast64_t; // istream >> unsigned long was not compiling.  
         using Hash       = int_fast64_t;  
-        using VersionInt = int_fast16_t;  
         using FileSize   = int_fast64_t;  
           
-        extern const Id NULL_ID;  
+        inline const Id NULL_ID = -1;
+
           
         template <typename T>  
         concept unsigned_integral = std::is_integral<T>::value && std::is_unsigned<T>::value;  
@@ -78,7 +78,15 @@ namespace pensar_digital
         using Bytes    = std::vector<Byte>;  
         using BytePtr  = Byte*;  
         using ByteSpan = std::span<Byte>;  
-  
+        inline const bool PAD_RIGHT = true;
+        inline const bool PAD_LEFT = false;
+        inline const bool TRIM_ELEMENTS = true;
+        inline const bool INCLUDE_EMPTY_FIELDS = true;
+        inline static const bool ADD_NULL_AT_END = true;  ///< Add null character at the end of the string.
+        inline static const bool DO_NOT_ADD_NULL_AT_END = false;  ///< Do not add null character at the end of the string.
+        inline static const bool FILL_NULL_BEFORE_COPY = true;  ///< Fill dest memory with null characters before copying the data.
+        inline static const bool DO_NOT_FILL_NULL_BEFORE_COPY = false;  ///< Do not fill dest memory with null characters before copying the data.
+
     }   // namespace cpplib  
 }       // namespace pensar_digital  
   

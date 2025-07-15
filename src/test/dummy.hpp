@@ -4,7 +4,7 @@
 #ifndef DUMMY_HPP
 #define DUMMY_HPP
 
-#include "../../../../unit_test/src/test.hpp"
+#include "../../../unit_test/src/test.hpp"
 #include "../s.hpp"
 #include "../object.hpp"
 #include "../clone_util.hpp"
@@ -37,9 +37,10 @@ namespace pensar_digital
                 };
                 Data mdata; //!< Member variable mdata contains the object data.
             public:
+				using Ptr = std::shared_ptr<Dummy>;
                     typedef pd::Factory<Dummy, Id, S> Factory;
                     inline static Factory factory = {3, 10, NULL_ID, EMPTY};
-                    inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
+                    inline static const Version::Ptr VERSION = pd::Version::get (1, 1, 1);
                     virtual const pd::Data* data() const noexcept { return &mdata; }
                     virtual size_t data_size() const noexcept { return mdata.data_size (); }
 

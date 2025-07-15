@@ -33,8 +33,6 @@ namespace pensar_digital
     namespace cpplib
     {
         namespace pd = pensar_digital::cpplib;
-        class Object;
-        using ObjectPtr = std::shared_ptr<Object>;
         
         inline static void log_throw(const S& error_msg = W("")) 
         {
@@ -56,274 +54,326 @@ namespace pensar_digital
 
         class Object
         {
-            private:
-                /// \brief Class Object::Data is compliant with the TriviallyCopyable concept. 
-                /// \see https://en.cppreference.com/w/cpp/named_req/TriviallyCopyable  
-                struct Data : public pd::Data
-                {
-                    Id mid;         //!< Unique id (among same class).
-                    Data (const Id& id = NULL_ID) noexcept : mid(id) {}
-                };
-                // Asserts Data is a trivially copyable type.
-                static_assert(TriviallyCopyable<Data>, "Data must be a trivially copyable type");
-                Data mdata; //!< Member variable mdata contains the object data.
-            public:
-                inline const static Data NULL_DATA = { NULL_ID};
-                using DataType = Data;
-                using Factory = pd::Factory<Object, typename Object::DataType> ;
-                inline virtual pd::Data* get_null_data() const noexcept { return (pd::Data*)(&NULL_DATA); }
-                // Version of the class.
-                inline static const VersionPtr VERSION = pd::Version::get (1, 1, 1);
-                virtual const VersionPtr version () const noexcept { return VERSION; }
+        private:
+            /// \brief Class Object::Data is compliant with the TriviallyCopyable concept. 
+            /// \see https://en.cppreference.com/w/cpp/named_req/TriviallyCopyable  
+            struct Data : public pd::Data
+            {                
+                Id mid;         //!< Unique id (among objects of the same class).
+                Data(const Id& id = NULL_ID) noexcept : mid(id) {}
+            };
+            // Asserts Data is a trivially copyable type.
+            static_assert(TriviallyCopyable<Data>, "Data must be a trivially copyable type");
+            Data mdata; //!< Member variable mdata contains the object data.
+        public:
+			using Ptr = std::shared_ptr<Object>;
+            inline const static Data NULL_DATA = { NULL_ID };
+            using DataType = Data;
+        private:
+            using Factory = pd::Factory<Object, typename Object::DataType>;
+		public:
+            inline virtual pd::Data* get_null_data() const noexcept { return (pd::Data*)(&NULL_DATA); }
 
-                using FactoryType = Factory;
-				inline const BytePtr object_data_bytes() const noexcept { return (BytePtr)&mdata; }
-				inline const size_t object_data_size() const noexcept { return sizeof(mdata); }
+            // Meta information.
+            
+            // Version of the class.
+            inline static const Version::Ptr VERSION = pd::Version::get(1, 1, 1);
+            virtual const Version::Ptr version() const noexcept { return VERSION; }
 
-                virtual const pd::Data* data() const noexcept { return &mdata; }
-                virtual const BytePtr data_bytes() const noexcept { return (BytePtr)&mdata; }
+            using FactoryType = Factory;
+            inline const BytePtr object_data_bytes() const noexcept { return (BytePtr)&mdata; }
+            inline const size_t object_data_size() const noexcept { return sizeof(mdata); }
 
-				inline static constexpr size_t DATA_SIZE = sizeof(mdata);
-                inline static constexpr size_t      SIZE = DATA_SIZE + Version::SIZE;
-				
-                virtual size_t data_size() const noexcept { return sizeof(mdata); }
-				virtual size_t size() const noexcept { return data_size() + Version::SIZE ; }
-                
-                /// Set id
-                /// \param val New value to set
-                void set_id(const Id& value) { mdata.mid = value; }
-            private:
-                inline static Factory mfactory = { 3, 10, NULL_DATA }; //!< Member variable "factory"
-                
-                // Set Factory as friend class to allow access to private members.
-                friend class Factory;
-            public:
-                
-                /// Default constructor.
-                Object(const Data& data = NULL_DATA) noexcept
-                {
-                    initialize(data);
-                }
+            virtual const pd::Data* data() const noexcept { return &mdata; }
+            virtual const BytePtr data_bytes() const noexcept { return (BytePtr)&mdata; }
 
-                /// Copy constructor
-                /// \param other Object to copy from
-                Object(const Object& o) { assign(o); }
+            inline static constexpr size_t DATA_SIZE = sizeof(mdata);
+            inline static constexpr size_t      SIZE = DATA_SIZE + Version::SIZE;
 
-                /// Move constructor
-                Object(Object&& o) noexcept { assign(o); }
+            virtual size_t data_size() const noexcept { return sizeof(mdata); }
+            virtual size_t size() const noexcept { return data_size() + Version::SIZE; }
+        protected:
+            /// Set id
+            /// \param val New value to set
+            void set_id(const Id& value) { mdata.mid = value; }
+        private:
+            inline static Factory mfactory = { 3, 10, NULL_DATA }; //!< Member variable "factory"
 
-                Object (MemoryBuffer& mb)
-                {
-					object_assign (mb);
-                }
+            // Set Factory as friend class to allow access to private members.
+            friend class Factory;
+        public:
 
-                /** Default destructor */
-                virtual ~Object() {}
+            /// Default constructor.
+            Object(const Data& data = NULL_DATA) noexcept
+            {
+                initialize(data);
+            }
 
-                virtual Object& assign (const Object&  o) noexcept { std::memcpy  ((void*)data(), ((Object&)o).data(), data_size ()); return *this; }
-                virtual Object& assign (const Object&& o) noexcept { std::memmove ((void*)data(), ((Object&)o).data(), data_size ()); return *this; }
-				virtual Object& assign (MemoryBuffer& mb) 
-				{
-					Version v(mb);
-                    Version v2 = *version ();
-					if (v != v2)
-						log_throw(W("Version mismatch."));
-					mb.read_known_size (data_bytes(), data_size ());
-					return *this;
-				}
+            /// Copy constructor
+            /// \param other Object to copy from
+            Object(const Object& o) { assign(o); }
 
-				Object& object_assign(MemoryBuffer& mb) noexcept
-				{
-                    Version v(mb);
-                    if (v != *VERSION)
-                        log_throw(W("Version mismatch."));
-                    mb.read_known_size(object_data_bytes(), DATA_SIZE);
-                    return *this;
-                }
+            /// Move constructor
+            Object(Object&& o) noexcept { assign(o); }
 
-				Object& object_assign(const Object& o) noexcept {
-                    mdata = o.mdata;
-                    return *this;
-                }
+            Object(MemoryBuffer& mb)
+            {
+                object_assign(mb);
+            }
 
-				inline virtual const Object& write (MemoryBuffer& mb) const noexcept
-				{
-					VERSION->write (mb);
-					mb.write ((BytePtr)(&mdata), DATA_SIZE);
-					return *this;
-				}
+            /** Default destructor */
+            virtual ~Object() {}
 
-				inline const Object& object_write (MemoryBuffer& mb) const noexcept
-				{
-                    VERSION->write(mb);
-                    mb.write((BytePtr)(&mdata), DATA_SIZE);
-					return *this;
-                }
-                /*
-                inline virtual void bytes_to_vector(ConstBytes& v) const noexcept
-                {
-                    VERSION->bytes(v);
-                    size_t req_size = v.size() + data_size();
-                    if (v.capacity() < req_size)
-						v.resize(req_size);
-                    std::copy_n(reinterpret_cast<const std::byte*>(&mdata), data_size(), v.end() - data_size());
-                }
-                */
-            MemoryBuffer::Ptr object_bytes() const noexcept
-			{
-				MemoryBuffer::Ptr mb = std::make_unique<MemoryBuffer>(SIZE);
-				mb->append(*VERSION->bytes());
-				mb->append((BytePtr)(&mdata), DATA_SIZE);
-				return mb;
-			}
-			/// \brief Returns a MemoryBuffer::Ptr with the object data.
-				virtual MemoryBuffer::Ptr bytes () const noexcept
-				{
-                    MemoryBuffer::Ptr mb = std::make_unique<MemoryBuffer> (size ());
-                    MemoryBuffer::Ptr version_bytes = version ()->bytes();
-                    mb->append (*version_bytes);
-                    mb->append ((BytePtr(&mdata)), data_size ());
-                    return mb;
-				}
+            virtual Object& assign(const Object& o) noexcept { std::memcpy((void*)data(), ((Object&)o).data(), data_size()); return *this; }
+            virtual Object& assign(const Object&& o) noexcept { std::memmove((void*)data(), ((Object&)o).data(), data_size()); return *this; }
+            virtual Object& assign(MemoryBuffer& mb)
+            {
+                Version v(mb);
+                Version v2 = *version();
+                if (v != v2)
+                    log_throw(W("Version mismatch."));
+                mb.read_known_size(data_bytes(), data_size());
+                return *this;
+            }
 
-                // Implicit convertion to MemoryBuffer::Ptr.
-				inline operator MemoryBuffer::Ptr () const noexcept
-				{
-					return bytes();
-				}
+            Object& object_assign(MemoryBuffer& mb) noexcept
+            {
+                Version v(mb);
+                if (v != *VERSION)
+                    log_throw(W("Version mismatch."));
+                mb.read_known_size(object_data_bytes(), DATA_SIZE);
+                return *this;
+            }
 
-                virtual ByteSpan data_span () const noexcept { return ByteSpan (data_bytes (), data_size()); }
-                
-                /// \brief Uses std::as_writable_bytes to get a span of writable bytes from the object.
-                virtual std::span<std::byte> wbytes() noexcept
-                {
-                    static_assert (sizeof(char) == sizeof(std::byte));
+            Object& object_assign(const Object& o) noexcept {
+                mdata = o.mdata;
+                return *this;
+            }
 
-                    auto byte_span = std::span<std::byte>((std::byte*)(data()), data_size());
+            inline virtual const Object& write(MemoryBuffer& mb) const noexcept
+            {
+                VERSION->write(mb);
+                mb.write((BytePtr)(&mdata), DATA_SIZE);
+                return *this;
+            }
 
-                    return std::as_writable_bytes(byte_span);
-				}
-                virtual std::string sclass_name () const
-				{
-					std::string s = typeid(*this).name();
-					s.erase(0, sizeof("class ") - 1);
-					return s;
-				}
+            inline const Object& object_write(MemoryBuffer& mb) const noexcept
+            {
+                VERSION->write(mb);
+                mb.write((BytePtr)(&mdata), DATA_SIZE);
+                return *this;
+            }
+            /*
+            inline virtual void bytes_to_vector(ConstBytes& v) const noexcept
+            {
+                VERSION->bytes(v);
+                size_t req_size = v.size() + data_size();
+                if (v.capacity() < req_size)
+                    v.resize(req_size);
+                std::copy_n(reinterpret_cast<const std::byte*>(&mdata), data_size(), v.end() - data_size());
+            }
+            */
 
-                virtual S class_name() const
-                {
-                    std::string s = typeid(*this).name();
-                    s.erase(0, sizeof("class ") - 1);
-                    #ifdef WIDE_CHAR
-					    return pd::to_wstring (s);
-					#else
-                        return s;
-                    #endif  
-                }
+            inline MemoryBuffer::Ptr object_bytes() const noexcept
+            {
+                MemoryBuffer::Ptr mb = std::make_unique<MemoryBuffer>(SIZE);
+                mb->append(*VERSION->bytes());
+                mb->append((BytePtr)(&mdata), DATA_SIZE);
+                return mb;
+            }
 
-                // Clone method. 
-                ObjectPtr clone() const noexcept { return pd::clone<Object>(*this, mdata.mid); }
-                
-				inline virtual Object* get_obj() const noexcept
-				{
-					return ((Object*)(&(*(mfactory.get(NULL_DATA)))));
-				}
-                
-                /*inline virtual Object* clone() const noexcept
-                {
-                    Object* o = get_obj();
-                    o->assign(*this);
-					return o;
-                }
-                */
+            /// \brief Returns a MemoryBuffer::Ptr with the object data.
+            inline virtual MemoryBuffer::Ptr bytes() const noexcept
+            {
+                MemoryBuffer::Ptr mb = std::make_unique<MemoryBuffer>(size());
+                MemoryBuffer::Ptr version_bytes = version()->bytes();
+                mb->append(*version_bytes);
+                mb->append((BytePtr(&mdata)), data_size());
+                return mb;
+            }
 
-                virtual bool equals(const Object& o) const noexcept
-                {
-                    return equal<Object>(*this, o);
-                }
+            // Implicit convertion to MemoryBuffer::Ptr.
+            inline operator MemoryBuffer::Ptr() const noexcept
+            {
+                return bytes();
+            }
 
-                /// Access object id
-                /// \return The current value of id
-                ///
-                virtual const Id id () const noexcept { return mdata.mid; };
+            inline virtual ByteSpan data_span() const noexcept { return ByteSpan(data_bytes(), data_size()); }
 
-                /// \brief Access hash
-                ///
-                /// \return  The current value of hash
-                virtual inline const Hash hash() const noexcept { return this->id(); };
+            /// \brief Uses std::as_writable_bytes to get a span of writable bytes from the object.
+            inline virtual std::span<std::byte> wbytes() noexcept
+            {
+                static_assert (sizeof(char) == sizeof(std::byte));
 
-                // Implements initialize method from Initializable concept.
-                virtual bool initialize (const Data& data) noexcept
-                { 
-                    mdata = data;
-                    
-                    return true; 
-                }
+                auto byte_span = std::span<std::byte>((std::byte*)(data()), data_size());
 
-                //virtual void read_bin_obj(std::istream& is, const std::endian& byte_order = std::endian::native);
+                return std::as_writable_bytes(byte_span);
+            }
 
-                void read_bin_version(std::istream& is, const Version& version, const std::endian& byte_order = std::endian::native);
+            inline virtual std::string sclass_name() const
+            {
+                std::string s = typeid(*this).name();
+                s.erase(0, sizeof("class ") - 1);
+                return s;
+            }
 
-                virtual  std::istream&  binary_read (std::istream&  is, const std::endian& byte_order = std::endian::native);
-                inline std::istream& bin_read(std::istream& is, const std::endian& byte_order = std::endian::native)
-                {
-                    read_bin_version(is, *VERSION, byte_order);
-                    is.read((char*)(&mdata), DATA_SIZE);
-                    return is;
-                };
+            inline virtual S class_name() const
+            {
+                std::string s = typeid(*this).name();
+                s.erase(0, sizeof("class ") - 1);
+#ifdef WIDE_CHAR
+                return pd::to_wstring(s);
+#else
+                return s;
+#endif  
+            }
+
+            // Clone method. 
+            inline Object::Ptr clone() const noexcept { return pd::clone<Object>(*this, mdata.mid); }
+
+            inline virtual Object* get_obj() const noexcept
+            {
+                return ((Object*)(&(*(mfactory.get(NULL_DATA)))));
+            }
+
+            /*inline virtual Object* clone() const noexcept
+            {
+                Object* o = get_obj();
+                o->assign(*this);
+                return o;
+            }
+            */
+
+            inline virtual bool equals(const Object& o) const noexcept
+            {
+                return equal<Object>(*this, o);
+            }
+
+            /// Access object id
+            /// \return The current value of id
+            ///
+            inline virtual const Id id() const noexcept { return mdata.mid; };
+
+            /// \brief Access hash
+            ///
+            /// \return  The current value of hash
+            inline virtual const Hash hash() const noexcept { return this->id(); };
+
+            // Implements initialize method from Initializable concept.
+            inline virtual bool initialize(const Data& data) noexcept
+            {
+                mdata = data;
+
+                return true;
+            }
+
+            inline std::ostream& bin_write(std::ostream& os, const std::endian& byte_order = std::endian::native) const
+            {
+                VERSION->binary_write(os, byte_order);
+                os.write((const char*)(&mdata), DATA_SIZE);
+                return os;
+            };
+
+            inline bool operator == (const Object& o) const { return  equals(o); }
+            inline bool operator != (const Object& o) const { return !equals(o); }
+
+            /// Conversion to string.
+            /// \return A string with the object id.
+            inline S to_string() const noexcept { return pd::to_string(mdata.mid); }
+
+            /// Implicit conversion to string.
+            /// \return A string with the object id.
+            inline operator S () const noexcept { return to_string(); }
+
+            /// Debug string.
+            /// \return A string with the object id.
+            inline virtual S debug_string() const noexcept
+            {
+                SStream ss;
+                ss << W("id = ") << Object::to_string();
+                return ss.str();
+
+            }
+
+            /// Assignment operator
+            /// \param o Object to assign from
+            /// \return A reference to this
+            inline Object& operator=(const Object& o) noexcept { return assign(o); }
+
+            /// Move assignment operator
+            inline Object& operator=(Object&& o) noexcept { return assign(o); }
+
+            static inline Factory::P  get(const Data& data = NULL_DATA)
+            {
+                return mfactory.get(data);
+            };
+
+            static inline Factory::P  get(const Id& id)
+            {
+                return mfactory.get(Data(id));
+            };
+
+            inline virtual InStream& read(InStream& is) { return is >> mdata.mid; }
+            inline virtual OutStream& write(OutStream& os) const { return os << id(); }
 
 
-                virtual std::ostream& binary_write (std::ostream& os, const std::endian& byte_order = std::endian::native) const;
-                inline std::ostream& bin_write(std::ostream& os, const std::endian& byte_order = std::endian::native) const
-                {
-                    VERSION->binary_write(os, byte_order);
-                    os.write((const char*)(&mdata), DATA_SIZE);
-                    return os;
-                };
+            inline InStream& operator >> (InStream& is)
+            {
+                return read(is);
+            }
 
-                bool operator == (const Object& o) const { return  equals(o); }
-                bool operator != (const Object& o) const { return !equals(o); }
+            inline OutStream& operator << (OutStream& os)
+            {
+                return write(os);
+            }
 
-                /// Conversion to string.
-                /// \return A string with the object id.
-                S to_string() const noexcept { return pd::to_string(mdata.mid); }
+            //***
+            inline void read_bin_version(std::istream& is, const Version& version, const std::endian& byte_order)
+            {
+                Version v;
+                v.binary_read(is, byte_order);
+                if (version != v)
+                    throw new std::runtime_error("Version mismatch.");
+            }
 
-                /// Implicit conversion to string.
-                /// \return A string with the object id.
-                operator S () const noexcept { return to_string(); }
+            inline std::istream& bin_read(std::istream& is, const std::endian& byte_order = std::endian::native)
+            {
+                read_bin_version(is, *VERSION, byte_order);
+                is.read((char*)(&mdata), DATA_SIZE);
+                return is;
+            }
 
-                /// Debug string.
-                /// \return A string with the object id.
-                virtual S debug_string() const noexcept
-                {
-                    SStream ss;
-                    ss << W("id = ") << Object::to_string();
-                    return ss.str();
+            // implements input stream member virtual std::istream& Object::read(std::istream& is)
+            inline virtual std::istream& binary_read(std::istream& is, const std::endian& byte_order = std::endian::native)
+            {
+                //read_bin_obj(is, byte_order);
+                bin_read(is, byte_order);
+                read_bin_version(is, *version (), byte_order);
+                is.read((char*)data(), data_size());
+                return is;
+            };
 
-                }
+            inline virtual std::ostream& binary_write(std::ostream& os, const std::endian& byte_order = std::endian::native) const
+            {
+                bin_write(os, byte_order);                   // Writes Object.
+                Version::Ptr v = version();
+                v->binary_write(os, byte_order);     // Writes the polymorphic Version.
+                os.write((const char*)data(), data_size()); // Writes the polymorphic data.
+                return os;
+            }
+        };  //  class Object.
 
-                /// Assignment operator
-                /// \param o Object to assign from
-                /// \return A reference to this
-                Object& operator=(const Object& o) noexcept { return assign(o); }
+        inline InStream& operator >> (InStream& is, Object& o)
+        {
+            return o.read(is);
+        }
 
-                /// Move assignment operator
-                Object& operator=(Object&& o) noexcept { return assign(o); }
+        inline OutStream& operator << (OutStream& os, const Object& o)
+        {
+            return o.write(os);
+        }
 
-                static inline Factory::P  get(const Data& data = NULL_DATA)
-                {
-                    return mfactory.get(data);
-                };
-
-                static inline Factory::P  get(const Id& id)
-				{
-					return mfactory.get(Data (id));
-				};
-
-                inline virtual InStream&  read  (InStream&  is)       { return is >> mdata.mid; }
-                inline virtual OutStream& write (OutStream& os) const { return os <<     id (); }
-                 
-        }; // Object
+// Object
         // CloneableConcept any class T with a T::Ptr clone (); method. where T::Ptr is a shared_ptr <T>.
         /*
         template <typename T>
@@ -350,14 +400,14 @@ namespace pensar_digital
             c.clear();
 
             // Reserve capacity if the container supports it (like std::vector)
-            auto* as_vector = dynamic_cast<std::vector<ObjectPtr>*>(&c);
+            auto* as_vector = dynamic_cast<std::vector<Object::Ptr>*>(&c);
             if (as_vector) {
                 as_vector->reserve(size);
             }
 
             for (size_t i = 0; i < size; ++i) {
-                // Create a new ObjectPtr, read its data, and add it to the container
-                ObjectPtr obj = Object::get ();
+                // Create a new Object::Ptr, read its data, and add it to the container
+                Object::Ptr obj = Object::get ();
                 obj->binary_read(is, byte_order); // Assuming Object has a binary_read method
                 c.insert(c.end(), obj); // Insert the object into the container
             }
@@ -402,24 +452,16 @@ namespace pensar_digital
 		}   
         */
 
-        inline InStream& operator >> (InStream& is, Object& o) 
-        { 
-			return o.read (is);
-        }
-    
-        inline OutStream& operator << (OutStream& os, const Object& o)
-        { 
-            return o.write (os);
-        }
 
-            // Dependency class is a Constrainable class used to define dependencies between objects.
+        //***
+        // Dependency class is a Constrainable class used to define dependencies between objects.
             /*template <Versionable MainClass, Versionable RequiredClass>
             class Dependency
             {
             private:
-                VersionInt required_public_interface_version;
-                VersionInt required_protected_interface_version;
-                VersionInt required_private_interface_version;
+                Version::Int required_public_interface_version;
+                Version::Int required_protected_interface_version;
+                Version::Int required_private_interface_version;
             public:
                 Dependency(Version v) noexcept
                     : required_public_interface_version(v.get_public ()),
