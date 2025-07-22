@@ -18,36 +18,35 @@ namespace pensar_digital
 		class IncCmd : public Command
 		{
 			public:
+				using Ptr = std::shared_ptr<IncCmd>;
+				IncCmd(const Id aid = NULL_ID) : Command(aid) { }
+				IncCmd(MemoryBuffer& mb) : Command(mb) { }
+				~IncCmd() = default;
 
-			IncCmd(const Id aid = NULL_ID) : Command(aid) { }
-			IncCmd(MemoryBuffer& mb) : Command(mb) { }
-			~IncCmd() = default;
+				using Factory = pd::Factory<IncCmd, Id>;
+				inline static Factory mfactory = { 3, 10, NULL_ID }; //!< Member variable "factory"
 
-			using Factory = pd::Factory<IncCmd, Id>;
-			inline static Factory mfactory = { 3, 10, NULL_ID }; //!< Member variable "factory"
+				inline static typename Factory::P get(Id aid = NULL_ID) noexcept
+				{
+					return mfactory.get(aid);
+				}
 
-			inline static typename Factory::P get(Id aid = NULL_ID) noexcept
-			{
-				return mfactory.get(aid);
-			}
+				virtual bool initialize(const Id id) noexcept
+				{
 
-			virtual bool initialize(const Id id) noexcept
-			{
+					this->set_id(id == NULL_ID ? this->mgenerator.get_id() : id);
 
-				this->set_id(id == NULL_ID ? this->mgenerator.get_id() : id);
-
-				return true;
-			}
-			virtual Ptr clone() const noexcept { return pd::clone<IncCmd>(*this, id()); }
-			void _run() { ++value; }
-			void _undo() const { --value; }
-
-
+					return true;
+				}
+				inline Ptr clone() const noexcept { return pd::clone<IncCmd>(*this, id()); }
+				inline void _run() { ++value; }
+				inline void _undo() const { --value; }
 		};
 
 		class DecCmd : public Command
 		{
 		public:
+			using Ptr = std::shared_ptr<DecCmd>;
 			DecCmd(const Id aid = NULL_ID) : Command(aid) { }
 			DecCmd(MemoryBuffer& mb) : Command(mb) { }
 			~DecCmd() = default;
@@ -76,6 +75,7 @@ namespace pensar_digital
 		class IncFailCmd : public Command
 		{
 		public:
+			using Ptr = std::shared_ptr<IncFailCmd>;
 			IncFailCmd(const Id aid = NULL_ID) : Command(aid) { }
 			IncFailCmd(MemoryBuffer& mb) : Command(mb) { }
 			~IncFailCmd() = default;
@@ -104,58 +104,59 @@ namespace pensar_digital
 
 		class DoubleCmd : public Command
 		{
-		public:
-			DoubleCmd(const Id aid = NULL_ID) : Command(aid) { }
-			DoubleCmd(MemoryBuffer& mb) : Command(mb) { }
-			~DoubleCmd() = default;
+			public:
+				using Ptr = std::shared_ptr<DoubleCmd>;
+				DoubleCmd(const Id aid = NULL_ID) : Command(aid) { }
+				DoubleCmd(MemoryBuffer& mb) : Command(mb) { }
+				~DoubleCmd() = default;
 
-			using Factory = pd::Factory<DoubleCmd, Id>;
-			inline static Factory mfactory = { 3, 10, NULL_ID }; //!< Member variable "factory"
+				using Factory = pd::Factory<DoubleCmd, Id>;
+				inline static Factory mfactory = { 3, 10, NULL_ID }; //!< Member variable "factory"
 
-			inline static typename Factory::P get(Id aid = NULL_ID) noexcept
-			{
-				return mfactory.get(aid);
-			}
+				inline static typename Factory::P get(Id aid = NULL_ID) noexcept
+				{
+					return mfactory.get(aid);
+				}
 
-			virtual bool initialize(const Id id) noexcept
-			{
+				virtual bool initialize(const Id id) noexcept
+				{
 
-				this->set_id(id == NULL_ID ? this->mgenerator.get_id() : id);
+					this->set_id(id == NULL_ID ? this->mgenerator.get_id() : id);
 
-				return true;
-			}
-			virtual Ptr clone() const noexcept { return pd::clone<DoubleCmd>(*this, id()); }
-			void _run() { value *= 2; }
-			void _undo() const { value /= 2; }
+					return true;
+				}
+				virtual Ptr clone() const noexcept { return pd::clone<DoubleCmd>(*this, id()); }
+				void _run() { value *= 2; }
+				void _undo() const { value /= 2; }
 		};
 
 		class DoubleFailCmd : public Command
 		{
-		public:
+			public:
+				using Ptr = std::shared_ptr<DoubleFailCmd>;
+				DoubleFailCmd(const Id aid = NULL_ID) : Command(aid) { }
+				DoubleFailCmd(MemoryBuffer& mb) : Command(mb) { }
+				~DoubleFailCmd() = default;
 
-			DoubleFailCmd(const Id aid = NULL_ID) : Command(aid) { }
-			DoubleFailCmd(MemoryBuffer& mb) : Command(mb) { }
-			~DoubleFailCmd() = default;
+				using Factory = pd::Factory<DoubleFailCmd, Id>;
+				inline static Factory mfactory = { 3, 10, NULL_ID }; //!< Member variable "factory"
 
-			using Factory = pd::Factory<DoubleFailCmd, Id>;
-			inline static Factory mfactory = { 3, 10, NULL_ID }; //!< Member variable "factory"
+				inline static typename Factory::P get(Id aid = NULL_ID) noexcept
+				{
+					return mfactory.get(aid);
+				}
 
-			inline static typename Factory::P get(Id aid = NULL_ID) noexcept
-			{
-				return mfactory.get(aid);
-			}
+				virtual bool initialize(const Id id) noexcept
+				{
 
-			virtual bool initialize(const Id id) noexcept
-			{
+					this->set_id(id == NULL_ID ? this->mgenerator.get_id() : id);
 
-				this->set_id(id == NULL_ID ? this->mgenerator.get_id() : id);
+					return true;
+				}
 
-				return true;
-			}
-
-			virtual Ptr clone() const noexcept { return pd::clone<DoubleFailCmd>(*this, id()); }
-			void _run() { throw "Double errors."; }
-			void _undo() const { value /= 2; }
+				Ptr clone() const noexcept { return pd::clone<DoubleFailCmd>(*this, id()); }
+				void _run() { throw "Double errors."; }
+				void _undo() const { value /= 2; }
 		};
 
 		TEST(Command, true)

@@ -7,7 +7,7 @@
 #include "constant.hpp"
 #include "s.hpp"
 #include "clone_util.hpp"
-#include "version.hpp"
+#include "meta.hpp"
 #include "factory.hpp"
 #include "log.hpp"
 #include "string_def.hpp"
@@ -75,10 +75,14 @@ namespace pensar_digital
             inline virtual pd::Data* get_null_data() const noexcept { return (pd::Data*)(&NULL_DATA); }
 
             // Meta information.
+            inline static const Meta<Object>::Ptr META = Meta<Object>::get (1,                           // class_id
+                                                                            W("pensar_digital::cpplib"), // namespace
+                                                                            W("Object"),                 // class name
+                                                                            1,                           // public interface version
+                                                                            1,                           // protected interface version.
+                                                                            1);                          // private interface version.                
             
-            // Version of the class.
-            inline static const Version::Ptr VERSION = pd::Version::get(1, 1, 1);
-            virtual const Version::Ptr version() const noexcept { return VERSION; }
+            const Meta<Object>::Ptr meta () const noexcept { return META; }
 
             using FactoryType = Factory;
             inline const BytePtr object_data_bytes() const noexcept { return (BytePtr)&mdata; }
@@ -88,10 +92,10 @@ namespace pensar_digital
             virtual const BytePtr data_bytes() const noexcept { return (BytePtr)&mdata; }
 
             inline static constexpr size_t DATA_SIZE = sizeof(mdata);
-            inline static constexpr size_t      SIZE = DATA_SIZE + Version::SIZE;
+            inline static constexpr size_t      SIZE = DATA_SIZE + sizeof(Id) + Version::SIZE;
 
             virtual size_t data_size() const noexcept { return sizeof(mdata); }
-            virtual size_t size() const noexcept { return data_size() + Version::SIZE; }
+            virtual size_t size() const noexcept { return data_size() + sizeof(Id) + Version::SIZE; }
         protected:
             /// Set id
             /// \param val New value to set
@@ -128,19 +132,17 @@ namespace pensar_digital
             virtual Object& assign(const Object&& o) noexcept { std::memmove((void*)data(), ((Object&)o).data(), data_size()); return *this; }
             virtual Object& assign(MemoryBuffer& mb)
             {
-                Version v(mb);
-                Version v2 = *version();
-                if (v != v2)
-                    log_throw(W("Version mismatch."));
+				// Verifies if it is the correct class_id and version.
+                if (mb.size() < SIZE)
+					log_throw(W("MemoryBuffer size is smaller than Object size."));
+				meta()->test_class_id_and_version(mb);
                 mb.read_known_size(data_bytes(), data_size());
                 return *this;
             }
 
             Object& object_assign(MemoryBuffer& mb) noexcept
             {
-                Version v(mb);
-                if (v != *VERSION)
-                    log_throw(W("Version mismatch."));
+                META->test_class_id_and_version (mb);
                 mb.read_known_size(object_data_bytes(), DATA_SIZE);
                 return *this;
             }
@@ -152,14 +154,18 @@ namespace pensar_digital
 
             inline virtual const Object& write(MemoryBuffer& mb) const noexcept
             {
-                VERSION->write(mb);
+				Id class_id = meta()->class_id();
+				mb.write((BytePtr)&class_id, sizeof(Id));   
+                meta ()->version ()->write(mb);
                 mb.write((BytePtr)(&mdata), DATA_SIZE);
                 return *this;
             }
 
             inline const Object& object_write(MemoryBuffer& mb) const noexcept
             {
-                VERSION->write(mb);
+                Id class_id = META->class_id();
+                mb.write((BytePtr)&class_id, sizeof(Id));
+                META->version ()->write(mb);
                 mb.write((BytePtr)(&mdata), DATA_SIZE);
                 return *this;
             }
@@ -176,8 +182,10 @@ namespace pensar_digital
 
             inline MemoryBuffer::Ptr object_bytes() const noexcept
             {
+                Id class_id = META->class_id();
                 MemoryBuffer::Ptr mb = std::make_unique<MemoryBuffer>(SIZE);
-                mb->append(*VERSION->bytes());
+				mb->append((BytePtr) &class_id, sizeof(Id)); // Write class_id.
+                mb->append(*META->version()->bytes());
                 mb->append((BytePtr)(&mdata), DATA_SIZE);
                 return mb;
             }
@@ -186,7 +194,9 @@ namespace pensar_digital
             inline virtual MemoryBuffer::Ptr bytes() const noexcept
             {
                 MemoryBuffer::Ptr mb = std::make_unique<MemoryBuffer>(size());
-                MemoryBuffer::Ptr version_bytes = version()->bytes();
+                Id class_id = meta ()->class_id();
+                mb->write((BytePtr)&class_id, sizeof(Id));
+                MemoryBuffer::Ptr version_bytes = meta ()->version ()->bytes();
                 mb->append(*version_bytes);
                 mb->append((BytePtr(&mdata)), data_size());
                 return mb;
@@ -269,7 +279,7 @@ namespace pensar_digital
 
             inline std::ostream& bin_write(std::ostream& os, const std::endian& byte_order = std::endian::native) const
             {
-                VERSION->binary_write(os, byte_order);
+                META->version()->binary_write(os, byte_order);
                 os.write((const char*)(&mdata), DATA_SIZE);
                 return os;
             };
@@ -338,7 +348,7 @@ namespace pensar_digital
 
             inline std::istream& bin_read(std::istream& is, const std::endian& byte_order = std::endian::native)
             {
-                read_bin_version(is, *VERSION, byte_order);
+                read_bin_version(is, *META->version (), byte_order);
                 is.read((char*)(&mdata), DATA_SIZE);
                 return is;
             }
@@ -348,17 +358,16 @@ namespace pensar_digital
             {
                 //read_bin_obj(is, byte_order);
                 bin_read(is, byte_order);
-                read_bin_version(is, *version (), byte_order);
+                read_bin_version(is, *meta ()->version(), byte_order);
                 is.read((char*)data(), data_size());
                 return is;
             };
 
             inline virtual std::ostream& binary_write(std::ostream& os, const std::endian& byte_order = std::endian::native) const
             {
-                bin_write(os, byte_order);                   // Writes Object.
-                Version::Ptr v = version();
-                v->binary_write(os, byte_order);     // Writes the polymorphic Version.
-                os.write((const char*)data(), data_size()); // Writes the polymorphic data.
+                bin_write(os, byte_order);                          // Writes Object.
+                meta()->version ()->binary_write(os, byte_order);   // Writes the polymorphic Version.
+                os.write((const char*)data(), data_size());         // Writes the polymorphic data.
                 return os;
             }
         };  //  class Object.
