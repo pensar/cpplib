@@ -18,14 +18,6 @@ namespace pensar_digital
 {
     namespace cpplib
     {
-        class Version;
-        // Versionable concept requires a inline static const Version public member named VERSION convertible to Version::Ptr.
-        template <typename T>
-        concept Versionable = requires (T t)
-        {
-            {t.VERSION} noexcept -> std::convertible_to<Version::Ptr>;
-        };
-
         class Version   
         {
             public:
@@ -203,6 +195,14 @@ namespace pensar_digital
                     return os.write((const char*)(&mdata), DATA_SIZE);
                 }
         }; // class Version
+
+        // Versionable concept requires a inline static const Version public member named VERSION convertible to Version::Ptr.
+        template <typename T>
+        concept Versionable = requires (T t)
+        {
+            { t.VERSION } noexcept -> std::convertible_to<Version::Ptr>;
+        };
+
         // Concept IdentifiableAndVersionable requires T to be Versionable and Identifiable.
         template <typename T>
         concept IdentifiableAndVersionable = Versionable<T> && Identifiable<T>;

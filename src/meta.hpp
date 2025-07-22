@@ -3,26 +3,88 @@
 
 #include "version.hpp"
 #include "s.hpp"
+#include "cs.hpp"
+
+#include "memory_buffer.hpp"
+#include "sorted_list.hpp"
 
 namespace pensar_digital
 {
 	namespace cpplib
 	{
 		// Create a variadic template class called Meta that has the following template parameters: T (the type of this meta information class refers to), all parent classes (provide a mechanism for no parent classes case) and all children classes (provide a checanism for no children classes case). Also provide public methods to access these info in a modern C++ 23 way.
-		template < class T, class... Parents>
-		class Meta
+		
+		class MetaBase
 		{
-			private:
-				Version::Ptr version; //!< Pointer to the version of T class.
-				Id class_id; //!< Unique identifier for the class.
+		public:
+			using IdentifierName = CS<0, 1024>;
+			using Ptr = std::shared_ptr<MetaBase>; //!< Pointer type for this base meta information class.
+		protected:
+			Version::Ptr mversion;		//!< Pointer to the version of T class (see class Meta below).
+			Id mclass_id;				//!< Unique identifier for the class.
+			IdentifierName mnamespace;	//!< Namespace of the class.
+			IdentifierName mclass_name; //!< Name of the class.
+
+			// Unique sorted list holding all class IDs.
+			inline static SortedList<Id> mIds = SortedList<Id>({}, true);
+			inline static bool register_class(const Id& class_id)
+			{
+				return mIds.add (class_id);
+			}
+				
+
+			public:
+				/// \brief Constructor taking a Version object as a parameter.
+				inline MetaBase(const Id class_id, const S& class_namespace, const S& class_name, const Version::Int pub = Version::NULL_VERSION, const Version::Int pro = Version::NULL_VERSION, const Version::Int pri = Version::NULL_VERSION) noexcept
+					: mclass_id(class_id), mnamespace(class_namespace), mclass_name(class_name), mversion(Version::get(pub, pro, pri))
+				{
+				}
+				inline virtual ~MetaBase() noexcept = default; // Virtual destructor for cleanup
+
+				// Version of this meta class.
+				//inline static const Version::Ptr VERSION = pd::Version::get(1, 1, 1);
+				inline virtual const Version::Ptr version() const noexcept { return mversion; }
+
+				/// \brief Returns the class ID.
+				inline virtual constexpr Id class_id() const noexcept
+				{
+					return mclass_id;
+				}
+
+
+				inline virtual bool test_class_id_and_version(MemoryBuffer& mb)
+				{
+					// Get class_id from mb.
+					Id class_id;
+					mb.read_known_size((BytePtr)&class_id, sizeof(Id));
+					if (class_id != mclass_id)
+					{
+						throw (W("Meta: Class ID mismatch"));
+					}
+
+					Version v(mb);
+					if (v != *mversion)
+					{
+						throw (W("Meta: Version mismatch"));
+					}
+					return true;
+				}
+		};
+		
+		template < class T, class... Parents>
+		class Meta : public MetaBase
+		{
 			public:
 				using Ptr = std::shared_ptr<Meta<T, Parents...>>; //!< Pointer type for this meta information class.
 				using Type = T; //!< The type of this meta information class refers to.
 				using ParentTypes = std::tuple<Parents...>; //!< Tuple of parent types.
 				
-				// Version of this meta class.
-				inline static const Version::Ptr VERSION = pd::Version::get(1, 1, 1);
-				virtual const Version::Ptr version() const noexcept { return VERSION; }
+
+				/// \brief Constructor for the Meta class.
+				Meta (const Id class_id, const S& class_namespace, const S& class_name, const Version::Int pub = Version::NULL_VERSION, const Version::Int pro = Version::NULL_VERSION, const Version::Int pri = Version::NULL_VERSION) noexcept
+					: MetaBase(class_id, class_namespace, class_name, pub, pro, pri)
+				{
+				}
 
 				/// \brief Returns the type name of the class.
 				static
@@ -74,21 +136,9 @@ namespace pensar_digital
 					return W("Type: ") + type_name_str() + W("\n") + parent_types_str();
 				}
 
-				/// \brief Constructor taking a Version object as a parameter.
-				Meta(const Version::Ptr& version) noexcept
-					: VERSION(version)
+				static Ptr get(const Id class_id, const S& class_namespace, const S& class_name, const Version::Int pub = Version::NULL_VERSION, const Version::Int pro = Version::NULL_VERSION, const Version::Int pri = Version::NULL_VERSION) noexcept
 				{
-					if (!VERSION)
-					{
-						log_throw(W("Version is null."));
-					}
-					this->version = version;
-				}
-
-				/// \brief version accessor.
-				inline const Version::Ptr version() const noexcept
-				{
-					return version;
+					return std::make_shared<Meta<T, Parents...>>(class_id, class_namespace, class_name, pub, pro, pri);
 				}
 		};
 	}
