@@ -247,6 +247,21 @@ namespace pensar_digital
             // Get comparator
             const Compare& comparator() const noexcept { return comp_; }
 
+			// An alias for back() with a name that makes much more sense.
+            inline auto& last () const
+            {
+                if (data_.empty())
+                    throw std::out_of_range(W("SortedList::back: List is empty"));
+                return data_.back();
+			}
+
+			// Gets the last element in the list.
+            inline auto& back() const
+            {
+                return last();
+			}
+
+
         private:
             std::vector<T> data_;
             bool unique_ = false; // Default to allowing duplicates

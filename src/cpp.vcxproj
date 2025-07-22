@@ -230,6 +230,7 @@
     <ClInclude Include="sorted_list.hpp" />
     <ClInclude Include="statistic.hpp" />
     <ClInclude Include="stop_watch.hpp" />
+    <ClInclude Include="stream_util.hpp" />
     <ClInclude Include="sysinfo.hpp" />
     <ClInclude Include="system.hpp" />
     <ClInclude Include="type_util.hpp" />

@@ -1,9 +1,9 @@
 #ifndef META_HPP
 #define META_HPP
-
 #include "version.hpp"
 #include "s.hpp"
 #include "cs.hpp"
+#include "stream_util.hpp"
 
 #include "memory_buffer.hpp"
 #include "sorted_list.hpp"
@@ -29,7 +29,16 @@ namespace pensar_digital
 			inline static SortedList<Id> mIds = SortedList<Id>({}, true);
 			inline static bool register_class(const Id& class_id)
 			{
-				return mIds.add (class_id);
+				bool ok = mIds.add (class_id);
+				if (!ok)
+				{
+					// Sends a message to the console (taking into consideration if WIDE_CHAR is defined or not) informing the class ID is already registered. And prints the next available class_id.
+					SStream ss;
+					ss << W("Meta: Class ID ") << class_id << W(" is already registered. Next available class_id is ") << (mIds.last() + 1) << std::endl;
+					S errmsg = ss.str();
+					out () << errmsg;
+					throw (errmsg);
+				}
 			}
 				
 
@@ -38,6 +47,7 @@ namespace pensar_digital
 				inline MetaBase(const Id class_id, const S& class_namespace, const S& class_name, const Version::Int pub = Version::NULL_VERSION, const Version::Int pro = Version::NULL_VERSION, const Version::Int pri = Version::NULL_VERSION) noexcept
 					: mclass_id(class_id), mnamespace(class_namespace), mclass_name(class_name), mversion(Version::get(pub, pro, pri))
 				{
+					register_class (class_id);
 				}
 				inline virtual ~MetaBase() noexcept = default; // Virtual destructor for cleanup
 

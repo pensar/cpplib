@@ -153,5 +153,8 @@
     <ClInclude Include="sorted_list.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="stream_util.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -13,13 +13,22 @@ namespace pensar_digital
 {
     namespace cpplib
     {
-        constexpr OutStream& out() noexcept
+        inline constexpr OutStream& out() noexcept
         {
             #ifdef WIDE_CHAR
                 return std::wcout;
             #else
                 return std::cout;
             #endif
+        }
+        
+        inline auto StringStream() noexcept
+        {
+#ifdef WIDE_CHAR
+            return std::wstringstream ();
+#else
+            return std::stringstream();
+#endif
         }
 
 
