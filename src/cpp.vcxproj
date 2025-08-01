@@ -205,7 +205,6 @@
     <ClInclude Include="..\src\s.hpp" />
     <ClInclude Include="..\src\string_def.hpp" />
     <ClInclude Include="..\src\string_types.hpp" />
-    <ClInclude Include="..\src\version.hpp" />
     <ClInclude Include="array.hpp" />
     <ClInclude Include="code_util.hpp" />
     <ClInclude Include="command.hpp" />
@@ -221,7 +220,6 @@
     <ClInclude Include="io_util.hpp" />
     <ClInclude Include="log.hpp" />
     <ClInclude Include="memory.hpp" />
-    <ClInclude Include="meta.hpp" />
     <ClInclude Include="multiplatform.hpp" />
     <ClInclude Include="object.hpp" />
     <ClInclude Include="obj_memory_buffer.hpp" />

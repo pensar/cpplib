@@ -52,7 +52,7 @@ namespace pensar_digital
         namespace pd = pensar_digital::cpplib;
         class Command : public Object
         {
-            private:
+        private:
 
             /// \brief Class Object::Data is compliant with the TriviallyCopyable concept. 
             /// \see https://en.cppreference.com/w/cpp/named_req/TriviallyCopyable  
@@ -72,17 +72,9 @@ namespace pensar_digital
             using DataType = Data;
             using Factory =  pd::Factory<Command, Id, typename Command::DataType>;
 
-
             // Meta information.
-            using MetaCmd = Meta<Command, Object>;
-            inline static const MetaCmd::Ptr META = MetaCmd::get (2,                            // class_id
-                                                                 W("pensar_digital::cpplib"),   // namespace
-                                                                 W("Command"),                  // class name
-                                                                 1,                             // public interface version
-                                                                 1,                             // protected interface version.
-                                                                 1);                            // private interface version.                
-
-            const MetaCmd::Ptr meta() const noexcept { return META; }
+            inline static const ClassInfo INFO = { CPPLIB_NAMESPACE, W("Command"), 2, 1, 1 };
+            inline virtual const ClassInfo* info_ptr() const noexcept { return &INFO; }
 
 
             using FactoryType = Factory;
@@ -91,7 +83,7 @@ namespace pensar_digital
             virtual const BytePtr data_bytes() const noexcept { return (BytePtr)data(); }
 
             virtual size_t data_size() const noexcept { return sizeof(mdata); }
-			virtual size_t size() const noexcept { return data_size() + meta()->version()->size() + Object::SIZE; } // ->version()->size(); }
+			virtual size_t size() const noexcept { return data_size() + sizeof(ClassInfo) + Object::SIZE; } // ->version()->size(); }
             
             using G = Generator<Command, Id>; //!< Generator alias.
 
@@ -149,9 +141,7 @@ namespace pensar_digital
 
             virtual Command& assign_without_object(MemoryBuffer& mb) noexcept
             {
-                Version v (mb);
-                if (v != *META->version ())
-                    log_and_throw(W("assign:Version mismatch"));
+                info_ptr ()->test_class_name_and_version (mb);
                 mb.read_known_size((BytePtr)&mdata, DATA_SIZE);
 				mgenerator = G(mb);
                 return *this;
@@ -166,7 +156,7 @@ namespace pensar_digital
             {
 				MemoryBuffer::Ptr mb = std::make_unique<MemoryBuffer>(SIZE);  
                 mb->append (*Object::bytes());
-				mb->append (*(META->version())->bytes());
+				mb->append (info_ptr ()->bytes());
                 mb->write((BytePtr(&mdata)), DATA_SIZE);
 				mb->append (*(mgenerator.bytes()));
                 return mb;
@@ -186,7 +176,7 @@ namespace pensar_digital
             inline virtual std::ostream& binary_write(std::ostream& os, const std::endian& byte_order = std::endian::native) const
 			{
 				Object::binary_write (os, byte_order);
-				META->version()->binary_write(os, byte_order);
+				info_ptr()->binary_write(os, byte_order);
 				os.write((char*)&mdata, DATA_SIZE);
 				mgenerator.binary_write(os, byte_order);
 				child_binary_write(os, byte_order); // Call to child class binary_write.
@@ -196,7 +186,8 @@ namespace pensar_digital
 			inline virtual std::istream& binary_read(std::istream& is, const std::endian& byte_order = std::endian::native)
 			{
 				Object::binary_read(is, byte_order);
-                META->version()->binary_read(is, byte_order);
+				ClassInfo* info = const_cast<ClassInfo*>(info_ptr());
+                info->binary_read(is, byte_order);
 				mgenerator.binary_read(is, byte_order);
                 is.read((char*)&mdata, DATA_SIZE);
 				child_binary_read(is, byte_order); // Call to child class binary_read.
@@ -246,7 +237,9 @@ namespace pensar_digital
 				~NullCommand() = default;
 				void _run() { }
 				void _undo() const { }
-				
+                inline static const ClassInfo INFO = { CPPLIB_NAMESPACE, W("NullCommand"), 2, 1, 1 };
+                inline virtual const ClassInfo* info_ptr() const noexcept { return &INFO; }
+
 				Ptr clone() const noexcept { return pd::clone<NullCommand>(*this); }
         };
         inline static const NullCommand NULL_CMD = NullCommand();
@@ -298,9 +291,8 @@ namespace pensar_digital
             using DataType = Data;
             using Factory = pd::Factory<CompositeCommand, Id>;
 
-            // Version of the class.
-            inline static const Version::Ptr VERSION = pd::Version::get(1, 1, 1);
-            virtual const Version::Ptr version() const noexcept { return VERSION; }
+            inline static const ClassInfo INFO = { CPPLIB_NAMESPACE, W("CompositeCommand"), 2, 1, 1 };
+            inline virtual const ClassInfo* info_ptr() const noexcept { return &INFO; }
 
             using FactoryType = Factory;
 
@@ -308,10 +300,10 @@ namespace pensar_digital
             virtual const BytePtr data_bytes() const noexcept { return (BytePtr)data(); }
 
             inline static constexpr size_t DATA_SIZE = sizeof(mdata);
-            inline static constexpr size_t      SIZE = DATA_SIZE + Version::SIZE;
+            inline static constexpr size_t      SIZE = DATA_SIZE + sizeof(ClassInfo);
 
             virtual size_t data_size() const noexcept { return sizeof(mdata); }
-            virtual size_t size() const noexcept { return data_size() + version()->size(); }
+            virtual size_t size() const noexcept { return data_size() + sizeof(ClassInfo); }
         public:
 			CompositeCommand (const Id aid = NULL_ID) : Command (aid)
 			{
@@ -336,7 +328,7 @@ namespace pensar_digital
             {
                 MemoryBuffer::Ptr mb = std::make_unique<MemoryBuffer>(SIZE);  
 				mb->append(*Object::bytes());
-                mb->append(*VERSION->bytes());
+                mb->append(info_ptr()->bytes());
                 mb->write((BytePtr(&mdata)), DATA_SIZE);
 				return mb;
             }
@@ -407,7 +399,7 @@ namespace pensar_digital
             inline virtual std::istream& binary_read(std::istream& is, const std::endian& byte_order = std::endian::native)
             {
                 Object::binary_read(is, byte_order);
-				VERSION->binary_read(is, byte_order);
+                info_ptr()->test_class_name_and_version (is, byte_order);
 				is.read((char*)(&mdata), DATA_SIZE);
 				for (size_t i = 0; i < mdata.mindex; ++i)
 				{
@@ -420,7 +412,7 @@ namespace pensar_digital
             inline virtual std::ostream& binary_write(std::ostream& os, const std::endian& byte_order = std::endian::native) const
             {
                 Object::binary_write(os, byte_order);
-                VERSION->binary_write(os, byte_order);
+                info_ptr()->binary_write(os, byte_order);
 				for (size_t i = 0; i < mdata.mindex; ++i)
                 {
                     mdata.mcommands[i]->binary_write(os, byte_order);

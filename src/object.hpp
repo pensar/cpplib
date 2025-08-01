@@ -7,17 +7,19 @@
 #include "constant.hpp"
 #include "s.hpp"
 #include "clone_util.hpp"
-#include "meta.hpp"
+
 #include "factory.hpp"
 #include "log.hpp"
 #include "string_def.hpp"
 #include "memory_buffer.hpp"
 #include "equal.hpp"
 
+#include "concept.hpp"
+
 #include <sstream>
 #include <iostream>
 #include <memory> // for std::shared_ptr
-
+#include <concepts> // std::convertible_to
 #include <string>
 #include <typeinfo> // for typeid
 #include <vector>
@@ -46,14 +48,116 @@ namespace pensar_digital
             std::memcpy  (l.data (), ((T&)r).data (), sizeof(T::DataType)); 
             return l; 
         }
+
         template <class T> T& moves (T& l, const T& r) noexcept
         { 
             std::memmove (l.data (), ((T&)r).data (), sizeof(T::DataType));
             return l; 
         }
+    
+        struct ClassInfo
+		{
+            inline static const size_t MAX_IDENTIFIER_SIZE = 100; ///< Maximum size for identifier strings.
+            using Identifier = CS<0, MAX_IDENTIFIER_SIZE>; ///< Type for identifiers, using a fixed-size character string.
+            Identifier mnamespace;
+            Identifier mclass_name;
+			VersionInt mpublic_interface_version;
+			VersionInt mprotected_interface_version;
+			VersionInt mprivate_interface_version;
+			inline static const VersionInt NULL_VERSION = -1; ///< Null version constant.
+
+            ClassInfo(const S& ns = EMPTY, const S& cn = EMPTY, VersionInt pub_ver = NULL_VERSION, VersionInt pro_ver = NULL_VERSION, VersionInt pri_ver = NULL_VERSION) noexcept
+                : mnamespace  (ns), 
+                    mclass_name (cn), 
+                    mpublic_interface_version    (pub_ver),
+					mprotected_interface_version (pro_ver), 
+                    mprivate_interface_version   (pri_ver) {}
+
+            inline void write (MemoryBuffer& mb) const noexcept
+            {
+                mb.write((BytePtr)this, sizeof(ClassInfo));
+			}
+
+            inline void read (MemoryBuffer& mb) 
+            {
+                mb.read_known_size((BytePtr)this, sizeof(ClassInfo));
+			}
+
+            MemoryBuffer::Ptr bytes() const noexcept
+            {
+                MemoryBuffer::Ptr mb = std::make_unique<MemoryBuffer>(sizeof(ClassInfo));
+                write(*mb);
+                return mb;
+            }
+
+            inline bool operator==(const ClassInfo& other) const noexcept
+            {
+                return equal<ClassInfo> (*this, other);
+            }
+
+            inline bool operator!=(const ClassInfo& other) const noexcept
+            {
+                return !(*this == other);
+			}
+
+            inline void test_class_name_and_version(MemoryBuffer& mb) const
+            {
+                if (mb.size() < sizeof(ClassInfo))
+                    log_throw(W("MemoryBuffer size is smaller than ClassInfo size."));
+                
+                ClassInfo info;
+                info.read   (mb);
+                
+                if (info != *this)
+                    log_throw(W("Version mismatch."));
+			}
+
+            inline const S to_s () const noexcept
+            {
+                SStream ss;
+                ss << mnamespace << W("::") << mclass_name 
+                   << W(" v") << mpublic_interface_version 
+                   << W(".") << mprotected_interface_version 
+                   << W(".") << mprivate_interface_version;
+                return ss.str();
+			}
+
+            inline std::istream& binary_read(std::istream& is, const std::endian& byte_order)
+            {
+                return is.read((char*)(this), sizeof(ClassInfo));
+            }
+
+            inline std::ostream& binary_write(std::ostream& os, const std::endian& byte_order) const
+            {
+                return os.write((const char*) this, sizeof(ClassInfo));
+            }
+
+            inline void test_class_name_and_version (std:: istream& is, const std::endian& byte_order = std::endian::native) const
+            {
+                ClassInfo info;
+                info.binary_read(is, byte_order);
+                if (info != *this)
+                    log_throw(W("Version mismatch."));
+			}
+        };
+
+        static_assert(StdLayoutTriviallyCopyable<ClassInfo>, W("ClassInfo must be a trivially copyable type"));
+        
+        template<typename T>
+        concept HasClassInfo = requires
+        {
+            // Check for static const C* members
+            { T::INFO } -> std::same_as<ClassInfo>;
+
+            // Ensure they are static and constant (implicit in the requires clause with ::)
+                requires std::is_same_v<decltype(T::INFO), const ClassInfo>;
+        };
 
         class Object
         {
+		    public:
+                inline static const ClassInfo INFO = { CPPLIB_NAMESPACE, W("Object"), 1, 1, 1 };
+                inline virtual const ClassInfo* info_ptr() const noexcept { return &INFO; }
         private:
             /// \brief Class Object::Data is compliant with the TriviallyCopyable concept. 
             /// \see https://en.cppreference.com/w/cpp/named_req/TriviallyCopyable  
@@ -64,6 +168,7 @@ namespace pensar_digital
             };
             // Asserts Data is a trivially copyable type.
             static_assert(TriviallyCopyable<Data>, "Data must be a trivially copyable type");
+
             Data mdata; //!< Member variable mdata contains the object data.
         public:
 			using Ptr = std::shared_ptr<Object>;
@@ -74,16 +179,6 @@ namespace pensar_digital
 		public:
             inline virtual pd::Data* get_null_data() const noexcept { return (pd::Data*)(&NULL_DATA); }
 
-            // Meta information.
-            inline static const Meta<Object>::Ptr META = Meta<Object>::get (1,                           // class_id
-                                                                            W("pensar_digital::cpplib"), // namespace
-                                                                            W("Object"),                 // class name
-                                                                            1,                           // public interface version
-                                                                            1,                           // protected interface version.
-                                                                            1);                          // private interface version.                
-            
-            const Meta<Object>::Ptr meta () const noexcept { return META; }
-
             using FactoryType = Factory;
             inline const BytePtr object_data_bytes() const noexcept { return (BytePtr)&mdata; }
             inline const size_t object_data_size() const noexcept { return sizeof(mdata); }
@@ -92,10 +187,10 @@ namespace pensar_digital
             virtual const BytePtr data_bytes() const noexcept { return (BytePtr)&mdata; }
 
             inline static constexpr size_t DATA_SIZE = sizeof(mdata);
-            inline static constexpr size_t      SIZE = DATA_SIZE + sizeof(Id) + Version::SIZE;
+            inline static constexpr size_t      SIZE = DATA_SIZE + sizeof(Id) + sizeof(ClassInfo);
 
             virtual size_t data_size() const noexcept { return sizeof(mdata); }
-            virtual size_t size() const noexcept { return data_size() + sizeof(Id) + Version::SIZE; }
+            virtual size_t size() const noexcept { return data_size() + sizeof(Id) + sizeof(ClassInfo); }
         protected:
             /// Set id
             /// \param val New value to set
@@ -132,17 +227,17 @@ namespace pensar_digital
             virtual Object& assign(const Object&& o) noexcept { std::memmove((void*)data(), ((Object&)o).data(), data_size()); return *this; }
             virtual Object& assign(MemoryBuffer& mb)
             {
-				// Verifies if it is the correct class_id and version.
+				// Verifies if it is the correct class and version.
                 if (mb.size() < SIZE)
 					log_throw(W("MemoryBuffer size is smaller than Object size."));
-				meta()->test_class_id_and_version(mb);
+				info_ptr()->test_class_name_and_version(mb);
                 mb.read_known_size(data_bytes(), data_size());
                 return *this;
             }
 
             Object& object_assign(MemoryBuffer& mb) noexcept
             {
-                META->test_class_id_and_version (mb);
+                INFO.test_class_name_and_version (mb);
                 mb.read_known_size(object_data_bytes(), DATA_SIZE);
                 return *this;
             }
@@ -154,18 +249,14 @@ namespace pensar_digital
 
             inline virtual const Object& write(MemoryBuffer& mb) const noexcept
             {
-				Id class_id = meta()->class_id();
-				mb.write((BytePtr)&class_id, sizeof(Id));   
-                meta ()->version ()->write(mb);
-                mb.write((BytePtr)(&mdata), DATA_SIZE);
+				info_ptr ()->write(mb);
+                mb.write((BytePtr)(data ()), data_size ());
                 return *this;
             }
 
             inline const Object& object_write(MemoryBuffer& mb) const noexcept
             {
-                Id class_id = META->class_id();
-                mb.write((BytePtr)&class_id, sizeof(Id));
-                META->version ()->write(mb);
+                INFO.write(mb);
                 mb.write((BytePtr)(&mdata), DATA_SIZE);
                 return *this;
             }
@@ -182,10 +273,8 @@ namespace pensar_digital
 
             inline MemoryBuffer::Ptr object_bytes() const noexcept
             {
-                Id class_id = META->class_id();
                 MemoryBuffer::Ptr mb = std::make_unique<MemoryBuffer>(SIZE);
-				mb->append((BytePtr) &class_id, sizeof(Id)); // Write class_id.
-                mb->append(*META->version()->bytes());
+                mb->append((BytePtr)&INFO, sizeof(ClassInfo));
                 mb->append((BytePtr)(&mdata), DATA_SIZE);
                 return mb;
             }
@@ -194,10 +283,7 @@ namespace pensar_digital
             inline virtual MemoryBuffer::Ptr bytes() const noexcept
             {
                 MemoryBuffer::Ptr mb = std::make_unique<MemoryBuffer>(size());
-                Id class_id = meta ()->class_id();
-                mb->write((BytePtr)&class_id, sizeof(Id));
-                MemoryBuffer::Ptr version_bytes = meta ()->version ()->bytes();
-                mb->append(*version_bytes);
+                mb->append((BytePtr)info_ptr(), sizeof(ClassInfo));
                 mb->append((BytePtr(&mdata)), data_size());
                 return mb;
             }
@@ -279,7 +365,7 @@ namespace pensar_digital
 
             inline std::ostream& bin_write(std::ostream& os, const std::endian& byte_order = std::endian::native) const
             {
-                META->version()->binary_write(os, byte_order);
+                INFO.binary_write (os, byte_order);
                 os.write((const char*)(&mdata), DATA_SIZE);
                 return os;
             };
@@ -337,18 +423,9 @@ namespace pensar_digital
                 return write(os);
             }
 
-            //***
-            inline void read_bin_version(std::istream& is, const Version& version, const std::endian& byte_order)
-            {
-                Version v;
-                v.binary_read(is, byte_order);
-                if (version != v)
-                    throw new std::runtime_error("Version mismatch.");
-            }
-
             inline std::istream& bin_read(std::istream& is, const std::endian& byte_order = std::endian::native)
             {
-                read_bin_version(is, *META->version (), byte_order);
+                info_ptr()->test_class_name_and_version(is, byte_order); 
                 is.read((char*)(&mdata), DATA_SIZE);
                 return is;
             }
@@ -358,7 +435,7 @@ namespace pensar_digital
             {
                 //read_bin_obj(is, byte_order);
                 bin_read(is, byte_order);
-                read_bin_version(is, *meta ()->version(), byte_order);
+                info_ptr ()->test_class_name_and_version (is, byte_order);
                 is.read((char*)data(), data_size());
                 return is;
             };
@@ -366,7 +443,7 @@ namespace pensar_digital
             inline virtual std::ostream& binary_write(std::ostream& os, const std::endian& byte_order = std::endian::native) const
             {
                 bin_write(os, byte_order);                          // Writes Object.
-                meta()->version ()->binary_write(os, byte_order);   // Writes the polymorphic Version.
+                info_ptr ()->binary_write(os, byte_order);   // Writes the polymorphic Version.
                 os.write((const char*)data(), data_size());         // Writes the polymorphic data.
                 return os;
             }

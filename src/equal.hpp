@@ -18,18 +18,31 @@ namespace pensar_digital
         struct HashComparableTag {};
         struct DataComparableTag {};
 		struct TriviallyComparableTag {};
+		struct StdLayoutTriviallyCopyableTag {};
 
         // Type trait to select the appropriate tag.
         template <class T>
-        using EqualDispatchTag = std::conditional_t<TriviallyHashComparable<T>, HashComparableTag, std::conditional_t<HasStdLayoutTriviallyCopyableData<T>, TriviallyComparableTag, DataComparableTag>>;
+        using EqualDispatchTag = std::conditional_t<
+            pensar_digital::cpplib::TriviallyHashComparable<T>,
+            pensar_digital::cpplib::HashComparableTag,
+            std::conditional_t<
+                pensar_digital::cpplib::HasStdLayoutTriviallyCopyableData<T>,
+                pensar_digital::cpplib::DataComparableTag,
+                std::conditional_t<
+                    std::is_trivially_copyable_v<T>,
+                    pensar_digital::cpplib::StdLayoutTriviallyCopyableTag,
+                    pensar_digital::cpplib::TriviallyComparableTag
+                >
+            >
+        >;
 
-        // Implementation for StdLayoutTriviallyCopyable.
-        template <StdLayoutTriviallyCopyable T>
-        bool equal_impl(const T& l, const T& r, TriviallyComparableTag)
+        // Implementation for TriviallyHashComparable (uses hash).
+        template <TriviallyHashComparable T>
+        bool equal_impl(const T& l, const T& r, HashComparableTag)
         {
-            if (&l == &r) // Same object
-                return true;
-            return std::memcmp(l, r, sizeof(l)) == 0;
+            if (l.hash() != r.hash())
+                return false;
+            return equal_impl(l, r, DataComparableTag{}); // Fall back to memcmp
         }
 
         // Implementation for HasStdLayoutTriviallyCopyableData (no hash).
@@ -41,17 +54,22 @@ namespace pensar_digital
             return std::memcmp(l.data(), r.data(), l.data_size()) == 0;
         }
 
-        // Implementation for TriviallyHashComparable (uses hash).
-        template <TriviallyHashComparable T>
-        bool equal_impl(const T& l, const T& r, HashComparableTag)
+		// Implementation for TriviallyComparable.
+        bool equal_impl(const auto& l, const auto& r, TriviallyComparableTag)
         {
-            if (l.hash() != r.hash())
-                return false;
-            return equal_impl(l, r, DataComparableTag{}); // Fall back to memcmp
+            return l == r;
+		}
+        // Implementation for StdLayoutTriviallyCopyable.
+        template <StdLayoutTriviallyCopyable T>
+        bool equal_impl(const T& l, const T& r, StdLayoutTriviallyCopyableTag)
+        {
+            if (&l == &r) // Same object
+                return true;
+            return std::memcmp(&l, &r, sizeof(l)) == 0;
         }
 
         // Public interface: single equal function.
-        template <HasStdLayoutTriviallyCopyableData T>
+        template <typename T>
         bool equal(const T& l, const T& r)
         {
             return equal_impl(l, r, EqualDispatchTag<T>{});

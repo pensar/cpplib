@@ -16,38 +16,48 @@ namespace pensar_digital
 		
 		class MetaBase
 		{
-		public:
-			using IdentifierName = CS<0, 1024>;
-			using Ptr = std::shared_ptr<MetaBase>; //!< Pointer type for this base meta information class.
-		protected:
-			Version::Ptr mversion;		//!< Pointer to the version of T class (see class Meta below).
-			Id mclass_id;				//!< Unique identifier for the class.
-			IdentifierName mnamespace;	//!< Namespace of the class.
-			IdentifierName mclass_name; //!< Name of the class.
+			public:
+				static const int8_t MAX_IDENTIFIER_LENTGH = 100; //!< Maximum size for identifier names.
+				using IdentifierName = CS<0, MAX_IDENTIFIER_LENTGH>;
+				using Ptr = std::shared_ptr<MetaBase>; //!< Pointer type for this base meta information class.
+			protected:
+				Version::Ptr mversion;		//!< Pointer to the version of T class (see class Meta below).
+				IdentifierName mnamespace;	//!< Namespace of the class.
+				IdentifierName mclass_name; //!< Name of the class.
 
-			// Unique sorted list holding all class IDs.
-			inline static SortedList<Id> mIds = SortedList<Id>({}, true);
-			inline static bool register_class(const Id& class_id)
-			{
-				bool ok = mIds.add (class_id);
-				if (!ok)
+				// Unique sorted list holding all class IDs.
+				inline static SortedList<S> mclasses = SortedList<S>({}, true);
+				inline static void register_class(const S& anamespace, const S& class_name)
 				{
-					// Sends a message to the console (taking into consideration if WIDE_CHAR is defined or not) informing the class ID is already registered. And prints the next available class_id.
-					SStream ss;
-					ss << W("Meta: Class ID ") << class_id << W(" is already registered. Next available class_id is ") << (mIds.last() + 1) << std::endl;
-					S errmsg = ss.str();
-					out () << errmsg;
-					throw (errmsg);
+					if (!mclasses.add(anamespace + W("::") + class_name))
+					{
+						// Sends a message to the console (taking into consideration if WIDE_CHAR is defined or not) informing the class ID is already registered. And prints the next available class_id.
+						SStream ss;
+						ss << W("Meta: class ") << anamespace << W("::") << class_name << W(" is already registered.") << std::endl;
+						S errmsg = ss.str();
+						out () << errmsg;
+						throw (errmsg);
+					}
+
 				}
-			}
-				
+			public:
+
+				inline IdentifierName class_namespace () const noexcept
+				{
+					return mnamespace;
+				}
+
+				inline IdentifierName class_name () const noexcept
+				{
+					return mclass_name;
+				}
 
 			public:
 				/// \brief Constructor taking a Version object as a parameter.
-				inline MetaBase(const Id class_id, const S& class_namespace, const S& class_name, const Version::Int pub = Version::NULL_VERSION, const Version::Int pro = Version::NULL_VERSION, const Version::Int pri = Version::NULL_VERSION) noexcept
-					: mclass_id(class_id), mnamespace(class_namespace), mclass_name(class_name), mversion(Version::get(pub, pro, pri))
+				inline MetaBase(const S& class_namespace, const S& class_name, const Version::Int pub = Version::NULL_VERSION, const Version::Int pro = Version::NULL_VERSION, const Version::Int pri = Version::NULL_VERSION) noexcept
+					: mnamespace(class_namespace), mclass_name(class_name), mversion(Version::get(pub, pro, pri))
 				{
-					register_class (class_id);
+					register_class (class_namespace, class_name);
 				}
 				inline virtual ~MetaBase() noexcept = default; // Virtual destructor for cleanup
 
@@ -55,27 +65,27 @@ namespace pensar_digital
 				//inline static const Version::Ptr VERSION = pd::Version::get(1, 1, 1);
 				inline virtual const Version::Ptr version() const noexcept { return mversion; }
 
-				/// \brief Returns the class ID.
-				inline virtual constexpr Id class_id() const noexcept
+				inline virtual bool test_class_name_and_version(MemoryBuffer& mb)
 				{
-					return mclass_id;
-				}
-
-
-				inline virtual bool test_class_id_and_version(MemoryBuffer& mb)
-				{
-					// Get class_id from mb.
-					Id class_id;
-					mb.read_known_size((BytePtr)&class_id, sizeof(Id));
-					if (class_id != mclass_id)
+					// Get class_namespace from mb.
+					IdentifierName class_namespace;
+					mb.read_known_size((BytePtr)&class_namespace, sizeof(IdentifierName));
+					if (class_namespace != mnamespace)
 					{
-						throw (W("Meta: Class ID mismatch"));
+						throw (W("Meta: Class namespace mismatch"));
+					}
+					// Get class_name from mb.
+					IdentifierName class_name;
+					mb.read_known_size((BytePtr)&class_name, sizeof(IdentifierName));
+					if (class_name != mclass_name)
+					{
+						throw (W("Meta: Class name mismatch"));
 					}
 
 					Version v(mb);
 					if (v != *mversion)
 					{
-						throw (W("Meta: Version mismatch"));
+						throw (W("Meta: Class version mismatch"));
 					}
 					return true;
 				}
@@ -91,16 +101,28 @@ namespace pensar_digital
 				
 
 				/// \brief Constructor for the Meta class.
-				Meta (const Id class_id, const S& class_namespace, const S& class_name, const Version::Int pub = Version::NULL_VERSION, const Version::Int pro = Version::NULL_VERSION, const Version::Int pri = Version::NULL_VERSION) noexcept
-					: MetaBase(class_id, class_namespace, class_name, pub, pro, pri)
+				Meta (const S& class_namespace, const S& class_name, const Version::Int pub = Version::NULL_VERSION, const Version::Int pro = Version::NULL_VERSION, const Version::Int pri = Version::NULL_VERSION) noexcept
+					: MetaBase(class_namespace, class_name, pub, pro, pri)
 				{
 				}
 
-				/// \brief Returns the type name of the class.
-				static
-					constexpr const char* type_name() noexcept
+				inline const S sclass_name () const noexcept
 				{
-					return typeid(T).name();
+					return mclass_name;
+				}
+
+				inline const S sclass_namespace () const noexcept
+				{
+					return mnamespace;
+				}
+
+				/// \brief Returns the type name of the class.
+				inline const S type_name() const noexcept
+				{
+					S stype_name = sclass_namespace ();
+					stype_name += W("::");
+					stype_name += sclass_name ();
+					return stype_name;
 				}
 
 				/// \brief Returns the number of parent classes.
@@ -123,32 +145,15 @@ namespace pensar_digital
 					return ParentTypes{};
 				}
 
-				/// \brief Returns a tuple of all child types.
-
-				/// \brief Returns a string representation of the type name.
-				static std::string type_name_str() noexcept
-				{
-					return std::string(typeid(T).name());
-				}
-
-				/// \brief Returns a string representation of the parent types.
-				static std::string parent_types_str() noexcept
-				{
-					S result;
-					result += W("Parents: ");
-					((result += typeid(Parents).name(), result += W(" ")), ...);
-					return result;
-				}
-
 				/// \brief Returns a string representation of the meta information.
-				static S to_string() noexcept
+				auto to_s() const noexcept
 				{
-					return W("Type: ") + type_name_str() + W("\n") + parent_types_str();
+					return type_name () + W("v") + mversion->to_s ();
 				}
 
-				static Ptr get(const Id class_id, const S& class_namespace, const S& class_name, const Version::Int pub = Version::NULL_VERSION, const Version::Int pro = Version::NULL_VERSION, const Version::Int pri = Version::NULL_VERSION) noexcept
+				static Ptr get(const S& class_namespace, const S& class_name, const Version::Int pub = Version::NULL_VERSION, const Version::Int pro = Version::NULL_VERSION, const Version::Int pri = Version::NULL_VERSION) noexcept
 				{
-					return std::make_shared<Meta<T, Parents...>>(class_id, class_namespace, class_name, pub, pro, pri);
+					return std::make_shared<Meta<T, Parents...>>(class_namespace, class_name, pub, pro, pri);
 				}
 		};
 	}

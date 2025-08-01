@@ -32,7 +32,7 @@ namespace pensar_digital
                 inline static VersionFactory mfactory = { 3, 10, 1, 1, 1, null_value<Id>() };
                 struct Data : public pd::Data
 				{
-                    Id         mid;
+                    Id  mid;
                     Int mpublic;
 					Int mprotected;
 					Int mprivate;

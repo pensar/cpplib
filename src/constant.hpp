@@ -42,6 +42,9 @@
 #include <functional>   // std::function  
 #include <cctype>       // std::tolower  
 #include <span>         // std::span  
+
+#include "string_def.hpp"
+
   
 namespace pensar_digital  
 {  
@@ -86,7 +89,8 @@ namespace pensar_digital
         inline static const bool DO_NOT_ADD_NULL_AT_END = false;  ///< Do not add null character at the end of the string.
         inline static const bool FILL_NULL_BEFORE_COPY = true;  ///< Fill dest memory with null characters before copying the data.
         inline static const bool DO_NOT_FILL_NULL_BEFORE_COPY = false;  ///< Do not fill dest memory with null characters before copying the data.
-
+		inline static const C* CPPLIB_NAMESPACE = W("pensar_digital::cpplib");  ///< Namespace for the library.
+		using VersionInt = int16_t;  ///< Type for version integers.
     }   // namespace cpplib  
 }       // namespace pensar_digital  
   

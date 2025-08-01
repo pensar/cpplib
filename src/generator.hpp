@@ -15,6 +15,7 @@
 #include <memory>   // shared_ptr
 #include <iosfwd>   // istream, ostream
 #include <bit>      // endian
+#include <concepts> // std::convertible_to
 
 namespace pensar_digital
 {

@@ -30,6 +30,10 @@ namespace pensar_digital
 				{
 					return mfactory.get(aid);
 				}
+				
+				// Meta information.
+				inline static const ClassInfo INFO = { CPPLIB_NAMESPACE, W("IncCmd"), 2, 1, 1 };
+				inline virtual const ClassInfo* info_ptr() const noexcept { return &INFO; }
 
 				virtual bool initialize(const Id id) noexcept
 				{
@@ -45,31 +49,36 @@ namespace pensar_digital
 
 		class DecCmd : public Command
 		{
-		public:
-			using Ptr = std::shared_ptr<DecCmd>;
-			DecCmd(const Id aid = NULL_ID) : Command(aid) { }
-			DecCmd(MemoryBuffer& mb) : Command(mb) { }
-			~DecCmd() = default;
+			public:
+				using Ptr = std::shared_ptr<DecCmd>;
+				DecCmd(const Id aid = NULL_ID) : Command(aid) { }
+				DecCmd(MemoryBuffer& mb) : Command(mb) { }
+				~DecCmd() = default;
 
-			using Factory = pd::Factory<DecCmd, Id>;
-			inline static Factory mfactory = { 3, 10, NULL_ID }; //!< Member variable "factory"
+				using Factory = pd::Factory<DecCmd, Id>;
+				inline static Factory mfactory = { 3, 10, NULL_ID }; //!< Member variable "factory"
 
-			inline static typename Factory::P get(Id aid = NULL_ID) noexcept
-			{
-				return mfactory.get(aid);
-			}
+				inline static typename Factory::P get(Id aid = NULL_ID) noexcept
+				{
+					return mfactory.get(aid);
+				}
 
-			virtual bool initialize(const Id id) noexcept
-			{
+				// Meta information.
+				inline static const ClassInfo INFO = { CPPLIB_NAMESPACE, W("DecCmd"), 2, 1, 1 };
+				inline virtual const ClassInfo* info_ptr() const noexcept { return &INFO; }
 
-				this->set_id(id == NULL_ID ? this->mgenerator.get_id() : id);
+				virtual bool initialize(const Id id) noexcept
+				{
 
-				return true;
-			}
-			virtual Ptr clone() const noexcept { return pd::clone<DecCmd>(*this, id()); }
+					this->set_id(id == NULL_ID ? this->mgenerator.get_id() : id);
 
-			void _run() { --value; }
-			void _undo() const { ++value; }
+					return true;
+				}
+
+				virtual Ptr clone() const noexcept { return pd::clone<DecCmd>(*this, id()); }
+
+				void _run() { --value; }
+				void _undo() const { ++value; }
 		};
 
 		class IncFailCmd : public Command
@@ -87,6 +96,9 @@ namespace pensar_digital
 			{
 				return mfactory.get(aid);
 			}
+			// Meta information.
+			inline static const ClassInfo INFO = { CPPLIB_NAMESPACE, W("IncFailCmd"), 2, 1, 1 };
+			inline virtual const ClassInfo* info_ptr() const noexcept { return &INFO; }
 
 			virtual bool initialize(const Id id) noexcept
 			{
@@ -97,7 +109,7 @@ namespace pensar_digital
 			}
 			virtual Ptr clone() const noexcept { return pd::clone<IncFailCmd>(*this, id()); }
 
-			void _run() { throw "cmdAddFail.run () error."; }
+			void _run() { throw "IncFailCmd.run () error."; }
 			void _undo() const { --value; }
 		};
 
@@ -117,6 +129,10 @@ namespace pensar_digital
 				{
 					return mfactory.get(aid);
 				}
+
+				// Meta information.
+				inline static const ClassInfo INFO = { CPPLIB_NAMESPACE, W("DoubleCmd"), 2, 1, 1 };
+				inline virtual const ClassInfo* info_ptr() const noexcept { return &INFO; }
 
 				virtual bool initialize(const Id id) noexcept
 				{
@@ -145,6 +161,10 @@ namespace pensar_digital
 				{
 					return mfactory.get(aid);
 				}
+
+				// Meta information.
+				inline static const ClassInfo INFO = { CPPLIB_NAMESPACE, W("DoubleFailCmd"), 2, 1, 1 };
+				inline virtual const ClassInfo* info_ptr() const noexcept { return &INFO; }
 
 				virtual bool initialize(const Id id) noexcept
 				{
