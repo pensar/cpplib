@@ -94,12 +94,13 @@ namespace pensar_digital
                 std::ifstream in(W("c:\\tmp\\test\\ObjectBinaryFileStreaming\\test.bin"), std::ios::binary);
                 for (Id i = 0; i < N; i++)
                 {
-                    Object::Ptr o = pd::Object::get();
+                    
                     MemoryBuffer mb(Object::SIZE);
                     mb.write (in, mb.size());
-					o->object_assign(mb);
+                    Object o(mb);
+                    
                     Object::Ptr o1 = pd::Object::get(i);
-                    CHECK_EQ(Object, *o, *o1, pd::to_string(i));
+                    CHECK_EQ(Object, o, *o1, pd::to_string(i));
                 }
             TEST_END(ObjectBinaryFileStreaming2)
     }

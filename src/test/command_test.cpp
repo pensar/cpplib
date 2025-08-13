@@ -306,6 +306,17 @@ namespace pensar_digital
 			}
 
 			CHECK_EQ(int, value, 0, "7");
+
+			MemoryBuffer::Ptr mb_ptr = cmd2.bytes();
+			Cmd cmd4(*mb_ptr);
+			value = 0;
+			cmd2.run();
+			CHECK_EQ(int, value, -2, "3");
+
+			cmd2.undo();
+			CHECK_EQ(int, value, 0, "4");
+
+
 		}
 		TEST_END(CompositeCommand)
 
