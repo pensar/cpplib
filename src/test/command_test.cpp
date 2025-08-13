@@ -309,7 +309,7 @@ namespace pensar_digital
 		}
 		TEST_END(CompositeCommand)
 
-		TEST(CommandBinaryFileStreaming, false)
+		TEST(CommandBinaryFileStreaming, true)
 			using Cmd = IncCmd;
 			std::ofstream out(W("c:\\tmp\\test\\CommandBinaryStreaming\\test.bin"), std::ios::binary);
 			Cmd cmd;

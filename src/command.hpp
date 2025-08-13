@@ -176,7 +176,7 @@ namespace pensar_digital
             inline virtual std::ostream& binary_write(std::ostream& os, const std::endian& byte_order = std::endian::native) const
 			{
 				Object::binary_write (os, byte_order);
-				info_ptr()->binary_write(os, byte_order);
+				INFO.binary_write(os, byte_order);
 				os.write((char*)&mdata, DATA_SIZE);
 				mgenerator.binary_write(os, byte_order);
 				child_binary_write(os, byte_order); // Call to child class binary_write.
@@ -186,11 +186,10 @@ namespace pensar_digital
 			inline virtual std::istream& binary_read(std::istream& is, const std::endian& byte_order = std::endian::native)
 			{
 				Object::binary_read(is, byte_order);
-				ClassInfo* info = const_cast<ClassInfo*>(info_ptr());
-                info->binary_read(is, byte_order);
-				mgenerator.binary_read(is, byte_order);
+				INFO.test_class_name_and_version(is, byte_order);
                 is.read((char*)&mdata, DATA_SIZE);
-				child_binary_read(is, byte_order); // Call to child class binary_read.
+                mgenerator.binary_read(is, byte_order);
+                child_binary_read(is, byte_order); // Call to child class binary_read.
                 return is;
 			}
 
