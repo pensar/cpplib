@@ -316,7 +316,6 @@ namespace pensar_digital
 			cmd2.undo();
 			CHECK_EQ(int, value, 0, "4");
 
-
 		}
 		TEST_END(CompositeCommand)
 
@@ -347,7 +346,7 @@ namespace pensar_digital
 			TEST_END(CompositeCommandClone)
 
 
-			TEST(CompositeCommandBinaryStreaming, true)
+			TEST(CompositeCmdBinaryStreaming, true)
 			using Cmd = CompositeCommand;
 
 			Cmd cmd;
@@ -365,7 +364,7 @@ namespace pensar_digital
 			//Cmd::Factory::P p4 = nullptr;
 			//buffer.read_obj(&p4);
 			//CHECK_EQ(Cmd, *p4, *p3, "2");
-		TEST_END(CompositeCommandBinaryStreaming)
+		TEST_END(CompositeCmdBinaryStreaming)
 
 	}
 }

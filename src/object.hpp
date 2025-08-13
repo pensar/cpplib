@@ -404,6 +404,14 @@ namespace pensar_digital
                 return mfactory.get(Data(id));
             };
 
+            static inline Factory::P get (MemoryBuffer& mb)
+            {
+                Factory::P o_ptr = get();
+                Object& o = *o_ptr;
+                o.assign(mb);
+                return o_ptr;
+            };
+
             inline virtual InStream& read(InStream& is) { return is >> mdata.mid; }
             inline virtual OutStream& write(OutStream& os) const { return os << id(); }
 

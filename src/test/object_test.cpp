@@ -46,6 +46,10 @@ namespace pensar_digital
 			o1->object_assign (*mb);
 			CHECK_EQ(Object, *o, *o1, W("1. o != o1"));
 
+            mb->reset_read_offset();
+			auto o2 = pd::Object::get(*mb);
+            CHECK_EQ(Object, *o, *o2, W("1. o != o1"));
+
          TEST_END(ObjectSerialization)
             
          TEST(ObjectBinaryFileStreaming, true)

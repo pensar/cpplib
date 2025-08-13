@@ -98,6 +98,27 @@ namespace pensar_digital
 				return *this;
 			}
 
+            Offset subtract_from_read_offset (const Offset& amount) 
+            {
+				// Check if the amount to subtract is valid.
+                if (amount > mread_offset)
+				{
+					throw std::runtime_error("MemoryBuffer::subtract_from_read_offset: invalid amount to subtract.");
+				}
+
+                // Set the read offset to the given offset.
+                mread_offset -= amount;
+
+                // Return the new read offset.
+                return mread_offset;
+			}
+
+            void reset_read_offset ()
+            {
+                // Set the read offset to 0.
+                mread_offset = 0;
+			}
+
             /** Default destructor */
             virtual ~MemoryBuffer()
             {

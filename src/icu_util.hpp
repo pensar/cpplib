@@ -352,14 +352,21 @@ namespace pensar_digital
 
             inline Encoding detect_encoding (const std::string& file_name)
             {
-                // Read the file content into a buffer
+                
                 std::ifstream file_stream(file_name, std::ios::binary);
                 if (!file_stream.is_open())
                 {
                     throw std::runtime_error("Error: Could not open file " + file_name);
                 }
-
-                std::vector<char> buffer((std::istreambuf_iterator<char>(file_stream)), std::istreambuf_iterator<char>());
+                
+                constexpr size_t MAX_BYTES = 10000; // Sufficient for ucsdet_setText, if changed it cannot exceed INT32_MAX.
+                std::vector<char> buffer(MAX_BYTES); // Allocate fixed size
+                file_stream.read(buffer.data(), MAX_BYTES);
+                std::streamsize bytes_read = file_stream.gcount();
+                if (file_stream.bad()) {
+                    file_stream.close();
+                    throw std::runtime_error("Error: Could not read file " + file_name);
+                }
                 file_stream.close();
 
                 // Check for BOM
@@ -376,8 +383,9 @@ namespace pensar_digital
                 {
                     throw std::runtime_error("Error: Could not open ICU charset detector");
                 }
-
-                ucsdet_setText(csd, buffer.data(), buffer.size(), &error);
+                
+                ucsdet_setText(csd, buffer.data(), static_cast<int32_t>(buffer.size()), &error);
+                
                 if (U_FAILURE(error))
                 {
                     ucsdet_close(csd);
