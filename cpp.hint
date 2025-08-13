@@ -3,3 +3,4 @@
 // For more information see https://go.microsoft.com/fwlink/?linkid=865984
 #define CHECK(bool_expression, error_message) check (bool_expression, error_message, __FILE__, __LINE__);
 #define CHECK_EQ(T, actual, expected, error_message) check<T> (actual, expected, error_message, __FILE__, __LINE__);
+#define CHECK_NOT_EQ(T, actual, expected, error_message) check_not_equal<T> (actual, expected, error_message, __FILE__, __LINE__);

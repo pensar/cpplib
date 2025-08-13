@@ -17,7 +17,7 @@ namespace pensar_digital
     {
         TEST(DistLev, true)
             using Pair = std::pair<S, S>;
-            using Map = std::map<Pair, int>;
+            using Map = std::map<Pair, size_t>;
             Map map;
             map[Pair (W(""), W(""))] = 0;
             map[Pair (W(""), W("a"))] = 1;
@@ -33,15 +33,15 @@ namespace pensar_digital
             map[Pair (W("Copa América Masculino de Basquete: Brasil x Porto Rico"), W("Copa América (r)  Masculino de Basquete -VT- Brasil x Porto Rico"))] = 10;
             map[Pair (W("copaamericamasculinodebasquetebrasilxportorico"), W("copaamericamasculinodebasqueteVTbrasilxportorico"))] = 2;
 
-            int i = 0;
+            size_t i = 0;
             for (const auto& it : map)
             {
                 S s = it.first.first;
                 S t = it.first.second;
-                int result = distance (s, t);
+                size_t result = distance (s, t);
 				std::stringstream ss;
 				ss  << s << " " << t << " " << "i = " << i++;
-                CHECK_EQ(int, result, it.second, ss.str ());
+                CHECK_EQ(size_t, result, it.second, ss.str ());
             }
         TEST_END(DistLev)
     }

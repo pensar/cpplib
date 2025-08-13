@@ -18,28 +18,28 @@ namespace pensar_digital
 #include <algorithm>
 #include <vector>
 
-        inline int distance(const S& source, const S& target) {
-            const int n = source.length();
-            const int m = target.length();
+        inline size_t distance(const S& source, const S& target) {
+            const size_t n = source.length();
+            const size_t m = target.length();
             if (n == 0) return m;
             if (m == 0) return n;
 
             // Use three rows to handle transposition
-            std::vector<int> row1(m + 1);  // i-2
-            std::vector<int> row2(m + 1);  // i-1
-            std::vector<int> row3(m + 1);  // i
+            std::vector<size_t> row1(m + 1);  // i-2
+            std::vector<size_t> row2(m + 1);  // i-1
+            std::vector<size_t> row3(m + 1);  // i
 
-            for (int j = 0; j <= m; j++) {
+            for (size_t j = 0; j <= m; j++) {
                 row2[j] = j;  // Initialize row2 as first row
             }
 
-            for (int i = 1; i <= n; i++) {
+            for (size_t i = 1; i <= n; i++) {
                 row3[0] = i;
 
-                for (int j = 1; j <= m; j++) {
+                for (size_t j = 1; j <= m; j++) {
                     const char s_i = source[i - 1];
                     const char t_j = target[j - 1];
-                    int cost = (s_i == t_j) ? 0 : 1;
+                    size_t cost = (s_i == t_j) ? 0 : 1;
 
                     row3[j] = std::min(std::min(row3[j - 1] + 1, row2[j] + 1), row2[j - 1] + cost);
 
