@@ -27,7 +27,6 @@ namespace pensar_digital
 {
     namespace cpplib
     { 
-
         class MemoryBuffer
         {
             public:
@@ -53,6 +52,13 @@ namespace pensar_digital
 				write (bp, size);
 			}
 
+            MemoryBuffer (const Ptr ptr, size_t size)
+                : MemoryBuffer()
+            {
+                // Copy the data to the buffer.
+                write(ptr->data(), size);
+			}
+
             // Copy constructor.
 			MemoryBuffer(const MemoryBuffer& mb) : MemoryBuffer()
 			{
@@ -67,7 +73,7 @@ namespace pensar_digital
                 write(t, sizeof(T));
             }
 
-			// Memory buffer constructor for StdLayoutTriviallyCopyableData types.
+			// Memory buffer constructor for StdLayoutTriviallyCopyableData types which has no other aggregate objects.
 			template <HasStdLayoutTriviallyCopyableData T>
 			MemoryBuffer(const T& t) : MemoryBuffer()
 			{
@@ -274,6 +280,10 @@ namespace pensar_digital
         // MemoryBufferPtrConvertible concept requires a public method bytes() returning something convertible to MemoryBuffer::Ptr.
         template <typename T>
         concept MemoryBufferPtrConvertible = requires(T t) { { t.bytes() } -> std::convertible_to<MemoryBuffer::Ptr>; };
+
+        // Concept for Sizeable and MemoryBufferPtrConvertible.
+		template <typename T>
+		concept WriteableToMemoryBuffer = Sizeable<T> && MemoryBufferPtrConvertible<T>;
 
         // BinaryConstructible concept requires a constructor with this parameter: (MemoryBuffer& bytes) returning something convertible to T.
         template <typename T>

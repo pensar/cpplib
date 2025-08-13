@@ -9,7 +9,6 @@
 #include "string_def.hpp"
 #include "s.hpp"
 #include "factory.hpp"
-#include "version.hpp"
 #include "error.hpp"
 
 #include <memory>   // shared_ptr
@@ -49,10 +48,7 @@ namespace pensar_digital
             using Factory = pd::Factory<G, T, T, T>;
             inline static Factory mfactory = { 3, 10, null_value<T>(), 0, 1}; //!< Member variable "factory"
             
-            // Version of the class.
-            inline static const Version::Ptr VERSION = pd::Version::get (1, 1, 2);
-            virtual const Version::Ptr version () const noexcept { return VERSION; }
-      private:
+       private:
           struct Data : public pd::Data
           {
               T minitial_value; //!< Generator initial_value.
@@ -64,11 +60,16 @@ namespace pensar_digital
    
           public:
 
-          using DataType = Data;
-          inline static constexpr size_t DATA_SIZE = sizeof(mdata);
-          inline static constexpr size_t      SIZE = DATA_SIZE + Version::SIZE + Object::SIZE;
+            inline static const ClassInfo INFO = { CPPLIB_NAMESPACE, W("Generator"), 2, 1, 1 };
+            inline virtual const ClassInfo* info_ptr() const noexcept { return &INFO; }
+            using DataType = Data;
+            inline static constexpr size_t DATA_SIZE = sizeof(mdata);
+            inline static constexpr size_t      SIZE = DATA_SIZE + sizeof(INFO) + Object::SIZE;
 
           inline const   pd::Data* generator_data     () const noexcept { return &mdata   ; }
+          virtual const pd::Data* data() const noexcept { return &mdata; }
+		  virtual size_t data_size() const noexcept { return DATA_SIZE; }
+          virtual const BytePtr data_bytes() const noexcept { return (BytePtr)&mdata; }
 		  inline const BytePtr generator_data_bytes() const noexcept { return (BytePtr)&mdata; }
 		  inline static const Data NULL_DATA = { null_value<T>(), null_value<T>() }; //!< Null data.
           inline virtual pd::Data* get_null_data() const noexcept { return (pd::Data*)(&NULL_DATA); }
@@ -80,16 +81,21 @@ namespace pensar_digital
 			// Constructor from MemoryBuffer.
 			Generator(MemoryBuffer& mb) noexcept : Object(mb)
             {
-                assign (mb);
+                assign_without_parent (mb);
             }
             virtual ~Generator () = default;
+
+            inline G& assign_without_parent (MemoryBuffer& mb) noexcept
+            {
+                INFO.test_class_name_and_version(mb);
+                mb.read_known_size((BytePtr)(&mdata), DATA_SIZE);
+                return *this;
+            }
 
             inline G& generator_assign(MemoryBuffer& mb) noexcept
             {
                 object_assign (mb);
-                VERSION->assign (mb);
-				mb.read_known_size((BytePtr)(&mdata), DATA_SIZE);
-				return *this;
+				return assign_without_parent (mb);
             }
 
 			inline virtual Object& assign(MemoryBuffer& mb) noexcept
@@ -101,16 +107,16 @@ namespace pensar_digital
             {
                 MemoryBuffer::Ptr mb = std::make_unique<MemoryBuffer>(SIZE);
 				mb->append (object_bytes ());
-                mb->append (VERSION->version_data_bytes (), Version::DATA_SIZE);
-				mb->write ((BytePtr(&mdata)), DATA_SIZE);
+                mb->append (INFO.bytes());
+				mb->write ((BytePtr)data (), data_size ());
 				return mb;
             }
 
             inline MemoryBuffer::Ptr generator_bytes() const noexcept
             {
                 MemoryBuffer::Ptr mb = std::make_unique<MemoryBuffer>(SIZE);
-                mb->append(object_data_bytes(), Object::DATA_SIZE);
-                mb->append(VERSION->version_data_bytes(), Version::DATA_SIZE);
+                mb->append(object_bytes()->data (), Object::SIZE);
+                mb->append(INFO.bytes ());
                 mb->write(generator_data_bytes (), DATA_SIZE);
                 return mb;
             }

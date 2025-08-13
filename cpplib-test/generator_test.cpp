@@ -98,7 +98,9 @@ namespace pensar_digital
             G g3(3);
             CHECK_NOT_EQ(G, g3, g, W("0"));
             CHECK_EQ(G, *pg2, g, W("1"));
-            CHECK_EQ(Version::Int, pg2->version()->get_private (), 2, W("2"));
+            CHECK_EQ(Version::Int, pg2->INFO.mpublic_interface_version, 2, W("2"));
+            CHECK_EQ(Version::Int, pg2->INFO.mprotected_interface_version, 1, W("3"));
+            CHECK_EQ(Version::Int, pg2->INFO.mprivate_interface_version, 1, W("4"));
 
         TEST_END(GeneratorFileBinaryStreaming)
 
@@ -116,15 +118,11 @@ namespace pensar_digital
             //G::Factory::P p = G::get (1, 0, 1);
             G g(1);
             //Constructs a MemoryBuffer using constructor for StdLayoutTriviallyCopyableData types.
-            MemoryBuffer buffer(g);
-            Id id = g.get_id ();
-            using Offset = MemoryBuffer::Offset;
-            Offset offset = buffer.append<G> (g);
-            Hash h = g.hash ();
-
+            MemoryBuffer::Ptr buffer_ptr = g.generator_bytes ();
+ 
             G g2;
             CHECK_NOT_EQ(G, g2, g, W("0"));
-            buffer.read_into_data<G>(&g2, offset);
+            g2.assign (*buffer_ptr);
             CHECK_EQ(G, g2, g, "1");
             
           TEST_END(GeneratorBinaryStreaming)

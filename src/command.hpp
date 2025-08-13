@@ -88,7 +88,7 @@ namespace pensar_digital
             using G = Generator<Command, Id>; //!< Generator alias.
 
             inline static constexpr size_t DATA_SIZE = sizeof(mdata);
-            inline static constexpr size_t      SIZE = Object::SIZE + DATA_SIZE + Version::SIZE + G::SIZE;
+            inline static constexpr size_t      SIZE = Object::SIZE + DATA_SIZE + sizeof(ClassInfo) + G::SIZE;
 
             protected:
             
@@ -141,7 +141,7 @@ namespace pensar_digital
 
             virtual Command& assign_without_object(MemoryBuffer& mb) noexcept
             {
-                info_ptr ()->test_class_name_and_version (mb);
+                INFO.test_class_name_and_version (mb);
                 mb.read_known_size((BytePtr)&mdata, DATA_SIZE);
 				mgenerator = G(mb);
                 return *this;
@@ -156,7 +156,7 @@ namespace pensar_digital
             {
 				MemoryBuffer::Ptr mb = std::make_unique<MemoryBuffer>(SIZE);  
                 mb->append (*Object::bytes());
-				mb->append (info_ptr ()->bytes());
+				mb->append (INFO.bytes());
                 mb->write((BytePtr(&mdata)), DATA_SIZE);
 				mb->append (*(mgenerator.bytes()));
                 return mb;
@@ -258,12 +258,13 @@ namespace pensar_digital
 		class CompositeCommand : public Command
 		{
             public:
-			inline static const size_t MAX_COMMANDS = 10;
-            using Ptr = std::shared_ptr<CompositeCommand>;
+    			inline static const size_t MAX_COMMANDS = 10;
+                using Ptr = std::shared_ptr<CompositeCommand>;
             private:
                 struct Data : public pd::Data
                 {
-                    std::array<Command*, MAX_COMMANDS> mcommands; //!< Member variable "commands" contains the list of commands to be executed.
+                    using CommandArray = std::array<Command*, MAX_COMMANDS>;
+                    CommandArray mcommands; //!< Member variable "commands" contains the list of commands to be executed.
                     size_t mindex = 0;
 					void add(Command* cmd)
                     {
@@ -286,139 +287,162 @@ namespace pensar_digital
                 static_assert(StdLayoutTriviallyCopyable<Data>, "Data must be a standard layout and trivially copyable type");
                 Data mdata; //!< Member variable mdata contains the object data.
             public:
-                inline const static Data NULL_DATA = {};
-        
-            using DataType = Data;
-            using Factory = pd::Factory<CompositeCommand, Id>;
+                inline const static Data NULL_DATA = { {}, 0 };
+                using DataType = Data;
+                using Factory = pd::Factory<CompositeCommand, Id>;
+                using Int = int_fast8_t;
+                inline static const ClassInfo INFO = { CPPLIB_NAMESPACE, W("CompositeCommand"), 2, 1, 1 };
+                inline virtual const ClassInfo* info_ptr() const noexcept { return &INFO; }
 
-            inline static const ClassInfo INFO = { CPPLIB_NAMESPACE, W("CompositeCommand"), 2, 1, 1 };
-            inline virtual const ClassInfo* info_ptr() const noexcept { return &INFO; }
+                using FactoryType = Factory;
 
-            using FactoryType = Factory;
+                virtual const pd::Data* data() const noexcept { return &mdata; }
+                virtual const BytePtr data_bytes() const noexcept { return (BytePtr)data(); }
 
-            virtual const pd::Data* data() const noexcept { return &mdata; }
-            virtual const BytePtr data_bytes() const noexcept { return (BytePtr)data(); }
+                inline static constexpr size_t DATA_SIZE = sizeof(mdata);
 
-            inline static constexpr size_t DATA_SIZE = sizeof(mdata);
-            inline static constexpr size_t      SIZE = DATA_SIZE + sizeof(ClassInfo);
-
-            virtual size_t data_size() const noexcept { return sizeof(mdata); }
-            virtual size_t size() const noexcept { return data_size() + sizeof(ClassInfo); }
-        public:
-			CompositeCommand (const Id aid = NULL_ID) : Command (aid)
-			{
-			}   
-			CompositeCommand (MemoryBuffer& mb) : Command(mb) { }
-            ~CompositeCommand()
-            {
-                mdata.free_commands();
-            }
-            
-            private:
-            inline static Factory mfactory = { 3, 10, NULL_ID };
+                virtual size_t data_size() const noexcept { return sizeof(mdata); }
+                virtual size_t size() const noexcept 
+                {
+                    size_t size = sizeof(mdata.mindex) + sizeof(ClassInfo);
+                    for (Int i = 0; i < mdata.mindex; ++i)
+                    {
+                        size += mdata.mcommands[i]->size();
+                    }
+                    return size;
+                }
 
             public:
+                CompositeCommand(const Id aid = NULL_ID) : Command(aid), mdata (NULL_DATA)
+			    {
+                   
+			    }  
 
-                      
-            virtual Command& assign(MemoryBuffer& mb) noexcept
-            {
-                return *this;
-            }
-            inline virtual MemoryBuffer::Ptr bytes() const noexcept
-            {
-                MemoryBuffer::Ptr mb = std::make_unique<MemoryBuffer>(SIZE);  
-				mb->append(*Object::bytes());
-                mb->append(info_ptr()->bytes());
-                mb->write((BytePtr(&mdata)), DATA_SIZE);
-				return mb;
-            }
+			    CompositeCommand (MemoryBuffer& mb) : Command(mb) { assign_without_parent(mb); }
 
-            // Implements initialize method from Initializable concept.
-            virtual bool initialize (const Id id) noexcept
-            {
-
-                this->set_id (id == NULL_ID ? this->mgenerator.get_id() : id);
-
-                return true;
-            }
-
-            inline static typename FactoryType::P get (const Id aid = NULL_ID) noexcept
-            {
-                return mfactory.get (aid);
-            }
-            void _run()
-			{
-				for (int_fast8_t i = 0; i < mdata.mindex; ++i)
-				{
-					mdata.mcommands[i]->run();
-				}
-			}
-			void _undo() const
-			{
-                for (int_fast8_t i = 0; i < mdata.mindex; ++i)
+                ~CompositeCommand()
                 {
-					mdata.mcommands[i]->undo();
-				}
-			}
-			
-            /// <summary>
-			/// Adds the command to the composite.
-			/// The CompositeCommand will take ownership of the command.
-			/// </summary>
-			/// <param name="cmd">Pointer to the command to be added.</param>
-			void add (Command* cmd) { mdata.add (cmd); }
-
-            Ptr clone () const noexcept 
-            {
-				// Create a new CompositeCommand instance using Ptr and make_shared with the current id and mdata.
-				Ptr pcc = std::make_shared<CompositeCommand>(id());
-                pcc->mdata.mindex = mdata.mindex;
-
-                // Clone all commands and add to the newly created composite.
-                for (size_t i = 0; i < mdata.mindex; ++i)
-                {
-                    pcc->add((Command*)mdata.mcommands[i]->clone().get ());
+                    mdata.free_commands();
                 }
-				return pcc;
-            }
+            
+                private:
+                inline static Factory mfactory = { 3, 10, NULL_ID };
 
-            virtual bool equals(const Object& o) const noexcept
-            {
-                const CompositeCommand* pother = dynamic_cast<const CompositeCommand*>(&o);
-                if (pother == nullptr)
-                    return false;
-                if (o.id () != id ())
-					return false;
-                for (size_t i = 0; i < mdata.mindex; ++i)
+                public:
+
+                Command& assign_without_parent(MemoryBuffer& mb) noexcept
                 {
-                    if (!mdata.mcommands[i]->equals(*pother->mdata.mcommands[i]))
+                    for (Int i = 0; i < mdata.mindex; ++i)
+                    {
+                        mdata.mcommands[i]->assign(mb);
+                    }
+                    return *this;
+                }
+
+                virtual Command& assign(MemoryBuffer& mb) noexcept
+                {
+					Command::assign(mb);
+                    return assign_without_parent (mb);
+                }
+                inline virtual MemoryBuffer::Ptr bytes() const noexcept
+                {
+                    MemoryBuffer::Ptr mb = std::make_unique<MemoryBuffer>(size ());  
+				    mb->append(Command::bytes());
+                    mb->append(INFO.bytes());
+					mb->append((BytePtr)(&mdata.mindex), sizeof(mdata.mindex));
+                    for (Int i = 0; i < mdata.mindex; ++i)
+                    {
+                        mb->append(mdata.mcommands[i]->bytes());
+                    };
+				    return mb;
+                }
+
+                // Implements initialize method from Initializable concept.
+                virtual bool initialize (const Id id) noexcept
+                {
+
+                    this->set_id (id == NULL_ID ? this->mgenerator.get_id() : id);
+
+                    return true;
+                }
+
+                inline static typename FactoryType::P get (const Id aid = NULL_ID) noexcept
+                {
+                    return mfactory.get (aid);
+                }
+                void _run()
+			    {
+				    for (Int i = 0; i < mdata.mindex; ++i)
+				    {
+					    mdata.mcommands[i]->run();
+				    }
+			    }
+			    void _undo() const
+			    {
+                    for (Int i = 0; i < mdata.mindex; ++i)
+                    {
+					    mdata.mcommands[i]->undo();
+				    }
+			    }
+			
+                /// <summary>
+			    /// Adds the command to the composite.
+			    /// The CompositeCommand will take ownership of the command.
+			    /// </summary>
+			    /// <param name="cmd">Pointer to the command to be added.</param>
+			    void add (Command* cmd) { mdata.add (cmd); }
+
+                Ptr clone () const noexcept 
+                {
+				    // Create a new CompositeCommand instance using Ptr and make_shared with the current id and mdata.
+				    Ptr pcc = std::make_shared<CompositeCommand>(id());
+                    pcc->mdata.mindex = mdata.mindex;
+
+                    // Clone all commands and add to the newly created composite.
+                    for (size_t i = 0; i < mdata.mindex; ++i)
+                    {
+                        pcc->add((Command*)mdata.mcommands[i]->clone().get ());
+                    }
+				    return pcc;
+                }
+
+                virtual bool equals(const Object& o) const noexcept
+                {
+                    const CompositeCommand* pother = dynamic_cast<const CompositeCommand*>(&o);
+                    if (pother == nullptr)
                         return false;
-				}
-                return true;
-            }
-            inline virtual std::istream& binary_read(std::istream& is, const std::endian& byte_order = std::endian::native)
-            {
-                Object::binary_read(is, byte_order);
-                info_ptr()->test_class_name_and_version (is, byte_order);
-				is.read((char*)(&mdata), DATA_SIZE);
-				for (size_t i = 0; i < mdata.mindex; ++i)
-				{
-					mdata.mcommands[i] = new Command ();
-					mdata.mcommands[i]->binary_read(is, byte_order);
-				}
-				return is;
-			}
-
-            inline virtual std::ostream& binary_write(std::ostream& os, const std::endian& byte_order = std::endian::native) const
-            {
-                Object::binary_write(os, byte_order);
-                info_ptr()->binary_write(os, byte_order);
-				for (size_t i = 0; i < mdata.mindex; ++i)
+                    if (o.id () != id ())
+					    return false;
+                    for (size_t i = 0; i < mdata.mindex; ++i)
+                    {
+                        if (!mdata.mcommands[i]->equals(*pother->mdata.mcommands[i]))
+                            return false;
+				    }
+                    return true;
+                }
+                inline virtual std::istream& binary_read(std::istream& is, const std::endian& byte_order = std::endian::native)
                 {
-                    mdata.mcommands[i]->binary_write(os, byte_order);
-				}
-                return os;
-			}
+                    Object::binary_read(is, byte_order);
+                    info_ptr()->test_class_name_and_version (is, byte_order);
+				    is.read((char*)(&mdata), DATA_SIZE);
+				    for (size_t i = 0; i < mdata.mindex; ++i)
+				    {
+					    mdata.mcommands[i] = new Command ();
+					    mdata.mcommands[i]->binary_read(is, byte_order);
+				    }
+				    return is;
+			    }
+
+                inline virtual std::ostream& binary_write(std::ostream& os, const std::endian& byte_order = std::endian::native) const
+                {
+                    Object::binary_write(os, byte_order);
+                    info_ptr()->binary_write(os, byte_order);
+				    for (size_t i = 0; i < mdata.mindex; ++i)
+                    {
+                        mdata.mcommands[i]->binary_write(os, byte_order);
+				    }
+                    return os;
+			    }
         };
  
     }

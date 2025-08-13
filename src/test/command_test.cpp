@@ -45,6 +45,14 @@ namespace pensar_digital
 				inline Ptr clone() const noexcept { return pd::clone<IncCmd>(*this, id()); }
 				inline void _run() { ++value; }
 				inline void _undo() const { --value; }
+
+				inline virtual MemoryBuffer::Ptr bytes() const noexcept
+				{
+					MemoryBuffer::Ptr mb = std::make_unique<MemoryBuffer>(size());
+					mb->append(Command::bytes());
+					mb->append(INFO.bytes());
+					return mb;
+				}
 		};
 
 		class DecCmd : public Command
@@ -79,6 +87,13 @@ namespace pensar_digital
 
 				void _run() { --value; }
 				void _undo() const { ++value; }
+				inline virtual MemoryBuffer::Ptr bytes() const noexcept
+				{
+					MemoryBuffer::Ptr mb = std::make_unique<MemoryBuffer>(size());
+					mb->append(Command::bytes());
+					mb->append(INFO.bytes());
+					return mb;
+				}
 		};
 
 		class IncFailCmd : public Command
@@ -111,6 +126,13 @@ namespace pensar_digital
 
 			void _run() { throw "IncFailCmd.run () error."; }
 			void _undo() const { --value; }
+			inline virtual MemoryBuffer::Ptr bytes() const noexcept
+			{
+				MemoryBuffer::Ptr mb = std::make_unique<MemoryBuffer>(size());
+				mb->append(Command::bytes());
+				mb->append(INFO.bytes());
+				return mb;
+			}
 		};
 
 
@@ -144,6 +166,13 @@ namespace pensar_digital
 				virtual Ptr clone() const noexcept { return pd::clone<DoubleCmd>(*this, id()); }
 				void _run() { value *= 2; }
 				void _undo() const { value /= 2; }
+				inline virtual MemoryBuffer::Ptr bytes() const noexcept
+				{
+					MemoryBuffer::Ptr mb = std::make_unique<MemoryBuffer>(size());
+					mb->append(Command::bytes());
+					mb->append(INFO.bytes());
+					return mb;
+				}
 		};
 
 		class DoubleFailCmd : public Command
@@ -177,6 +206,13 @@ namespace pensar_digital
 				Ptr clone() const noexcept { return pd::clone<DoubleFailCmd>(*this, id()); }
 				void _run() { throw "Double errors."; }
 				void _undo() const { value /= 2; }
+				inline virtual MemoryBuffer::Ptr bytes() const noexcept
+				{
+					MemoryBuffer::Ptr mb = std::make_unique<MemoryBuffer>(size());
+					mb->append(Command::bytes());
+					mb->append(INFO.bytes());
+					return mb;
+				}
 		};
 
 		TEST(Command, true)
@@ -288,22 +324,30 @@ namespace pensar_digital
 			CHECK_EQ(Cmd, cmd, cmd2, W("1"));
 			TEST_END(CommandBinaryFileStreaming)
 
-		TEST(CompositeCommandBinaryStreaming, false)
+		
+			TEST (CompositeCommandClone, true)
+				using Cmd = CompositeCommand;
+				Cmd cmd;
+				Cmd cmd2;
+				CHECK_NOT_EQ(Cmd, cmd, cmd2, W("0"));
+				Cmd::Ptr cmd3 = cmd.clone();
+				Cmd& cmd4 = *cmd3;
+				CHECK_EQ(Cmd, cmd4, cmd, W("1"));
+			TEST_END(CompositeCommandClone)
+
+
+			TEST(CompositeCommandBinaryStreaming, true)
 			using Cmd = CompositeCommand;
 
 			Cmd cmd;
 			Cmd cmd2;
 			CHECK_NOT_EQ(Cmd, cmd, cmd2, W("0"));
-			Cmd::Ptr cmd3 = cmd.clone();
-			Cmd& cmd4 = *cmd3;
-			CHECK_EQ(Cmd, cmd4, cmd, W("1"));
 
-			MemoryBuffer mb(cmd);
+			MemoryBuffer::Ptr mb_ptr = cmd.bytes ();
 
-			Cmd cmd5;
-			cmd5.assign(mb);
+			cmd2.assign(*mb_ptr);
 
-			CHECK_EQ(Cmd, cmd5, cmd, W("1"));
+			CHECK_EQ(Cmd, cmd2, cmd, W("1"));
 
 
 			//Cmd::Factory::P p3 = buffer.CreateAndAddObj();

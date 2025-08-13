@@ -183,14 +183,14 @@ namespace pensar_digital
             inline const BytePtr object_data_bytes() const noexcept { return (BytePtr)&mdata; }
             inline const size_t object_data_size() const noexcept { return sizeof(mdata); }
 
-            virtual const pd::Data* data() const noexcept { return &mdata; }
-            virtual const BytePtr data_bytes() const noexcept { return (BytePtr)&mdata; }
+            virtual const pd::Data* data() const noexcept { return &this->mdata; }
+            virtual const BytePtr data_bytes() const noexcept { return (BytePtr)&this->mdata; }
 
             inline static constexpr size_t DATA_SIZE = sizeof(mdata);
-            inline static constexpr size_t      SIZE = DATA_SIZE + sizeof(Id) + sizeof(ClassInfo);
+            inline static constexpr size_t      SIZE = DATA_SIZE + sizeof(ClassInfo);
 
-            virtual size_t data_size() const noexcept { return sizeof(mdata); }
-            virtual size_t size() const noexcept { return data_size() + sizeof(Id) + sizeof(ClassInfo); }
+            virtual size_t data_size() const noexcept { return sizeof(this->mdata); }
+            virtual size_t size() const noexcept { return data_size() + sizeof(ClassInfo); }
         protected:
             /// Set id
             /// \param val New value to set
@@ -225,23 +225,21 @@ namespace pensar_digital
 
             virtual Object& assign(const Object& o) noexcept { std::memcpy((void*)data(), ((Object&)o).data(), data_size()); return *this; }
             virtual Object& assign(const Object&& o) noexcept { std::memmove((void*)data(), ((Object&)o).data(), data_size()); return *this; }
-            virtual Object& assign(MemoryBuffer& mb)
-            {
-				// Verifies if it is the correct class and version.
-                if (mb.size() < SIZE)
-					log_throw(W("MemoryBuffer size is smaller than Object size."));
-				info_ptr()->test_class_name_and_version(mb);
-                mb.read_known_size(data_bytes(), data_size());
-                return *this;
-            }
-
-            Object& object_assign(MemoryBuffer& mb) noexcept
+           Object& object_assign(MemoryBuffer& mb) noexcept
             {
                 INFO.test_class_name_and_version (mb);
                 mb.read_known_size(object_data_bytes(), DATA_SIZE);
                 return *this;
             }
+            virtual Object& assign(MemoryBuffer& mb)
+            {
+				// Verifies if it is the correct class and version.
+                if (mb.size() < SIZE)
+					log_throw(W("MemoryBuffer size is smaller than Object size."));
+				return object_assign (mb);
+            }
 
+ 
             Object& object_assign(const Object& o) noexcept {
                 mdata = o.mdata;
                 return *this;
@@ -282,10 +280,7 @@ namespace pensar_digital
             /// \brief Returns a MemoryBuffer::Ptr with the object data.
             inline virtual MemoryBuffer::Ptr bytes() const noexcept
             {
-                MemoryBuffer::Ptr mb = std::make_unique<MemoryBuffer>(size());
-                mb->append((BytePtr)info_ptr(), sizeof(ClassInfo));
-                mb->append((BytePtr(&mdata)), data_size());
-                return mb;
+               return object_bytes ();
             }
 
             // Implicit convertion to MemoryBuffer::Ptr.
@@ -425,7 +420,7 @@ namespace pensar_digital
 
             inline std::istream& bin_read(std::istream& is, const std::endian& byte_order = std::endian::native)
             {
-                info_ptr()->test_class_name_and_version(is, byte_order); 
+                INFO.test_class_name_and_version(is, byte_order); 
                 is.read((char*)(&mdata), DATA_SIZE);
                 return is;
             }
