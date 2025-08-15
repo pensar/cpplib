@@ -15,7 +15,6 @@
 #include "object.hpp"
 #include "concept.hpp" // Identifiable
 #include "generator.hpp"
-#include "version.hpp"
 #include "factory.hpp"
 #include "bool.hpp"
 #include "memory_buffer.hpp"

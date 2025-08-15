@@ -6,7 +6,6 @@
 
 #include "string_def.hpp"
 #include "object.hpp"
-#include "version.hpp"
 #include "log.hpp"
 
 #include <stdexcept>
@@ -56,7 +55,7 @@ namespace pensar_digital
         class Error : public Object
         {
             public:
-                inline static const Version::Ptr VERSION = pd::Version::get (1, 1, 1);
+                
                 Error (const S& error_msg, const Id aid = 0): Object (aid), error_message (error_msg) {}
 
             const S& get_error_message () const { return error_message; } ;
@@ -84,13 +83,6 @@ namespace pensar_digital
 
         inline OutStream& operator<< (OutStream& os, const Error& e) { return e.write (os); }
         inline InStream&  operator>> (InStream&  is,       Error& e) { return e.read  (is); }
-
-        class UnsupportedVersion : public Error
-        {
-            public:
-                inline static const Version::Ptr VERSION = pd::Version::get (1, 1, 1);
-                UnsupportedVersion (const Version v): Error (W("Unsupported version number: ") + v.to_string ()){};
-        };
 
         inline static void log_and_throw(const S& error_msg = W("")) 
         {

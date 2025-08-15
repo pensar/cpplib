@@ -437,7 +437,8 @@ namespace pensar_digital
             inline virtual std::istream& binary_read(std::istream& is, const std::endian& byte_order = std::endian::native)
             {
                 //read_bin_obj(is, byte_order);
-                bin_read(is, byte_order);
+                INFO.test_class_name_and_version(is, byte_order);
+                is.read((char*)(&mdata), DATA_SIZE);
                 info_ptr ()->test_class_name_and_version (is, byte_order);
                 is.read((char*)data(), data_size());
                 return is;

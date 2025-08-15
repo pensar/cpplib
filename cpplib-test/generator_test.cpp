@@ -5,7 +5,6 @@
 #include "../src/generator.hpp"
 #include "../src/memory_buffer.hpp"
 
-#include "../src/trivially_persistable_memory_buffer.hpp"
 #include "../src/concept.hpp"
 
 #include <sstream>
@@ -98,9 +97,9 @@ namespace pensar_digital
             G g3(3);
             CHECK_NOT_EQ(G, g3, g, W("0"));
             CHECK_EQ(G, *pg2, g, W("1"));
-            CHECK_EQ(Version::Int, pg2->INFO.mpublic_interface_version, 2, W("2"));
-            CHECK_EQ(Version::Int, pg2->INFO.mprotected_interface_version, 1, W("3"));
-            CHECK_EQ(Version::Int, pg2->INFO.mprivate_interface_version, 1, W("4"));
+            CHECK_EQ(VersionInt, pg2->INFO.mpublic_interface_version, 2, W("2"));
+            CHECK_EQ(VersionInt, pg2->INFO.mprotected_interface_version, 1, W("3"));
+            CHECK_EQ(VersionInt, pg2->INFO.mprivate_interface_version, 1, W("4"));
 
         TEST_END(GeneratorFileBinaryStreaming)
 

@@ -40,7 +40,9 @@ namespace pensar_digital
 				using Ptr = std::shared_ptr<Dummy>;
                     typedef pd::Factory<Dummy, Id, S> Factory;
                     inline static Factory factory = {3, 10, NULL_ID, EMPTY};
-                    inline static const Version::Ptr VERSION = pd::Version::get (1, 1, 1);
+                    inline static const ClassInfo INFO = { CPPLIB_NAMESPACE, W("Dummy"), 1, 1, 1 };
+                    inline virtual const ClassInfo* info_ptr() const noexcept { return &INFO; }
+
                     virtual const pd::Data* data() const noexcept { return &mdata; }
                     virtual size_t data_size() const noexcept { return mdata.data_size (); }
 

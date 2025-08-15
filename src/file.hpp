@@ -18,8 +18,7 @@
 
 #include "s.hpp"
 #include "object.hpp"
-#include "path.hpp"
-#include "version.hpp"  
+#include "path.hpp"  
 #include "generator.hpp"
 #include "memory_buffer.hpp"
 #include "random_util.hpp"
@@ -406,7 +405,8 @@ namespace pensar_digital
         {
             private:
             public:
-                inline static const Version::Ptr VERSION = Version::get(1, 1, 1);
+                inline static const ClassInfo INFO = { CPPLIB_NAMESPACE, W("TextFile"), 1, 1, 1 };
+                inline virtual const ClassInfo* info_ptr() const noexcept { return &INFO; }
                 TextFile(const Path& full_path, const S& content = EMPTY,
                     const TextMode mode = OpenMode::DEFAULT_TEXT_MODE, const Id id = NULL_ID) : File(full_path, id, mode)
                 {
@@ -654,8 +654,9 @@ namespace pensar_digital
         class TmpTextFile : public TextFile
         {
 			public:
-				inline static const Version::Ptr VERSION = Version::get(1, 1, 1);
-                inline TmpTextFile (const S& file_name = EMPTY, const S& content = EMPTY, const Id id = null_value<Id>()) : 
+                inline static const ClassInfo INFO = { CPPLIB_NAMESPACE, W("TmpTextFile"), 1, 1, 1 };
+                inline virtual const ClassInfo* info_ptr() const noexcept { return &INFO; }
+                inline TmpTextFile (const S& file_name = EMPTY, const S& content = EMPTY, const Id id = null_value<Id>()) :
                     TextFile(TMP_PATH / file_name, content, OpenMode::DEFAULT_TEXT_MODE, id)
                 {
 				}
@@ -682,8 +683,9 @@ namespace pensar_digital
         {
 			private:
 			public:
-				inline static const Version::Ptr VERSION = Version::get(1, 1, 1);
-			private:
+                inline static const ClassInfo INFO = { CPPLIB_NAMESPACE, W("BinaryFile"), 1, 1, 1 };
+                inline virtual const ClassInfo* info_ptr() const noexcept { return &INFO; }
+        private:
                 inline BinaryFile (const Path&                   full_path,
                             const OpenMode mode                     = OpenMode::DEFAULT_BIN_MODE,
                             const BytePtr                 data      = nullptr, 

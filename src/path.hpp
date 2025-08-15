@@ -9,7 +9,6 @@
 
 #include "memory.hpp"
 #include "constant.hpp"
-#include "version.hpp"
 #include "concept.hpp"
 #include "io_util.hpp"
 #include "clone_util.hpp"
@@ -39,7 +38,8 @@ namespace pensar_digital
             private:
                 inline static PathFactory mfactory = { 3, 10, W("."), null_value<Id>()};
             public:
-                inline static const Version::Ptr VERSION = pd::Version::get (1, 1, 1);
+                inline static const ClassInfo INFO = { CPPLIB_NAMESPACE, W("Path"), 1, 1, 1 };
+                inline virtual const ClassInfo* info_ptr() const noexcept { return &INFO; }
 
             Path(const fs::path& p = W("."), const Id& id = null_value<Id>()) : Object(id), fs::path(p) {}
             Path(const std::string& s, const Id& id = null_value<Id>()) : Object(id), fs::path(s) {}
@@ -203,7 +203,7 @@ namespace pensar_digital
             virtual std::ostream& binary_write(std::ostream& os, const std::endian& byte_order = std::endian::native) const
             {
                 Object::binary_write(os, byte_order);
-                VERSION->binary_write(os, byte_order);
+                INFO.binary_write(os, byte_order);
                 os.write((const char*)data(), data_size());
                 return os;
             };

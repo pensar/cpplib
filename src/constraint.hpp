@@ -5,7 +5,6 @@
 #define CONSTRAINT_HPP
 
 #include "object.hpp"
-#include "version.hpp"
 #include "constant.hpp"
 
 #include <cstdarg>
@@ -26,7 +25,9 @@ namespace pensar_digital
 		class Operand : public Object
 		{
 			public:
-				inline static const Version::Ptr VERSION = pd::Version::get(1, 1, 1);
+				inline static const ClassInfo INFO = { CPPLIB_NAMESPACE, W("Operand"), 1, 1, 1 };
+				inline virtual const ClassInfo* info_ptr() const noexcept { return &INFO; }
+
 				Operand (const Id aid = NULL_ID) : Object(aid) {}
 				
 				template <typename ... Args>
@@ -44,7 +45,8 @@ namespace pensar_digital
 				typedef UnaryOperand<T, ResultType, D> UnaryOp;
 				typedef Operand <T, T, ResultType, UnaryOp> Base;
 			public:
-				inline static const Version::Ptr VERSION = pd::Version::get(1, 1, 1);
+				inline static const ClassInfo INFO = { CPPLIB_NAMESPACE, W("UnaryOperand"), 1, 1, 1 };
+				inline virtual const ClassInfo* info_ptr() const noexcept { return &INFO; }
 
 				UnaryOperand (const Id aid = NULL_ID) : Base(aid) {}
 				
@@ -63,8 +65,9 @@ namespace pensar_digital
 			private:
 				typedef UnaryOperand<T, bool, NotOperand<T>> Base;
 			public:
-				inline static const Version::Ptr VERSION = pd::Version::get(1, 1, 1);
-				
+				inline static const ClassInfo INFO = { CPPLIB_NAMESPACE, W("NotOperand"), 1, 1, 1 };
+				inline virtual const ClassInfo* info_ptr() const noexcept { return &INFO; }
+
 				NotOperand (const Id aid = NULL_ID) : Base(aid) {}
 			
 				virtual ~NotOperand() {}
@@ -82,7 +85,8 @@ namespace pensar_digital
 			private:
 				typedef Operand<L, R, ResultType, BinaryOperand<L, R, ResultType, D>> Base;
 			public:
-				inline static const Version::Ptr VERSION = pd::Version::get(1, 1, 1);
+				inline static const ClassInfo INFO = { CPPLIB_NAMESPACE, W("BinaryOperand"), 1, 1, 1 };
+				inline virtual const ClassInfo* info_ptr() const noexcept { return &INFO; }
 				BinaryOperand (const Id aid = NULL_ID) : Base (aid) {}
 				virtual ~BinaryOperand() {}
 
@@ -100,7 +104,8 @@ namespace pensar_digital
 				typedef BinaryOperand<L, R, bool, AndOperand<L, R>> Base;
 			
 			public:
-				inline static const Version::Ptr VERSION = pd::Version::get(1, 1, 1);
+				inline static const ClassInfo INFO = { CPPLIB_NAMESPACE, W("AndOperand"), 1, 1, 1 };
+				inline virtual const ClassInfo* info_ptr() const noexcept { return &INFO; }
 				AndOperand (const Id aid = NULL_ID) noexcept : Base (aid) {}
 			
 				virtual ~AndOperand() {}
@@ -120,7 +125,8 @@ namespace pensar_digital
 			typedef BinaryOperand<L, R, bool, OrOperand<L, R>> Base;
 
 		public:
-			inline static const Version::Ptr VERSION = pd::Version::get(1, 1, 1);
+			inline static const ClassInfo INFO = { CPPLIB_NAMESPACE, W("OrOperand"), 1, 1, 1 };
+			inline virtual const ClassInfo* info_ptr() const noexcept { return &INFO; }
 			OrOperand(const Id aid = NULL_ID) noexcept : Base(aid) {}
 
 			virtual ~OrOperand() {}
@@ -140,7 +146,8 @@ namespace pensar_digital
 			typedef BinaryOperand<L, R, bool, XorOperand<L, R>> Base;
 
 		public:
-			inline static const Version::Ptr VERSION = pd::Version::get (1, 1, 1);
+			inline static const ClassInfo INFO = { CPPLIB_NAMESPACE, W("XorOperand"), 1, 1, 1 };
+			inline virtual const ClassInfo* info_ptr() const noexcept { return &INFO; }
 			XorOperand(const Id aid = NULL_ID) noexcept : Base(aid) {}
 
 			virtual ~XorOperand() {}
@@ -165,7 +172,8 @@ namespace pensar_digital
 			S name;
 
 			public:
-				inline static const Version::Ptr VERSION = pd::Version::get (1, 1, 1);
+				inline static const ClassInfo INFO = { CPPLIB_NAMESPACE, W("Constraint"), 1, 1, 1 };
+				inline virtual const ClassInfo* info_ptr() const noexcept { return &INFO; }
 				//typedef IConstraint<Constraint>     I; // Interface type.
 				//typedef IConstraintRO<Constraint> IRO; // Read only interface type.
 
@@ -240,8 +248,9 @@ namespace pensar_digital
 				const R& right;
 				OpType op;
 			public:
-				inline static const Version::Ptr VERSION = pd::Version::get (1, 1, 1);
-				
+				inline static const ClassInfo INFO = { CPPLIB_NAMESPACE, W("CompositeConstraint"), 1, 1, 1 };
+				inline virtual const ClassInfo* info_ptr() const noexcept { return &INFO; }
+
 				CompositeConstraint (const L&    aleft,
 									 const R&  aright,
 									 const OpType aop,
@@ -291,7 +300,8 @@ namespace pensar_digital
 				const std::basic_regex <C> regex;
 
 			public:
-				inline static const Version::Ptr VERSION = pd::Version::get (1, 1, 1);
+				inline static const ClassInfo INFO = { CPPLIB_NAMESPACE, W("StringConstraint"), 1, 1, 1 };
+				inline virtual const ClassInfo* info_ptr() const noexcept { return &INFO; }
 
 				/// Default constructor
 				StringConstraint (const S& aregex = W(""), const Id aid = NULL_ID, const S& aname = W(""))
@@ -316,7 +326,8 @@ namespace pensar_digital
 				const T mmax;
 
 			public:
-				inline static const Version::Ptr VERSION = pd::Version::get (1, 1, 1);
+				inline static const ClassInfo INFO = { CPPLIB_NAMESPACE, W("RangeConstraint"), 1, 1, 1 };
+				inline virtual const ClassInfo* info_ptr() const noexcept { return &INFO; }
 
 				/// Default constructor
 				RangeConstraint (const T& amin, const T& amax, const Id aid = NULL_ID, const S& aname = W("")) 
