@@ -436,8 +436,8 @@ namespace pensar_digital
                 }
                 inline virtual std::istream& binary_read(std::istream& is, const std::endian& byte_order = std::endian::native)
                 {
-                    Object::binary_read(is, byte_order);
-                    info_ptr()->test_class_name_and_version (is, byte_order);
+                    Command::binary_read(is, byte_order);
+                    INFO.test_class_name_and_version (is, byte_order);
 				    is.read((char*)(&mdata), DATA_SIZE);
 				    for (size_t i = 0; i < mdata.mindex; ++i)
 				    {
@@ -449,8 +449,8 @@ namespace pensar_digital
 
                 inline virtual std::ostream& binary_write(std::ostream& os, const std::endian& byte_order = std::endian::native) const
                 {
-                    Object::binary_write(os, byte_order);
-                    info_ptr()->binary_write(os, byte_order);
+                    Command::binary_write(os, byte_order);
+                    INFO.binary_write(os, byte_order);
 				    for (size_t i = 0; i < mdata.mindex; ++i)
                     {
                         mdata.mcommands[i]->binary_write(os, byte_order);

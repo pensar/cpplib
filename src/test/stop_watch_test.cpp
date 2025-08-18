@@ -2,9 +2,9 @@
 // license: MIT (https://opensource.org/licenses/MIT)
 
 #include "../../../unit_test/src/test.hpp"
-#include "../../src/s.hpp"
-#include "../../src/stop_watch.hpp"
-#include "../../src/constraint.hpp"
+#include "../s.hpp"
+#include "../stop_watch.hpp"
+#include "../constraint.hpp"
 #include <thread>
 #include <chrono>
 

@@ -1,9 +1,10 @@
 // author : Mauricio Gomes
 // license: MIT (https://opensource.org/licenses/MIT)
 
-#include "..\unit-test\test\test.hpp"
+#include "../../../unit_test/src/test.hpp"
 
-#include "../cpplib/cpp//path.hpp"
+
+#include "../path.hpp"
 
 namespace pensar_digital
 {

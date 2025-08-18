@@ -52,6 +52,22 @@ namespace pensar_digital
 					mb->append(INFO.bytes());
 					return mb;
 				}
+
+				inline virtual std::ostream& binary_write(std::ostream& os, const std::endian& byte_order = std::endian::native) const
+				{
+					Command::binary_write(os, byte_order);
+					INFO.binary_write(os, byte_order);
+
+					return os;
+				}
+
+				inline virtual std::istream& binary_read(std::istream& is, const std::endian& byte_order = std::endian::native)
+				{
+					Command::binary_read(is, byte_order);
+					INFO.test_class_name_and_version(is, byte_order);
+
+					return is;
+				}
 		};
 
 		class DecCmd : public Command
@@ -93,6 +109,22 @@ namespace pensar_digital
 					mb->append(INFO.bytes());
 					return mb;
 				}
+
+				inline virtual std::ostream& binary_write(std::ostream& os, const std::endian& byte_order = std::endian::native) const
+				{
+					Command::binary_write(os, byte_order);
+					INFO.binary_write(os, byte_order);
+
+					return os;
+				}
+
+				inline virtual std::istream& binary_read(std::istream& is, const std::endian& byte_order = std::endian::native)
+				{
+					Command::binary_read(is, byte_order);
+					INFO.test_class_name_and_version(is, byte_order);
+
+					return is;
+				}
 		};
 
 		class IncFailCmd : public Command
@@ -131,6 +163,22 @@ namespace pensar_digital
 				mb->append(Command::bytes());
 				mb->append(INFO.bytes());
 				return mb;
+			}
+
+			inline virtual std::ostream& binary_write(std::ostream& os, const std::endian& byte_order = std::endian::native) const
+			{
+				Command::binary_write(os, byte_order);
+				INFO.binary_write(os, byte_order);
+
+				return os;
+			}
+
+			inline virtual std::istream& binary_read(std::istream& is, const std::endian& byte_order = std::endian::native)
+			{
+				Command::binary_read(is, byte_order);
+				INFO.test_class_name_and_version(is, byte_order);
+
+				return is;
 			}
 		};
 
@@ -172,6 +220,22 @@ namespace pensar_digital
 					mb->append(INFO.bytes());
 					return mb;
 				}
+
+				inline virtual std::ostream& binary_write(std::ostream& os, const std::endian& byte_order = std::endian::native) const
+				{
+					Command::binary_write(os, byte_order);
+					INFO.binary_write(os, byte_order);
+
+					return os;
+				}
+
+				inline virtual std::istream& binary_read(std::istream& is, const std::endian& byte_order = std::endian::native)
+				{
+					Command::binary_read(is, byte_order);
+					INFO.test_class_name_and_version(is, byte_order);
+
+					return is;
+				}
 		};
 
 		class DoubleFailCmd : public Command
@@ -211,6 +275,22 @@ namespace pensar_digital
 					mb->append(Command::bytes());
 					mb->append(INFO.bytes());
 					return mb;
+				}
+
+				inline virtual std::ostream& binary_write(std::ostream& os, const std::endian& byte_order = std::endian::native) const
+				{
+					Command::binary_write(os, byte_order);
+					INFO.binary_write(os, byte_order);
+
+					return os;
+				}
+
+				inline virtual std::istream& binary_read(std::istream& is, const std::endian& byte_order = std::endian::native)
+				{
+					Command::binary_read(is, byte_order);
+					INFO.test_class_name_and_version(is, byte_order);
+
+					return is;
 				}
 		};
 

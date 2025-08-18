@@ -1,43 +1,35 @@
-// $Id$
+// author : Mauricio Gomes
+// license: MIT (https://opensource.org/licenses/MIT)
 
-#include <cmath>
-#include <boost/test/unit_test.hpp>
+#include "../../../unit_test/src/test.hpp"
+
+
+#include "../statistic.hpp"
 #include "../random_util.hpp"
-#include "../log.hpp"
 
-namespace cpp = pensar_digital::cpplib;
+using namespace pensar_digital::cpplib;
 
-BOOST_AUTO_TEST_SUITE(random_util_suite)
-
-BOOST_AUTO_TEST_CASE(random_test)
+namespace pensar_digital
 {
-  cpp::CRandom r(0, 9);
+    namespace test = pensar_digital::unit_test;
+    using namespace pensar_digital::unit_test;
+    namespace cpplib
+    {
+        TEST(RandomUtilTest, true)
 
-  int a[10];
+            CRandom r(0, 9);
+        const int N = 100000;
+        int a[N];
 
-  for (unsigned i = 0; i < 10; ++i)
-    a[i] = 0;
+        for (int i = 0; i < N; ++i)
+        {
+            a[i] = r.get();
+        }
 
-  for (unsigned i = 0; i < 10000; ++i)
-  {
-      unsigned u = r.get ();
-      a[u]++;
-  }
+        // Calculates the standard deviation on a.
+        auto sd = pensar_digital::cpplib::standard_deviation(a, a + N);
+        CHECK(sd < 3, "Standard deviation is too high.");
 
-  double variance = 0.0;
-
-  for (unsigned i = 0; i < 10; ++i)
-  {
-      variance += pow(a[i] - 1000, 2);
-  }
-
-  variance /= 10;
-
-  double standard_deviation = sqrt (variance);
-
-  //cpplog << "standard deviation = " << standard_deviation << std::endl;
-
-  BOOST_CHECK (standard_deviation < 50);
+        TEST_END(RandomUtilTest)
+    }
 }
-
-BOOST_AUTO_TEST_SUITE_END ()
