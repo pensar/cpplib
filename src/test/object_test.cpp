@@ -67,7 +67,7 @@ namespace pensar_digital
 
             for (Id i = 0; i < N; i++)
             {
-				objects[i]->bin_write(out);
+				objects[i]->binary_write(out);
             }
 			out.close();
 
@@ -75,7 +75,7 @@ namespace pensar_digital
             for (Id i = 0; i < N; i++)
             {
 				Object::Ptr o = pd::Object::get();
-				o->bin_read(in);
+				o->binary_read(in);
                 Object::Ptr o1 = pd::Object::get(i);
                 CHECK_EQ(Object, *o, *o1, pd::to_string(i));
             }

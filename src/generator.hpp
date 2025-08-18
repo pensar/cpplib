@@ -150,16 +150,10 @@ namespace pensar_digital
             /// \param val New value to set
             inline virtual void set_value(T val) { mdata.mvalue = val; }
 
-            /*
             virtual std::istream& binary_read(std::istream& is, const std::endian& byte_order = std::endian::native)
             {
-                    //read_bin_obj (is, byte_order);
-                    //read_bin_version (is, byte_order);
-                    //binary_read<decltype (mdata.minitial_value)> (is, mdata.minitial_value, byte_order);
-                    //binary_read<decltype (mdata.mvalue        )> (is, mdata.mvalue        , byte_order);   
-                    //binary_read<decltype (mdata.mstep         )> (is, mdata.mstep         , byte_order);   
                 Object::binary_read (is, byte_order);
-                read_bin_version(is, *VERSION, byte_order);
+                INFO.test_class_name_and_version (is, byte_order);
                 is.read((char*)data(), data_size());
                 return is;
             };
@@ -167,15 +161,11 @@ namespace pensar_digital
             virtual std::ostream& binary_write(std::ostream& os, const std::endian& byte_order = std::endian::native) const
             {
                 Object::binary_write(os, byte_order);
-                VERSION->binary_write(os, byte_order);
+                INFO.binary_write(os, byte_order);
                 os.write((const char*)data(), data_size());
-                //binary_write<decltype (mdata.minitial_value)> (os, mdata.minitial_value, byte_order);
-                //binary_write<decltype (mdata.mvalue)>         (os, mdata.mvalue        , byte_order);
-                //binary_write<decltype (mdata.mstep )>         (os, mdata.mstep         , byte_order);
-                //VERSION->write(os, amode, byte_order);
                 return os;
             };
-            */
+
             void set_id (const T& aid) { Object::set_id (aid); }
 
            

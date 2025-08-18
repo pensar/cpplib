@@ -358,13 +358,6 @@ namespace pensar_digital
                 return true;
             }
 
-            inline std::ostream& bin_write(std::ostream& os, const std::endian& byte_order = std::endian::native) const
-            {
-                INFO.binary_write (os, byte_order);
-                os.write((const char*)(&mdata), DATA_SIZE);
-                return os;
-            };
-
             inline bool operator == (const Object& o) const { return  equals(o); }
             inline bool operator != (const Object& o) const { return !equals(o); }
 
@@ -426,21 +419,10 @@ namespace pensar_digital
                 return write(os);
             }
 
-            inline std::istream& bin_read(std::istream& is, const std::endian& byte_order = std::endian::native)
+             inline virtual std::istream& binary_read(std::istream& is, const std::endian& byte_order = std::endian::native)
             {
-                INFO.test_class_name_and_version(is, byte_order); 
-                is.read((char*)(&mdata), DATA_SIZE);
-                return is;
-            }
-
-            // implements input stream member virtual std::istream& Object::read(std::istream& is)
-            inline virtual std::istream& binary_read(std::istream& is, const std::endian& byte_order = std::endian::native)
-            {
-                //read_bin_obj(is, byte_order);
                 INFO.test_class_name_and_version(is, byte_order);
                 is.read((char*)(&mdata), DATA_SIZE);
-                info_ptr ()->test_class_name_and_version (is, byte_order);
-                is.read((char*)data(), data_size());
                 return is;
             };
 
@@ -448,9 +430,6 @@ namespace pensar_digital
             {
                 INFO.binary_write(os, byte_order);
                 os.write((const char*)(&mdata), DATA_SIZE);
-          
-                info_ptr ()->binary_write(os, byte_order);   
-                os.write((const char*)data(), data_size());         
                 return os;
             }
         };  //  class Object.
