@@ -446,9 +446,11 @@ namespace pensar_digital
 
             inline virtual std::ostream& binary_write(std::ostream& os, const std::endian& byte_order = std::endian::native) const
             {
-                bin_write(os, byte_order);                          // Writes Object.
-                info_ptr ()->binary_write(os, byte_order);   // Writes the polymorphic Version.
-                os.write((const char*)data(), data_size());         // Writes the polymorphic data.
+                INFO.binary_write(os, byte_order);
+                os.write((const char*)(&mdata), DATA_SIZE);
+          
+                info_ptr ()->binary_write(os, byte_order);   
+                os.write((const char*)data(), data_size());         
                 return os;
             }
         };  //  class Object.
