@@ -82,7 +82,7 @@ namespace pensar_digital
             virtual const BytePtr data_bytes() const noexcept { return (BytePtr)data(); }
 
             virtual size_t data_size() const noexcept { return sizeof(mdata); }
-			virtual size_t size() const noexcept { return data_size() + sizeof(ClassInfo) + Object::SIZE; } // ->version()->size(); }
+			virtual size_t size() const noexcept { return data_size() + sizeof(ClassInfo) + Object::SIZE; }
             
             using G = Generator<Command, Id>; //!< Generator alias.
 
@@ -178,7 +178,7 @@ namespace pensar_digital
 				INFO.binary_write(os, byte_order);
 				os.write((char*)&mdata, DATA_SIZE);
 				mgenerator.binary_write(os, byte_order);
-				child_binary_write(os, byte_order); // Call to child class binary_write.
+				
 				return os;
 			}
 
@@ -188,7 +188,7 @@ namespace pensar_digital
 				INFO.test_class_name_and_version(is, byte_order);
                 is.read((char*)&mdata, DATA_SIZE);
                 mgenerator.binary_read(is, byte_order);
-                child_binary_read(is, byte_order); // Call to child class binary_read.
+                
                 return is;
 			}
 
@@ -239,6 +239,22 @@ namespace pensar_digital
                 inline virtual const ClassInfo* info_ptr() const noexcept { return &INFO; }
 
 				Ptr clone() const noexcept { return pd::clone<NullCommand>(*this); }
+
+                inline virtual std::ostream& binary_write(std::ostream& os, const std::endian& byte_order = std::endian::native) const
+                {
+                    Command::binary_write(os, byte_order);
+                    INFO.binary_write(os, byte_order);
+ 
+                    return os;
+                }
+
+                inline virtual std::istream& binary_read(std::istream& is, const std::endian& byte_order = std::endian::native)
+                {
+                    Command::binary_read(is, byte_order);
+                    INFO.test_class_name_and_version(is, byte_order);
+
+                    return is;
+                }
         };
         inline static const NullCommand NULL_CMD = NullCommand();
 
